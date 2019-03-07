@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "584381409493",
+    "firebase_url": "https://irecipe.firebaseio.com",
+    "project_id": "irecipe",
+    "storage_bucket": "irecipe.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:584381409493:android:c12d672efb0e321e",
+        "android_client_info": {
+          "package_name": "com.rokudoz.irecipe"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "584381409493-6fi4dqggmrtl86pkur817eiusb1a17qm.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.rokudoz.irecipe",
+            "certificate_hash": "5d52f7a8c198df9c194ee5452766a5f09217af46"
+          }
+        },
+        {
+          "client_id": "584381409493-kc27vgfp6imj2svgq61h25vsql75ar2l.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDNdZDw9SXOd-l3YGY6a2IRjr8rcZzKvZM"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "584381409493-kc27vgfp6imj2svgq61h25vsql75ar2l.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
