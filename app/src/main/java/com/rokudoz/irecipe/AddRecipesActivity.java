@@ -18,7 +18,7 @@ import java.util.Map;
 public class AddRecipesActivity extends AppCompatActivity {
 
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
-    private CollectionReference notebookRef = db.collection("Recipes");
+    private CollectionReference collectionReference = db.collection("Recipes");
 
     private EditText editTextTitle;
     private EditText editTextDescription;
@@ -48,19 +48,19 @@ public class AddRecipesActivity extends AppCompatActivity {
             tags.put(tag, true);
         }
 
-        Recipe recipe = new Recipe(title, description,tags);
+        Recipe recipe = new Recipe(title, description, tags);
 
-        notebookRef.add(recipe)
-        .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-            @Override
-            public void onSuccess(DocumentReference documentReference) {
-                Toast.makeText(AddRecipesActivity.this, "Succesfully added " + title +" to the recipes list", Toast.LENGTH_SHORT).show();
-            }
-        });
+        collectionReference.add(recipe)
+                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                    @Override
+                    public void onSuccess(DocumentReference documentReference) {
+                        Toast.makeText(AddRecipesActivity.this, "Succesfully added " + title + " to the recipes list", Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
 
-    public void backToSearch(View v){
-        Intent intent = new Intent(this,MainActivity.class);
+    public void backToSearch(View v) {
+        Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
     }
 }

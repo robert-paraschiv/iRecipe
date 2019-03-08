@@ -24,35 +24,35 @@ public class MainActivity extends AppCompatActivity {
     ArrayList<String> selectedIngredients;//-----
 
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
-    private CollectionReference notebookRef = db.collection("Recipes");
+    private CollectionReference collectionReference = db.collection("Recipes");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        selectedIngredients=new ArrayList<String>(); // -----
+        selectedIngredients = new ArrayList<String>();
 
         textViewData = findViewById(R.id.text_view_data);
 
     }
 
-    public void onStart(){ //------------------
+    public void onStart() {
         super.onStart();
         //create an instance of ListView
         ListView cbListView = findViewById(R.id.checkable_list);
         //set multiple selection mode
         cbListView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
-        String[] items = {"potatoes","cheese","apples","salt"};
+        String[] items = {"potatoes", "cheese", "apples", "salt"};
         //supply data itmes to ListView
-        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this,R.layout.checkable_list_layout,R.id.txt_title,items);
+        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, R.layout.checkable_list_layout, R.id.txt_title, items);
         cbListView.setAdapter(arrayAdapter);
         //set OnItemClickListener
-        cbListView.setOnItemClickListener(new AdapterView.OnItemClickListener(){
+        cbListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 // selected item
                 String selectedItem = ((TextView) view).getText().toString();
-                if(selectedIngredients.contains(selectedItem))
+                if (selectedIngredients.contains(selectedItem))
                     selectedIngredients.remove(selectedItem); //remove deselected item from the list of selected items
                 else
                     selectedIngredients.add(selectedItem); //add selected item to the list of selected items
@@ -65,11 +65,12 @@ public class MainActivity extends AppCompatActivity {
     public void loadNotes(View v) {
 
         String ingredientsString = "";
-        for(String ingredient : selectedIngredients){
-            if(ingredientsString == "")
+        for (String ingredient : selectedIngredients) {
+            if (ingredientsString == "") {
                 ingredientsString = ingredient;
-            else
+            } else {
                 ingredientsString += "," + ingredient;
+            }
         }
 
         String[] ingredientsArray = ingredientsString.split("\\s*,\\s*");
@@ -79,7 +80,7 @@ public class MainActivity extends AppCompatActivity {
             ingredientsHashMap.put(tag, true);
         }
 
-        notebookRef.whereEqualTo("tags", ingredientsHashMap).get()
+        collectionReference.whereEqualTo("tags", ingredientsHashMap).get()
                 .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                     @Override
                     public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
@@ -92,7 +93,7 @@ public class MainActivity extends AppCompatActivity {
                             String documentId = recipe.getDocumentId();
                             String title = recipe.getTitle();
 
-                            data += "ID: " + documentId +"\nTitle: " + title;
+                            data += "ID: " + documentId + "\nTitle: " + title;
 
                             for (String tag : recipe.getTags().keySet()) {
                                 data += "\n-" + tag;
@@ -105,7 +106,7 @@ public class MainActivity extends AppCompatActivity {
                 });
     }
 
-    public void navigateToAddRecipes(View v){
+    public void navigateToAddRecipes(View v) {
         Intent intent = new Intent(this, AddRecipesActivity.class);
         startActivity(intent);
     }
