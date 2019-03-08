@@ -2,22 +2,24 @@ package com.rokudoz.irecipe;
 
 import com.google.firebase.firestore.Exclude;
 
+import java.util.Map;
+
 public class Note {
     private String documentId;
     private String title;
     private String description;
     private int priority;
-    private int contPotatos;
+    Map<String, Boolean> tags;
 
     public Note() {
         //public no-arg constructor needed
     }
 
-    public Note(String title, String description, int priority, int contPotatos) {
+    public Note(String title, String description, int priority, Map<String, Boolean> tags) {
         this.title = title;
         this.description = description;
         this.priority = priority;
-        this.contPotatos = contPotatos;
+        this.tags = tags;
     }
 
     @Exclude
@@ -29,13 +31,6 @@ public class Note {
         this.documentId = documentId;
     }
 
-    public int getContPotatos() {
-        return contPotatos;
-    }
-
-    public void setContPotatos(int contPotatos) {
-        this.contPotatos = contPotatos;
-    }
     public String getTitle() {
         return title;
     }
@@ -48,7 +43,7 @@ public class Note {
         return priority;
     }
 
-    public void setPriority(int priority) {
-        this.priority = priority;
+    public Map<String, Boolean> getTags() {
+        return tags;
     }
 }

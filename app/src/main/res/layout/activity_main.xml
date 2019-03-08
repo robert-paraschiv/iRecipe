@@ -28,18 +28,23 @@
         android:layout_height="wrap_content"
         android:hint="Priority"
         android:inputType="number" />
+
     <EditText
-        android:id="@+id/edit_text_contPotatos"
+        android:id="@+id/edit_text_tags"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Contains Potatoes?"
-        android:inputType="number" />
+        android:hint="Tags"
+        android:inputType="text" />
     <CheckBox
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/cb_contPotatoes"
-        android:text="Filter search by potatoes"
-        />
+        android:text="Contains Potatoes"/>
+    <CheckBox
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/cb_contCheese"
+        android:text="Contains Cheese"/>
 
     <Button
         android:layout_width="match_parent"
