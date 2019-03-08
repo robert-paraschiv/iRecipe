@@ -5,6 +5,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -28,8 +29,8 @@ public class MainActivity extends AppCompatActivity {
     private EditText editTextDescription;
     private EditText editTextPriority;
     private EditText editTextContPotatos;
-    private EditText editTextContSalt;
     private TextView textViewData;
+    private CheckBox cbPotatoes;
 
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private CollectionReference notebookRef = db.collection("Recipes");
@@ -45,8 +46,8 @@ public class MainActivity extends AppCompatActivity {
         editTextDescription = findViewById(R.id.edit_text_description);
         editTextPriority = findViewById(R.id.edit_text_priority);
         editTextContPotatos = findViewById(R.id.edit_text_contPotatos);
-        editTextContSalt = findViewById(R.id.edit_text_contSalt);
         textViewData = findViewById(R.id.text_view_data);
+        cbPotatoes = findViewById(R.id.cb_contPotatoes);
     }
 
     @Override
@@ -94,33 +95,41 @@ public class MainActivity extends AppCompatActivity {
         if (editTextContPotatos.length()==0){
             editTextContPotatos.setText("0");
         }
-        if (editTextContSalt.length()==0){
-            editTextContSalt.setText("0");
-        }
 
         int contPotatos = Integer.parseInt(editTextContPotatos.getText().toString());
-        int contSalt = Integer.parseInt(editTextContSalt.getText().toString());
 
         int priority = Integer.parseInt(editTextPriority.getText().toString());
 
-        Note note = new Note(title, description, priority, contPotatos, contSalt);
+        Note note = new Note(title, description, priority, contPotatos);
 
         notebookRef.add(note);
     }
 
     public void loadNotes(View v) {
-        Query query;
-        if (lastResult == null) {
-            query = notebookRef.orderBy("priority")
-                    .whereEqualTo("contPotatos",1)
+//        int contPotatos = 0;
+//        contPotatos = Integer.parseInt(editTextContPotatos.getText().toString());
 
-                    .limit(3);
-        } else {
-            query = notebookRef.orderBy("priority")
-                    .whereEqualTo("contPotatos",1)
-                    .startAfter(lastResult)
-                    .limit(3);
+        int contPotatos=0;
+        if (cbPotatoes.isChecked()) {
+            contPotatos=1;
+        } else if(!cbPotatoes.isChecked()) {
+            contPotatos=0;
         }
+
+        Query query;
+//        if (lastResult == null) {
+//            query = notebookRef.orderBy("priority")
+//                    .whereEqualTo("contPotatos",contPotatos)
+//                    .limit(3);
+//        } else {
+//            query = notebookRef.orderBy("priority")
+//                    .whereEqualTo("contPotatos",contPotatos)
+//                    .startAfter(lastResult)
+//                    .limit(3);
+//        }
+
+        query = notebookRef.orderBy("title")
+                .whereEqualTo("contPotatos",contPotatos);
 
         query.get()
                 .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
@@ -136,13 +145,11 @@ public class MainActivity extends AppCompatActivity {
                             String title = note.getTitle();
                             String description = note.getDescription();
                             int contPotatos = note.getContPotatos();
-                            int contSalt = note.getContSalt();
                             int priority = note.getPriority();
 
                             data += "ID: " + documentId
                                     + "\nTitle: " + title + "\nDescription: " + description
                                     + "\nContains Potatos: " + contPotatos
-                                    + "\nContains Salt: " + contSalt
                                     + "\nPriority: " + priority + "\n\n";
                         }
 

@@ -32,14 +32,14 @@
         android:id="@+id/edit_text_contPotatos"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Contains Potatos?"
+        android:hint="Contains Potatoes?"
         android:inputType="number" />
-    <EditText
-        android:id="@+id/edit_text_contSalt"
-        android:layout_width="match_parent"
+    <CheckBox
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:hint="Contains Salt?"
-        android:inputType="number" />
+        android:id="@+id/cb_contPotatoes"
+        android:text="Filter search by potatoes"
+        />
 
     <Button
         android:layout_width="match_parent"
