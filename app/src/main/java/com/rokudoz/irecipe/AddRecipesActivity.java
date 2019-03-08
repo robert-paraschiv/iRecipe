@@ -35,7 +35,7 @@ public class AddRecipesActivity extends AppCompatActivity {
 
     }
 
-    public void addNote(View v) {
+    public void addRecipe(View v) {
         final String title = editTextTitle.getText().toString();
         String description = editTextDescription.getText().toString();
 

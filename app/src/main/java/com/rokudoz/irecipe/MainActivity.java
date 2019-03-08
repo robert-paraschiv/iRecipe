@@ -62,7 +62,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    public void loadNotes(View v) {
+    public void searchRecipes(View v) {
 
         String ingredientsString = "";
         for (String ingredient : selectedIngredients) {

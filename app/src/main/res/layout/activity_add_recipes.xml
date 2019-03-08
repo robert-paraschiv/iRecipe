@@ -33,7 +33,7 @@
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:onClick="addNote"
+        android:onClick="addRecipe"
         android:text="Add" />
     <Button
         android:layout_width="match_parent"
