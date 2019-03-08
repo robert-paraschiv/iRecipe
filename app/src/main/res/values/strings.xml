@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">iRecipe</string>
+    <string name="tv_search">Search for a recipe with the following ingredients :</string>
 </resources>

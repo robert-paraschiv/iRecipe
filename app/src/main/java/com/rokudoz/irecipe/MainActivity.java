@@ -1,10 +1,12 @@
 package com.rokudoz.irecipe;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.CheckBox;
-import android.widget.EditText;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -13,16 +15,13 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
-    private EditText editTextTitle;
-    private EditText editTextDescription;
-    private EditText editTextPriority;
-    private EditText editTextTags;
     private TextView textViewData;
-    private CheckBox contPotatoes, contCheese;
+    ArrayList<String> selectedIngredients;//-----
 
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private CollectionReference notebookRef = db.collection("Recipes");
@@ -32,82 +31,82 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        editTextTitle = findViewById(R.id.edit_text_title);
-        editTextDescription = findViewById(R.id.edit_text_description);
-        editTextPriority = findViewById(R.id.edit_text_priority);
-        editTextTags = findViewById(R.id.edit_text_tags);
-        textViewData = findViewById(R.id.text_view_data);
-        contPotatoes = findViewById(R.id.cb_contPotatoes);
-        contCheese = findViewById(R.id.cb_contCheese);
+        selectedIngredients=new ArrayList<String>(); // -----
 
-        //updateNestedValue();
+        textViewData = findViewById(R.id.text_view_data);
+
     }
 
-    public void addNote(View v) {
-        String title = editTextTitle.getText().toString();
-        String description = editTextDescription.getText().toString();
+    public void onStart(){ //------------------
+        super.onStart();
+        //create an instance of ListView
+        ListView cbListView = findViewById(R.id.checkable_list);
+        //set multiple selection mode
+        cbListView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+        String[] items = {"potatoes","cheese","apples","salt"};
+        //supply data itmes to ListView
+        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this,R.layout.checkable_list_layout,R.id.txt_title,items);
+        cbListView.setAdapter(arrayAdapter);
+        //set OnItemClickListener
+        cbListView.setOnItemClickListener(new AdapterView.OnItemClickListener(){
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                // selected item
+                String selectedItem = ((TextView) view).getText().toString();
+                if(selectedIngredients.contains(selectedItem))
+                    selectedIngredients.remove(selectedItem); //remove deselected item from the list of selected items
+                else
+                    selectedIngredients.add(selectedItem); //add selected item to the list of selected items
 
-        if (editTextPriority.length() == 0) {
-            editTextPriority.setText("0");
-        }
+            }
 
-        int priority = Integer.parseInt(editTextPriority.getText().toString());
-
-        String tagInput = editTextTags.getText().toString();
-        String[] tagArray = tagInput.split("\\s*,\\s*");
-        Map<String, Boolean> tags = new HashMap<>();
-
-        for (String tag : tagArray) {
-            tags.put(tag, true);
-        }
-
-        Note note = new Note(title, description, priority, tags);
-
-        notebookRef.add(note);
+        });
     }
 
     public void loadNotes(View v) {
-        String tagInput="";
-        if (contCheese.isChecked())
-            tagInput+="cheese,";
-        if (contPotatoes.isChecked())
-            tagInput+="potatoes,";
 
-        //String tagInput = editTextTags.getText().toString();
-        String[] tagArray = tagInput.split("\\s*,\\s*");
-        Map<String, Boolean> tags = new HashMap<>();
-
-        for (String tag : tagArray) {
-            tags.put(tag, true);
+        String ingredientsString = "";
+        for(String ingredient : selectedIngredients){
+            if(ingredientsString == "")
+                ingredientsString = ingredient;
+            else
+                ingredientsString += "," + ingredient;
         }
 
-        notebookRef.whereEqualTo("tags", tags).get()
+        String[] ingredientsArray = ingredientsString.split("\\s*,\\s*");
+        Map<String, Boolean> ingredientsHashMap = new HashMap<>();
+
+        for (String tag : ingredientsArray) {
+            ingredientsHashMap.put(tag, true);
+        }
+
+        notebookRef.whereEqualTo("tags", ingredientsHashMap).get()
                 .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                     @Override
                     public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                         String data = "";
 
                         for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
-                            Note note = documentSnapshot.toObject(Note.class);
-                            note.setDocumentId(documentSnapshot.getId());
+                            Recipe recipe = documentSnapshot.toObject(Recipe.class);
+                            recipe.setDocumentId(documentSnapshot.getId());
 
-                            String documentId = note.getDocumentId();
+                            String documentId = recipe.getDocumentId();
+                            String title = recipe.getTitle();
 
-                            data += "ID: " + documentId;
+                            data += "ID: " + documentId +"\nTitle: " + title;
 
-                            for (String tag : note.getTags().keySet()) {
+                            for (String tag : recipe.getTags().keySet()) {
                                 data += "\n-" + tag;
                             }
 
                             data += "\n\n";
                         }
-                        textViewData.append(data);
+                        textViewData.setText(data);
                     }
                 });
     }
 
-    private void updateNestedValue() {
-        notebookRef.document("aoSRcxTCxkLpFcCyldBw")
-                .update("tags.tag1.nested1.nested2", true);
+    public void navigateToAddRecipes(View v){
+        Intent intent = new Intent(this, AddRecipesActivity.class);
+        startActivity(intent);
     }
 }
