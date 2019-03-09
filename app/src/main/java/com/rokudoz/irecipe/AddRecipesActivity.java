@@ -48,7 +48,7 @@ public class AddRecipesActivity extends AppCompatActivity {
             tags.put(tag, true);
         }
 
-        Recipe recipe = new Recipe(title, description, tags);
+        com.rokudoz.irecipe.Recipe recipe = new com.rokudoz.irecipe.Recipe(title, description, tags);
 
         collectionReference.add(recipe)
                 .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {

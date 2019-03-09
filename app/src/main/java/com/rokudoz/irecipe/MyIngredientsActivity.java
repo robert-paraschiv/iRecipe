@@ -8,32 +8,41 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.rokudoz.irecipe.Models.User;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-public class MainActivity extends AppCompatActivity {
+public class MyIngredientsActivity extends AppCompatActivity {
     private TextView textViewData;
     ArrayList<String> selectedIngredients;//-----
 
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
-    private CollectionReference collectionReference = db.collection("Recipes");
+    private CollectionReference usersReference = db.collection("Users");
+    private CollectionReference recipesReference = db.collection("Recipes");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_my_ingredients);
 
         selectedIngredients = new ArrayList<String>();
 
-        textViewData = findViewById(R.id.text_view_data);
+        textViewData = findViewById(R.id.tv_data);
+
+    }
+
+    public void saveMyIngredients(View v){
 
     }
 
@@ -62,52 +71,11 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    public void searchRecipes(View v) {
-
-        String ingredientsString = "";
-        for (String ingredient : selectedIngredients) {
-            if (ingredientsString == "") {
-                ingredientsString = ingredient;
-            } else {
-                ingredientsString += "," + ingredient;
-            }
-        }
-
-        String[] ingredientsArray = ingredientsString.split("\\s*,\\s*");
-        Map<String, Boolean> ingredientsHashMap = new HashMap<>();
-
-        for (String tag : ingredientsArray) {
-            ingredientsHashMap.put(tag, true);
-        }
-
-        collectionReference.whereEqualTo("tags", ingredientsHashMap).get()
-                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-                    @Override
-                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                        String data = "";
-
-                        for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
-                            com.rokudoz.irecipe.Recipe recipe = documentSnapshot.toObject(com.rokudoz.irecipe.Recipe.class);
-                            recipe.setDocumentId(documentSnapshot.getId());
-
-                            String documentId = recipe.getDocumentId();
-                            String title = recipe.getTitle();
-
-                            data += "ID: " + documentId + "\nTitle: " + title;
-
-                            for (String tag : recipe.getTags().keySet()) {
-                                data += "\n-" + tag;
-                            }
-
-                            data += "\n\n";
-                        }
-                        textViewData.setText(data);
-                    }
-                });
+    public void retrieveSavedIngredients(View v) {
     }
 
-    public void navigateToAddRecipes(View v) {
-        Intent intent = new Intent(this, AddRecipesActivity.class);
+    public void backToSearch(View v) {
+        Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
     }
 }

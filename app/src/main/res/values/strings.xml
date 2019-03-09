@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">iRecipe</string>
     <string name="tv_search">Search for a recipe with the following ingredients :</string>
+    <string name="select_myingredients_string">Select the ingredients you have around</string>
 </resources>
