@@ -20,6 +20,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.rokudoz.irecipe.Account.LoginActivity;
+import com.rokudoz.irecipe.Models.Recipe;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -114,7 +115,7 @@ public class SearchActivity extends AppCompatActivity {
                         String data = "";
 
                         for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
-                            com.rokudoz.irecipe.Recipe recipe = documentSnapshot.toObject(com.rokudoz.irecipe.Recipe.class);
+                            Recipe recipe = documentSnapshot.toObject(Recipe.class);
                             recipe.setDocumentId(documentSnapshot.getId());
 
                             String documentId = recipe.getDocumentId();
@@ -137,7 +138,10 @@ public class SearchActivity extends AppCompatActivity {
         Intent intent = new Intent(this, AddRecipesActivity.class);
         startActivity(intent);
     }
-
+    public void navigateToMyIngredients(View v) {
+        Intent intent = new Intent(this, MyIngredientsActivity.class);
+        startActivity(intent);
+    }
 
     /*
         ----------------------------- Firebase setup ---------------------------------

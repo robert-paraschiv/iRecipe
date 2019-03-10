@@ -29,7 +29,14 @@
         android:onClick="searchRecipes"
         android:text="Search" />
     <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:layout_below="@id/search_btn"
+        android:id="@+id/navToMyIngredients_btn"
+        android:onClick="navigateToMyIngredients"
+        android:text="My ingredients"/>
+    <Button
+        android:layout_below="@id/navToMyIngredients_btn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/signOut_btn"

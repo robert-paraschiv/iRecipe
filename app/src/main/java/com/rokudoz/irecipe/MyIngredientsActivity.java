@@ -1,6 +1,7 @@
 package com.rokudoz.irecipe;
 
 import android.content.Intent;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -8,14 +9,27 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
+import com.rokudoz.irecipe.Models.Recipe;
+import com.rokudoz.irecipe.Models.User;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class MyIngredientsActivity extends AppCompatActivity {
     private TextView textViewData;
+    private String documentID="";
     ArrayList<String> selectedIngredients;//-----
 
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -28,12 +42,43 @@ public class MyIngredientsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_my_ingredients);
 
         selectedIngredients = new ArrayList<String>();
-
         textViewData = findViewById(R.id.tv_data);
 
+        getDocumentId();
+    }
+
+    private void getDocumentId(){
+        db.collection("Users").whereEqualTo("user_id", FirebaseAuth.getInstance().getCurrentUser().getUid())
+                .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                    @Override
+                    public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                        if (e == null) {
+                            documentID = queryDocumentSnapshots.getDocuments().get(0).getId();
+                        }
+                    }
+                });
     }
 
     public void saveMyIngredients(View v){
+
+        String ingredientsString = "";
+        for (String ingredient : selectedIngredients) {
+            if (ingredientsString == "") {
+                ingredientsString = ingredient;
+            } else {
+                ingredientsString += "," + ingredient;
+            }
+        }
+
+        String[] ingredientsArray = ingredientsString.split("\\s*,\\s*");
+        Map<String, Boolean> ingredientsHashMap = new HashMap<>();
+
+        for (String tag : ingredientsArray) {
+            ingredientsHashMap.put(tag, true);
+        }
+
+        db.collection("Users").document(documentID)
+                .update("tags", ingredientsHashMap);
 
     }
 
@@ -63,6 +108,7 @@ public class MyIngredientsActivity extends AppCompatActivity {
     }
 
     public void retrieveSavedIngredients(View v) {
+
     }
 
     public void backToSearch(View v) {

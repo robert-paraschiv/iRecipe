@@ -49,7 +49,7 @@
         android:layout_height="wrap_content"
         android:id="@+id/backToSearchBtn"
         android:onClick="backToSearch"
-        android:text="Save" />
+        android:text="Back to Search" />
 
 
 

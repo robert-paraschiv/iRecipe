@@ -11,6 +11,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.rokudoz.irecipe.Models.Recipe;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -48,7 +49,7 @@ public class AddRecipesActivity extends AppCompatActivity {
             tags.put(tag, true);
         }
 
-        com.rokudoz.irecipe.Recipe recipe = new com.rokudoz.irecipe.Recipe(title, description, tags);
+        Recipe recipe = new Recipe(title, description, tags);
 
         collectionReference.add(recipe)
                 .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {

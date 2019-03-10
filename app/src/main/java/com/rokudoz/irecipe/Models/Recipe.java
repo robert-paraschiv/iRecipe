@@ -1,4 +1,4 @@
-package com.rokudoz.irecipe;
+package com.rokudoz.irecipe.Models;
 
 import com.google.firebase.firestore.Exclude;
 
