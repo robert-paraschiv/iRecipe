@@ -10,10 +10,10 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity android:name=".Account.RegisterActivity"></activity>
-        <activity android:name=".MainActivity"/>
         <activity android:name=".MyIngredientsActivity" />
         <activity android:name=".AddRecipesActivity" />
-            <activity android:name=".Account.LoginActivity" >
+        <activity android:name=".Account.LoginActivity" />
+        <activity android:name=".SearchActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

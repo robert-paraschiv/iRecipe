@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="16dp"
-    tools:context="com.rokudoz.irecipe.MainActivity">
+    tools:context="com.rokudoz.irecipe.SearchActivity">
 
     <TextView
         android:layout_width="wrap_content"
@@ -28,10 +28,16 @@
         android:id="@+id/search_btn"
         android:onClick="searchRecipes"
         android:text="Search" />
-
+    <Button
+        android:layout_below="@id/search_btn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/signOut_btn"
+        android:onClick="signOut"
+        android:text="Sign out" />
 
     <android.support.v4.widget.NestedScrollView
-        android:layout_below="@+id/search_btn"
+        android:layout_below="@+id/signOut_btn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
         <TextView

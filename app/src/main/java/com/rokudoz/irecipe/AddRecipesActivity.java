@@ -60,7 +60,7 @@ public class AddRecipesActivity extends AppCompatActivity {
     }
 
     public void backToSearch(View v) {
-        Intent intent = new Intent(this, MainActivity.class);
+        Intent intent = new Intent(this, SearchActivity.class);
         startActivity(intent);
     }
 }
