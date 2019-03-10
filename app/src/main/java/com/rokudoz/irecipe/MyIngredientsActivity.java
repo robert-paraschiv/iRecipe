@@ -28,13 +28,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class MyIngredientsActivity extends AppCompatActivity {
+
     private TextView textViewData;
-    private String documentID="";
-    ArrayList<String> selectedIngredients;//-----
+    private String documentID = "";
+    ArrayList<String> selectedIngredients;
 
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private CollectionReference usersReference = db.collection("Users");
-    private CollectionReference recipesReference = db.collection("Recipes");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,8 +47,16 @@ public class MyIngredientsActivity extends AppCompatActivity {
         getDocumentId();
     }
 
-    private void getDocumentId(){
-        db.collection("Users").whereEqualTo("user_id", FirebaseAuth.getInstance().getCurrentUser().getUid())
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        setupCheckList();
+        retrieveSavedIngredients();
+    }
+
+    private void getDocumentId() {
+        usersReference.whereEqualTo("user_id", FirebaseAuth.getInstance().getCurrentUser().getUid())
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
                     public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
@@ -59,7 +67,7 @@ public class MyIngredientsActivity extends AppCompatActivity {
                 });
     }
 
-    public void saveMyIngredients(View v){
+    public void saveMyIngredients() {
 
         String ingredientsString = "";
         for (String ingredient : selectedIngredients) {
@@ -76,38 +84,79 @@ public class MyIngredientsActivity extends AppCompatActivity {
         for (String tag : ingredientsArray) {
             ingredientsHashMap.put(tag, true);
         }
-
-        db.collection("Users").document(documentID)
-                .update("tags", ingredientsHashMap);
+        if (!selectedIngredients.isEmpty()) {
+            db.collection("Users").document(documentID)
+                    .update("tags", ingredientsHashMap);
+        } else {
+            db.collection("Users").document(documentID)
+                    .update("tags", "");
+        }
 
     }
 
-    public void onStart() {
-        super.onStart();
+    private void retrieveSavedIngredients() {
+        String ingredientsString = "";
+        for (String ingredient : selectedIngredients) {
+            if (ingredientsString == "") {
+                ingredientsString = ingredient;
+            } else {
+                ingredientsString += "," + ingredient;
+            }
+        }
+
+        String[] ingredientsArray = ingredientsString.split("\\s*,\\s*");
+        Map<String, Boolean> ingredientsHashMap = new HashMap<>();
+
+
+        for (String tag : ingredientsArray) {
+            ingredientsHashMap.put(tag, true);
+        }
+
+        usersReference.whereEqualTo("user_id", FirebaseAuth.getInstance().getCurrentUser().getUid()).get()
+                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                    @Override
+                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                        String data = "";
+
+                        for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                            User user = documentSnapshot.toObject(User.class);
+                            for (String tag : user.getTags().keySet()) {
+                                data += "\n-" + tag;
+                            }
+                        }
+                        textViewData.setText(data);
+
+                    }
+                });
+
+    }
+
+
+    private void setupCheckList() {
         //create an instance of ListView
         ListView cbListView = findViewById(R.id.checkable_list);
         //set multiple selection mode
         cbListView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
         String[] items = {"potatoes", "cheese", "apples", "salt"};
-        //supply data itmes to ListView
+        //supply data items to ListView
         ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, R.layout.checkable_list_layout, R.id.txt_title, items);
         cbListView.setAdapter(arrayAdapter);
         //set OnItemClickListener
+        // cbListView.setItemChecked(1, true); -----------------------------------------------------------------------------------------
         cbListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 // selected item
                 String selectedItem = ((TextView) view).getText().toString();
-                if (selectedIngredients.contains(selectedItem))
+                if (selectedIngredients.contains(selectedItem)) {
                     selectedIngredients.remove(selectedItem); //remove deselected item from the list of selected items
-                else
+                } else {
                     selectedIngredients.add(selectedItem); //add selected item to the list of selected items
+                }
 
+                saveMyIngredients();
             }
 
         });
-    }
-
-    public void retrieveSavedIngredients(View v) {
 
     }
 
