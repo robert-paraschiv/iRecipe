@@ -15,6 +15,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -28,8 +29,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-public class SearchActivity extends AppCompatActivity {
+public class SearchActivity extends AppCompatActivity implements RecipeAdapter.OnItemClickListener {
     private static final String TAG = "SearchActivity";
+
 
     //Firebase
     private FirebaseAuth.AuthStateListener mAuthListener;
@@ -79,7 +81,7 @@ public class SearchActivity extends AppCompatActivity {
                         for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
                             User user = documentSnapshot.toObject(User.class);
                             for (String tag : user.getTags().keySet()) {
-                                tags.put(tag,true);
+                                tags.put(tag, true);
                             }
                         }
 
@@ -97,6 +99,18 @@ public class SearchActivity extends AppCompatActivity {
                         recyclerView.setAdapter(recipeAdapter);
 
                         recipeAdapter.startListening();
+
+                        recipeAdapter.setOnItemClickListener(new RecipeAdapter.OnItemClickListener() {
+                            @Override
+                            public void onItemClick(DocumentSnapshot documentSnapshot, int position) {
+                                Recipe recipe = documentSnapshot.toObject(Recipe.class);
+                                String id = documentSnapshot.getId();
+                                String path = documentSnapshot.getReference().getPath();
+                                Intent intent = new Intent(SearchActivity.this,RecipeDetailed.class).putExtra("documentID",id);
+                                //Toast.makeText(SearchActivity.this, "Position: " + position + "ID: " + id + "Path: " +path , Toast.LENGTH_SHORT).show();
+                                startActivity(intent);
+                            }
+                        });
                     }
                 });
 
@@ -146,5 +160,10 @@ public class SearchActivity extends AppCompatActivity {
                 // ...
             }
         };
+    }
+
+    @Override
+    public void onItemClick(DocumentSnapshot documentSnapshot, int position) {
+
     }
 }
