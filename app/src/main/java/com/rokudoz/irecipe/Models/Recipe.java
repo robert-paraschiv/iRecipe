@@ -8,7 +8,7 @@ public class Recipe {
     private String documentId;
     private String title;
     private String description;
-    Map<String, Boolean> tags;
+    private Map<String, Boolean> tags;
 
     public Recipe() {
         //public no-arg constructor needed
@@ -37,6 +37,10 @@ public class Recipe {
 
     public String getDescription() {
         return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public Map<String, Boolean> getTags() {

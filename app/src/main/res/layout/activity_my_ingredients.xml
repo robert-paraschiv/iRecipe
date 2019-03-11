@@ -34,21 +34,22 @@
 
     </android.support.v4.widget.NestedScrollView>
 
-    <Button
-        android:layout_below="@id/nestedScrollview"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/save_btn"
-        android:text="Save" />
-
 
     <Button
-        android:layout_below="@id/save_btn"
+    android:layout_below="@id/nestedScrollview"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:id="@+id/backToSearchBtn"
+    android:onClick="backToSearch"
+    android:text="Back to Search" />
+
+    <Button
+        android:layout_below="@id/backToSearchBtn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/backToSearchBtn"
-        android:onClick="backToSearch"
-        android:text="Back to Search" />
+        android:id="@+id/signOut"
+        android:onClick="signOut"
+        android:text="Sign Out" />
 
 
 
