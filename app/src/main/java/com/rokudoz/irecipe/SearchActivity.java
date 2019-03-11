@@ -31,7 +31,7 @@ import java.util.Map;
 
 public class SearchActivity extends AppCompatActivity implements RecipeAdapter.OnItemClickListener {
     private static final String TAG = "SearchActivity";
-
+    private Boolean userSigned=false;
 
     //Firebase
     private FirebaseAuth.AuthStateListener mAuthListener;
@@ -51,7 +51,7 @@ public class SearchActivity extends AppCompatActivity implements RecipeAdapter.O
         selectedIngredients = new ArrayList<>();
 
         setupFirebaseAuth();
-        setupRecyclerView();
+
 
     }
 
@@ -67,7 +67,9 @@ public class SearchActivity extends AppCompatActivity implements RecipeAdapter.O
         if (mAuthListener != null) {
             FirebaseAuth.getInstance().removeAuthStateListener(mAuthListener);
         }
-        recipeAdapter.stopListening();
+        if (userSigned) {
+            recipeAdapter.stopListening();
+        }
     }
 
     private void setupRecyclerView() {
@@ -143,6 +145,8 @@ public class SearchActivity extends AppCompatActivity implements RecipeAdapter.O
                     if (user.isEmailVerified()) {
 //                        Log.d(TAG, "onAuthStateChanged: signed_in: " + user.getUid());
 //                        Toast.makeText(SearchActivity.this, "Authenticated with: " + user.getEmail(), Toast.LENGTH_SHORT).show();
+                        userSigned=true;
+                        setupRecyclerView();
                     } else {
                         Toast.makeText(SearchActivity.this, "Email is not Verified\nCheck your Inbox", Toast.LENGTH_SHORT).show();
                         FirebaseAuth.getInstance().signOut();
