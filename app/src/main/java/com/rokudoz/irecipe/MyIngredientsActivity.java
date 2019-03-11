@@ -115,18 +115,20 @@ public class MyIngredientsActivity extends AppCompatActivity {
                                 data = ""+ tag;
                                 if (tag.equals("potatoes")) {
                                     hasPotatoes=true;
-                                    data+="yah ";
+                                    selectedIngredients.add(tag);
                                 }
                                 if (tag.equals("cheese")) {
                                     hasCheese=true;
+                                    selectedIngredients.add(tag);
                                 }
                                 if (tag.equals("apples")) {
                                     hasApples=true;
+                                    selectedIngredients.add(tag);
                                 }
                                 if (tag.equals("salt")) {
                                     hasSalt=true;
+                                    selectedIngredients.add(tag);
                                 }
-
                             }
                         }
                         textViewData.setText(data);
@@ -141,7 +143,7 @@ public class MyIngredientsActivity extends AppCompatActivity {
 
     private void setupCheckList() {
         //create an instance of ListView
-        ListView cbListView = findViewById(R.id.checkable_list);
+        final ListView cbListView = findViewById(R.id.checkable_list);
         //set multiple selection mode
         cbListView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
         String[] items = {"potatoes", "cheese", "apples", "salt"};
@@ -158,9 +160,9 @@ public class MyIngredientsActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 // selected item
                 String selectedItem = ((TextView) view).getText().toString();
-                if (selectedIngredients.contains(selectedItem)) {
+                if (selectedIngredients.contains(selectedItem) && !cbListView.isItemChecked(position)) {
                     selectedIngredients.remove(selectedItem); //remove deselected item from the list of selected items
-                } else {
+                } else if (!selectedIngredients.contains(selectedItem) && cbListView.isItemChecked(position)){
                     selectedIngredients.add(selectedItem); //add selected item to the list of selected items
                 }
                 saveMyIngredients();
