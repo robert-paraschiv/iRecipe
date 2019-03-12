@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -34,6 +35,7 @@ public class MyIngredientsActivity extends AppCompatActivity {
     private static final String TAG = "MyIngredientsActivity";
 
     private TextView textViewData;
+    private ProgressBar pbLoading;
 
     private Boolean hasPotatoes=false;
     private Boolean hasCheese=false;
@@ -55,6 +57,9 @@ public class MyIngredientsActivity extends AppCompatActivity {
 
         selectedIngredients = new ArrayList<String>();
         textViewData = findViewById(R.id.tv_data);
+        
+        pbLoading=findViewById(R.id.pbLoading);
+        pbLoading.setVisibility(View.VISIBLE);
 
         getDocumentId();
         setupFirebaseAuth();
@@ -151,6 +156,7 @@ public class MyIngredientsActivity extends AppCompatActivity {
                         }
                         textViewData.setText(data);
 
+                        pbLoading.setVisibility(View.INVISIBLE);
                         setupCheckList();
                     }
                 });

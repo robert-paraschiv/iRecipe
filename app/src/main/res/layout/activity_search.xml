@@ -8,34 +8,38 @@
     android:padding="8dp"
     tools:context="com.rokudoz.irecipe.SearchActivity">
 
-<android.support.v7.widget.RecyclerView
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:id="@+id/recycler_view"/>
+    <ProgressBar
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/pbLoading"
+        android:layout_gravity="center"
+        android:visibility="visible"
+        />
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 
 
     <Button
+        android:id="@+id/signOut_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|center"
-        android:id="@+id/signOut_btn"
         android:onClick="navigateToMyIngredients"
         android:text="My ingredients" />
-
 
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/button_add_recipe"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="16dp"
         android:layout_gravity="bottom|end"
+        android:layout_margin="16dp"
         android:onClick="navigateToAddRecipes"
         android:src="@drawable/ic_add"
-        app:fabCustomSize="50dp"
-        />
-
-
+        app:fabCustomSize="50dp" />
 
 
 </android.support.design.widget.CoordinatorLayout>

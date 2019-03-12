@@ -8,6 +8,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
@@ -32,6 +33,7 @@ import java.util.Map;
 public class SearchActivity extends AppCompatActivity implements RecipeAdapter.OnItemClickListener {
     private static final String TAG = "SearchActivity";
     private Boolean userSigned=false;
+    private ProgressBar pbLoading;
 
     //Firebase
     private FirebaseAuth.AuthStateListener mAuthListener;
@@ -49,7 +51,8 @@ public class SearchActivity extends AppCompatActivity implements RecipeAdapter.O
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
         selectedIngredients = new ArrayList<>();
-
+        pbLoading=findViewById(R.id.pbLoading);
+        pbLoading.setVisibility(View.VISIBLE);
         setupFirebaseAuth();
 
 
@@ -101,6 +104,8 @@ public class SearchActivity extends AppCompatActivity implements RecipeAdapter.O
                         recyclerView.setAdapter(recipeAdapter);
 
                         recipeAdapter.startListening();
+
+                        pbLoading.setVisibility(View.INVISIBLE);
 
                         recipeAdapter.setOnItemClickListener(new RecipeAdapter.OnItemClickListener() {
                             @Override
