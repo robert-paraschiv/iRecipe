@@ -37,10 +37,10 @@ public class RecipeDetailed extends AppCompatActivity {
         getIncomingIntent();
     }
 
-    private void getIncomingIntent(){
+    private void getIncomingIntent() {
         Log.d(TAG, "getIncomingIntent: checking for intent");
 
-        if (getIntent().hasExtra("documentID")){
+        if (getIntent().hasExtra("documentID")) {
             Log.d(TAG, "getIncomingIntent: found intent extras");
 
             String documentID = getIntent().getStringExtra("documentID");
@@ -49,37 +49,38 @@ public class RecipeDetailed extends AppCompatActivity {
                     .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                         @Override
                         public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                            if (task.isSuccessful()){
-                                DocumentSnapshot documentSnapshot=task.getResult();
-                                if (documentSnapshot.exists()){
+                            if (task.isSuccessful()) {
+                                DocumentSnapshot documentSnapshot = task.getResult();
+                                if (documentSnapshot.exists()) {
                                     String ingredients = "";
 
-                                        Recipe recipe = documentSnapshot.toObject(Recipe.class);
-                                        recipe.setDocumentId(documentSnapshot.getId());
+                                    Recipe recipe = documentSnapshot.toObject(Recipe.class);
+                                    recipe.setDocumentId(documentSnapshot.getId());
 
-                                        String documentId = recipe.getDocumentId();
-                                        String title = recipe.getTitle();
-                                        String description = recipe.getDescription();
-                                        tvTitle.setText(title);
-                                        tvDescription.setText(description);
+                                    String documentId = recipe.getDocumentId();
+                                    String title = recipe.getTitle();
+                                    String description = recipe.getDescription();
+                                    tvTitle.setText(title);
+                                    tvDescription.setText(description);
 
-                                        for (String tag : recipe.getTags().keySet()) {
-                                            ingredients += "\n- " + tag +" "+ recipe.getTags().get(tag);
-                                        }
+                                    for (String tag : recipe.getTags().keySet()) {
+                                        ingredients += "\n- " + tag + " " + recipe.getTags().get(tag);
+                                    }
 
 
                                     tvIngredients.setText(ingredients);
-                                }else {
+                                } else {
                                     Log.d(TAG, "No such document");
                                 }
 
-                            }else {
-                                Log.d(TAG, "get failed with ",task.getException());
+                            } else {
+                                Log.d(TAG, "get failed with ", task.getException());
                             }
                         }
                     });
         }
     }
+
     public void navigateToSearchActivity(View v) {
         Intent intent = new Intent(this, SearchActivity.class);
         startActivity(intent);

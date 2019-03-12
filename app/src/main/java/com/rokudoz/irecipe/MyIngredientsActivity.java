@@ -37,10 +37,10 @@ public class MyIngredientsActivity extends AppCompatActivity {
     private TextView textViewData;
     private ProgressBar pbLoading;
 
-    private Boolean hasPotatoes=false;
-    private Boolean hasCheese=false;
-    private Boolean hasApples=false;
-    private Boolean hasSalt=false;
+    private Boolean hasPotatoes = false;
+    private Boolean hasCheese = false;
+    private Boolean hasApples = false;
+    private Boolean hasSalt = false;
 
     private String documentID = "";
     ArrayList<String> selectedIngredients;
@@ -57,8 +57,8 @@ public class MyIngredientsActivity extends AppCompatActivity {
 
         selectedIngredients = new ArrayList<String>();
         textViewData = findViewById(R.id.tv_data);
-        
-        pbLoading=findViewById(R.id.pbLoading);
+
+        pbLoading = findViewById(R.id.pbLoading);
         pbLoading.setVisibility(View.VISIBLE);
 
         getDocumentId();
@@ -94,37 +94,7 @@ public class MyIngredientsActivity extends AppCompatActivity {
                 });
     }
 
-    public void saveMyIngredients() {
-
-        String ingredientsString = "";
-        for (String ingredient : selectedIngredients) {
-            if (ingredientsString == "") {
-                ingredientsString = ingredient;
-            } else {
-                ingredientsString += "," + ingredient;
-            }
-        }
-
-        String[] ingredientsArray = ingredientsString.split("\\s*,\\s*");
-        Map<String, Boolean> ingredientsHashMap = new HashMap<>();
-
-        for (String tag : ingredientsArray) {
-            ingredientsHashMap.put(tag, true);
-        }
-        if (!selectedIngredients.isEmpty()) {
-            db.collection("Users").document(documentID)
-                    .update("tags", ingredientsHashMap);
-        } else {
-            Map<String, Boolean>emptyIngredientsHashMap=new HashMap<>();
-            emptyIngredientsHashMap.put("noTags",true);
-            db.collection("Users").document(documentID)
-                    .update("tags", emptyIngredientsHashMap);
-        }
-
-    }
-
     private void retrieveSavedIngredients() {
-        final Map<String, Boolean> ingredientsHashMap = new HashMap<>();
 
         usersReference.whereEqualTo("user_id", FirebaseAuth.getInstance().getCurrentUser().getUid()).get()
                 .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
@@ -135,21 +105,21 @@ public class MyIngredientsActivity extends AppCompatActivity {
                         for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
                             User user = documentSnapshot.toObject(User.class);
                             for (String tag : user.getTags().keySet()) {
-                                data = ""+ tag;
-                                if (tag.equals("potatoes")) {
-                                    hasPotatoes=true;
+                                data += "\n " + tag + " " + user.getTags().get(tag);
+                                if (tag.equals("potatoes") && user.getTags().get(tag) == true) {
+                                    hasPotatoes = true;
                                     selectedIngredients.add(tag);
                                 }
-                                if (tag.equals("cheese")) {
-                                    hasCheese=true;
+                                if (tag.equals("cheese") && user.getTags().get(tag) == true) {
+                                    hasCheese = true;
                                     selectedIngredients.add(tag);
                                 }
-                                if (tag.equals("apples")) {
-                                    hasApples=true;
+                                if (tag.equals("apples") && user.getTags().get(tag) == true) {
+                                    hasApples = true;
                                     selectedIngredients.add(tag);
                                 }
-                                if (tag.equals("salt")) {
-                                    hasSalt=true;
+                                if (tag.equals("salt") && user.getTags().get(tag) == true) {
+                                    hasSalt = true;
                                     selectedIngredients.add(tag);
                                 }
                             }
@@ -170,7 +140,7 @@ public class MyIngredientsActivity extends AppCompatActivity {
         final ListView cbListView = findViewById(R.id.checkable_list);
         //set multiple selection mode
         cbListView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
-        String[] items = {"potatoes", "cheese", "apples", "salt"};
+        final String[] items = {"potatoes", "cheese", "apples", "salt"};
         //supply data items to ListView
         ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, R.layout.checkable_list_layout, R.id.txt_title, items);
         cbListView.setAdapter(arrayAdapter);
@@ -182,14 +152,31 @@ public class MyIngredientsActivity extends AppCompatActivity {
 
         cbListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                // selected item
-                String selectedItem = ((TextView) view).getText().toString();
-                if (selectedIngredients.contains(selectedItem) && !cbListView.isItemChecked(position)) {
-                    selectedIngredients.remove(selectedItem); //remove deselected item from the list of selected items
-                } else if (!selectedIngredients.contains(selectedItem) && cbListView.isItemChecked(position)){
-                    selectedIngredients.add(selectedItem); //add selected item to the list of selected items
-                }
-                saveMyIngredients();
+
+                Map<String, Boolean> deselectedIngredientsHashMap = new HashMap<>();
+                if (!cbListView.isItemChecked(0))
+                    deselectedIngredientsHashMap.put(items[0], false);
+                else
+                    deselectedIngredientsHashMap.put(items[0], true);
+
+                if (!cbListView.isItemChecked(1))
+                    deselectedIngredientsHashMap.put(items[1], false);
+                else
+                    deselectedIngredientsHashMap.put(items[1], true);
+
+                if (!cbListView.isItemChecked(2))
+                    deselectedIngredientsHashMap.put(items[2], false);
+                else
+                    deselectedIngredientsHashMap.put(items[2], true);
+
+                if (!cbListView.isItemChecked(3))
+                    deselectedIngredientsHashMap.put(items[3], false);
+                else
+                    deselectedIngredientsHashMap.put(items[3], true);
+
+
+                db.collection("Users").document(documentID)
+                        .update("tags", deselectedIngredientsHashMap);
             }
 
         });
@@ -201,13 +188,14 @@ public class MyIngredientsActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    public void signOut(View v){
+    public void signOut(View v) {
         FirebaseAuth.getInstance().signOut();
     }
+
     /*
     ----------------------------- Firebase setup ---------------------------------
  */
-    private void setupFirebaseAuth(){
+    private void setupFirebaseAuth() {
         Log.d(TAG, "setupFirebaseAuth: started");
 
         mAuthListener = new FirebaseAuth.AuthStateListener() {
@@ -217,10 +205,10 @@ public class MyIngredientsActivity extends AppCompatActivity {
                 if (user != null) {
 
                     //check if email is verified
-                    if(user.isEmailVerified()){
+                    if (user.isEmailVerified()) {
 //                        Log.d(TAG, "onAuthStateChanged: signed_in: " + user.getUid());
 //                        Toast.makeText(SearchActivity.this, "Authenticated with: " + user.getEmail(), Toast.LENGTH_SHORT).show();
-                    }else{
+                    } else {
                         Toast.makeText(MyIngredientsActivity.this, "Email is not Verified\nCheck your Inbox", Toast.LENGTH_SHORT).show();
                         FirebaseAuth.getInstance().signOut();
                     }

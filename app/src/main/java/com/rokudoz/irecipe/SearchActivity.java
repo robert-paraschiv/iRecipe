@@ -32,7 +32,7 @@ import java.util.Map;
 
 public class SearchActivity extends AppCompatActivity implements RecipeAdapter.OnItemClickListener {
     private static final String TAG = "SearchActivity";
-    private Boolean userSigned=false;
+    private Boolean userSigned = false;
     private ProgressBar pbLoading;
 
     //Firebase
@@ -51,7 +51,7 @@ public class SearchActivity extends AppCompatActivity implements RecipeAdapter.O
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
         selectedIngredients = new ArrayList<>();
-        pbLoading=findViewById(R.id.pbLoading);
+        pbLoading = findViewById(R.id.pbLoading);
         pbLoading.setVisibility(View.VISIBLE);
         setupFirebaseAuth();
 
@@ -90,7 +90,7 @@ public class SearchActivity extends AppCompatActivity implements RecipeAdapter.O
                             }
                         }
 
-                        Query query = recipeRef.whereGreaterThan("tags", tags);
+                        Query query = recipeRef.whereGreaterThanOrEqualTo("tags", tags);
 
                         FirestoreRecyclerOptions<Recipe> options = new FirestoreRecyclerOptions.Builder<Recipe>()
                                 .setQuery(query, Recipe.class)
@@ -113,7 +113,7 @@ public class SearchActivity extends AppCompatActivity implements RecipeAdapter.O
                                 Recipe recipe = documentSnapshot.toObject(Recipe.class);
                                 String id = documentSnapshot.getId();
                                 String path = documentSnapshot.getReference().getPath();
-                                Intent intent = new Intent(SearchActivity.this,RecipeDetailed.class).putExtra("documentID",id);
+                                Intent intent = new Intent(SearchActivity.this, RecipeDetailed.class).putExtra("documentID", id);
                                 //Toast.makeText(SearchActivity.this, "Position: " + position + "ID: " + id + "Path: " +path , Toast.LENGTH_SHORT).show();
                                 startActivity(intent);
                             }
@@ -150,7 +150,7 @@ public class SearchActivity extends AppCompatActivity implements RecipeAdapter.O
                     if (user.isEmailVerified()) {
 //                        Log.d(TAG, "onAuthStateChanged: signed_in: " + user.getUid());
 //                        Toast.makeText(SearchActivity.this, "Authenticated with: " + user.getEmail(), Toast.LENGTH_SHORT).show();
-                        userSigned=true;
+                        userSigned = true;
                         setupRecyclerView();
                     } else {
                         Toast.makeText(SearchActivity.this, "Email is not Verified\nCheck your Inbox", Toast.LENGTH_SHORT).show();

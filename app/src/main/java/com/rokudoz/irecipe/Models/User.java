@@ -8,7 +8,7 @@ public class User {
     private String name;
     Map<String, Boolean> tags;
 
-    public User(String user_id, String name,Map<String, Boolean> tags) {
+    public User(String user_id, String name, Map<String, Boolean> tags) {
         this.user_id = user_id;
         this.name = name;
         this.tags = tags;
