@@ -64,7 +64,7 @@ public class RecipeDetailed extends AppCompatActivity {
                                         tvDescription.setText(description);
 
                                         for (String tag : recipe.getTags().keySet()) {
-                                            ingredients += "\n-" + tag;
+                                            ingredients += "\n- " + tag +" "+ recipe.getTags().get(tag);
                                         }
 
 

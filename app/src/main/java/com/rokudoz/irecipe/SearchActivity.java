@@ -86,11 +86,11 @@ public class SearchActivity extends AppCompatActivity implements RecipeAdapter.O
                         for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
                             User user = documentSnapshot.toObject(User.class);
                             for (String tag : user.getTags().keySet()) {
-                                tags.put(tag, true);
+                                tags.put(tag, user.getTags().get(tag));
                             }
                         }
 
-                        Query query = recipeRef.whereEqualTo("tags", tags);
+                        Query query = recipeRef.whereGreaterThan("tags", tags);
 
                         FirestoreRecyclerOptions<Recipe> options = new FirestoreRecyclerOptions.Builder<Recipe>()
                                 .setQuery(query, Recipe.class)
