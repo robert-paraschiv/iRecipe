@@ -41,6 +41,7 @@ public class MyIngredientsActivity extends AppCompatActivity {
     private Boolean hasCheese = false;
     private Boolean hasApples = false;
     private Boolean hasSalt = false;
+    private Boolean hasGorgonzola = false;
 
     private String documentID = "";
     ArrayList<String> selectedIngredients;
@@ -121,6 +122,9 @@ public class MyIngredientsActivity extends AppCompatActivity {
                                 if (tag.equals("salt") && user.getTags().get(tag) == true) {
                                     hasSalt = true;
                                     selectedIngredients.add(tag);
+                                }if (tag.equals("gorgonzola") && user.getTags().get(tag) == true) {
+                                    hasGorgonzola = true;
+                                    selectedIngredients.add(tag);
                                 }
                             }
                         }
@@ -140,7 +144,7 @@ public class MyIngredientsActivity extends AppCompatActivity {
         final ListView cbListView = findViewById(R.id.checkable_list);
         //set multiple selection mode
         cbListView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
-        final String[] items = {"potatoes", "cheese", "apples", "salt"};
+        final String[] items = {"potatoes", "cheese", "apples", "salt","gorgonzola"};
         //supply data items to ListView
         ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, R.layout.checkable_list_layout, R.id.txt_title, items);
         cbListView.setAdapter(arrayAdapter);
@@ -149,6 +153,7 @@ public class MyIngredientsActivity extends AppCompatActivity {
         cbListView.setItemChecked(1, hasCheese);
         cbListView.setItemChecked(2, hasApples);
         cbListView.setItemChecked(3, hasSalt);
+        cbListView.setItemChecked(4, hasGorgonzola);
 
         cbListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -173,6 +178,10 @@ public class MyIngredientsActivity extends AppCompatActivity {
                     deselectedIngredientsHashMap.put(items[3], false);
                 else
                     deselectedIngredientsHashMap.put(items[3], true);
+                if (!cbListView.isItemChecked(4))
+                    deselectedIngredientsHashMap.put(items[4], false);
+                else
+                    deselectedIngredientsHashMap.put(items[4], true);
 
 
                 db.collection("Users").document(documentID)

@@ -88,9 +88,10 @@ public class SearchActivity extends AppCompatActivity implements RecipeAdapter.O
                             for (String tag : user.getTags().keySet()) {
                                 tags.put(tag, user.getTags().get(tag));
                             }
+                            Toast.makeText(SearchActivity.this, tags.toString(), Toast.LENGTH_LONG).show();
                         }
 
-                        Query query = recipeRef.whereGreaterThanOrEqualTo("tags", tags);
+                        Query query = recipeRef.whereEqualTo("tags", tags);
 
                         FirestoreRecyclerOptions<Recipe> options = new FirestoreRecyclerOptions.Builder<Recipe>()
                                 .setQuery(query, Recipe.class)
