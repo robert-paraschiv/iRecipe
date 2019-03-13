@@ -26,6 +26,7 @@ import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.StorageTask;
 import com.google.firebase.storage.UploadTask;
+import com.rokudoz.irecipe.Models.PossibleIngredients;
 import com.rokudoz.irecipe.Models.Recipe;
 import com.squareup.picasso.Picasso;
 
@@ -114,11 +115,17 @@ public class AddRecipesActivity extends AppCompatActivity {
 
 
         String tagInput = editTextTags.getText().toString();
+        String[] possibleIngredients = PossibleIngredients.getIngredientsNames();
         String[] tagArray = tagInput.split("\\s*,\\s*");
-        final Map<String, Boolean> tags = new HashMap<>();
 
-        for (String tag : tagArray) {
-            tags.put(tag, true);
+        final Map<String, Boolean> tags = new HashMap<>();
+        for (String ingredient : possibleIngredients) {
+            tags.put(ingredient, false);
+        }
+        if (!tagInput.trim().equals("")) {
+            for (String tag : tagArray) {
+                tags.put(tag, true);
+            }
         }
 
 
@@ -147,6 +154,12 @@ public class AddRecipesActivity extends AppCompatActivity {
                                                     editTextTags.setText("");
                                                     editTextDescription.setText("");
                                                     editTextTitle.setText("");
+                                                }
+                                            })
+                                            .addOnFailureListener(new OnFailureListener() {
+                                                @Override
+                                                public void onFailure(@NonNull Exception e) {
+                                                    Toast.makeText(AddRecipesActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
                                                 }
                                             });
                                 }

@@ -63,7 +63,9 @@ public class RecipeDetailed extends AppCompatActivity {
             HashMap<String, Boolean> tags = (HashMap<String, Boolean>) getIntent().getSerializableExtra("ingredients");
 
             for (String tag : tags.keySet()) {
-                ingredients += "\n- " + tag;
+                if (tags.get(tag)) {
+                    ingredients += "\n- " + tag;
+                }
             }
 
             tvTitle.setText(title);
@@ -72,6 +74,8 @@ public class RecipeDetailed extends AppCompatActivity {
 
             Picasso.get()
                     .load(imageUrl)
+                    .fit()
+                    .centerCrop()
                     .into(mImageView);
         }
     }
