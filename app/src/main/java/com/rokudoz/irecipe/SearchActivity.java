@@ -60,7 +60,10 @@ public class SearchActivity extends AppCompatActivity {
         setContentView(R.layout.activity_search);
         pbLoading = findViewById(R.id.pbLoading);
         pbLoading.setVisibility(View.VISIBLE);
+
+        buildRecyclerView();
         setupFirebaseAuth();
+
     }
 
     public void onStart() {
@@ -192,7 +195,6 @@ public class SearchActivity extends AppCompatActivity {
 //                        Log.d(TAG, "onAuthStateChanged: signed_in: " + user.getUid());
 //                        Toast.makeText(SearchActivity.this, "Authenticated with: " + user.getEmail(), Toast.LENGTH_SHORT).show();
                         userSigned = true;
-                        buildRecyclerView();
                         performQuery();
                     } else {
                         Toast.makeText(SearchActivity.this, "Email is not Verified\nCheck your Inbox", Toast.LENGTH_SHORT).show();

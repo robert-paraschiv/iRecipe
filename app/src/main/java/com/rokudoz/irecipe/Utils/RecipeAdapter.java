@@ -74,7 +74,6 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
         holder.tvDocumentId.setText(currentItem.getDocumentId());
         Picasso.get()
                 .load(currentItem.getImageUrl())
-                .placeholder(R.mipmap.ic_launcher)
                 .fit()
                 .centerCrop()
                 .into(holder.mImageView);
