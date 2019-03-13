@@ -20,19 +20,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/addRecipes_image"
+        android:layout_centerHorizontal="true"
         android:layout_marginTop="16dp"
         android:text="Choose File" />
-
-    <EditText
-        android:id="@+id/addRecipes_text_file_name"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/addRecipes_image"
-        android:layout_marginStart="-1dp"
-        android:layout_marginTop="16dp"
-        android:layout_toEndOf="@+id/addRecipes_choose_path_btn"
-        android:hint="Enter a file name" />
-
 
     <EditText
         android:id="@+id/edit_text_title"
@@ -72,7 +62,6 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/addRecipes_progressbar"
         android:layout_marginTop="16dp"
-        android:onClick="addRecipe"
         android:text="Add" />
 
     <Button

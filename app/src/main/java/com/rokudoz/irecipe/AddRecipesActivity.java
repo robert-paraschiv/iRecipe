@@ -24,6 +24,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.StorageTask;
 import com.google.firebase.storage.UploadTask;
 import com.rokudoz.irecipe.Models.Recipe;
 import com.squareup.picasso.Picasso;
@@ -39,9 +40,10 @@ public class AddRecipesActivity extends AppCompatActivity {
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private CollectionReference collectionReference = db.collection("Recipes");
     private StorageReference mStorageRef = FirebaseStorage.getInstance().getReference("RecipePhotos");
+    private StorageTask mUploadTask;
 
-    private EditText editTextTitle, editTextDescription, editTextTags, editTextFileName;
-    private Button mChooseFileBtn;
+    private EditText editTextTitle, editTextDescription, editTextTags;
+    private Button mChooseFileBtn, mAddRecipeBtn;
     private ImageView mImageView;
     private ProgressBar mProgressBar;
 
@@ -54,14 +56,26 @@ public class AddRecipesActivity extends AppCompatActivity {
         editTextDescription = findViewById(R.id.edit_text_description);
         editTextTags = findViewById(R.id.edit_text_tags);
         mProgressBar = findViewById(R.id.addRecipes_progressbar);
-        editTextFileName = findViewById(R.id.addRecipes_text_file_name);
         mImageView = findViewById(R.id.addRecipes_image);
         mChooseFileBtn = findViewById(R.id.addRecipes_choose_path_btn);
+        mAddRecipeBtn = findViewById(R.id.addRecipes_add_btn);
+
 
         mChooseFileBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 openFileChooser();
+            }
+        });
+        mAddRecipeBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mUploadTask != null && mUploadTask.isInProgress()) {
+                    Toast.makeText(AddRecipesActivity.this, "Upload in progress...", Toast.LENGTH_SHORT).show();
+
+                } else {
+                    addRecipe();
+                }
             }
         });
 
@@ -94,7 +108,7 @@ public class AddRecipesActivity extends AppCompatActivity {
     }
 
     // Adding Recipes -----------------------------------------------------------------------------
-    public void addRecipe(View v) {
+    public void addRecipe() {
         final String title = editTextTitle.getText().toString();
         final String description = editTextDescription.getText().toString();
 
@@ -112,7 +126,7 @@ public class AddRecipesActivity extends AppCompatActivity {
             final StorageReference fileReference = mStorageRef.child(System.currentTimeMillis()
                     + "." + getFileExtension(mImageUri));
 
-            fileReference.putFile(mImageUri)
+            mUploadTask = fileReference.putFile(mImageUri)
                     .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                         @Override
                         public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
@@ -143,7 +157,7 @@ public class AddRecipesActivity extends AppCompatActivity {
                                 public void run() {
                                     mProgressBar.setProgress(0);
                                 }
-                            }, 500);
+                            }, 50);
                             Toast.makeText(AddRecipesActivity.this, "Upload Succesfull", Toast.LENGTH_SHORT).show();
 
 
@@ -168,7 +182,6 @@ public class AddRecipesActivity extends AppCompatActivity {
         }
     }
 //  ----------------------------------------------------------------------------------------------
-
 
 
     public void backToSearch(View v) {

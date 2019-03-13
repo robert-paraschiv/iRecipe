@@ -81,6 +81,8 @@ public class SearchActivity extends AppCompatActivity {
         mRecyclerView = findViewById(R.id.recycler_view);
         mRecyclerView.setHasFixedSize(true);
         mLayoutManager = new LinearLayoutManager(this);
+
+        mRecipeList = new ArrayList<>();
         mAdapter = new RecipeAdapter(mRecipeList);
 
         mRecyclerView.setLayoutManager(mLayoutManager);
@@ -101,7 +103,7 @@ public class SearchActivity extends AppCompatActivity {
                             for (String tag : user.getTags().keySet()) {
                                 tags.put(tag, Objects.requireNonNull(user.getTags().get(tag)));
                             }
-                            Toast.makeText(SearchActivity.this, tags.toString(), Toast.LENGTH_SHORT).show();
+//                            Toast.makeText(SearchActivity.this, tags.toString(), Toast.LENGTH_SHORT).show();
                         }
 
                         Query notesQuery = null;
@@ -186,8 +188,8 @@ public class SearchActivity extends AppCompatActivity {
 //                        Log.d(TAG, "onAuthStateChanged: signed_in: " + user.getUid());
 //                        Toast.makeText(SearchActivity.this, "Authenticated with: " + user.getEmail(), Toast.LENGTH_SHORT).show();
                         userSigned = true;
-                        performQuery();
                         buildRecyclerView();
+                        performQuery();
                     } else {
                         Toast.makeText(SearchActivity.this, "Email is not Verified\nCheck your Inbox", Toast.LENGTH_SHORT).show();
                         FirebaseAuth.getInstance().signOut();
