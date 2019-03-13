@@ -19,6 +19,10 @@ import com.google.firebase.firestore.QuerySnapshot;
 import com.rokudoz.irecipe.Models.Recipe;
 import com.rokudoz.irecipe.Models.User;
 
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
+
 public class RecipeDetailed extends AppCompatActivity {
     private static final String TAG = "RecipeDetailed";
     private TextView tvTitle, tvDescription, tvIngredients;
@@ -44,40 +48,20 @@ public class RecipeDetailed extends AppCompatActivity {
             Log.d(TAG, "getIncomingIntent: found intent extras");
 
             String documentID = getIntent().getStringExtra("documentID");
+            String title = getIntent().getStringExtra("title");
+            String description = getIntent().getStringExtra("description");
+            String ingredients = "";
 
-            recipesRef.document(documentID).get()
-                    .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                        @Override
-                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                            if (task.isSuccessful()) {
-                                DocumentSnapshot documentSnapshot = task.getResult();
-                                if (documentSnapshot.exists()) {
-                                    String ingredients = "";
+            @SuppressWarnings("unchecked")
+            HashMap<String, Boolean> tags = (HashMap<String, Boolean>) getIntent().getSerializableExtra("ingredients");
 
-                                    Recipe recipe = documentSnapshot.toObject(Recipe.class);
-                                    recipe.setDocumentId(documentSnapshot.getId());
+            for (String tag : tags.keySet()) {
+                ingredients += "\n- " + tag;
+            }
 
-                                    String documentId = recipe.getDocumentId();
-                                    String title = recipe.getTitle();
-                                    String description = recipe.getDescription();
-                                    tvTitle.setText(title);
-                                    tvDescription.setText(description);
-
-                                    for (String tag : recipe.getTags().keySet()) {
-                                        ingredients += "\n- " + tag + " " + recipe.getTags().get(tag);
-                                    }
-
-
-                                    tvIngredients.setText(ingredients);
-                                } else {
-                                    Log.d(TAG, "No such document");
-                                }
-
-                            } else {
-                                Log.d(TAG, "get failed with ", task.getException());
-                            }
-                        }
-                    });
+            tvTitle.setText(title);
+            tvDescription.setText(description);
+            tvIngredients.setText(ingredients);
         }
     }
 

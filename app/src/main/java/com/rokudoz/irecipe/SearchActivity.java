@@ -11,8 +11,9 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import com.firebase.ui.firestore.FirestoreRecyclerOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
@@ -26,11 +27,13 @@ import com.rokudoz.irecipe.Models.Recipe;
 import com.rokudoz.irecipe.Models.User;
 import com.rokudoz.irecipe.Utils.RecipeAdapter;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
-public class SearchActivity extends AppCompatActivity implements RecipeAdapter.OnItemClickListener {
+public class SearchActivity extends AppCompatActivity {
     private static final String TAG = "SearchActivity";
     private Boolean userSigned = false;
     private ProgressBar pbLoading;
@@ -42,20 +45,22 @@ public class SearchActivity extends AppCompatActivity implements RecipeAdapter.O
     private CollectionReference recipeRef = db.collection("Recipes");
     private CollectionReference usersReference = db.collection("Users");
 
-    private RecipeAdapter recipeAdapter;
+    private RecyclerView mRecyclerView;
+    private RecipeAdapter mAdapter;
+    private RecyclerView.LayoutManager mLayoutManager;
 
-    ArrayList<String> selectedIngredients;
+    private ArrayList<Recipe> mRecipeList = new ArrayList<>();
+    private ArrayList<String> mDocumentIDs = new ArrayList<>();
+
+    private DocumentSnapshot mLastQueriedDocument;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
-        selectedIngredients = new ArrayList<>();
         pbLoading = findViewById(R.id.pbLoading);
         pbLoading.setVisibility(View.VISIBLE);
         setupFirebaseAuth();
-
-
     }
 
     public void onStart() {
@@ -70,14 +75,22 @@ public class SearchActivity extends AppCompatActivity implements RecipeAdapter.O
         if (mAuthListener != null) {
             FirebaseAuth.getInstance().removeAuthStateListener(mAuthListener);
         }
-        if (userSigned) {
-            recipeAdapter.stopListening();
-        }
     }
 
-    private void setupRecyclerView() {
+    public void buildRecyclerView() {
+        mRecyclerView = findViewById(R.id.recycler_view);
+        mRecyclerView.setHasFixedSize(true);
+        mLayoutManager = new LinearLayoutManager(this);
+        mAdapter = new RecipeAdapter(mRecipeList);
 
-        usersReference.whereEqualTo("user_id", FirebaseAuth.getInstance().getCurrentUser().getUid()).get()
+        mRecyclerView.setLayoutManager(mLayoutManager);
+        mRecyclerView.setAdapter(mAdapter);
+    }
+
+
+    private void performQuery() {
+
+        usersReference.whereEqualTo("user_id", Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid()).get()
                 .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                     @Override
                     public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
@@ -86,36 +99,57 @@ public class SearchActivity extends AppCompatActivity implements RecipeAdapter.O
                         for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
                             User user = documentSnapshot.toObject(User.class);
                             for (String tag : user.getTags().keySet()) {
-                                tags.put(tag, user.getTags().get(tag));
+                                tags.put(tag, Objects.requireNonNull(user.getTags().get(tag)));
                             }
-                            Toast.makeText(SearchActivity.this, tags.toString(), Toast.LENGTH_LONG).show();
+                            Toast.makeText(SearchActivity.this, tags.toString(), Toast.LENGTH_SHORT).show();
                         }
 
-                        Query query = recipeRef.whereEqualTo("tags", tags);
+                        Query notesQuery = null;
+                        if (mLastQueriedDocument != null) {
+                            notesQuery = recipeRef.whereGreaterThanOrEqualTo("tags", tags)
+                                    .startAfter(mLastQueriedDocument); // Necessary so we don't have the same results multiple times
+//                                    .limit(3);
+                        } else {
+                            notesQuery = recipeRef.whereGreaterThanOrEqualTo("tags", tags);
+//                                    .limit(3);
+                        }
 
-                        FirestoreRecyclerOptions<Recipe> options = new FirestoreRecyclerOptions.Builder<Recipe>()
-                                .setQuery(query, Recipe.class)
-                                .build();
-
-                        recipeAdapter = new RecipeAdapter(options);
-
-                        RecyclerView recyclerView = findViewById(R.id.recycler_view);
-                        recyclerView.setHasFixedSize(true);
-                        recyclerView.setLayoutManager(new LinearLayoutManager(SearchActivity.this));
-                        recyclerView.setAdapter(recipeAdapter);
-
-                        recipeAdapter.startListening();
-
-                        pbLoading.setVisibility(View.INVISIBLE);
-
-                        recipeAdapter.setOnItemClickListener(new RecipeAdapter.OnItemClickListener() {
+                        notesQuery.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                             @Override
-                            public void onItemClick(DocumentSnapshot documentSnapshot, int position) {
-                                Recipe recipe = documentSnapshot.toObject(Recipe.class);
-                                String id = documentSnapshot.getId();
-                                String path = documentSnapshot.getReference().getPath();
-                                Intent intent = new Intent(SearchActivity.this, RecipeDetailed.class).putExtra("documentID", id);
-                                //Toast.makeText(SearchActivity.this, "Position: " + position + "ID: " + id + "Path: " +path , Toast.LENGTH_SHORT).show();
+                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                if (task.isSuccessful()) {
+
+                                    for (QueryDocumentSnapshot document : Objects.requireNonNull(task.getResult())) {
+                                        Recipe recipe = document.toObject(Recipe.class);
+                                        mRecipeList.add(recipe);
+                                        mDocumentIDs.add(document.getId());
+//                        Log.d(TAG, "onComplete: got a new note. Position: " + (mNotes.size() - 1));
+                                    }
+
+                                    if (task.getResult().size() != 0) {
+                                        mLastQueriedDocument = task.getResult().getDocuments()
+                                                .get(task.getResult().size() - 1);
+                                    }
+
+                                    mAdapter.notifyDataSetChanged();
+                                } else {
+                                    Toast.makeText(SearchActivity.this, "FAILED", Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        });
+                        pbLoading.setVisibility(View.INVISIBLE);
+                        mAdapter.setOnItemClickListener(new RecipeAdapter.OnItemClickListener() {
+                            @Override
+                            public void onItemClick(int position) {
+                                String id = mDocumentIDs.get(position);
+                                String title = mRecipeList.get(position).getTitle();
+                                String description = mRecipeList.get(position).getDescription();
+                                Map<String, Boolean> ingredients = mRecipeList.get(position).getTags();
+                                Intent intent = new Intent(SearchActivity.this, RecipeDetailed.class)
+                                        .putExtra("documentID", id)
+                                        .putExtra("title", title)
+                                        .putExtra("description", description)
+                                        .putExtra("ingredients", (Serializable) ingredients);
                                 startActivity(intent);
                             }
                         });
@@ -152,7 +186,8 @@ public class SearchActivity extends AppCompatActivity implements RecipeAdapter.O
 //                        Log.d(TAG, "onAuthStateChanged: signed_in: " + user.getUid());
 //                        Toast.makeText(SearchActivity.this, "Authenticated with: " + user.getEmail(), Toast.LENGTH_SHORT).show();
                         userSigned = true;
-                        setupRecyclerView();
+                        performQuery();
+                        buildRecyclerView();
                     } else {
                         Toast.makeText(SearchActivity.this, "Email is not Verified\nCheck your Inbox", Toast.LENGTH_SHORT).show();
                         FirebaseAuth.getInstance().signOut();
@@ -172,8 +207,4 @@ public class SearchActivity extends AppCompatActivity implements RecipeAdapter.O
         };
     }
 
-    @Override
-    public void onItemClick(DocumentSnapshot documentSnapshot, int position) {
-
-    }
 }
