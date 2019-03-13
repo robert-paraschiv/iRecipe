@@ -11,9 +11,8 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnCompleteListener;
+import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
@@ -36,12 +35,6 @@ public class SearchActivity extends AppCompatActivity implements RecipeAdapter.O
     private Boolean userSigned = false;
     private ProgressBar pbLoading;
 
-    //vars
-    private View mParentLayout;
-    private RecyclerView mRecyclerView;
-    private ArrayList<Recipe> mNotes = new ArrayList<>();
-    private DocumentSnapshot mLastQueriedDocument;
-
     //Firebase
     private FirebaseAuth.AuthStateListener mAuthListener;
 
@@ -60,9 +53,9 @@ public class SearchActivity extends AppCompatActivity implements RecipeAdapter.O
         selectedIngredients = new ArrayList<>();
         pbLoading = findViewById(R.id.pbLoading);
         pbLoading.setVisibility(View.VISIBLE);
-        mRecyclerView = findViewById(R.id.recycler_view);
         setupFirebaseAuth();
-        initRecyclerView();
+
+
     }
 
     public void onStart() {
@@ -77,18 +70,10 @@ public class SearchActivity extends AppCompatActivity implements RecipeAdapter.O
         if (mAuthListener != null) {
             FirebaseAuth.getInstance().removeAuthStateListener(mAuthListener);
         }
-    }
-
-    private void initRecyclerView(){
-        if(recipeAdapter == null){
-            recipeAdapter = new RecipeAdapter(SearchActivity.this, mNotes);
+        if (userSigned) {
+            recipeAdapter.stopListening();
         }
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(SearchActivity.this));
-        mRecyclerView.setAdapter(recipeAdapter);
-
-        
     }
-
 
     private void setupRecyclerView() {
 
@@ -103,45 +88,26 @@ public class SearchActivity extends AppCompatActivity implements RecipeAdapter.O
                             for (String tag : user.getTags().keySet()) {
                                 tags.put(tag, user.getTags().get(tag));
                             }
-                            Toast.makeText(SearchActivity.this, tags.toString(), Toast.LENGTH_SHORT).show();
+                            Toast.makeText(SearchActivity.this, tags.toString(), Toast.LENGTH_LONG).show();
                         }
 
-                        Query notesQuery = null;
-                        if(mLastQueriedDocument != null){
-                            notesQuery = recipeRef
-                                    .whereEqualTo("tags", tags);
-                        }
-                        else{
-                            notesQuery = recipeRef
-                                    .whereEqualTo("tags", tags);
-                        }
+                        Query query = recipeRef.whereEqualTo("tags", tags);
 
-                        notesQuery.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                            @Override
-                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                                if(task.isSuccessful()){
+                        FirestoreRecyclerOptions<Recipe> options = new FirestoreRecyclerOptions.Builder<Recipe>()
+                                .setQuery(query, Recipe.class)
+                                .build();
 
-                                    for(QueryDocumentSnapshot document: task.getResult()){
-                                        Recipe recipe = document.toObject(Recipe.class);
-                                        mNotes.add(recipe);
-//                        Log.d(TAG, "onComplete: got a new note. Position: " + (mNotes.size() - 1));
-                                    }
+                        recipeAdapter = new RecipeAdapter(options);
 
-                                    if(task.getResult().size() != 0){
-                                        mLastQueriedDocument = task.getResult().getDocuments()
-                                                .get(task.getResult().size() -1);
-                                    }
+                        RecyclerView recyclerView = findViewById(R.id.recycler_view);
+                        recyclerView.setHasFixedSize(true);
+                        recyclerView.setLayoutManager(new LinearLayoutManager(SearchActivity.this));
+                        recyclerView.setAdapter(recipeAdapter);
 
-                                    recipeAdapter.notifyDataSetChanged();
-                                }
-                                else{
-                                    Toast.makeText(SearchActivity.this, "FAILED", Toast.LENGTH_SHORT).show();
-                                }
-                            }
-                        });
-
+                        recipeAdapter.startListening();
 
                         pbLoading.setVisibility(View.INVISIBLE);
+
                         recipeAdapter.setOnItemClickListener(new RecipeAdapter.OnItemClickListener() {
                             @Override
                             public void onItemClick(DocumentSnapshot documentSnapshot, int position) {
@@ -153,8 +119,6 @@ public class SearchActivity extends AppCompatActivity implements RecipeAdapter.O
                                 startActivity(intent);
                             }
                         });
-
-
                     }
                 });
 
@@ -207,7 +171,6 @@ public class SearchActivity extends AppCompatActivity implements RecipeAdapter.O
             }
         };
     }
-
 
     @Override
     public void onItemClick(DocumentSnapshot documentSnapshot, int position) {
