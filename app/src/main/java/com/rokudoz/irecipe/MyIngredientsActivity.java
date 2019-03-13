@@ -24,6 +24,7 @@ import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.rokudoz.irecipe.Account.LoginActivity;
+import com.rokudoz.irecipe.Models.PossibleIngredients;
 import com.rokudoz.irecipe.Models.User;
 
 import java.util.ArrayList;
@@ -122,7 +123,7 @@ public class MyIngredientsActivity extends AppCompatActivity {
         final ListView cbListView = findViewById(R.id.checkable_list);
         //set multiple selection mode
         cbListView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
-        final String[] items = {"potatoes", "cheese", "apples", "salt", "gorgonzola"};
+        final String[] items = PossibleIngredients.getIngredientsNames();
         //supply data items to ListView
         ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, R.layout.checkable_list_layout, R.id.txt_title, items);
         cbListView.setAdapter(arrayAdapter);
