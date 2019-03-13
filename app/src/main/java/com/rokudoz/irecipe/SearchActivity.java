@@ -106,7 +106,7 @@ public class SearchActivity extends AppCompatActivity {
                             for (String tag : user.getTags().keySet()) {
                                 tags.put(tag, Objects.requireNonNull(user.getTags().get(tag)));
                             }
-//                            Toast.makeText(SearchActivity.this, tags.toString(), Toast.LENGTH_SHORT).show();
+                            Toast.makeText(SearchActivity.this, tags.toString(), Toast.LENGTH_SHORT).show();
                         }
 
                         Query notesQuery = null;

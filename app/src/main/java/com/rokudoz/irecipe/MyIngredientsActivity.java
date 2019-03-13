@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class MyIngredientsActivity extends AppCompatActivity {
     private static final String TAG = "MyIngredientsActivity";
@@ -37,14 +38,11 @@ public class MyIngredientsActivity extends AppCompatActivity {
     private TextView textViewData;
     private ProgressBar pbLoading;
 
-    private Boolean hasPotatoes = false;
-    private Boolean hasCheese = false;
-    private Boolean hasApples = false;
-    private Boolean hasSalt = false;
-    private Boolean hasGorgonzola = false;
+    private Boolean querrySucceeded = false;
 
     private String documentID = "";
-    ArrayList<String> selectedIngredients;
+
+    Map<String, Boolean> ingredientsUserHas = new HashMap<>();
 
     //Firebase
     private FirebaseAuth.AuthStateListener mAuthListener;
@@ -56,7 +54,6 @@ public class MyIngredientsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my_ingredients);
 
-        selectedIngredients = new ArrayList<String>();
         textViewData = findViewById(R.id.tv_data);
 
         pbLoading = findViewById(R.id.pbLoading);
@@ -64,15 +61,13 @@ public class MyIngredientsActivity extends AppCompatActivity {
 
         getDocumentId();
         setupFirebaseAuth();
+        retrieveSavedIngredients();
     }
 
     @Override
     protected void onStart() {
         super.onStart();
         FirebaseAuth.getInstance().addAuthStateListener(mAuthListener);
-        //setupCheckList();
-        retrieveSavedIngredients();
-
     }
 
     @Override
@@ -107,31 +102,14 @@ public class MyIngredientsActivity extends AppCompatActivity {
                             User user = documentSnapshot.toObject(User.class);
                             for (String tag : user.getTags().keySet()) {
                                 data += "\n " + tag + " " + user.getTags().get(tag);
-                                if (tag.equals("potatoes") && user.getTags().get(tag) == true) {
-                                    hasPotatoes = true;
-                                    selectedIngredients.add(tag);
-                                }
-                                if (tag.equals("cheese") && user.getTags().get(tag) == true) {
-                                    hasCheese = true;
-                                    selectedIngredients.add(tag);
-                                }
-                                if (tag.equals("apples") && user.getTags().get(tag) == true) {
-                                    hasApples = true;
-                                    selectedIngredients.add(tag);
-                                }
-                                if (tag.equals("salt") && user.getTags().get(tag) == true) {
-                                    hasSalt = true;
-                                    selectedIngredients.add(tag);
-                                }if (tag.equals("gorgonzola") && user.getTags().get(tag) == true) {
-                                    hasGorgonzola = true;
-                                    selectedIngredients.add(tag);
-                                }
+                                ingredientsUserHas.put(tag, Objects.requireNonNull(user.getTags().get(tag)));
                             }
                         }
                         textViewData.setText(data);
 
-                        pbLoading.setVisibility(View.INVISIBLE);
                         setupCheckList();
+                        pbLoading.setVisibility(View.INVISIBLE);
+
                     }
                 });
 
@@ -144,48 +122,31 @@ public class MyIngredientsActivity extends AppCompatActivity {
         final ListView cbListView = findViewById(R.id.checkable_list);
         //set multiple selection mode
         cbListView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
-        final String[] items = {"potatoes", "cheese", "apples", "salt","gorgonzola"};
+        final String[] items = {"potatoes", "cheese", "apples", "salt", "gorgonzola"};
         //supply data items to ListView
         ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, R.layout.checkable_list_layout, R.id.txt_title, items);
         cbListView.setAdapter(arrayAdapter);
-        //set OnItemClickListener
-        cbListView.setItemChecked(0, hasPotatoes);
-        cbListView.setItemChecked(1, hasCheese);
-        cbListView.setItemChecked(2, hasApples);
-        cbListView.setItemChecked(3, hasSalt);
-        cbListView.setItemChecked(4, hasGorgonzola);
+
+        // sets the initial checkbox values taken from database
+        int index = 0;
+        for (String item : items) {
+            cbListView.setItemChecked(index, Objects.requireNonNull(ingredientsUserHas.get(item)));
+            Log.d(TAG, item + " index " + index + " value " + ingredientsUserHas.get(item));
+            index++;
+        }
 
         cbListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
-                Map<String, Boolean> deselectedIngredientsHashMap = new HashMap<>();
-                if (!cbListView.isItemChecked(0))
-                    deselectedIngredientsHashMap.put(items[0], false);
-                else
-                    deselectedIngredientsHashMap.put(items[0], true);
-
-                if (!cbListView.isItemChecked(1))
-                    deselectedIngredientsHashMap.put(items[1], false);
-                else
-                    deselectedIngredientsHashMap.put(items[1], true);
-
-                if (!cbListView.isItemChecked(2))
-                    deselectedIngredientsHashMap.put(items[2], false);
-                else
-                    deselectedIngredientsHashMap.put(items[2], true);
-
-                if (!cbListView.isItemChecked(3))
-                    deselectedIngredientsHashMap.put(items[3], false);
-                else
-                    deselectedIngredientsHashMap.put(items[3], true);
-                if (!cbListView.isItemChecked(4))
-                    deselectedIngredientsHashMap.put(items[4], false);
-                else
-                    deselectedIngredientsHashMap.put(items[4], true);
-
+                // gets checkBox value and updates database with it
+                Map<String, Boolean> selectedIngredientsMap = new HashMap<>();
+                int i = 0;
+                for (String tag : items) {
+                    selectedIngredientsMap.put(tag, cbListView.isItemChecked(i));
+                    i++;
+                }
 
                 db.collection("Users").document(documentID)
-                        .update("tags", deselectedIngredientsHashMap);
+                        .update("tags", selectedIngredientsMap);
             }
 
         });

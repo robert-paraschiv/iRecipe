@@ -121,6 +121,7 @@ public class AddRecipesActivity extends AppCompatActivity {
             tags.put(tag, true);
         }
 
+
         // Uploading image to Firestore
         if (mImageUri != null) {
             final StorageReference fileReference = mStorageRef.child(System.currentTimeMillis()
