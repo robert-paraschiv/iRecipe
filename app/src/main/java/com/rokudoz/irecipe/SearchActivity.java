@@ -146,12 +146,16 @@ public class SearchActivity extends AppCompatActivity {
                                 String id = mDocumentIDs.get(position);
                                 String title = mRecipeList.get(position).getTitle();
                                 String description = mRecipeList.get(position).getDescription();
+                                String imageUrl = mRecipeList.get(position).getImageUrl();
                                 Map<String, Boolean> ingredients = mRecipeList.get(position).getTags();
+
                                 Intent intent = new Intent(SearchActivity.this, RecipeDetailed.class)
                                         .putExtra("documentID", id)
                                         .putExtra("title", title)
                                         .putExtra("description", description)
-                                        .putExtra("ingredients", (Serializable) ingredients);
+                                        .putExtra("ingredients", (Serializable) ingredients)
+                                        .putExtra("imageUrl",imageUrl);
+
                                 startActivity(intent);
                             }
                         });
