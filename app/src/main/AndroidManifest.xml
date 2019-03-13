@@ -2,22 +2,25 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.rokudoz.irecipe">
 
+    <uses-permission android:name="android.permission.INTERNET"/>
+
     <application
         android:allowBackup="true"
+        android:fullBackupContent="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".RecipeDetailed"></activity>
+        <activity android:name=".RecipeDetailed"/>
         <activity android:name=".Account.RegisterActivity" />
         <activity android:name=".MyIngredientsActivity" />
         <activity android:name=".AddRecipesActivity" />
         <activity android:name=".Account.LoginActivity" />
         <activity android:name=".SearchActivity">
             <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
