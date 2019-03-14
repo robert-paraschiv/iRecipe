@@ -1,14 +1,17 @@
-package com.rokudoz.irecipe;
+package com.rokudoz.irecipe.Fragments;
 
 import android.content.Intent;
-import android.support.annotation.NonNull;
-import android.support.design.widget.FloatingActionButton;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
@@ -27,8 +30,11 @@ import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.rokudoz.irecipe.Account.LoginActivity;
+import com.rokudoz.irecipe.AddRecipesActivity;
 import com.rokudoz.irecipe.Models.Recipe;
 import com.rokudoz.irecipe.Models.User;
+import com.rokudoz.irecipe.R;
+import com.rokudoz.irecipe.RecipeDetailed;
 import com.rokudoz.irecipe.Utils.RecipeAdapter;
 
 import java.io.Serializable;
@@ -37,9 +43,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-public class SearchActivity extends AppCompatActivity implements RecipeAdapter.OnItemClickListener {
-    private static final String TAG = "SearchActivity";
-    private Boolean userSigned = false;
+public class HomeFragment extends Fragment implements RecipeAdapter.OnItemClickListener {
+    private static final String TAG = "HomeFragment";
+
     private ProgressBar pbLoading;
     private FloatingActionButton fab;
 
@@ -60,12 +66,15 @@ public class SearchActivity extends AppCompatActivity implements RecipeAdapter.O
 
     private DocumentSnapshot mLastQueriedDocument;
 
+    @Nullable
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_search);
-        pbLoading = findViewById(R.id.pbLoading);
-        fab = findViewById(R.id.fab_add_recipe);
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_home, container, false);
+
+        pbLoading = view.findViewById(R.id.homeFragment_pbLoading);
+        fab = view.findViewById(R.id.fab_add_recipe);
+        mRecyclerView = view.findViewById(R.id.recycler_view);
+
         pbLoading.setVisibility(View.VISIBLE);
         mStorageRef = FirebaseStorage.getInstance();
 
@@ -73,8 +82,12 @@ public class SearchActivity extends AppCompatActivity implements RecipeAdapter.O
         buildRecyclerView();
         setupFirebaseAuth();
 
+
+        return view; // HAS TO BE THE LAST ONE ---------------------------------
     }
 
+
+    @Override
     public void onStart() {
         super.onStart();
         FirebaseAuth.getInstance().addAuthStateListener(mAuthListener);
@@ -82,17 +95,17 @@ public class SearchActivity extends AppCompatActivity implements RecipeAdapter.O
     }
 
     @Override
-    protected void onStop() {
+    public void onStop() {
         super.onStop();
         if (mAuthListener != null) {
             FirebaseAuth.getInstance().removeAuthStateListener(mAuthListener);
         }
     }
 
+
     public void buildRecyclerView() {
-        mRecyclerView = findViewById(R.id.recycler_view);
         mRecyclerView.setHasFixedSize(true);
-        mLayoutManager = new LinearLayoutManager(this);
+        mLayoutManager = new LinearLayoutManager(getContext());
 
         mRecipeList = new ArrayList<>();
         mAdapter = new RecipeAdapter(mRecipeList);
@@ -100,7 +113,7 @@ public class SearchActivity extends AppCompatActivity implements RecipeAdapter.O
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setAdapter(mAdapter);
 
-        mAdapter.setOnItemClickListener(SearchActivity.this);
+        mAdapter.setOnItemClickListener(HomeFragment.this);
     }
 
 
@@ -117,7 +130,7 @@ public class SearchActivity extends AppCompatActivity implements RecipeAdapter.O
                             for (String tag : user.getTags().keySet()) {
                                 tags.put(tag, Objects.requireNonNull(user.getTags().get(tag)));
                             }
-//                            Toast.makeText(SearchActivity.this, tags.toString(), Toast.LENGTH_SHORT).show();
+//                            Toast.makeText(MainActivity.this, tags.toString(), Toast.LENGTH_SHORT).show();
                         }
 
                         Query notesQuery = null;
@@ -149,7 +162,7 @@ public class SearchActivity extends AppCompatActivity implements RecipeAdapter.O
 
                                     mAdapter.notifyDataSetChanged();
                                 } else {
-                                    Toast.makeText(SearchActivity.this, "FAILED", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(getContext(), "FAILED", Toast.LENGTH_SHORT).show();
                                 }
                             }
                         });
@@ -163,7 +176,7 @@ public class SearchActivity extends AppCompatActivity implements RecipeAdapter.O
                                 String imageUrl = mRecipeList.get(position).getImageUrl();
                                 Map<String, Boolean> ingredients = mRecipeList.get(position).getTags();
 
-                                Intent intent = new Intent(SearchActivity.this, RecipeDetailed.class)
+                                Intent intent = new Intent(getContext(), RecipeDetailed.class)
                                         .putExtra("documentID", id)
                                         .putExtra("title", title)
                                         .putExtra("description", description)
@@ -176,7 +189,7 @@ public class SearchActivity extends AppCompatActivity implements RecipeAdapter.O
                             @Override
                             public void onFavoriteCick(int position) {
                                 String id = mDocumentIDs.get(position);
-                                Toast.makeText(SearchActivity.this, "Favorite click at " + id, Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getContext(), "Favorite click at " + id, Toast.LENGTH_SHORT).show();
                             }
 
                             @Override
@@ -193,7 +206,7 @@ public class SearchActivity extends AppCompatActivity implements RecipeAdapter.O
                                         recipeRef.document(id).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
                                             @Override
                                             public void onSuccess(Void aVoid) {
-                                                Toast.makeText(SearchActivity.this, "Deleted from Db", Toast.LENGTH_SHORT).show();
+                                                Toast.makeText(getContext(), "Deleted from Db", Toast.LENGTH_SHORT).show();
                                                 mRecipeList.remove(position);
                                                 mDocumentIDs.remove(position);
                                                 performQuery();
@@ -201,17 +214,17 @@ public class SearchActivity extends AppCompatActivity implements RecipeAdapter.O
                                         }).addOnFailureListener(new OnFailureListener() {
                                             @Override
                                             public void onFailure(@NonNull Exception e) {
-                                                Toast.makeText(SearchActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                                                Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
                                             }
                                         });
                                     }
                                 }).addOnFailureListener(new OnFailureListener() {
                                     @Override
                                     public void onFailure(@NonNull Exception e) {
-                                        Toast.makeText(SearchActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
                                     }
                                 });
-//                                Toast.makeText(SearchActivity.this, "Delete click at " + position, Toast.LENGTH_SHORT).show();
+//                                Toast.makeText(MainActivity.this, "Delete click at " + position, Toast.LENGTH_SHORT).show();
                             }
                         });
                     }
@@ -220,13 +233,8 @@ public class SearchActivity extends AppCompatActivity implements RecipeAdapter.O
     }
 
 
-    public void navigateToAddRecipes(View v) {
-        Intent intent = new Intent(this, AddRecipesActivity.class);
-        startActivity(intent);
-    }
-
-    public void navigateToMyIngredients(View v) {
-        Intent intent = new Intent(this, MyIngredientsActivity.class);
+    public void navigateToAddRecipes() {
+        Intent intent = new Intent(getContext(), AddRecipesActivity.class);
         startActivity(intent);
     }
 
@@ -245,26 +253,31 @@ public class SearchActivity extends AppCompatActivity implements RecipeAdapter.O
                     //check if email is verified
                     if (user.isEmailVerified()) {
 //                        Log.d(TAG, "onAuthStateChanged: signed_in: " + user.getUid());
-//                        Toast.makeText(SearchActivity.this, "Authenticated with: " + user.getEmail(), Toast.LENGTH_SHORT).show();
-                        if (user.getUid().equals("7H4eXFbVusXFoJWyvDyBv1e0NvE3"))
-                        {
+//                        Toast.makeText(MainActivity.this, "Authenticated with: " + user.getEmail(), Toast.LENGTH_SHORT).show();
+                        if (user.getUid().equals("7H4eXFbVusXFoJWyvDyBv1e0NvE3")) {
                             fab.show();
+                            fab.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    navigateToAddRecipes();
+                                }
+                            });
                         }
-                        userSigned = true;
+                        //If use is authenticated, perform query
                         performQuery();
                     } else {
-                        Toast.makeText(SearchActivity.this, "Email is not Verified\nCheck your Inbox", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), "Email is not Verified\nCheck your Inbox", Toast.LENGTH_SHORT).show();
                         FirebaseAuth.getInstance().signOut();
                     }
 
                 } else {
                     // User is signed out
                     Log.d(TAG, "onAuthStateChanged: signed_out");
-                    Toast.makeText(SearchActivity.this, "Not logged in", Toast.LENGTH_SHORT).show();
-                    Intent intent = new Intent(SearchActivity.this, LoginActivity.class);
+                    Toast.makeText(getContext(), "Not logged in", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(getContext(), LoginActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
-                    finish();
+                    getActivity().finish();
                 }
                 // ...
             }

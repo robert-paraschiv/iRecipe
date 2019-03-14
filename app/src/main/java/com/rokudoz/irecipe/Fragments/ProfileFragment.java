@@ -1,14 +1,17 @@
-package com.rokudoz.irecipe;
+package com.rokudoz.irecipe.Fragments;
 
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -26,18 +29,19 @@ import com.google.firebase.firestore.QuerySnapshot;
 import com.rokudoz.irecipe.Account.LoginActivity;
 import com.rokudoz.irecipe.Models.PossibleIngredients;
 import com.rokudoz.irecipe.Models.User;
+import com.rokudoz.irecipe.R;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-public class MyIngredientsActivity extends AppCompatActivity {
-    private static final String TAG = "MyIngredientsActivity";
+public class ProfileFragment extends Fragment {
+    private static final String TAG = "ProfileFragment";
 
     private TextView textViewData;
     private ProgressBar pbLoading;
+    private ListView cbListView;
+    private Button signOutBtn;
 
     private Boolean querrySucceeded = false;
 
@@ -50,29 +54,42 @@ public class MyIngredientsActivity extends AppCompatActivity {
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private CollectionReference usersReference = db.collection("Users");
 
+
+    @Nullable
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_my_ingredients);
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_profile, container, false);
 
-        textViewData = findViewById(R.id.tv_data);
-
-        pbLoading = findViewById(R.id.pbLoading);
+        textViewData = view.findViewById(R.id.tv_data);
+        cbListView = view.findViewById(R.id.checkable_list);
+        pbLoading = view.findViewById(R.id.pbLoading);
         pbLoading.setVisibility(View.VISIBLE);
+        signOutBtn = view.findViewById(R.id.profileFragment_signOut);
 
         getDocumentId();
         setupFirebaseAuth();
         retrieveSavedIngredients();
+
+        signOutBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                signOut();
+            }
+        });
+
+        return view;
     }
 
+
+
     @Override
-    protected void onStart() {
+    public void onStart() {
         super.onStart();
         FirebaseAuth.getInstance().addAuthStateListener(mAuthListener);
     }
 
     @Override
-    protected void onStop() {
+    public void onStop() {
         super.onStop();
         if (mAuthListener != null) {
             FirebaseAuth.getInstance().removeAuthStateListener(mAuthListener);
@@ -120,12 +137,11 @@ public class MyIngredientsActivity extends AppCompatActivity {
 
     private void setupCheckList() {
         //create an instance of ListView
-        final ListView cbListView = findViewById(R.id.checkable_list);
         //set multiple selection mode
         cbListView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
         final String[] items = PossibleIngredients.getIngredientsNames();
         //supply data items to ListView
-        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, R.layout.checkable_list_layout, R.id.txt_title, items);
+        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(getContext(), R.layout.checkable_list_layout, R.id.txt_title, items);
         cbListView.setAdapter(arrayAdapter);
 
         // sets the initial checkbox values taken from database
@@ -154,12 +170,7 @@ public class MyIngredientsActivity extends AppCompatActivity {
 
     }
 
-    public void backToSearch(View v) {
-        Intent intent = new Intent(this, SearchActivity.class);
-        startActivity(intent);
-    }
-
-    public void signOut(View v) {
+    public void signOut() {
         FirebaseAuth.getInstance().signOut();
     }
 
@@ -178,20 +189,20 @@ public class MyIngredientsActivity extends AppCompatActivity {
                     //check if email is verified
                     if (user.isEmailVerified()) {
 //                        Log.d(TAG, "onAuthStateChanged: signed_in: " + user.getUid());
-//                        Toast.makeText(SearchActivity.this, "Authenticated with: " + user.getEmail(), Toast.LENGTH_SHORT).show();
+//                        Toast.makeText(MainActivity.this, "Authenticated with: " + user.getEmail(), Toast.LENGTH_SHORT).show();
                     } else {
-                        Toast.makeText(MyIngredientsActivity.this, "Email is not Verified\nCheck your Inbox", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), "Email is not Verified\nCheck your Inbox", Toast.LENGTH_SHORT).show();
                         FirebaseAuth.getInstance().signOut();
                     }
 
                 } else {
                     // User is signed out
                     Log.d(TAG, "onAuthStateChanged: signed_out");
-                    Toast.makeText(MyIngredientsActivity.this, "Not logged in", Toast.LENGTH_SHORT).show();
-                    Intent intent = new Intent(MyIngredientsActivity.this, LoginActivity.class);
+                    Toast.makeText(getContext(), "Not logged in", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(getContext(), LoginActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
-                    finish();
+                    getActivity().finish();
                 }
                 // ...
             }

@@ -1,31 +1,18 @@
 package com.rokudoz.irecipe;
 
 import android.content.Intent;
-import android.media.Image;
-import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
-import com.rokudoz.irecipe.Models.Recipe;
-import com.rokudoz.irecipe.Models.User;
 import com.squareup.picasso.Picasso;
 
-import java.io.Serializable;
 import java.util.HashMap;
-import java.util.Map;
 
 public class RecipeDetailed extends AppCompatActivity {
     private static final String TAG = "RecipeDetailed";
@@ -81,7 +68,7 @@ public class RecipeDetailed extends AppCompatActivity {
     }
 
     public void navigateToSearchActivity(View v) {
-        Intent intent = new Intent(this, SearchActivity.class);
+        Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
         finish();
     }
