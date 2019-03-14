@@ -37,7 +37,7 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
 
     public class RecipeViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener,
             View.OnCreateContextMenuListener, MenuItem.OnMenuItemClickListener {
-        TextView tvTitle, tvDescription, tvDocumentId;
+        TextView tvTitle, tvDescription;
         ImageView mImageView;
         Map<String, Boolean> ingredientTags;
 
@@ -45,7 +45,6 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
             super(itemView);
             tvTitle = itemView.findViewById(R.id.text_view_title);
             tvDescription = itemView.findViewById(R.id.text_view_description);
-            tvDocumentId = itemView.findViewById(R.id.text_view_id);
             mImageView = itemView.findViewById(R.id.recipeItem_image);
 
             itemView.setOnClickListener(this);
@@ -107,7 +106,6 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
 
         holder.tvTitle.setText(currentItem.getTitle());
         holder.tvDescription.setText(currentItem.getDescription());
-        holder.tvDocumentId.setText(currentItem.getDocumentId());
         Picasso.get()
                 .load(currentItem.getImageUrl())
                 .fit()

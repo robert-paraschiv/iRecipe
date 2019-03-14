@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_marginTop="4dp"
     tools:context="com.rokudoz.irecipe.MainActivity">
 
 
@@ -20,7 +19,7 @@
         android:layout_height="47dp"
         android:layout_alignParentBottom="true"
         android:background="?android:attr/windowBackground"
-        app:menu="@menu/bottom_navigation" />
+        app:menu="@menu/bottom_navigation"/>
 
 
 </RelativeLayout>

@@ -4,8 +4,17 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <android.support.design.widget.NavigationView
+        android:id="@+id/profileFragment_topNavView"
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:layout_alignParentTop="true">
+
+    </android.support.design.widget.NavigationView>
+
     <TextView
         android:id="@+id/myingredients_tv_search"
+        android:layout_below="@+id/profileFragment_topNavView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"

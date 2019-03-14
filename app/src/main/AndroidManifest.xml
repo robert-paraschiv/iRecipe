@@ -14,7 +14,6 @@
         android:theme="@style/AppTheme">
         <activity android:name=".RecipeDetailed"/>
         <activity android:name=".Account.RegisterActivity" />
-        <activity android:name=".MyIngredientsActivity" />
         <activity android:name=".AddRecipesActivity" />
         <activity android:name=".Account.LoginActivity" />
         <activity android:name=".MainActivity">
