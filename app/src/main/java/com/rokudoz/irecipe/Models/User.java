@@ -38,6 +38,10 @@ public class User {
         return tags;
     }
 
+    public void setTags(Map<String, Boolean> tags) {
+        this.tags = tags;
+    }
+
     @Override
     public String toString() {
         return "User{" +

@@ -2,6 +2,7 @@ package com.rokudoz.irecipe;
 
 import android.content.Intent;
 import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -40,6 +41,7 @@ public class SearchActivity extends AppCompatActivity implements RecipeAdapter.O
     private static final String TAG = "SearchActivity";
     private Boolean userSigned = false;
     private ProgressBar pbLoading;
+    private FloatingActionButton fab;
 
     //Firebase
     private FirebaseAuth.AuthStateListener mAuthListener;
@@ -63,9 +65,11 @@ public class SearchActivity extends AppCompatActivity implements RecipeAdapter.O
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
         pbLoading = findViewById(R.id.pbLoading);
+        fab = findViewById(R.id.fab_add_recipe);
         pbLoading.setVisibility(View.VISIBLE);
         mStorageRef = FirebaseStorage.getInstance();
 
+        fab.hide();
         buildRecyclerView();
         setupFirebaseAuth();
 
@@ -242,6 +246,10 @@ public class SearchActivity extends AppCompatActivity implements RecipeAdapter.O
                     if (user.isEmailVerified()) {
 //                        Log.d(TAG, "onAuthStateChanged: signed_in: " + user.getUid());
 //                        Toast.makeText(SearchActivity.this, "Authenticated with: " + user.getEmail(), Toast.LENGTH_SHORT).show();
+                        if (user.getUid().equals("7H4eXFbVusXFoJWyvDyBv1e0NvE3"))
+                        {
+                            fab.show();
+                        }
                         userSigned = true;
                         performQuery();
                     } else {

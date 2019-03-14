@@ -20,8 +20,12 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.rokudoz.irecipe.Models.PossibleIngredients;
 import com.rokudoz.irecipe.Models.User;
 import com.rokudoz.irecipe.R;
+
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class RegisterActivity extends AppCompatActivity {
@@ -201,14 +205,21 @@ public class RegisterActivity extends AppCompatActivity {
      * Adds data to the node: "users"
      */
     public void addNewUser(){
+        String[] possibleIngredients = PossibleIngredients.getIngredientsNames();
+
+        final Map<String, Boolean> tags = new HashMap<>();
+        for (String ingredient : possibleIngredients) {
+            tags.put(ingredient, false);
+        }
 
         String userid = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
         Log.d(TAG, "addNewUser: Adding new User: \n user_id:" + userid);
         mUser.setName(name);
         mUser.setUser_id(userid);
+        mUser.setTags(tags);
 
-        //User user= new User(name, userid);
+        //User user = new User(name, userid);
         userRef.add(mUser);
         FirebaseAuth.getInstance().signOut();
         redirectLoginScreen();
