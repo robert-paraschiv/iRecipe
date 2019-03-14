@@ -30,6 +30,7 @@ import com.rokudoz.irecipe.Models.PossibleIngredients;
 import com.rokudoz.irecipe.Models.Recipe;
 import com.squareup.picasso.Picasso;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -122,9 +123,14 @@ public class AddRecipesActivity extends AppCompatActivity {
         for (String ingredient : possibleIngredients) {
             tags.put(ingredient, false);
         }
+
+        //Checks if ingredients in edit text are included in the PossibleIngredients Array
         if (!tagInput.trim().equals("")) {
             for (String tag : tagArray) {
-                tags.put(tag, true);
+                if (Arrays.asList(possibleIngredients).contains(tag)) {
+                    tags.put(tag, true);
+                }
+
             }
         }
 
