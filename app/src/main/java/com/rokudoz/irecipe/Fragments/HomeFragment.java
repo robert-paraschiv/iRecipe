@@ -34,7 +34,6 @@ import com.rokudoz.irecipe.AddRecipesActivity;
 import com.rokudoz.irecipe.Models.Recipe;
 import com.rokudoz.irecipe.Models.User;
 import com.rokudoz.irecipe.R;
-import com.rokudoz.irecipe.RecipeDetailed;
 import com.rokudoz.irecipe.Utils.RecipeAdapter;
 
 import java.io.Serializable;
@@ -176,14 +175,16 @@ public class HomeFragment extends Fragment implements RecipeAdapter.OnItemClickL
                                 String imageUrl = mRecipeList.get(position).getImageUrl();
                                 Map<String, Boolean> ingredients = mRecipeList.get(position).getTags();
 
-                                Intent intent = new Intent(getContext(), RecipeDetailed.class)
-                                        .putExtra("documentID", id)
-                                        .putExtra("title", title)
-                                        .putExtra("description", description)
-                                        .putExtra("ingredients", (Serializable) ingredients)
-                                        .putExtra("imageUrl", imageUrl);
+                                String ingredientsString = "";
+                                for (String ingredient : ingredients.keySet()) {
+                                    if (ingredients.get(ingredient)) {
+                                        ingredientsString += "\n- " + ingredient;
+                                    }
+                                }
 
-                                startActivity(intent);
+                                RecipeDetailedFragment fragment = RecipeDetailedFragment.newInstance(id, title, description, ingredientsString, imageUrl);
+
+                                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fragment).commit();
                             }
 
                             @Override

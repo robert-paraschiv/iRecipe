@@ -6,57 +6,6 @@
     android:layout_height="match_parent"
     tools:context=".RecipeDetailed">
 
-    <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="300dp"
-        android:id="@+id/recipeDetailed_image"
-        android:elevation="4dp"
-        />
 
-    <TextView
-        android:id="@+id/tvTitle"
-        style="@style/TextAppearance.AppCompat.Large"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/recipeDetailed_image"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        tools:text="TitleHere" />
-
-    <TextView
-        android:id="@+id/tvDescription"
-        style="@style/TextAppearance.AppCompat"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/tvTitle"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp"
-        tools:text="Description Here" />
-
-    <TextView
-        android:id="@+id/tvIngredientsList"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/tvDescription"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        tools:text="Ingredients list
-        -Ingredient1
-        -Ingredient2
-        -Ingredient3
-        -Ingredient4
-        -Ingredient5
-        -Ingredient6"
-        />
-
-    <Button
-        android:id="@+id/backBtn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="8dp"
-        android:onClick="navigateToSearchActivity"
-        android:text="Back" />
 
 </RelativeLayout>
