@@ -2,7 +2,10 @@ package com.rokudoz.irecipe.Utils;
 
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -22,35 +25,69 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
 
     public interface OnItemClickListener {
         void onItemClick(int position);
+
+        void onFavoriteCick(int position);
+
+        void onDeleteClick(int position);
     }
 
     public void setOnItemClickListener(OnItemClickListener listener) {
         mListener = listener;
     }
 
-    public static class RecipeViewHolder extends RecyclerView.ViewHolder {
+    public class RecipeViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener,
+            View.OnCreateContextMenuListener, MenuItem.OnMenuItemClickListener {
         TextView tvTitle, tvDescription, tvDocumentId;
         ImageView mImageView;
         Map<String, Boolean> ingredientTags;
 
-        public RecipeViewHolder(View itemView, final OnItemClickListener listener) {
+        public RecipeViewHolder(View itemView) {
             super(itemView);
             tvTitle = itemView.findViewById(R.id.text_view_title);
             tvDescription = itemView.findViewById(R.id.text_view_description);
             tvDocumentId = itemView.findViewById(R.id.text_view_id);
             mImageView = itemView.findViewById(R.id.recipeItem_image);
 
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (listener != null) {
-                        int position = getAdapterPosition();
-                        if (position != RecyclerView.NO_POSITION) {
-                            listener.onItemClick(position);
-                        }
+            itemView.setOnClickListener(this);
+            itemView.setOnCreateContextMenuListener(this);
+        }
+
+        @Override
+        public void onClick(View v) {
+            if (mListener != null) {
+                int position = getAdapterPosition();
+                if (position != RecyclerView.NO_POSITION) {
+                    mListener.onItemClick(position);
+                }
+            }
+        }
+
+        @Override
+        public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+            menu.setHeaderTitle("Select Action");
+            MenuItem setAsFavorite = menu.add(Menu.NONE,1,1,"Favorite");
+            MenuItem delete = menu.add(Menu.NONE,2,2,"Delete");
+
+            setAsFavorite.setOnMenuItemClickListener(this);
+            delete.setOnMenuItemClickListener(this);
+        }
+
+        @Override
+        public boolean onMenuItemClick(MenuItem item) {
+            if (mListener != null) {
+                int position = getAdapterPosition();
+                if (position != RecyclerView.NO_POSITION) {
+                    switch (item.getItemId()){
+                        case 1:
+                            mListener.onFavoriteCick(position);
+                            break;
+                        case 2:
+                            mListener.onDeleteClick(position);
+                            break;
                     }
                 }
-            });
+            }
+            return false;
         }
     }
 
@@ -61,8 +98,7 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
     @Override
     public RecipeViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.recipe_item, parent, false);
-        RecipeViewHolder recipeViewHolder = new RecipeViewHolder(v, mListener);
-        return recipeViewHolder;
+        return new RecipeViewHolder(v);
     }
 
     @Override

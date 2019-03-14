@@ -12,6 +12,7 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -22,6 +23,8 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 import com.rokudoz.irecipe.Account.LoginActivity;
 import com.rokudoz.irecipe.Models.Recipe;
 import com.rokudoz.irecipe.Models.User;
@@ -33,7 +36,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-public class SearchActivity extends AppCompatActivity {
+public class SearchActivity extends AppCompatActivity implements RecipeAdapter.OnItemClickListener {
     private static final String TAG = "SearchActivity";
     private Boolean userSigned = false;
     private ProgressBar pbLoading;
@@ -44,6 +47,7 @@ public class SearchActivity extends AppCompatActivity {
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private CollectionReference recipeRef = db.collection("Recipes");
     private CollectionReference usersReference = db.collection("Users");
+    private FirebaseStorage mStorageRef;
 
     private RecyclerView mRecyclerView;
     private RecipeAdapter mAdapter;
@@ -60,6 +64,7 @@ public class SearchActivity extends AppCompatActivity {
         setContentView(R.layout.activity_search);
         pbLoading = findViewById(R.id.pbLoading);
         pbLoading.setVisibility(View.VISIBLE);
+        mStorageRef = FirebaseStorage.getInstance();
 
         buildRecyclerView();
         setupFirebaseAuth();
@@ -90,6 +95,8 @@ public class SearchActivity extends AppCompatActivity {
 
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setAdapter(mAdapter);
+
+        mAdapter.setOnItemClickListener(SearchActivity.this);
     }
 
 
@@ -99,14 +106,14 @@ public class SearchActivity extends AppCompatActivity {
                 .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                     @Override
                     public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-
+                        //Gets User Ingredients from database
                         Map<String, Boolean> tags = new HashMap<>();
                         for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
                             User user = documentSnapshot.toObject(User.class);
                             for (String tag : user.getTags().keySet()) {
                                 tags.put(tag, Objects.requireNonNull(user.getTags().get(tag)));
                             }
-                            Toast.makeText(SearchActivity.this, tags.toString(), Toast.LENGTH_SHORT).show();
+//                            Toast.makeText(SearchActivity.this, tags.toString(), Toast.LENGTH_SHORT).show();
                         }
 
                         Query notesQuery = null;
@@ -157,9 +164,50 @@ public class SearchActivity extends AppCompatActivity {
                                         .putExtra("title", title)
                                         .putExtra("description", description)
                                         .putExtra("ingredients", (Serializable) ingredients)
-                                        .putExtra("imageUrl",imageUrl);
+                                        .putExtra("imageUrl", imageUrl);
 
                                 startActivity(intent);
+                            }
+
+                            @Override
+                            public void onFavoriteCick(int position) {
+                                String id = mDocumentIDs.get(position);
+                                Toast.makeText(SearchActivity.this, "Favorite click at " + id, Toast.LENGTH_SHORT).show();
+                            }
+
+                            @Override
+                            public void onDeleteClick(final int position) {
+                                Recipe selectedRecipe = mRecipeList.get(position);
+                                final String id = mDocumentIDs.get(position);
+
+                                //Deleting image from FirebaseStorage
+                                StorageReference imageRef = mStorageRef.getReferenceFromUrl(selectedRecipe.getImageUrl());
+                                imageRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+                                        //Deleting Document of the item selected
+                                        recipeRef.document(id).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                            @Override
+                                            public void onSuccess(Void aVoid) {
+                                                Toast.makeText(SearchActivity.this, "Deleted from Db", Toast.LENGTH_SHORT).show();
+                                                mRecipeList.remove(position);
+                                                mDocumentIDs.remove(position);
+                                                performQuery();
+                                            }
+                                        }).addOnFailureListener(new OnFailureListener() {
+                                            @Override
+                                            public void onFailure(@NonNull Exception e) {
+                                                Toast.makeText(SearchActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                                            }
+                                        });
+                                    }
+                                }).addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        Toast.makeText(SearchActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+//                                Toast.makeText(SearchActivity.this, "Delete click at " + position, Toast.LENGTH_SHORT).show();
                             }
                         });
                     }
@@ -215,4 +263,18 @@ public class SearchActivity extends AppCompatActivity {
         };
     }
 
+    @Override
+    public void onItemClick(int position) {
+
+    }
+
+    @Override
+    public void onFavoriteCick(int position) {
+
+    }
+
+    @Override
+    public void onDeleteClick(int position) {
+
+    }
 }

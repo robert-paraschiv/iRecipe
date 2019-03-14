@@ -151,9 +151,7 @@ public class AddRecipesActivity extends AppCompatActivity {
                                                 @Override
                                                 public void onSuccess(DocumentReference documentReference) {
                                                     Toast.makeText(AddRecipesActivity.this, "Succesfully added " + title + " to the recipes list", Toast.LENGTH_SHORT).show();
-                                                    editTextTags.setText("");
-                                                    editTextDescription.setText("");
-                                                    editTextTitle.setText("");
+
                                                 }
                                             })
                                             .addOnFailureListener(new OnFailureListener() {
@@ -173,7 +171,10 @@ public class AddRecipesActivity extends AppCompatActivity {
                                 }
                             }, 50);
                             Toast.makeText(AddRecipesActivity.this, "Upload Succesfull", Toast.LENGTH_SHORT).show();
-
+                            editTextTags.setText("");
+                            editTextDescription.setText("");
+                            editTextTitle.setText("");
+                            mImageView.setImageResource(android.R.color.transparent);
 
                         }
                     })
