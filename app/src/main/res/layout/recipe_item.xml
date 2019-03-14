@@ -1,50 +1,55 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
     android:layout_marginStart="4dp"
-    android:layout_marginEnd="4dp"
     android:layout_marginTop="4dp"
-    app:cardBackgroundColor="#e0e0e0">
+    android:layout_marginEnd="4dp"
+    app:cardBackgroundColor="#e0e0e0"
+    app:cardCornerRadius="10dp"
+    android:elevation="4dp">
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="8dp">
+        android:padding="4dp">
+
         <ImageView
             android:id="@+id/recipeItem_image"
-            android:layout_width="120dp"
-            android:layout_height="80dp"
-            />
+            android:layout_width="match_parent"
+            android:layout_height="150dp"
+            android:layout_marginTop="4dp"
+            android:layout_centerHorizontal="true"
+            tools:src="@color/colorAccent"/>
 
         <TextView
             android:id="@+id/text_view_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Title"
-            android:layout_marginStart="8dp"
-            android:layout_toEndOf="@+id/recipeItem_image"
+            android:layout_below="@id/recipeItem_image"
+            android:layout_marginStart="4dp"
             android:maxLines="1"
-            android:textAppearance="@style/TextAppearance.AppCompat.Large"/>
+            android:text="Title"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large" />
 
         <TextView
             android:id="@+id/text_view_id"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_below="@+id/recipeItem_image"
+            android:layout_alignParentEnd="true"
             android:text="Id"
-            android:textAppearance="@style/TextAppearance.AppCompat.Large"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentEnd="true"/>
+            android:textAppearance="@style/TextAppearance.AppCompat.Large" />
+
         <TextView
             android:id="@+id/text_view_description"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_below="@id/text_view_title"
             android:layout_marginStart="4dp"
-            android:layout_toEndOf="@id/recipeItem_image"
-            android:text="Description"
-            android:layout_below="@+id/text_view_title"/>
+            android:text="Description" />
 
     </RelativeLayout>
 </android.support.v7.widget.CardView>
