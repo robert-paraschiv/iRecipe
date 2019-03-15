@@ -30,18 +30,22 @@ import com.rokudoz.irecipe.Account.LoginActivity;
 import com.rokudoz.irecipe.Models.PossibleIngredients;
 import com.rokudoz.irecipe.Models.User;
 import com.rokudoz.irecipe.R;
+import com.squareup.picasso.Picasso;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
+import de.hdodenhof.circleimageview.CircleImageView;
+
 public class ProfileFragment extends Fragment {
     private static final String TAG = "ProfileFragment";
 
-    private TextView textViewData;
+    private TextView textViewData, tvHelloUserName;
     private ProgressBar pbLoading;
     private ListView cbListView;
     private Button signOutBtn;
+    private CircleImageView mProfileImage;
 
     private Boolean querrySucceeded = false;
 
@@ -65,10 +69,18 @@ public class ProfileFragment extends Fragment {
         pbLoading = view.findViewById(R.id.pbLoading);
         pbLoading.setVisibility(View.VISIBLE);
         signOutBtn = view.findViewById(R.id.profileFragment_signOut);
+        tvHelloUserName = view.findViewById(R.id.profileFragment_helloUser_textview);
+        mProfileImage = view.findViewById(R.id.profileFragment_profileImage);
 
         getDocumentId();
         setupFirebaseAuth();
         retrieveSavedIngredients();
+
+        Picasso.get()
+                .load("https://firebasestorage.googleapis.com/v0/b/irecipe.appspot.com/o/RecipePhotos%2F1552491481106.jpg?alt=media&token=873c295f-e2be-4080-8835-f9e0144a2666")
+                .fit()
+                .centerCrop()
+                .into(mProfileImage);
 
         signOutBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -79,7 +91,6 @@ public class ProfileFragment extends Fragment {
 
         return view;
     }
-
 
 
     @Override
@@ -122,6 +133,8 @@ public class ProfileFragment extends Fragment {
                                 data += "\n " + tag + " " + user.getTags().get(tag);
                                 ingredientsUserHas.put(tag, Objects.requireNonNull(user.getTags().get(tag)));
                             }
+
+                            tvHelloUserName.setText(String.format("Hello, %s", user.getName()));
                         }
                         textViewData.setText(data);
 
