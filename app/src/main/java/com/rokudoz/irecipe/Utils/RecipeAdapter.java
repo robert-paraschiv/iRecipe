@@ -2,6 +2,7 @@ package com.rokudoz.irecipe.Utils;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -38,7 +39,7 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
     public class RecipeViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener,
             View.OnCreateContextMenuListener, MenuItem.OnMenuItemClickListener {
         TextView tvTitle, tvDescription;
-        ImageView mImageView;
+        ImageView mImageView,imgFavorited;
         Map<String, Boolean> ingredientTags;
 
         public RecipeViewHolder(View itemView) {
@@ -46,6 +47,7 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
             tvTitle = itemView.findViewById(R.id.text_view_title);
             tvDescription = itemView.findViewById(R.id.text_view_description);
             mImageView = itemView.findViewById(R.id.recipeItem_image);
+            imgFavorited = itemView.findViewById(R.id.recyclerview_favorite);
 
             itemView.setOnClickListener(this);
             itemView.setOnCreateContextMenuListener(this);
@@ -64,8 +66,8 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
         @Override
         public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
             menu.setHeaderTitle("Select Action");
-            MenuItem setAsFavorite = menu.add(Menu.NONE,1,1,"Favorite");
-            MenuItem delete = menu.add(Menu.NONE,2,2,"Delete");
+            MenuItem setAsFavorite = menu.add(Menu.NONE, 1, 1, "Favorite");
+            MenuItem delete = menu.add(Menu.NONE, 2, 2, "Delete");
 
             setAsFavorite.setOnMenuItemClickListener(this);
             delete.setOnMenuItemClickListener(this);
@@ -76,7 +78,7 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
             if (mListener != null) {
                 int position = getAdapterPosition();
                 if (position != RecyclerView.NO_POSITION) {
-                    switch (item.getItemId()){
+                    switch (item.getItemId()) {
                         case 1:
                             mListener.onFavoriteCick(position);
                             break;
@@ -111,6 +113,10 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
                 .fit()
                 .centerCrop()
                 .into(holder.mImageView);
+        holder.imgFavorited.setImageResource(R.drawable.ic_star_border_black_24dp);
+        if (currentItem.getFavorite() != null && currentItem.getFavorite()) {
+            holder.imgFavorited.setImageResource(R.drawable.ic_star_gold_24dp);
+        }
 
     }
 

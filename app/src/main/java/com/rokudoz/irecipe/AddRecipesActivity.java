@@ -150,7 +150,7 @@ public class AddRecipesActivity extends AppCompatActivity {
                                     final String imageUrl = uri.toString();
 
                                     // Sends recipe data to Firestore database
-                                    Recipe recipe = new Recipe(title, description, tags, imageUrl);
+                                    Recipe recipe = new Recipe(title, description, tags, imageUrl,false);
 
                                     collectionReference.add(recipe)
                                             .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {

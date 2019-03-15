@@ -1,5 +1,7 @@
 package com.rokudoz.irecipe.Models;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.Map;
 
 public class User {
@@ -7,15 +9,26 @@ public class User {
     private String user_id;
     private String name;
     Map<String, Boolean> tags;
+    private ArrayList<String> favoriteRecipes;
 
-    public User(String user_id, String name, Map<String, Boolean> tags) {
+    public User(String user_id, String name, Map<String, Boolean> tags, ArrayList<String> favoriteRecipes) {
         this.user_id = user_id;
         this.name = name;
         this.tags = tags;
+        this.favoriteRecipes = favoriteRecipes;
     }
 
-    public User() {
 
+    public User() {
+        //Empty constructor
+    }
+
+    public ArrayList<String> getFavoriteRecipes() {
+        return favoriteRecipes;
+    }
+
+    public void setFavoriteRecipes(ArrayList<String> favoriteRecipes) {
+        this.favoriteRecipes = favoriteRecipes;
     }
 
     public String getUser_id() {
@@ -47,6 +60,10 @@ public class User {
         return "User{" +
                 "user_id='" + user_id + '\'' +
                 ", name='" + name + '\'' +
+                ", tags=" + tags +
+                ", favoriteRecipes=" + favoriteRecipes +
                 '}';
     }
+
+
 }

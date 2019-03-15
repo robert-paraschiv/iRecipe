@@ -10,12 +10,13 @@ public class Recipe {
     private String description;
     private Map<String, Boolean> tags;
     private String imageUrl;
+    private Boolean isFavorite;
 
     public Recipe() {
         //public no-arg constructor needed
     }
 
-    public Recipe(String title, String description, Map<String, Boolean> tags, String imageUrl) {
+    public Recipe(String title, String description, Map<String, Boolean> tags, String imageUrl, Boolean isFavorite) {
         if (title.trim().equals("")) {
             title = "No Title";
         }
@@ -23,6 +24,7 @@ public class Recipe {
         this.description = description;
         this.tags = tags;
         this.imageUrl = imageUrl;
+        this.isFavorite = isFavorite;
     }
 
     @Exclude
@@ -57,4 +59,12 @@ public class Recipe {
     public String getImageUrl() {return imageUrl;}
 
     public void setImageUrl(String imageUrl) {this.imageUrl = imageUrl;}
+
+    public Boolean getFavorite() {
+        return isFavorite;
+    }
+
+    public void setFavorite(Boolean favorite) {
+        isFavorite = favorite;
+    }
 }

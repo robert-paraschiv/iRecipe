@@ -2,12 +2,16 @@ package com.rokudoz.irecipe.Fragments;
 
 import android.content.Intent;
 import android.os.Bundle;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,6 +26,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
@@ -52,7 +57,7 @@ public class HomeFragment extends Fragment implements RecipeAdapter.OnItemClickL
 
     //Firebase
     private FirebaseAuth.AuthStateListener mAuthListener;
-
+    private User mUser;
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private CollectionReference recipeRef = db.collection("Recipes");
     private CollectionReference usersReference = db.collection("Users");
@@ -64,6 +69,8 @@ public class HomeFragment extends Fragment implements RecipeAdapter.OnItemClickL
 
     private ArrayList<String> mDocumentIDs = new ArrayList<>();
     private ArrayList<Recipe> mRecipeList = new ArrayList<>();
+    private ArrayList<String> favRecipes = new ArrayList<>();
+    private String loggedinUserDocument = "";
 
     private DocumentSnapshot mLastQueriedDocument;
 
@@ -79,7 +86,7 @@ public class HomeFragment extends Fragment implements RecipeAdapter.OnItemClickL
         if (view == null) {
             view = inflater.inflate(R.layout.fragment_home, container, false);
         }
-
+        mUser = new User();
         pbLoading = view.findViewById(R.id.homeFragment_pbLoading);
         fab = view.findViewById(R.id.fab_add_recipe);
         mRecyclerView = view.findViewById(R.id.recycler_view);
@@ -136,6 +143,9 @@ public class HomeFragment extends Fragment implements RecipeAdapter.OnItemClickL
                         Map<String, Boolean> tags = new HashMap<>();
                         for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
                             User user = documentSnapshot.toObject(User.class);
+                            mUser = documentSnapshot.toObject(User.class);
+                            loggedinUserDocument = queryDocumentSnapshots.getDocuments().get(0).getId();
+                            favRecipes = mUser.getFavoriteRecipes();
                             for (String tag : user.getTags().keySet()) {
                                 tags.put(tag, Objects.requireNonNull(user.getTags().get(tag)));
                             }
@@ -159,8 +169,14 @@ public class HomeFragment extends Fragment implements RecipeAdapter.OnItemClickL
 
                                     for (QueryDocumentSnapshot document : Objects.requireNonNull(task.getResult())) {
                                         Recipe recipe = document.toObject(Recipe.class);
-                                        mRecipeList.add(recipe);
                                         mDocumentIDs.add(document.getId());
+                                        if (favRecipes.contains(document.getId())) {
+                                            recipe.setFavorite(true);
+                                        } else {
+                                            recipe.setFavorite(false);
+                                        }
+                                        mRecipeList.add(recipe);
+
 //                        Log.d(TAG, "onComplete: got a new note. Position: " + (mNotes.size() - 1));
                                     }
 
@@ -200,7 +216,24 @@ public class HomeFragment extends Fragment implements RecipeAdapter.OnItemClickL
                             @Override
                             public void onFavoriteCick(int position) {
                                 String id = mDocumentIDs.get(position);
-                                Toast.makeText(getContext(), "Favorite click at " + id, Toast.LENGTH_SHORT).show();
+
+                                if (favRecipes == null) {
+                                    favRecipes = new ArrayList<>();
+                                }
+                                if (favRecipes.contains(id)) {
+                                    favRecipes.remove(id);
+                                    mRecipeList.get(position).setFavorite(false);
+                                    Toast.makeText(getContext(), "Removed " + id + " from favorites", Toast.LENGTH_SHORT).show();
+                                } else {
+                                    favRecipes.add(id);
+                                    mRecipeList.get(position).setFavorite(true);
+                                    Toast.makeText(getContext(), "Added " + id + " to favorites", Toast.LENGTH_SHORT).show();
+                                }
+                                mUser.setFavoriteRecipes(favRecipes);
+                                DocumentReference favRecipesRef = usersReference.document(loggedinUserDocument);
+                                favRecipesRef.update("favoriteRecipes", favRecipes);
+
+                                mAdapter.notifyDataSetChanged();
                             }
 
                             @Override
