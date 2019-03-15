@@ -13,13 +13,14 @@
         android:layout_height="match_parent"
         android:layout_above="@id/bottom_navigation" />
 
-    <android.support.design.widget.BottomNavigationView
+    <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottom_navigation"
         android:layout_width="match_parent"
         android:layout_height="47dp"
         android:layout_alignParentBottom="true"
         android:background="?android:attr/windowBackground"
         app:itemHorizontalTranslationEnabled="false"
+        app:labelVisibilityMode="unlabeled"
         app:itemIconTint="@drawable/selector_bottombar_item"
         app:itemTextColor="@drawable/selector_bottombar_text"
         android:elevation="4dp"
