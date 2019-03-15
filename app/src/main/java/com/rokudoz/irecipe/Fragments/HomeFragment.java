@@ -170,7 +170,7 @@ public class HomeFragment extends Fragment implements RecipeAdapter.OnItemClickL
                                     for (QueryDocumentSnapshot document : Objects.requireNonNull(task.getResult())) {
                                         Recipe recipe = document.toObject(Recipe.class);
                                         mDocumentIDs.add(document.getId());
-                                        if (favRecipes.contains(document.getId())) {
+                                        if (favRecipes != null && favRecipes.contains(document.getId())) {
                                             recipe.setFavorite(true);
                                         } else {
                                             recipe.setFavorite(false);

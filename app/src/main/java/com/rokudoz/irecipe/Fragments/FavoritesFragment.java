@@ -2,6 +2,7 @@ package com.rokudoz.irecipe.Fragments;
 
 import android.content.Intent;
 import android.os.Bundle;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -43,7 +44,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-public class FavoritesFragment extends Fragment implements RecipeAdapter.OnItemClickListener{
+public class FavoritesFragment extends Fragment implements RecipeAdapter.OnItemClickListener {
     private static final String TAG = "FavoritesFragment";
 
     public View view;
@@ -163,7 +164,7 @@ public class FavoritesFragment extends Fragment implements RecipeAdapter.OnItemC
                                     for (QueryDocumentSnapshot document : Objects.requireNonNull(task.getResult())) {
                                         Recipe recipe = document.toObject(Recipe.class);
                                         mDocumentIDs.add(document.getId());
-                                        if (favRecipes.contains(document.getId())) {
+                                        if (favRecipes != null && favRecipes.contains(document.getId())) {
                                             recipe.setFavorite(true);
                                             mRecipeList.add(recipe);
                                         } else {
