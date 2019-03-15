@@ -44,11 +44,14 @@
 
         <ImageView
             android:id="@+id/recyclerview_favorite"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:layout_below="@id/text_view_description"
-            android:src="@drawable/ic_star_border_black_24dp"/>
+            android:layout_width="33dp"
+            android:layout_height="33dp"
+            android:elevation="4dp"
+            android:layout_below="@id/recipeItem_image"
+            android:layout_marginEnd="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_alignParentEnd="true"
+            android:src="@drawable/ic_star_border_black_24dp" />
 
     </RelativeLayout>
 </androidx.cardview.widget.CardView>

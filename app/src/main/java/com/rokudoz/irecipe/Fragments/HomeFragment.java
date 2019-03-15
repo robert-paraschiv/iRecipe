@@ -174,7 +174,7 @@ public class HomeFragment extends Fragment implements RecipeAdapter.OnItemClickL
                             @Override
                             public void onEvent(@javax.annotation.Nullable QuerySnapshot queryDocumentSnapshots,
                                                 @javax.annotation.Nullable FirebaseFirestoreException e) {
-                            if (queryDocumentSnapshots!=null){
+                                if (queryDocumentSnapshots != null) {
                                     for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
                                         Recipe recipe = document.toObject(Recipe.class);
                                         mDocumentIDs.add(document.getId());
@@ -188,12 +188,12 @@ public class HomeFragment extends Fragment implements RecipeAdapter.OnItemClickL
 //                        Log.d(TAG, "onComplete: got a new note. Position: " + (mNotes.size() - 1));
                                     }
 
-                                if (queryDocumentSnapshots.getDocuments().size() != 0) {
-                                    mLastQueriedDocument = queryDocumentSnapshots.getDocuments()
-                                            .get(queryDocumentSnapshots.getDocuments().size() - 1);
+                                    if (queryDocumentSnapshots.getDocuments().size() != 0) {
+                                        mLastQueriedDocument = queryDocumentSnapshots.getDocuments()
+                                                .get(queryDocumentSnapshots.getDocuments().size() - 1);
+                                    }
                                 }
-                            }
-                                    mAdapter.notifyDataSetChanged();
+                                mAdapter.notifyDataSetChanged();
 
                             }
                         });
@@ -307,7 +307,7 @@ public class HomeFragment extends Fragment implements RecipeAdapter.OnItemClickL
                     if (user.isEmailVerified()) {
 //                        Log.d(TAG, "onAuthStateChanged: signed_in: " + user.getUid());
 //                        Toast.makeText(MainActivity.this, "Authenticated with: " + user.getEmail(), Toast.LENGTH_SHORT).show();
-                        if (user.getUid().equals("7H4eXFbVusXFoJWyvDyBv1e0NvE3")) {
+                        if (user.getEmail().equals("paraschivlongin@gmail.com")) {
                             fab.show();
                             fab.setOnClickListener(new View.OnClickListener() {
                                 @Override

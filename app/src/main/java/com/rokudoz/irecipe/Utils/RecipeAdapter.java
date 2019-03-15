@@ -51,6 +51,18 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
 
             itemView.setOnClickListener(this);
             itemView.setOnCreateContextMenuListener(this);
+
+            imgFavorited.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (mListener != null) {
+                        int position = getAdapterPosition();
+                        if (position != RecyclerView.NO_POSITION) {
+                            mListener.onFavoriteCick(position);
+                        }
+                    }
+                }
+            });
         }
 
         @Override
@@ -66,10 +78,8 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
         @Override
         public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
             menu.setHeaderTitle("Select Action");
-            MenuItem setAsFavorite = menu.add(Menu.NONE, 1, 1, "Favorite");
-            MenuItem delete = menu.add(Menu.NONE, 2, 2, "Delete");
+            MenuItem delete = menu.add(Menu.NONE, 1, 1, "Delete");
 
-            setAsFavorite.setOnMenuItemClickListener(this);
             delete.setOnMenuItemClickListener(this);
         }
 
@@ -78,14 +88,7 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
             if (mListener != null) {
                 int position = getAdapterPosition();
                 if (position != RecyclerView.NO_POSITION) {
-                    switch (item.getItemId()) {
-                        case 1:
-                            mListener.onFavoriteCick(position);
-                            break;
-                        case 2:
-                            mListener.onDeleteClick(position);
-                            break;
-                    }
+                    mListener.onDeleteClick(position);
                 }
             }
             return false;
