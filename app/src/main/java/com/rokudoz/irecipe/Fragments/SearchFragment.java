@@ -13,6 +13,11 @@ import com.rokudoz.irecipe.R;
 public class SearchFragment extends Fragment {
     private static final String TAG = "SearchFragment";
 
+    public static SearchFragment newInstance() {
+        SearchFragment fragment = new SearchFragment();
+        return fragment;
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {

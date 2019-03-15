@@ -67,6 +67,12 @@ public class HomeFragment extends Fragment implements RecipeAdapter.OnItemClickL
 
     private DocumentSnapshot mLastQueriedDocument;
 
+    public static HomeFragment newInstance() {
+        HomeFragment fragment = new HomeFragment();
+        return fragment;
+    }
+
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {

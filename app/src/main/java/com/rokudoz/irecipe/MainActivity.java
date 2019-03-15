@@ -14,12 +14,16 @@ import com.rokudoz.irecipe.Fragments.HomeFragment;
 import com.rokudoz.irecipe.Fragments.ProfileFragment;
 import com.rokudoz.irecipe.Fragments.SearchFragment;
 
+import java.util.ArrayDeque;
+import java.util.Deque;
+
 import static android.support.v4.app.FragmentManager.POP_BACK_STACK_INCLUSIVE;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
     private static final String FRAGMENT_HOME = "HomeFragment";
-    private static final String FRAGMENT_OTHER = "OtherFragment";
+    private static final String FRAGMENT_PROFILE = "ProfileFragment";
+    private static final String FRAGMENT_SEARCH = "SearchFragment";
     BottomNavigationView bottomNav;
 
     @Override
@@ -34,57 +38,80 @@ public class MainActivity extends AppCompatActivity {
             getSupportFragmentManager().beginTransaction().add(R.id.fragment_container,
                     new HomeFragment()).commit();
         }
+        setBottomNavigationView();
+    }
 
+
+    Deque<Integer> mStack = new ArrayDeque<>();
+    boolean isBackPressed = false;
+
+    private void setBottomNavigationView() {
         bottomNav.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
-            public boolean onNavigationItemSelected(@NonNull final MenuItem item) {
-                Fragment selectedFragment = null;
-
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 switch (item.getItemId()) {
                     case R.id.nav_home:
-                        viewFragment(new HomeFragment(), FRAGMENT_HOME);
-                        return true;
-                    case R.id.nav_account:
-                        viewFragment(new ProfileFragment(), FRAGMENT_OTHER);
+                        if (!isBackPressed) {
+                            pushFragmentIntoStack(R.id.nav_home);
+                        }
+                        isBackPressed = false;
+                        setFragment(HomeFragment.newInstance(), FRAGMENT_HOME);
                         return true;
                     case R.id.nav_search:
-                        viewFragment(new SearchFragment(), FRAGMENT_OTHER);
+                        if (!isBackPressed) {
+                            pushFragmentIntoStack(R.id.nav_search);
+                        }
+                        isBackPressed = false;
+                        setFragment(SearchFragment.newInstance(), FRAGMENT_SEARCH);
                         return true;
-                }
+                    case R.id.nav_account:
+                        if (!isBackPressed) {
+                            pushFragmentIntoStack(R.id.nav_account);
+                        }
+                        isBackPressed = false;
+                        setFragment(ProfileFragment.newInstance(), FRAGMENT_PROFILE);
+                        return true;
 
-                return false;
+                    default:
+                        return false;
+                }
             }
         });
-    }
-
-
-    private void viewFragment(Fragment fragment, String name){
-        final FragmentManager fragmentManager = getSupportFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.replace(R.id.fragment_container, fragment);
-        // 1. Know how many fragments there are in the stack
-        final int count = fragmentManager.getBackStackEntryCount();
-        // 2. If the fragment is **not** "home type", save it to the stack
-        if( name.equals(FRAGMENT_OTHER) ) {
-            fragmentTransaction.addToBackStack(name);
-        }
-        // Commit !
-        fragmentTransaction.commit();
-        // 3. After the commit, if the fragment is not an "home type" the back stack is changed, triggering the
-        // OnBackStackChanged callback
-        fragmentManager.addOnBackStackChangedListener(new FragmentManager.OnBackStackChangedListener() {
+        bottomNav.setOnNavigationItemReselectedListener(new BottomNavigationView.OnNavigationItemReselectedListener() {
             @Override
-            public void onBackStackChanged() {
-                // If the stack decreases it means I clicked the back button
-                if( fragmentManager.getBackStackEntryCount() <= count){
-                    // pop all the fragment and remove the listener
-                    fragmentManager.popBackStack(FRAGMENT_OTHER, POP_BACK_STACK_INCLUSIVE);
-                    fragmentManager.removeOnBackStackChangedListener(this);
-                    // set the home button selected
-                    bottomNav.getMenu().getItem(0).setChecked(true);
+            public void onNavigationItemReselected(@NonNull MenuItem item) {
+                if (item.getItemId()==R.id.nav_home){
+                    setFragment(HomeFragment.newInstance(), FRAGMENT_HOME);
                 }
             }
         });
+        bottomNav.setSelectedItemId(R.id.nav_home);
+        pushFragmentIntoStack(R.id.nav_home);
     }
 
+    private void pushFragmentIntoStack(int id) {
+        if (mStack.size() < 3) {
+            mStack.push(id);
+        } else {
+            mStack.removeLast();
+            mStack.push(id);
+        }
+    }
+
+    private void setFragment(Fragment fragment, String tag) {
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.fragment_container, fragment, tag);
+        transaction.commit();
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (mStack.size() > 1) {
+            isBackPressed = true;
+            mStack.pop();
+            bottomNav.setSelectedItemId(mStack.peek());
+        } else {
+            super.onBackPressed();
+        }
+    }
 }

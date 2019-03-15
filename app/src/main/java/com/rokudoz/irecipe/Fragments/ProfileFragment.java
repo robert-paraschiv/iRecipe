@@ -59,6 +59,11 @@ public class ProfileFragment extends Fragment {
     private CollectionReference usersReference = db.collection("Users");
 
 
+    public static ProfileFragment newInstance() {
+        ProfileFragment fragment = new ProfileFragment();
+        return fragment;
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
