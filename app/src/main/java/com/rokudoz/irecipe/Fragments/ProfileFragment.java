@@ -77,8 +77,8 @@ public class ProfileFragment extends Fragment {
         tvHelloUserName = view.findViewById(R.id.profileFragment_helloUser_textview);
         mProfileImage = view.findViewById(R.id.profileFragment_profileImage);
 
-        getDocumentId();
         setupFirebaseAuth();
+        getDocumentId();
         retrieveSavedIngredients();
 
         Picasso.get()
