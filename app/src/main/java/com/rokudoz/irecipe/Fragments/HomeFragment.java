@@ -174,7 +174,7 @@ public class HomeFragment extends Fragment implements RecipeAdapter.OnItemClickL
                             @Override
                             public void onEvent(@javax.annotation.Nullable QuerySnapshot queryDocumentSnapshots,
                                                 @javax.annotation.Nullable FirebaseFirestoreException e) {
-
+                            if (queryDocumentSnapshots!=null){
                                     for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
                                         Recipe recipe = document.toObject(Recipe.class);
                                         mDocumentIDs.add(document.getId());
@@ -187,10 +187,12 @@ public class HomeFragment extends Fragment implements RecipeAdapter.OnItemClickL
 
 //                        Log.d(TAG, "onComplete: got a new note. Position: " + (mNotes.size() - 1));
                                     }
+
                                 if (queryDocumentSnapshots.getDocuments().size() != 0) {
                                     mLastQueriedDocument = queryDocumentSnapshots.getDocuments()
                                             .get(queryDocumentSnapshots.getDocuments().size() - 1);
                                 }
+                            }
                                     mAdapter.notifyDataSetChanged();
 
                             }

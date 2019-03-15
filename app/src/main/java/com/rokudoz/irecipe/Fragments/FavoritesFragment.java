@@ -24,9 +24,12 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -129,15 +132,20 @@ public class FavoritesFragment extends Fragment implements RecipeAdapter.OnItemC
 
 
     private void performQuery() {
-        usersReference.whereEqualTo("user_id", Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid()).get()
-                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+        usersReference.whereEqualTo("user_id", Objects.requireNonNull(FirebaseAuth.getInstance()
+                .getCurrentUser()).getUid())
+                .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
-                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                    public void onEvent(@javax.annotation.Nullable QuerySnapshot queryDocumentSnapshots, @javax.annotation.Nullable FirebaseFirestoreException e) {
+                        if (e != null) {
+                            Log.w(TAG, "onEvent: ", e);
+                            return;
+                        }
                         //Gets User Ingredients from database
                         Map<String, Boolean> tags = new HashMap<>();
-                        for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
-                            User user = documentSnapshot.toObject(User.class);
-                            mUser = documentSnapshot.toObject(User.class);
+                        for (DocumentChange documentSnapshot : queryDocumentSnapshots.getDocumentChanges()) {
+                            User user = documentSnapshot.getDocument().toObject(User.class);
+                            mUser = documentSnapshot.getDocument().toObject(User.class);
                             loggedinUserDocument = queryDocumentSnapshots.getDocuments().get(0).getId();
                             favRecipes = mUser.getFavoriteRecipes();
                             for (String tag : user.getTags().keySet()) {
@@ -156,16 +164,16 @@ public class FavoritesFragment extends Fragment implements RecipeAdapter.OnItemC
 //                                    .limit(3);
                         }
 
-                        notesQuery.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                        notesQuery.addSnapshotListener(new EventListener<QuerySnapshot>() {
                             @Override
-                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                                if (task.isSuccessful()) {
-
-                                    for (QueryDocumentSnapshot document : Objects.requireNonNull(task.getResult())) {
+                            public void onEvent(@javax.annotation.Nullable QuerySnapshot queryDocumentSnapshots,
+                                                @javax.annotation.Nullable FirebaseFirestoreException e) {
+                                if (queryDocumentSnapshots!=null){
+                                    for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
                                         Recipe recipe = document.toObject(Recipe.class);
-                                        mDocumentIDs.add(document.getId());
                                         if (favRecipes != null && favRecipes.contains(document.getId())) {
                                             recipe.setFavorite(true);
+                                            mDocumentIDs.add(document.getId()); // Need to add it only if it is fav
                                             mRecipeList.add(recipe);
                                         } else {
                                             recipe.setFavorite(false);
@@ -174,16 +182,16 @@ public class FavoritesFragment extends Fragment implements RecipeAdapter.OnItemC
 //                        Log.d(TAG, "onComplete: got a new note. Position: " + (mNotes.size() - 1));
                                     }
 
-                                    if (task.getResult().size() != 0) {
-                                        mLastQueriedDocument = task.getResult().getDocuments()
-                                                .get(task.getResult().size() - 1);
+                                    if (queryDocumentSnapshots.getDocuments().size() != 0) {
+                                        mLastQueriedDocument = queryDocumentSnapshots.getDocuments()
+                                                .get(queryDocumentSnapshots.getDocuments().size() - 1);
                                     }
-                                    mAdapter.notifyDataSetChanged();
-                                } else {
-                                    Toast.makeText(getContext(), "FAILED", Toast.LENGTH_SHORT).show();
                                 }
+                                mAdapter.notifyDataSetChanged();
+
                             }
                         });
+
                         pbLoading.setVisibility(View.INVISIBLE);
                         mAdapter.setOnItemClickListener(new RecipeAdapter.OnItemClickListener() {
                             @Override
@@ -210,7 +218,6 @@ public class FavoritesFragment extends Fragment implements RecipeAdapter.OnItemC
                             @Override
                             public void onFavoriteCick(int position) {
                                 String id = mDocumentIDs.get(position);
-
                                 if (favRecipes == null) {
                                     favRecipes = new ArrayList<>();
                                 }
@@ -218,6 +225,7 @@ public class FavoritesFragment extends Fragment implements RecipeAdapter.OnItemC
                                     favRecipes.remove(id);
                                     mRecipeList.get(position).setFavorite(false);
                                     mRecipeList.remove(position);
+                                    mDocumentIDs.remove(position);
                                     Toast.makeText(getContext(), "Removed " + id + " from favorites", Toast.LENGTH_SHORT).show();
                                 } else {
                                     favRecipes.add(id);
@@ -266,6 +274,7 @@ public class FavoritesFragment extends Fragment implements RecipeAdapter.OnItemC
 //                                Toast.makeText(MainActivity.this, "Delete click at " + position, Toast.LENGTH_SHORT).show();
                             }
                         });
+
                     }
                 });
 
