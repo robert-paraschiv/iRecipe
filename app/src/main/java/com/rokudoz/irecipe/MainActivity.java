@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.rokudoz.irecipe.Fragments.FavoritesFragment;
 import com.rokudoz.irecipe.Fragments.HomeFragment;
 import com.rokudoz.irecipe.Fragments.ProfileFragment;
 import com.rokudoz.irecipe.Fragments.SearchFragment;
@@ -22,8 +23,10 @@ import static android.support.v4.app.FragmentManager.POP_BACK_STACK_INCLUSIVE;
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
     private static final String FRAGMENT_HOME = "HomeFragment";
-    private static final String FRAGMENT_PROFILE = "ProfileFragment";
     private static final String FRAGMENT_SEARCH = "SearchFragment";
+    private static final String FRAGMENT_FAVORITES = "FavoritesFragment";
+    private static final String FRAGMENT_PROFILE = "ProfileFragment";
+
     BottomNavigationView bottomNav;
 
     @Override
@@ -34,10 +37,10 @@ public class MainActivity extends AppCompatActivity {
         bottomNav = findViewById(R.id.bottom_navigation);
 
         //I added this if statement to keep the selected fragment when rotating the device
-        if (savedInstanceState == null) {
-            getSupportFragmentManager().beginTransaction().add(R.id.fragment_container,
-                    new HomeFragment()).commit();
-        }
+//        if (savedInstanceState == null) {
+//            getSupportFragmentManager().beginTransaction().add(R.id.fragment_container,
+//                    new HomeFragment()).commit();
+//        }
         setBottomNavigationView();
     }
 
@@ -63,6 +66,13 @@ public class MainActivity extends AppCompatActivity {
                         }
                         isBackPressed = false;
                         setFragment(SearchFragment.newInstance(), FRAGMENT_SEARCH);
+                        return true;
+                    case R.id.nav_favorites:
+                        if (!isBackPressed){
+                            pushFragmentIntoStack(R.id.nav_favorites);
+                        }
+                        isBackPressed=false;
+                        setFragment(FavoritesFragment.newInstance(),FRAGMENT_FAVORITES);
                         return true;
                     case R.id.nav_account:
                         if (!isBackPressed) {
