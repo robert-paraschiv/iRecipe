@@ -36,7 +36,6 @@ import com.rokudoz.irecipe.Models.User;
 import com.rokudoz.irecipe.R;
 import com.rokudoz.irecipe.Utils.RecipeAdapter;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -45,8 +44,11 @@ import java.util.Objects;
 public class HomeFragment extends Fragment implements RecipeAdapter.OnItemClickListener {
     private static final String TAG = "HomeFragment";
 
+    public View view;
+
     private ProgressBar pbLoading;
     private FloatingActionButton fab;
+    private Boolean hasBeenActiveBefore = false;
 
     //Firebase
     private FirebaseAuth.AuthStateListener mAuthListener;
@@ -60,15 +62,17 @@ public class HomeFragment extends Fragment implements RecipeAdapter.OnItemClickL
     private RecipeAdapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
 
-    private ArrayList<Recipe> mRecipeList = new ArrayList<>();
     private ArrayList<String> mDocumentIDs = new ArrayList<>();
+    private ArrayList<Recipe> mRecipeList = new ArrayList<>();
 
     private DocumentSnapshot mLastQueriedDocument;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_home, container, false);
+        if (view == null) {
+            view = inflater.inflate(R.layout.fragment_home, container, false);
+        }
 
         pbLoading = view.findViewById(R.id.homeFragment_pbLoading);
         fab = view.findViewById(R.id.fab_add_recipe);
@@ -77,10 +81,10 @@ public class HomeFragment extends Fragment implements RecipeAdapter.OnItemClickL
         pbLoading.setVisibility(View.VISIBLE);
         mStorageRef = FirebaseStorage.getInstance();
 
+
         fab.hide();
         buildRecyclerView();
         setupFirebaseAuth();
-
 
         return view; // HAS TO BE THE LAST ONE ---------------------------------
     }
@@ -93,12 +97,14 @@ public class HomeFragment extends Fragment implements RecipeAdapter.OnItemClickL
 //        recipeAdapter.startListening();
     }
 
+
     @Override
     public void onStop() {
         super.onStop();
         if (mAuthListener != null) {
             FirebaseAuth.getInstance().removeAuthStateListener(mAuthListener);
         }
+
     }
 
 
@@ -106,7 +112,6 @@ public class HomeFragment extends Fragment implements RecipeAdapter.OnItemClickL
         mRecyclerView.setHasFixedSize(true);
         mLayoutManager = new LinearLayoutManager(getContext());
 
-        mRecipeList = new ArrayList<>();
         mAdapter = new RecipeAdapter(mRecipeList);
 
         mRecyclerView.setLayoutManager(mLayoutManager);
@@ -117,7 +122,6 @@ public class HomeFragment extends Fragment implements RecipeAdapter.OnItemClickL
 
 
     private void performQuery() {
-
         usersReference.whereEqualTo("user_id", Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid()).get()
                 .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                     @Override
@@ -158,7 +162,6 @@ public class HomeFragment extends Fragment implements RecipeAdapter.OnItemClickL
                                         mLastQueriedDocument = task.getResult().getDocuments()
                                                 .get(task.getResult().size() - 1);
                                     }
-
                                     mAdapter.notifyDataSetChanged();
                                 } else {
                                     Toast.makeText(getContext(), "FAILED", Toast.LENGTH_SHORT).show();
@@ -184,7 +187,8 @@ public class HomeFragment extends Fragment implements RecipeAdapter.OnItemClickL
 
                                 RecipeDetailedFragment fragment = RecipeDetailedFragment.newInstance(id, title, description, ingredientsString, imageUrl);
 
-                                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fragment).commit();
+                                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fragment)
+                                        .addToBackStack(null).commit();
                             }
 
                             @Override

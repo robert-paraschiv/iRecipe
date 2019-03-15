@@ -24,7 +24,7 @@ public class MainActivity extends AppCompatActivity {
 
         //I added this if statement to keep the selected fragment when rotating the device
         if (savedInstanceState == null) {
-            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
+            getSupportFragmentManager().beginTransaction().add(R.id.fragment_container,
                     new HomeFragment()).commit();
         }
     }
@@ -48,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
                     }
 
                     getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
-                            selectedFragment).commit();
+                            selectedFragment).addToBackStack(null).commit();
 
 
                     return true;

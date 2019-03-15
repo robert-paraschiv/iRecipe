@@ -10,6 +10,7 @@
         android:layout_height="300dp"
         android:id="@+id/recipeDetailed_image"
         android:elevation="4dp"
+        android:transitionName="example_transition"
         />
 
     <TextView
