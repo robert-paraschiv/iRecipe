@@ -56,7 +56,6 @@ public class HomeFragment extends Fragment implements RecipeAdapter.OnItemClickL
 
     private ProgressBar pbLoading;
     private FloatingActionButton fab;
-    private Boolean hasBeenActiveBefore = false;
 
     //Firebase
     private FirebaseAuth.AuthStateListener mAuthListener;
@@ -124,7 +123,7 @@ public class HomeFragment extends Fragment implements RecipeAdapter.OnItemClickL
     }
 
 
-    public void buildRecyclerView() {
+    private void buildRecyclerView() {
         mRecyclerView.setHasFixedSize(true);
         mLayoutManager = new LinearLayoutManager(getContext());
 

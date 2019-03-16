@@ -218,6 +218,7 @@ public class RegisterActivity extends AppCompatActivity {
         mUser.setName(name);
         mUser.setUser_id(userid);
         mUser.setTags(tags);
+        mUser.setUserProfilePicUrl("");
 
         //User user = new User(name, userid);
         userRef.add(mUser);

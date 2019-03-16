@@ -51,7 +51,8 @@ public class ProfileFragment extends Fragment {
 
     private Boolean querrySucceeded = false;
 
-    private String documentID = "";
+    private String userDocumentID = "";
+    private String userProfilePicUrl = "";
 
     Map<String, Boolean> ingredientsUserHas = new HashMap<>();
 
@@ -80,14 +81,7 @@ public class ProfileFragment extends Fragment {
         mProfileImage = view.findViewById(R.id.profileFragment_profileImage);
 
         setupFirebaseAuth();
-        getDocumentId();
-        retrieveSavedIngredients();
-
-        Picasso.get()
-                .load("https://firebasestorage.googleapis.com/v0/b/irecipe.appspot.com/o/RecipePhotos%2F1552491481106.jpg?alt=media&token=873c295f-e2be-4080-8835-f9e0144a2666")
-                .fit()
-                .centerCrop()
-                .into(mProfileImage);
+        getUserInfo();
 
         signOutBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -104,6 +98,7 @@ public class ProfileFragment extends Fragment {
     public void onStart() {
         super.onStart();
         FirebaseAuth.getInstance().addAuthStateListener(mAuthListener);
+
     }
 
     @Override
@@ -114,80 +109,78 @@ public class ProfileFragment extends Fragment {
         }
     }
 
-    private void getDocumentId() {
+    private void getUserInfo() {
         usersReference.whereEqualTo("user_id", FirebaseAuth.getInstance().getCurrentUser().getUid())
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
                     public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
                         if (e == null) {
-                            documentID = queryDocumentSnapshots.getDocuments().get(0).getId();
-                        }
-                    }
-                });
-    }
+                            String data = "";
 
-    private void retrieveSavedIngredients() {
+                            User user = queryDocumentSnapshots.getDocuments().get(0).toObject(User.class);
+                            userDocumentID = queryDocumentSnapshots.getDocuments().get(0).getId();
+                            userProfilePicUrl = user.getUserProfilePicUrl();
 
-        usersReference.whereEqualTo("user_id", FirebaseAuth.getInstance().getCurrentUser().getUid()).get()
-                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-                    @Override
-                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                        String data = "";
-
-                        for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
-                            User user = documentSnapshot.toObject(User.class);
                             for (String tag : user.getTags().keySet()) {
                                 data += "\n " + tag + " " + user.getTags().get(tag);
                                 ingredientsUserHas.put(tag, Objects.requireNonNull(user.getTags().get(tag)));
                             }
+                            Log.d(TAG, "onEvent: " + ingredientsUserHas.toString());
+
+                            textViewData.setText(data);
 
                             tvHelloUserName.setText(String.format("Hello, %s", user.getName()));
+
+                            setupCheckList();
+                            pbLoading.setVisibility(View.INVISIBLE);
+
+                            if (!userProfilePicUrl.equals("")) {
+                                Picasso.get()
+                                        .load(userProfilePicUrl)
+                                        .fit()
+                                        .centerCrop()
+                                        .into(mProfileImage);
+                            }
                         }
-                        textViewData.setText(data);
-
-                        setupCheckList();
-                        pbLoading.setVisibility(View.INVISIBLE);
-
                     }
                 });
-
-
     }
 
 
     private void setupCheckList() {
         //create an instance of ListView
         //set multiple selection mode
-        cbListView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
-        final String[] items = PossibleIngredients.getIngredientsNames();
-        //supply data items to ListView
-        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(getContext(), R.layout.checkable_list_layout, R.id.txt_title, items);
-        cbListView.setAdapter(arrayAdapter);
+        if (getActivity() != null) {
+            cbListView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+            final String[] items = PossibleIngredients.getIngredientsNames();
+            //supply data items to ListView
+            ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(getContext(), R.layout.checkable_list_layout, R.id.txt_title, items);
+            cbListView.setAdapter(arrayAdapter);
 
-        // sets the initial checkbox values taken from database
-        int index = 0;
-        for (String item : items) {
-            cbListView.setItemChecked(index, Objects.requireNonNull(ingredientsUserHas.get(item)));
-            Log.d(TAG, item + " index " + index + " value " + ingredientsUserHas.get(item));
-            index++;
-        }
-
-        cbListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                // gets checkBox value and updates database with it
-                Map<String, Boolean> selectedIngredientsMap = new HashMap<>();
-                int i = 0;
-                for (String tag : items) {
-                    selectedIngredientsMap.put(tag, cbListView.isItemChecked(i));
-                    i++;
-                }
-
-                db.collection("Users").document(documentID)
-                        .update("tags", selectedIngredientsMap);
+            // sets the initial checkbox values taken from database
+            int index = 0;
+            for (String item : items) {
+                cbListView.setItemChecked(index, ingredientsUserHas.get(item));
+                Log.d(TAG, item + " index " + index + " value " + ingredientsUserHas.get(item));
+                index++;
             }
 
-        });
+            cbListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    // gets checkBox value and updates database with it
+                    Map<String, Boolean> selectedIngredientsMap = new HashMap<>();
+                    int i = 0;
+                    for (String tag : items) {
+                        selectedIngredientsMap.put(tag, cbListView.isItemChecked(i));
+                        i++;
+                    }
 
+                    db.collection("Users").document(userDocumentID)
+                            .update("tags", selectedIngredientsMap);
+                }
+
+            });
+        }
     }
 
     public void signOut() {

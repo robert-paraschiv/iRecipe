@@ -10,12 +10,14 @@ public class User {
     private String name;
     Map<String, Boolean> tags;
     private ArrayList<String> favoriteRecipes;
+    private String userProfilePicUrl;
 
-    public User(String user_id, String name, Map<String, Boolean> tags, ArrayList<String> favoriteRecipes) {
+    public User(String user_id, String name, Map<String, Boolean> tags, ArrayList<String> favoriteRecipes,String userProfilePicUrl) {
         this.user_id = user_id;
         this.name = name;
         this.tags = tags;
         this.favoriteRecipes = favoriteRecipes;
+        this.userProfilePicUrl = userProfilePicUrl;
     }
 
 
@@ -55,6 +57,15 @@ public class User {
         this.tags = tags;
     }
 
+
+    public String getUserProfilePicUrl() {
+        return userProfilePicUrl;
+    }
+
+    public void setUserProfilePicUrl(String userProfilePicUrl) {
+        this.userProfilePicUrl = userProfilePicUrl;
+    }
+
     @Override
     public String toString() {
         return "User{" +
@@ -62,8 +73,7 @@ public class User {
                 ", name='" + name + '\'' +
                 ", tags=" + tags +
                 ", favoriteRecipes=" + favoriteRecipes +
+                ", userProfilePicUrl='" + userProfilePicUrl + '\'' +
                 '}';
     }
-
-
 }

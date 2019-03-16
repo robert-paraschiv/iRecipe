@@ -156,11 +156,11 @@ public class FavoritesFragment extends Fragment implements RecipeAdapter.OnItemC
 
                         Query notesQuery = null;
                         if (mLastQueriedDocument != null) {
-                            notesQuery = recipeRef.whereGreaterThanOrEqualTo("tags", tags)
+                            notesQuery = recipeRef.whereEqualTo("favorite", false)
                                     .startAfter(mLastQueriedDocument); // Necessary so we don't have the same results multiple times
 //                                    .limit(3);
                         } else {
-                            notesQuery = recipeRef.whereGreaterThanOrEqualTo("tags", tags);
+                            notesQuery = recipeRef.whereEqualTo("favorite", false);
 //                                    .limit(3);
                         }
 
