@@ -41,6 +41,7 @@ public class AddRecipesActivity extends AppCompatActivity {
 
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private CollectionReference collectionReference = db.collection("Recipes");
+    private CollectionReference ingredientsReference = db.collection("Ingredients");
     private StorageReference mStorageRef = FirebaseStorage.getInstance().getReference("RecipePhotos");
     private StorageTask mUploadTask;
 
@@ -109,6 +110,7 @@ public class AddRecipesActivity extends AppCompatActivity {
         return mime.getExtensionFromMimeType(cR.getType(uri));
     }
 
+
     // Adding Recipes -----------------------------------------------------------------------------
     public void addRecipe() {
         final String title = editTextTitle.getText().toString();
@@ -116,7 +118,7 @@ public class AddRecipesActivity extends AppCompatActivity {
 
 
         String tagInput = editTextTags.getText().toString();
-        String[] possibleIngredients = PossibleIngredients.getIngredientsNames();
+        String[] possibleIngredients = PossibleIngredients.getIngredientsNames(); /////////////////////////////////////////////////////////////////////////////////
         String[] tagArray = tagInput.split("\\s*,\\s*");
 
         final Map<String, Boolean> tags = new HashMap<>();

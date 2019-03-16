@@ -111,7 +111,6 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
 
         holder.tvTitle.setText(currentItem.getTitle());
         holder.tvDescription.setText(currentItem.getDescription());
-        Picasso.get().setIndicatorsEnabled(true);
         Picasso.get()
                 .load(currentItem.getImageUrl())
                 .fit()

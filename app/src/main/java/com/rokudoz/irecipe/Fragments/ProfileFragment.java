@@ -1,16 +1,20 @@
 package com.rokudoz.irecipe.Fragments;
 
+import android.content.ContentResolver;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.MimeTypeMap;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -19,17 +23,26 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.OnProgressListener;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.StorageTask;
+import com.google.firebase.storage.UploadTask;
 import com.rokudoz.irecipe.Account.LoginActivity;
+import com.rokudoz.irecipe.AddRecipesActivity;
 import com.rokudoz.irecipe.Models.PossibleIngredients;
+import com.rokudoz.irecipe.Models.Recipe;
 import com.rokudoz.irecipe.Models.User;
 import com.rokudoz.irecipe.R;
 import com.squareup.picasso.Picasso;
@@ -40,9 +53,13 @@ import java.util.Objects;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
+import static android.app.Activity.RESULT_OK;
+
 public class ProfileFragment extends Fragment {
     private static final String TAG = "ProfileFragment";
 
+    private static final int PICK_IMAGE_REQUEST = 1;
+    private Uri mImageUri;
     private TextView textViewData, tvHelloUserName;
     private ProgressBar pbLoading;
     private ListView cbListView;
@@ -60,6 +77,8 @@ public class ProfileFragment extends Fragment {
     private FirebaseAuth.AuthStateListener mAuthListener;
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private CollectionReference usersReference = db.collection("Users");
+    private StorageReference mStorageRef = FirebaseStorage.getInstance().getReference("RecipePhotos");
+    private StorageTask mUploadTask;
 
 
     public static ProfileFragment newInstance() {
@@ -89,6 +108,17 @@ public class ProfileFragment extends Fragment {
                 signOut();
             }
         });
+        mProfileImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mUploadTask != null && mUploadTask.isInProgress()) {
+                    Toast.makeText(getContext(), "Upload in progress...", Toast.LENGTH_SHORT).show();
+
+                } else {
+                    openFileChooser();
+                }
+            }
+        });
 
         return view;
     }
@@ -107,6 +137,92 @@ public class ProfileFragment extends Fragment {
         if (mAuthListener != null) {
             FirebaseAuth.getInstance().removeAuthStateListener(mAuthListener);
         }
+    }
+
+    private void openFileChooser() {
+        Intent intent = new Intent();
+        intent.setType("image/*");
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        startActivityForResult(intent, PICK_IMAGE_REQUEST);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK
+                && data != null && data.getData() != null) {
+            mImageUri = data.getData();
+
+            //Picasso.with(this).load(mImageUri).into(mImageView);  --OLD lib
+
+            uploadUserProfilePic();
+        }
+    }
+
+    private String getFileExtension(Uri uri) {
+        ContentResolver cR = getActivity().getContentResolver();
+        MimeTypeMap mime = MimeTypeMap.getSingleton();
+        return mime.getExtensionFromMimeType(cR.getType(uri));
+    }
+
+    private void uploadUserProfilePic() {
+        if (mImageUri != null) {
+            final StorageReference newFileReference = mStorageRef.child(System.currentTimeMillis()
+                    + "." + getFileExtension(mImageUri));
+            final StorageReference oldPicReference = FirebaseStorage.getInstance().getReferenceFromUrl(userProfilePicUrl);
+
+            mUploadTask = newFileReference.putFile(mImageUri)
+                    .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                        @Override
+                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                            newFileReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                @Override
+                                public void onSuccess(Uri uri) {
+                                    final String imageUrl = uri.toString();
+                                    if (!userProfilePicUrl.equals("")) {
+                                        oldPicReference.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                            @Override
+                                            public void onSuccess(Void aVoid) {
+                                                Toast.makeText(getContext(), "deleted oldfile", Toast.LENGTH_SHORT).show();
+                                                updateUserProfilePicUrl(imageUrl);
+                                            }
+                                        });
+                                    }
+
+                                }
+                            });
+
+                            Toast.makeText(getContext(), "Upload Succesfull", Toast.LENGTH_SHORT).show();
+
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
+                        }
+                    });
+
+        } else {
+            Toast.makeText(getContext(), "No file selected", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void updateUserProfilePicUrl(String imageUrl) {
+        usersReference.document(userDocumentID).update("userProfilePicUrl", imageUrl)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Toast.makeText(getContext(), "Updated db with profile pic", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Toast.makeText(getContext(), "Failed to update db with profile pic", Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
 
     private void getUserInfo() {
@@ -137,9 +253,16 @@ public class ProfileFragment extends Fragment {
                             if (!userProfilePicUrl.equals("")) {
                                 Picasso.get()
                                         .load(userProfilePicUrl)
+                                        .error(R.drawable.ic_home_black_24dp)
                                         .fit()
                                         .centerCrop()
                                         .into(mProfileImage);
+                            } else if (userProfilePicUrl.equals("")) {
+                                Picasso.get()
+                                        .load(R.drawable.ic_home_black_24dp)
+                                        .placeholder(R.drawable.ic_home_black_24dp)
+                                        .into(mProfileImage);
+                                Toast.makeText(getContext(), "empty", Toast.LENGTH_SHORT).show();
                             }
                         }
                     }
