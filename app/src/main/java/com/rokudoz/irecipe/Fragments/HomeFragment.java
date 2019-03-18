@@ -191,7 +191,7 @@ public class HomeFragment extends Fragment implements RecipeAdapter.OnItemClickL
                                         if (recipe.getIngredient_array() != null && finalUserIngredientsArray != null) {
                                             //Check if recipe contains any ingredient that user has
                                             boolean noElementsInCommon = Collections.disjoint(recipe.getIngredient_array(), finalUserIngredientsArray);
-                                            if (!noElementsInCommon) {
+                                            if (!noElementsInCommon && finalUserIngredientsArray.containsAll(recipe.getIngredient_array())) {
                                                 mRecipeList.add(recipe);
                                                 Log.d(TAG, "onEvent: Recipe ingredientsArray " + recipe.getIngredient_array().toString()
                                                         + " User ingredients: " + finalUserIngredientsArray);
