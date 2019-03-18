@@ -3,8 +3,10 @@ package com.rokudoz.irecipe.Account;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
@@ -19,12 +21,15 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.rokudoz.irecipe.Models.PossibleIngredients;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.rokudoz.irecipe.Models.User;
 import com.rokudoz.irecipe.R;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -35,10 +40,11 @@ public class RegisterActivity extends AppCompatActivity {
     //Firebase
     private FirebaseAuth.AuthStateListener mAuthListener;
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
-    private CollectionReference userRef= db.collection("Users");
+    private CollectionReference userRef = db.collection("Users");
+    private CollectionReference ingredientsReference = db.collection("Ingredients");
 
     //widgets
-    private EditText mEmail, mName,mPassword, mConfirmPassword;
+    private EditText mEmail, mName, mPassword, mConfirmPassword;
     private Button mRegister;
     private ProgressBar mProgressBar;
 
@@ -46,6 +52,9 @@ public class RegisterActivity extends AppCompatActivity {
     private Context mContext;
     private String email, name, password;
     private User mUser;
+
+    private List<String> ingredientList;
+    private String[] ingStringArray;
 
 
     @Override
@@ -61,6 +70,7 @@ public class RegisterActivity extends AppCompatActivity {
         mUser = new User();
         Log.d(TAG, "onCreate: started");
 
+        getIngredientList();
         initProgressBar();
         setupFirebaseAuth();
         init();
@@ -68,7 +78,7 @@ public class RegisterActivity extends AppCompatActivity {
         hideSoftKeyboard();
     }
 
-    private void init(){
+    private void init() {
 
 
         mRegister.setOnClickListener(new View.OnClickListener() {
@@ -80,12 +90,12 @@ public class RegisterActivity extends AppCompatActivity {
                 password = mPassword.getText().toString();
 
                 if (checkInputs(email, name, password, mConfirmPassword.getText().toString())) {
-                    if(doStringsMatch(password, mConfirmPassword.getText().toString())){
+                    if (doStringsMatch(password, mConfirmPassword.getText().toString())) {
                         registerNewEmail(email, password);
-                    }else{
+                    } else {
                         Toast.makeText(mContext, "passwords do not match", Toast.LENGTH_SHORT).show();
                     }
-                }else{
+                } else {
                     Toast.makeText(mContext, "All fields must be filled", Toast.LENGTH_SHORT).show();
                 }
             }
@@ -95,25 +105,27 @@ public class RegisterActivity extends AppCompatActivity {
 
     /**
      * Return true if @param 's1' matches @param 's2'
+     *
      * @param s1
      * @param s2
      * @return
      */
-    private boolean doStringsMatch(String s1, String s2){
+    private boolean doStringsMatch(String s1, String s2) {
         return s1.equals(s2);
     }
 
 
     /**
      * Checks all the input fields for null
+     *
      * @param email
      * @param username
      * @param password
      * @return
      */
-    private boolean checkInputs(String email, String username, String password, String confirmPassword){
+    private boolean checkInputs(String email, String username, String password, String confirmPassword) {
         Log.d(TAG, "checkInputs: checking inputs for null values");
-        if(email.equals("") || username.equals("") || password.equals("") || confirmPassword.equals("")){
+        if (email.equals("") || username.equals("") || password.equals("") || confirmPassword.equals("")) {
             Toast.makeText(mContext, "All fields must be filled out", Toast.LENGTH_SHORT).show();
             return false;
         }
@@ -121,21 +133,21 @@ public class RegisterActivity extends AppCompatActivity {
     }
 
 
-    private void showProgressBar(){
+    private void showProgressBar() {
         mProgressBar.setVisibility(View.VISIBLE);
     }
 
-    private void hideProgressBar(){
+    private void hideProgressBar() {
         mProgressBar.setVisibility(View.GONE);
     }
 
-    private void initProgressBar(){
+    private void initProgressBar() {
         mProgressBar = (ProgressBar) findViewById(R.id.progressBar);
         mProgressBar.setVisibility(View.INVISIBLE);
     }
 
 
-    private void hideSoftKeyboard(){
+    private void hideSoftKeyboard() {
         this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
     }
 
@@ -144,7 +156,7 @@ public class RegisterActivity extends AppCompatActivity {
      */
 
 
-    private void setupFirebaseAuth(){
+    private void setupFirebaseAuth() {
 
         mAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
@@ -169,10 +181,11 @@ public class RegisterActivity extends AppCompatActivity {
 
     /**
      * Register a new email and password to Firebase Authentication
+     *
      * @param email
      * @param password
      */
-    public void registerNewEmail(final String email, String password){
+    public void registerNewEmail(final String email, String password) {
 
         showProgressBar();
 
@@ -182,12 +195,12 @@ public class RegisterActivity extends AppCompatActivity {
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         Log.d(TAG, "registerNewEmail: onComplete: " + task.isSuccessful());
 
-                        if (task.isSuccessful()){
+                        if (task.isSuccessful()) {
                             //send email verificaiton
                             sendVerificationEmail();
 
                             //add user details to firebase database
-                            addNewUser();
+                            getIngredientList();
                         }
                         if (!task.isSuccessful()) {
                             Toast.makeText(mContext, "Someone with that email already exists",
@@ -204,8 +217,8 @@ public class RegisterActivity extends AppCompatActivity {
     /**
      * Adds data to the node: "users"
      */
-    public void addNewUser(){
-        String[] possibleIngredients = PossibleIngredients.getIngredientsNames();
+    public void addNewUser() {
+        String[] possibleIngredients = ingStringArray;
 
         final Map<String, Boolean> tags = new HashMap<>();
         for (String ingredient : possibleIngredients) {
@@ -226,6 +239,22 @@ public class RegisterActivity extends AppCompatActivity {
         redirectLoginScreen();
     }
 
+
+    private void getIngredientList() {
+        ingredientsReference.document("ingredient_list")
+                .addSnapshotListener(new EventListener<DocumentSnapshot>() {
+                    @Override
+                    public void onEvent(@javax.annotation.Nullable DocumentSnapshot documentSnapshot, @javax.annotation.Nullable FirebaseFirestoreException e) {
+                        if (e == null) {
+                            ingredientList = (List<String>) documentSnapshot.get("ingredient_list");
+                            ingStringArray = ingredientList.toArray(new String[ingredientList.size()]);
+                            addNewUser();
+                        }
+                    }
+                });
+    }
+
+
     /**
      * sends an email verification link to the user
      */
@@ -239,8 +268,7 @@ public class RegisterActivity extends AppCompatActivity {
                         public void onComplete(@NonNull Task<Void> task) {
                             if (task.isSuccessful()) {
                                 Toast.makeText(mContext, "Sent verification email", Toast.LENGTH_SHORT).show();
-                            }
-                            else{
+                            } else {
                                 Toast.makeText(mContext, "couldn't send email", Toast.LENGTH_SHORT).show();
                                 hideProgressBar();
                             }
@@ -253,7 +281,7 @@ public class RegisterActivity extends AppCompatActivity {
     /**
      * Redirects the user to the login screen
      */
-    private void redirectLoginScreen(){
+    private void redirectLoginScreen() {
         Log.d(TAG, "redirectLoginScreen: redirecting to login screen.");
 
         Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);

@@ -9,7 +9,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -28,26 +27,22 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.StorageTask;
 import com.google.firebase.storage.UploadTask;
 import com.rokudoz.irecipe.Account.LoginActivity;
-import com.rokudoz.irecipe.AddRecipesActivity;
-import com.rokudoz.irecipe.Models.PossibleIngredients;
-import com.rokudoz.irecipe.Models.Recipe;
 import com.rokudoz.irecipe.Models.User;
 import com.rokudoz.irecipe.R;
 import com.squareup.picasso.Picasso;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -66,10 +61,11 @@ public class ProfileFragment extends Fragment {
     private Button signOutBtn;
     private CircleImageView mProfileImage;
 
-    private Boolean querrySucceeded = false;
-
     private String userDocumentID = "";
     private String userProfilePicUrl = "";
+
+    private List<String> ingredientList;
+    private String[] ingStringArray;
 
     Map<String, Boolean> ingredientsUserHas = new HashMap<>();
 
@@ -77,6 +73,7 @@ public class ProfileFragment extends Fragment {
     private FirebaseAuth.AuthStateListener mAuthListener;
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private CollectionReference usersReference = db.collection("Users");
+    private CollectionReference ingredientsReference = db.collection("Ingredients");
     private StorageReference mStorageRef = FirebaseStorage.getInstance().getReference("RecipePhotos");
     private StorageTask mUploadTask;
 
@@ -154,8 +151,6 @@ public class ProfileFragment extends Fragment {
                 && data != null && data.getData() != null) {
             mImageUri = data.getData();
 
-            //Picasso.with(this).load(mImageUri).into(mImageView);  --OLD lib
-
             uploadUserProfilePic();
         }
     }
@@ -214,13 +209,28 @@ public class ProfileFragment extends Fragment {
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
-                        Toast.makeText(getContext(), "Updated db with profile pic", Toast.LENGTH_SHORT).show();
+                        Log.d(TAG, "onSuccess: Updated db with profile pic");
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(getContext(), "Failed to update db with profile pic", Toast.LENGTH_SHORT).show();
+                        Log.d(TAG, "onFailure: Failed to update db with profile pic");
+                    }
+                });
+    }
+
+    private void getIngredientList() {
+        ingredientsReference.document("ingredient_list")
+                .addSnapshotListener(new EventListener<DocumentSnapshot>() {
+                    @Override
+                    public void onEvent(@javax.annotation.Nullable DocumentSnapshot documentSnapshot, @javax.annotation.Nullable FirebaseFirestoreException e) {
+                        if (e == null) {
+                            ingredientList = (List<String>) documentSnapshot.get("ingredient_list");
+                            ingStringArray = ingredientList.toArray(new String[ingredientList.size()]);
+
+                            setupCheckList();
+                        }
                     }
                 });
     }
@@ -247,7 +257,8 @@ public class ProfileFragment extends Fragment {
 
                             tvHelloUserName.setText(String.format("Hello, %s", user.getName()));
 
-                            setupCheckList();
+                            getIngredientList();
+
                             pbLoading.setVisibility(View.INVISIBLE);
 
                             if (!userProfilePicUrl.equals("")) {
@@ -275,7 +286,9 @@ public class ProfileFragment extends Fragment {
         //set multiple selection mode
         if (getActivity() != null) {
             cbListView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
-            final String[] items = PossibleIngredients.getIngredientsNames();
+//            final String[] items = PossibleIngredients.getIngredientsNames();
+            final String[] items = ingStringArray;
+
             //supply data items to ListView
             ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(getContext(), R.layout.checkable_list_layout, R.id.txt_title, items);
             cbListView.setAdapter(arrayAdapter);

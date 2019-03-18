@@ -20,24 +20,29 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.StorageTask;
 import com.google.firebase.storage.UploadTask;
-import com.rokudoz.irecipe.Models.PossibleIngredients;
 import com.rokudoz.irecipe.Models.Recipe;
 import com.squareup.picasso.Picasso;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class AddRecipesActivity extends AppCompatActivity {
 
     private static final int PICK_IMAGE_REQUEST = 1;
     private Uri mImageUri;
+    private List<String> ingredientList;
+    private String[] ingStringArray;
 
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private CollectionReference collectionReference = db.collection("Recipes");
@@ -77,7 +82,7 @@ public class AddRecipesActivity extends AppCompatActivity {
                     Toast.makeText(AddRecipesActivity.this, "Upload in progress...", Toast.LENGTH_SHORT).show();
 
                 } else {
-                    addRecipe();
+                    getIngredientList();
                 }
             }
         });
@@ -111,6 +116,22 @@ public class AddRecipesActivity extends AppCompatActivity {
     }
 
 
+
+    private void getIngredientList() {
+        ingredientsReference.document("ingredient_list")
+                .addSnapshotListener(new EventListener<DocumentSnapshot>() {
+                    @Override
+                    public void onEvent(@javax.annotation.Nullable DocumentSnapshot documentSnapshot, @javax.annotation.Nullable FirebaseFirestoreException e) {
+                        if (e == null) {
+                            ingredientList = (List<String>) documentSnapshot.get("ingredient_list");
+                            ingStringArray = ingredientList.toArray(new String[ingredientList.size()]);
+
+                            addRecipe();
+                        }
+                    }
+                });
+    }
+
     // Adding Recipes -----------------------------------------------------------------------------
     public void addRecipe() {
         final String title = editTextTitle.getText().toString();
@@ -118,7 +139,7 @@ public class AddRecipesActivity extends AppCompatActivity {
 
 
         String tagInput = editTextTags.getText().toString();
-        String[] possibleIngredients = PossibleIngredients.getIngredientsNames(); /////////////////////////////////////////////////////////////////////////////////
+        String[] possibleIngredients = ingStringArray; /////////////////////////////////////////////////////////////////////////////////
         String[] tagArray = tagInput.split("\\s*,\\s*");
 
         final Map<String, Boolean> tags = new HashMap<>();
@@ -132,7 +153,6 @@ public class AddRecipesActivity extends AppCompatActivity {
                 if (Arrays.asList(possibleIngredients).contains(tag)) {
                     tags.put(tag, true);
                 }
-
             }
         }
 
