@@ -312,6 +312,9 @@ public class ProfileFragment extends Fragment {
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                     // gets checkBox value and updates database with it
                     Map<String, Boolean> selectedIngredientsMap = new HashMap<>();
+                    if (userIngredientList == null) {
+                        userIngredientList = new ArrayList<>();
+                    }
                     int i = 0;
                     for (String tag : items) {
                         selectedIngredientsMap.put(tag, cbListView.isItemChecked(i));
@@ -326,9 +329,7 @@ public class ProfileFragment extends Fragment {
 
                     db.collection("Users").document(userDocumentID)
                             .update("tags", selectedIngredientsMap);
-                    if (userIngredientList == null) {
-                        userIngredientList.add("none");
-                    }
+
                     db.collection("Users").document(userDocumentID)
                             .update("ingredient_array", userIngredientList);
                 }

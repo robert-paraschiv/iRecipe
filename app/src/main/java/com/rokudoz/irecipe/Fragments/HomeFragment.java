@@ -162,7 +162,7 @@ public class HomeFragment extends Fragment implements RecipeAdapter.OnItemClickL
                             }
 //                            Toast.makeText(MainActivity.this, tags.toString(), Toast.LENGTH_SHORT).show();
                         }
-                        Log.d(TAG, "onEvent: User ingredientsArray" + userIngredientsArray);
+                        Log.d(TAG, "onEvent: User ingredientsArray " + userIngredientsArray);
                         Query notesQuery = null;
                         if (mLastQueriedDocument != null) {
                             notesQuery = recipeRef.whereLessThanOrEqualTo("tags", tags)
@@ -193,9 +193,11 @@ public class HomeFragment extends Fragment implements RecipeAdapter.OnItemClickL
                                             boolean noElementsInCommon = Collections.disjoint(recipe.getIngredient_array(), finalUserIngredientsArray);
                                             if (!noElementsInCommon) {
                                                 mRecipeList.add(recipe);
-                                                Log.d(TAG, "onEvent: Recipe ingredientsArray " + recipe.getIngredient_array().toString());
+                                                Log.d(TAG, "onEvent: Recipe ingredientsArray " + recipe.getIngredient_array().toString()
+                                                        + " User ingredients: " + finalUserIngredientsArray);
                                             } else {
-                                                Log.d(TAG, "onEvent: Recipe didnt have in common: " + recipe.getIngredient_array().toString());
+                                                Log.d(TAG, "onEvent: Rejected recipe: " + recipe.getTitle()
+                                                        + ", ingredients: " + recipe.getIngredient_array().toString());
                                             }
                                         }
                                     }
