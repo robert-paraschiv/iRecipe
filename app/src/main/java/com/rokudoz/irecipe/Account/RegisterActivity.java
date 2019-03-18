@@ -28,6 +28,8 @@ import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.rokudoz.irecipe.Models.User;
 import com.rokudoz.irecipe.R;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -70,7 +72,7 @@ public class RegisterActivity extends AppCompatActivity {
         mUser = new User();
         Log.d(TAG, "onCreate: started");
 
-        getIngredientList();
+
         initProgressBar();
         setupFirebaseAuth();
         init();
@@ -231,6 +233,7 @@ public class RegisterActivity extends AppCompatActivity {
         mUser.setName(name);
         mUser.setUser_id(userid);
         mUser.setTags(tags);
+        mUser.setIngredient_array(new ArrayList<String>());
         mUser.setUserProfilePicUrl("");
 
         //User user = new User(name, userid);

@@ -171,8 +171,15 @@ public class ProfileFragment extends Fragment {
         if (mImageUri != null) {
             final StorageReference newFileReference = mStorageRef.child(System.currentTimeMillis()
                     + "." + getFileExtension(mImageUri));
-            final StorageReference oldPicReference = FirebaseStorage.getInstance().getReferenceFromUrl(userProfilePicUrl);
 
+            StorageReference oldPicReference = FirebaseStorage.getInstance().getReference();
+
+            if (!userProfilePicUrl.equals("")){
+
+                oldPicReference = FirebaseStorage.getInstance().getReferenceFromUrl(userProfilePicUrl);
+            }
+
+            final StorageReference finalOldPicReference = oldPicReference;
             mUploadTask = newFileReference.putFile(mImageUri)
                     .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                         @Override
@@ -182,13 +189,15 @@ public class ProfileFragment extends Fragment {
                                 public void onSuccess(Uri uri) {
                                     final String imageUrl = uri.toString();
                                     if (!userProfilePicUrl.equals("")) {
-                                        oldPicReference.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        finalOldPicReference.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
                                             @Override
                                             public void onSuccess(Void aVoid) {
                                                 Toast.makeText(getContext(), "deleted oldfile", Toast.LENGTH_SHORT).show();
                                                 updateUserProfilePicUrl(imageUrl);
                                             }
                                         });
+                                    }else {
+                                        updateUserProfilePicUrl(imageUrl);
                                     }
 
                                 }
