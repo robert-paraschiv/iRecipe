@@ -57,7 +57,7 @@ public class HomeFragment extends Fragment implements RecipeAdapter.OnItemClickL
     private ProgressBar pbLoading;
     private FloatingActionButton fab;
 
-    //Firebase
+    //FireBase
     private FirebaseAuth.AuthStateListener mAuthListener;
     private User mUser;
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -72,7 +72,7 @@ public class HomeFragment extends Fragment implements RecipeAdapter.OnItemClickL
     private ArrayList<String> mDocumentIDs = new ArrayList<>();
     private ArrayList<Recipe> mRecipeList = new ArrayList<>();
     private ArrayList<String> favRecipes = new ArrayList<>();
-    private String loggedinUserDocument = "";
+    private String loggedInUserDocumentId = "";
 
     private DocumentSnapshot mLastQueriedDocument;
 
@@ -109,7 +109,6 @@ public class HomeFragment extends Fragment implements RecipeAdapter.OnItemClickL
     public void onStart() {
         super.onStart();
         FirebaseAuth.getInstance().addAuthStateListener(mAuthListener);
-//        recipeAdapter.startListening();
     }
 
 
@@ -119,7 +118,6 @@ public class HomeFragment extends Fragment implements RecipeAdapter.OnItemClickL
         if (mAuthListener != null) {
             FirebaseAuth.getInstance().removeAuthStateListener(mAuthListener);
         }
-
     }
 
 
@@ -153,7 +151,7 @@ public class HomeFragment extends Fragment implements RecipeAdapter.OnItemClickL
                         for (DocumentChange documentSnapshot : queryDocumentSnapshots.getDocumentChanges()) {
                             User user = documentSnapshot.getDocument().toObject(User.class);
                             mUser = documentSnapshot.getDocument().toObject(User.class);
-                            loggedinUserDocument = queryDocumentSnapshots.getDocuments().get(0).getId();
+                            loggedInUserDocumentId = queryDocumentSnapshots.getDocuments().get(0).getId();
                             favRecipes = mUser.getFavoriteRecipes();
                             userIngredientsArray = mUser.getIngredient_array();
 
@@ -174,129 +172,139 @@ public class HomeFragment extends Fragment implements RecipeAdapter.OnItemClickL
                         }
 
                         final List<String> finalUserIngredientsArray = userIngredientsArray;
-                        notesQuery.addSnapshotListener(new EventListener<QuerySnapshot>() {
-                            @Override
-                            public void onEvent(@javax.annotation.Nullable QuerySnapshot queryDocumentSnapshots,
-                                                @javax.annotation.Nullable FirebaseFirestoreException e) {
-                                if (queryDocumentSnapshots != null) {
-                                    for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
-                                        Recipe recipe = document.toObject(Recipe.class);
-                                        mDocumentIDs.add(document.getId());
 
-                                        if (favRecipes != null && favRecipes.contains(document.getId())) {
-                                            recipe.setFavorite(true);
-                                        } else {
-                                            recipe.setFavorite(false);
-                                        }
-                                        if (recipe.getIngredient_array() != null && finalUserIngredientsArray != null) {
-                                            //Check if recipe contains any ingredient that user has
-                                            boolean noElementsInCommon = Collections.disjoint(recipe.getIngredient_array(), finalUserIngredientsArray);
-                                            if (!noElementsInCommon && finalUserIngredientsArray.containsAll(recipe.getIngredient_array())) {
-                                                mRecipeList.add(recipe);
-                                                Log.d(TAG, "onEvent: Recipe ingredientsArray " + recipe.getIngredient_array().toString()
-                                                        + " User ingredients: " + finalUserIngredientsArray);
-                                            } else {
-                                                Log.d(TAG, "onEvent: Rejected recipe: " + recipe.getTitle()
-                                                        + ", ingredients: " + recipe.getIngredient_array().toString());
-                                            }
-                                        }
-                                    }
-
-                                    if (queryDocumentSnapshots.getDocuments().size() != 0) {
-                                        mLastQueriedDocument = queryDocumentSnapshots.getDocuments()
-                                                .get(queryDocumentSnapshots.getDocuments().size() - 1);
-                                    }
-                                }
-                                mAdapter.notifyDataSetChanged();
-
-                            }
-                        });
+                        PerformMainQuery(notesQuery, finalUserIngredientsArray);
 
                         pbLoading.setVisibility(View.INVISIBLE);
-                        mAdapter.setOnItemClickListener(new RecipeAdapter.OnItemClickListener() {
-                            @Override
-                            public void onItemClick(int position) {
-                                String id = mDocumentIDs.get(position);
-                                String title = mRecipeList.get(position).getTitle();
-                                String description = mRecipeList.get(position).getDescription();
-                                String imageUrl = mRecipeList.get(position).getImageUrl();
-                                Map<String, Boolean> ingredients = mRecipeList.get(position).getTags();
 
-                                String ingredientsString = "";
-                                for (String ingredient : ingredients.keySet()) {
-                                    if (ingredients.get(ingredient)) {
-                                        ingredientsString += "\n- " + ingredient;
-                                    }
-                                }
-
-                                RecipeDetailedFragment fragment = RecipeDetailedFragment.newInstance(id, title, description, ingredientsString, imageUrl);
-
-                                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fragment)
-                                        .addToBackStack(null).commit();
-                            }
-
-                            @Override
-                            public void onFavoriteCick(int position) {
-                                String id = mDocumentIDs.get(position);
-
-                                if (favRecipes == null) {
-                                    favRecipes = new ArrayList<>();
-                                }
-                                if (favRecipes.contains(id)) {
-                                    favRecipes.remove(id);
-                                    mRecipeList.get(position).setFavorite(false);
-                                    Toast.makeText(getContext(), "Removed " + id + " from favorites", Toast.LENGTH_SHORT).show();
-                                } else {
-                                    favRecipes.add(id);
-                                    mRecipeList.get(position).setFavorite(true);
-                                    Toast.makeText(getContext(), "Added " + id + " to favorites", Toast.LENGTH_SHORT).show();
-                                }
-                                mUser.setFavoriteRecipes(favRecipes);
-                                DocumentReference favRecipesRef = usersReference.document(loggedinUserDocument);
-                                favRecipesRef.update("favoriteRecipes", favRecipes);
-
-                                mAdapter.notifyDataSetChanged();
-                            }
-
-                            @Override
-                            public void onDeleteClick(final int position) {
-                                Recipe selectedRecipe = mRecipeList.get(position);
-                                final String id = mDocumentIDs.get(position);
-
-                                //Deleting image from FirebaseStorage
-                                StorageReference imageRef = mStorageRef.getReferenceFromUrl(selectedRecipe.getImageUrl());
-                                imageRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
-                                    @Override
-                                    public void onSuccess(Void aVoid) {
-                                        //Deleting Document of the item selected
-                                        recipeRef.document(id).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
-                                            @Override
-                                            public void onSuccess(Void aVoid) {
-                                                Toast.makeText(getContext(), "Deleted from Db", Toast.LENGTH_SHORT).show();
-                                                mRecipeList.remove(position);
-                                                mDocumentIDs.remove(position);
-                                                performQuery();
-                                            }
-                                        }).addOnFailureListener(new OnFailureListener() {
-                                            @Override
-                                            public void onFailure(@NonNull Exception e) {
-                                                Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
-                                            }
-                                        });
-                                    }
-                                }).addOnFailureListener(new OnFailureListener() {
-                                    @Override
-                                    public void onFailure(@NonNull Exception e) {
-                                        Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
-                                    }
-                                });
-//                                Toast.makeText(MainActivity.this, "Delete click at " + position, Toast.LENGTH_SHORT).show();
-                            }
-                        });
+                        initializeRecyclerViewAdapterOnClicks();
 
                     }
                 });
 
+    }
+
+    private void PerformMainQuery(Query notesQuery, final List<String> finalUserIngredientsArray) {
+        notesQuery.addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@javax.annotation.Nullable QuerySnapshot queryDocumentSnapshots,
+                                @javax.annotation.Nullable FirebaseFirestoreException e) {
+                if (queryDocumentSnapshots != null) {
+                    for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
+                        Recipe recipe = document.toObject(Recipe.class);
+                        mDocumentIDs.add(document.getId());
+
+                        if (favRecipes != null && favRecipes.contains(document.getId())) {
+                            recipe.setFavorite(true);
+                        } else {
+                            recipe.setFavorite(false);
+                        }
+                        if (recipe.getIngredient_array() != null && finalUserIngredientsArray != null) {
+                            //Check if recipe contains any ingredient that user has
+                            boolean noElementsInCommon = Collections.disjoint(recipe.getIngredient_array(), finalUserIngredientsArray);
+                            if (!noElementsInCommon && finalUserIngredientsArray.containsAll(recipe.getIngredient_array())) {
+                                mRecipeList.add(recipe);
+                                Log.d(TAG, "onEvent: Recipe ingredientsArray " + recipe.getIngredient_array().toString()
+                                        + " User ingredients: " + finalUserIngredientsArray);
+                            } else {
+                                Log.d(TAG, "onEvent: Rejected recipe: " + recipe.getTitle()
+                                        + ", ingredients: " + recipe.getIngredient_array().toString());
+                            }
+                        }
+                    }
+
+                    if (queryDocumentSnapshots.getDocuments().size() != 0) {
+                        mLastQueriedDocument = queryDocumentSnapshots.getDocuments()
+                                .get(queryDocumentSnapshots.getDocuments().size() - 1);
+                    }
+                }
+                mAdapter.notifyDataSetChanged();
+
+            }
+        });
+    }
+
+    private void initializeRecyclerViewAdapterOnClicks() {
+        mAdapter.setOnItemClickListener(new RecipeAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(int position) {
+                String id = mDocumentIDs.get(position);
+                String title = mRecipeList.get(position).getTitle();
+                String description = mRecipeList.get(position).getDescription();
+                String imageUrl = mRecipeList.get(position).getImageUrl();
+                Map<String, Boolean> ingredients = mRecipeList.get(position).getTags();
+
+                String ingredientsString = "";
+                for (String ingredient : ingredients.keySet()) {
+                    if (ingredients.get(ingredient)) {
+                        ingredientsString += "\n- " + ingredient;
+                    }
+                }
+
+                RecipeDetailedFragment fragment = RecipeDetailedFragment.newInstance(id, title, description, ingredientsString, imageUrl);
+
+                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fragment)
+                        .addToBackStack(null).commit();
+            }
+
+            @Override
+            public void onFavoriteCick(int position) {
+                String id = mDocumentIDs.get(position);
+
+                if (favRecipes == null) {
+                    favRecipes = new ArrayList<>();
+                }
+                if (favRecipes.contains(id)) {
+                    favRecipes.remove(id);
+                    mRecipeList.get(position).setFavorite(false);
+                    Toast.makeText(getContext(), "Removed " + id + " from favorites", Toast.LENGTH_SHORT).show();
+                } else {
+                    favRecipes.add(id);
+                    mRecipeList.get(position).setFavorite(true);
+                    Toast.makeText(getContext(), "Added " + id + " to favorites", Toast.LENGTH_SHORT).show();
+                }
+                mUser.setFavoriteRecipes(favRecipes);
+                DocumentReference favRecipesRef = usersReference.document(loggedInUserDocumentId);
+                favRecipesRef.update("favoriteRecipes", favRecipes);
+
+                mAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onDeleteClick(final int position) {
+                Recipe selectedRecipe = mRecipeList.get(position);
+                final String id = mDocumentIDs.get(position);
+
+                //Deleting image from FirebaseStorage
+                StorageReference imageRef = mStorageRef.getReferenceFromUrl(selectedRecipe.getImageUrl());
+                imageRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        //Deleting Document of the item selected
+                        recipeRef.document(id).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                Toast.makeText(getContext(), "Deleted from Db", Toast.LENGTH_SHORT).show();
+                                mRecipeList.remove(position);
+                                mDocumentIDs.remove(position);
+                                performQuery();
+                            }
+                        }).addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                });
+//                                Toast.makeText(MainActivity.this, "Delete click at " + position, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
 
