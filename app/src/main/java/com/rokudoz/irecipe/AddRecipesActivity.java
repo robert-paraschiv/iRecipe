@@ -4,9 +4,11 @@ import android.content.ContentResolver;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Handler;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+
 import android.os.Bundle;
 import android.view.View;
 import android.webkit.MimeTypeMap;
@@ -32,6 +34,7 @@ import com.google.firebase.storage.UploadTask;
 import com.rokudoz.irecipe.Models.Recipe;
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -41,8 +44,9 @@ public class AddRecipesActivity extends AppCompatActivity {
 
     private static final int PICK_IMAGE_REQUEST = 1;
     private Uri mImageUri;
-    private List<String> ingredientList;
-    private String[] ingStringArray;
+    private List<String> possibleIngredientList;
+    private String[] possibleIngredientStringArray;
+    private List<String> recipeIngredientList;
 
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private CollectionReference collectionReference = db.collection("Recipes");
@@ -116,15 +120,14 @@ public class AddRecipesActivity extends AppCompatActivity {
     }
 
 
-
     private void getIngredientList() {
         ingredientsReference.document("ingredient_list")
                 .addSnapshotListener(new EventListener<DocumentSnapshot>() {
                     @Override
                     public void onEvent(@javax.annotation.Nullable DocumentSnapshot documentSnapshot, @javax.annotation.Nullable FirebaseFirestoreException e) {
                         if (e == null) {
-                            ingredientList = (List<String>) documentSnapshot.get("ingredient_list");
-                            ingStringArray = ingredientList.toArray(new String[ingredientList.size()]);
+                            possibleIngredientList = (List<String>) documentSnapshot.get("ingredient_list");
+                            possibleIngredientStringArray = possibleIngredientList.toArray(new String[possibleIngredientList.size()]);
 
                             addRecipe();
                         }
@@ -139,8 +142,10 @@ public class AddRecipesActivity extends AppCompatActivity {
 
 
         String tagInput = editTextTags.getText().toString();
-        String[] possibleIngredients = ingStringArray; /////////////////////////////////////////////////////////////////////////////////
-        String[] tagArray = tagInput.split("\\s*,\\s*");
+        String[] possibleIngredients = possibleIngredientStringArray; /////////////////////////////////////////////////////////////////////////////////
+        final String[] inputIngredientArray = tagInput.split("\\s*,\\s*");
+
+        recipeIngredientList = new ArrayList<>();
 
         final Map<String, Boolean> tags = new HashMap<>();
         for (String ingredient : possibleIngredients) {
@@ -149,9 +154,10 @@ public class AddRecipesActivity extends AppCompatActivity {
 
         //Checks if ingredients in edit text are included in the PossibleIngredients Array
         if (!tagInput.trim().equals("")) {
-            for (String tag : tagArray) {
+            for (String tag : inputIngredientArray) {
                 if (Arrays.asList(possibleIngredients).contains(tag)) {
                     tags.put(tag, true);
+                    recipeIngredientList.add(tag);
                 }
             }
         }
@@ -172,7 +178,7 @@ public class AddRecipesActivity extends AppCompatActivity {
                                     final String imageUrl = uri.toString();
 
                                     // Sends recipe data to Firestore database
-                                    Recipe recipe = new Recipe(title, description, tags, imageUrl,false);
+                                    Recipe recipe = new Recipe(title, description, tags, imageUrl, false, recipeIngredientList);
 
                                     collectionReference.add(recipe)
                                             .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {

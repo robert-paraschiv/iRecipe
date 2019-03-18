@@ -2,6 +2,7 @@ package com.rokudoz.irecipe.Models;
 
 import com.google.firebase.firestore.Exclude;
 
+import java.util.List;
 import java.util.Map;
 
 public class Recipe {
@@ -11,12 +12,13 @@ public class Recipe {
     private Map<String, Boolean> tags;
     private String imageUrl;
     private Boolean isFavorite;
+    private List<String> ingredient_array;
 
     public Recipe() {
         //public no-arg constructor needed
     }
 
-    public Recipe(String title, String description, Map<String, Boolean> tags, String imageUrl, Boolean isFavorite) {
+    public Recipe(String title, String description, Map<String, Boolean> tags, String imageUrl, Boolean isFavorite, List<String> ingredient_array) {
         if (title.trim().equals("")) {
             title = "No Title";
         }
@@ -25,6 +27,7 @@ public class Recipe {
         this.tags = tags;
         this.imageUrl = imageUrl;
         this.isFavorite = isFavorite;
+        this.ingredient_array = ingredient_array;
     }
 
     @Exclude
@@ -56,12 +59,24 @@ public class Recipe {
         return tags;
     }
 
-    public String getImageUrl() {return imageUrl;}
+    public String getImageUrl() {
+        return imageUrl;
+    }
 
-    public void setImageUrl(String imageUrl) {this.imageUrl = imageUrl;}
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
 
     public Boolean getFavorite() {
         return isFavorite;
+    }
+
+    public List<String> getIngredient_array() {
+        return ingredient_array;
+    }
+
+    public void setIngredient_array(List<String> ingredient_array) {
+        this.ingredient_array = ingredient_array;
     }
 
     public void setFavorite(Boolean favorite) {

@@ -19,10 +19,8 @@ import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
@@ -45,7 +43,9 @@ import com.rokudoz.irecipe.R;
 import com.rokudoz.irecipe.Utils.RecipeAdapter;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -148,27 +148,32 @@ public class HomeFragment extends Fragment implements RecipeAdapter.OnItemClickL
                         }
                         //Gets User Ingredients from database
                         Map<String, Boolean> tags = new HashMap<>();
+                        List<String> userIngredientsArray = new ArrayList<>();
+
                         for (DocumentChange documentSnapshot : queryDocumentSnapshots.getDocumentChanges()) {
                             User user = documentSnapshot.getDocument().toObject(User.class);
                             mUser = documentSnapshot.getDocument().toObject(User.class);
                             loggedinUserDocument = queryDocumentSnapshots.getDocuments().get(0).getId();
                             favRecipes = mUser.getFavoriteRecipes();
+                            userIngredientsArray = mUser.getIngredient_array();
+
                             for (String tag : user.getTags().keySet()) {
                                 tags.put(tag, Objects.requireNonNull(user.getTags().get(tag)));
                             }
 //                            Toast.makeText(MainActivity.this, tags.toString(), Toast.LENGTH_SHORT).show();
                         }
-
+                        Log.d(TAG, "onEvent: User ingredientsArray" + userIngredientsArray);
                         Query notesQuery = null;
                         if (mLastQueriedDocument != null) {
-                            notesQuery = recipeRef.whereGreaterThanOrEqualTo("tags", tags)
+                            notesQuery = recipeRef.whereLessThanOrEqualTo("tags", tags)
                                     .startAfter(mLastQueriedDocument); // Necessary so we don't have the same results multiple times
 //                                    .limit(3);
                         } else {
-                            notesQuery = recipeRef.whereGreaterThanOrEqualTo("tags", tags);
+                            notesQuery = recipeRef.whereLessThanOrEqualTo("tags", tags);
 //                                    .limit(3);
                         }
 
+                        final List<String> finalUserIngredientsArray = userIngredientsArray;
                         notesQuery.addSnapshotListener(new EventListener<QuerySnapshot>() {
                             @Override
                             public void onEvent(@javax.annotation.Nullable QuerySnapshot queryDocumentSnapshots,
@@ -177,14 +182,22 @@ public class HomeFragment extends Fragment implements RecipeAdapter.OnItemClickL
                                     for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
                                         Recipe recipe = document.toObject(Recipe.class);
                                         mDocumentIDs.add(document.getId());
+
                                         if (favRecipes != null && favRecipes.contains(document.getId())) {
                                             recipe.setFavorite(true);
                                         } else {
                                             recipe.setFavorite(false);
                                         }
-                                        mRecipeList.add(recipe);
-
-//                        Log.d(TAG, "onComplete: got a new note. Position: " + (mNotes.size() - 1));
+                                        if (recipe.getIngredient_array() != null && finalUserIngredientsArray != null) {
+                                            //Check if recipe contains any ingredient that user has
+                                            boolean noElementsInCommon = Collections.disjoint(recipe.getIngredient_array(), finalUserIngredientsArray);
+                                            if (!noElementsInCommon) {
+                                                mRecipeList.add(recipe);
+                                                Log.d(TAG, "onEvent: Recipe ingredientsArray " + recipe.getIngredient_array().toString());
+                                            } else {
+                                                Log.d(TAG, "onEvent: Recipe didnt have in common: " + recipe.getIngredient_array().toString());
+                                            }
+                                        }
                                     }
 
                                     if (queryDocumentSnapshots.getDocuments().size() != 0) {

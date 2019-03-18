@@ -41,6 +41,8 @@ import com.rokudoz.irecipe.Models.User;
 import com.rokudoz.irecipe.R;
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -66,6 +68,8 @@ public class ProfileFragment extends Fragment {
 
     private List<String> ingredientList;
     private String[] ingStringArray;
+    private String[] userIngredientArray;
+    private List<String> userIngredientList;
 
     Map<String, Boolean> ingredientsUserHas = new HashMap<>();
 
@@ -95,6 +99,8 @@ public class ProfileFragment extends Fragment {
         signOutBtn = view.findViewById(R.id.profileFragment_signOut);
         tvHelloUserName = view.findViewById(R.id.profileFragment_helloUser_textview);
         mProfileImage = view.findViewById(R.id.profileFragment_profileImage);
+
+        userIngredientList = new ArrayList<>();
 
         setupFirebaseAuth();
         getUserInfo();
@@ -246,6 +252,7 @@ public class ProfileFragment extends Fragment {
                             User user = queryDocumentSnapshots.getDocuments().get(0).toObject(User.class);
                             userDocumentID = queryDocumentSnapshots.getDocuments().get(0).getId();
                             userProfilePicUrl = user.getUserProfilePicUrl();
+                            userIngredientList = user.getIngredient_array();
 
                             for (String tag : user.getTags().keySet()) {
                                 data += "\n " + tag + " " + user.getTags().get(tag);
@@ -308,11 +315,22 @@ public class ProfileFragment extends Fragment {
                     int i = 0;
                     for (String tag : items) {
                         selectedIngredientsMap.put(tag, cbListView.isItemChecked(i));
+                        if (userIngredientList != null && userIngredientList.contains(tag)  &&!cbListView.isItemChecked(i)) {
+                            userIngredientList.remove(tag);
+                        } else if (userIngredientList != null && !userIngredientList.contains(tag) && cbListView.isItemChecked(i)) {
+                            userIngredientList.add(tag);
+                        }
+
                         i++;
                     }
 
                     db.collection("Users").document(userDocumentID)
                             .update("tags", selectedIngredientsMap);
+                    if (userIngredientList == null) {
+                        userIngredientList.add("none");
+                    }
+                    db.collection("Users").document(userDocumentID)
+                            .update("ingredient_array", userIngredientList);
                 }
 
             });
