@@ -218,8 +218,8 @@ public class HomeFragment extends Fragment implements RecipeAdapter.OnItemClickL
                         mLastQueriedDocument = queryDocumentSnapshots.getDocuments()
                                 .get(queryDocumentSnapshots.getDocuments().size() - 1);
                     }
+                    Log.d(TAG, "onEvent: querry size" + queryDocumentSnapshots.size());
                 }
-                Log.d(TAG, "onEvent: querry size" + queryDocumentSnapshots.size());
                 mAdapter.notifyDataSetChanged();
 
             }
