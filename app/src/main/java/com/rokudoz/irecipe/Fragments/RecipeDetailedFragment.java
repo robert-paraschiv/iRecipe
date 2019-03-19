@@ -51,22 +51,29 @@ public class RecipeDetailedFragment extends Fragment {
     private static final String ARG_DESCRIPTION = "argDescription";
     private static final String ARG_IMAGEURL = "argImageurl";
     private static final String ARG_INGREDIENTS = "argIngredients";
+    private static final String ARG_INSTRUCTIONS = "argInstructions";
+    private static final String ARG_ISFAVORITE = "argIsFavorite";
+    private static final String ARG_FAVRECIPES = "argFavRecipes";
+    private static final String ARG_LOGGEDINUSERDOCUMENTID = "argLoggedInUserDocumentId";
 
     private String documentID = "";
     private String currentUserImageUrl = "";
     private String currentUserName = "";
+    private String loggedInUserDocumentId = "";
+    private String title = "";
+    private Boolean isRecipeFavorite;
 
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
 
-    private TextView tvTitle, tvDescription, tvIngredients;
-    private ImageView mImageView;
+    private TextView tvTitle, tvDescription, tvIngredients, tvInstructions;
+    private ImageView mImageView, mFavoriteIcon;
     private Button mAddCommentBtn;
     private EditText mCommentEditText;
 
     private ArrayList<Comment> commentList = new ArrayList<>();
-
+    private ArrayList<String> favRecipes = new ArrayList<>();
     private ArrayList<String> newItemsToAdd = new ArrayList<>();
     private User mUser;
 
@@ -78,7 +85,8 @@ public class RecipeDetailedFragment extends Fragment {
     private CollectionReference usersRef = db.collection("Users");
     private CollectionReference commentRef = db.collection("Comments");
 
-    public static RecipeDetailedFragment newInstance(String id, String title, String description, String ingredients, String imageUrl) {
+    public static RecipeDetailedFragment newInstance(String id, String title, String description, String ingredients, String imageUrl
+            , String instructions, Boolean isFavorite, ArrayList<String> favRecipes, String loggedInUserDocumentId) {
         RecipeDetailedFragment fragment = new RecipeDetailedFragment();
         Bundle args = new Bundle();
         args.putString(ARG_ID, id);
@@ -86,7 +94,10 @@ public class RecipeDetailedFragment extends Fragment {
         args.putString(ARG_DESCRIPTION, description);
         args.putString(ARG_IMAGEURL, imageUrl);
         args.putString(ARG_INGREDIENTS, ingredients);
-
+        args.putString(ARG_INSTRUCTIONS, instructions);
+        args.putBoolean(ARG_ISFAVORITE, isFavorite);
+        args.putStringArrayList(ARG_FAVRECIPES, favRecipes);
+        args.putString(ARG_LOGGEDINUSERDOCUMENTID, loggedInUserDocumentId);
         fragment.setArguments(args);
         return fragment;
     }
@@ -105,6 +116,8 @@ public class RecipeDetailedFragment extends Fragment {
         mAddCommentBtn = view.findViewById(R.id.recipeDetailed_addComment_btn);
         mRecyclerView = view.findViewById(R.id.comment_recycler_view);
         mCommentEditText = view.findViewById(R.id.recipeDetailed_et_commentInput);
+        tvInstructions = view.findViewById(R.id.tvInstructions);
+        mFavoriteIcon = view.findViewById(R.id.imageview_favorite_icon);
 
         mAddCommentBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -114,6 +127,26 @@ public class RecipeDetailedFragment extends Fragment {
                 } else {
                     Toast.makeText(getContext(), "Comment cannot be empty", Toast.LENGTH_SHORT).show();
                 }
+            }
+        });
+        mFavoriteIcon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (favRecipes == null) {
+                    favRecipes = new ArrayList<>();
+                }
+                if (favRecipes.contains(documentID)) {
+                    favRecipes.remove(documentID);
+                    isRecipeFavorite = false;
+                    Toast.makeText(getContext(), "Removed " + title + " from favorites", Toast.LENGTH_SHORT).show();
+                } else {
+                    favRecipes.add(documentID);
+                    isRecipeFavorite = true;
+                    Toast.makeText(getContext(), "Added " + title + " to favorites", Toast.LENGTH_SHORT).show();
+                }
+                setFavoriteIcon(isRecipeFavorite);
+                DocumentReference favRecipesRef = usersRef.document(loggedInUserDocumentId);
+                favRecipesRef.update("favoriteRecipes", favRecipes);
             }
         });
 
@@ -165,21 +198,36 @@ public class RecipeDetailedFragment extends Fragment {
     private void getRecipeArgsPassed() {
         if (getArguments() != null) {
             documentID = getArguments().getString(ARG_ID);
-            String title = getArguments().getString(ARG_TITLE);
+            title = getArguments().getString(ARG_TITLE);
             String description = getArguments().getString(ARG_DESCRIPTION);
             String imageUrl = getArguments().getString(ARG_IMAGEURL);
             String ingredients = getArguments().getString(ARG_INGREDIENTS);
-
+            String instructions = getArguments().getString(ARG_INSTRUCTIONS);
+            isRecipeFavorite = getArguments().getBoolean(ARG_ISFAVORITE);
+            favRecipes = getArguments().getStringArrayList(ARG_FAVRECIPES);
+            loggedInUserDocumentId = getArguments().getString(ARG_LOGGEDINUSERDOCUMENTID);
 
             tvTitle.setText(title);
             tvDescription.setText(description);
             tvIngredients.setText(ingredients);
+            tvInstructions.setText("Instructions: \n\n" + instructions);
+
+
+            setFavoriteIcon(isRecipeFavorite);
 
             Picasso.get()
                     .load(imageUrl)
                     .fit()
                     .centerCrop()
                     .into(mImageView);
+        }
+    }
+
+    private void setFavoriteIcon(Boolean isFavorite) {
+        if (isFavorite) {
+            mFavoriteIcon.setImageResource(R.drawable.ic_star_gold_24dp);
+        } else {
+            mFavoriteIcon.setImageResource(R.drawable.ic_star_border_black_24dp);
         }
     }
 

@@ -54,7 +54,7 @@ public class AddRecipesActivity extends AppCompatActivity {
     private StorageReference mStorageRef = FirebaseStorage.getInstance().getReference("RecipePhotos");
     private StorageTask mUploadTask;
 
-    private EditText editTextTitle, editTextDescription, editTextTags;
+    private EditText editTextTitle, editTextDescription, editTextTags, editTextInstructions;
     private Button mChooseFileBtn, mAddRecipeBtn;
     private ImageView mImageView;
     private ProgressBar mProgressBar;
@@ -71,6 +71,7 @@ public class AddRecipesActivity extends AppCompatActivity {
         mImageView = findViewById(R.id.addRecipes_image);
         mChooseFileBtn = findViewById(R.id.addRecipes_choose_path_btn);
         mAddRecipeBtn = findViewById(R.id.addRecipes_add_btn);
+        editTextInstructions = findViewById(R.id.edit_text_instructions);
 
 
         mChooseFileBtn.setOnClickListener(new View.OnClickListener() {
@@ -139,7 +140,7 @@ public class AddRecipesActivity extends AppCompatActivity {
     public void addRecipe() {
         final String title = editTextTitle.getText().toString();
         final String description = editTextDescription.getText().toString();
-
+        final String instructions = editTextInstructions.getText().toString();
 
         String tagInput = editTextTags.getText().toString();
         String[] possibleIngredients = possibleIngredientStringArray; /////////////////////////////////////////////////////////////////////////////////
@@ -178,7 +179,7 @@ public class AddRecipesActivity extends AppCompatActivity {
                                     final String imageUrl = uri.toString();
 
                                     // Sends recipe data to Firestore database
-                                    Recipe recipe = new Recipe(title, description, tags, imageUrl, false, recipeIngredientList);
+                                    Recipe recipe = new Recipe(title, description, tags, imageUrl, false, recipeIngredientList,instructions);
 
                                     collectionReference.add(recipe)
                                             .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {

@@ -40,6 +40,17 @@
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="8dp"
                 tools:text="Description Here" />
+            <ImageView
+                android:layout_width="33dp"
+                android:layout_height="33dp"
+                android:id="@+id/imageview_favorite_icon"
+                android:src="@drawable/ic_star_border_black_24dp"
+                android:layout_below="@id/recipeDetailed_image"
+                android:layout_alignParentEnd="true"
+                android:elevation="4dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
+                />
 
             <TextView
                 android:id="@+id/tvIngredientsList"
@@ -56,24 +67,39 @@
         -Ingredient5
         -Ingredient6" />
 
+            <TextView
+                android:id="@+id/tvInstructions"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/tvIngredientsList"
+                android:padding="8dp"
+                style="@style/TextAppearance.MaterialComponents.Chip"
+                tools:text="Okay so basically you do stuff here
+with the ingredients so ay lmao many lines
+but yeah so then we add the stuff together and then we don't have the stuff anymore
+but the stuff turns into some food so basically we do have stuff
+but the stuff is now food" />
+
 
             <EditText
                 android:id="@+id/recipeDetailed_et_commentInput"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/tvIngredientsList"
+                android:layout_below="@id/tvInstructions"
+                android:layout_marginStart="8dp"
                 android:layout_toStartOf="@+id/recipeDetailed_addComment_btn"
                 android:hint="Comment here" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/recipeDetailed_addComment_btn"
+                style="@style/Widget.MaterialComponents.Button.TextButton.Dialog.IconButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/tvIngredientsList"
+                android:layout_below="@id/tvInstructions"
                 android:layout_alignParentEnd="true"
-                android:paddingStart="8dp"
-                android:paddingEnd="8dp"
-                android:text="Send" />
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:text="Post" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/comment_recycler_view"

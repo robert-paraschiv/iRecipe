@@ -235,23 +235,27 @@ public class HomeFragment extends Fragment implements RecipeAdapter.OnItemClickL
                 String description = mRecipeList.get(position).getDescription();
                 String imageUrl = mRecipeList.get(position).getImageUrl();
                 Map<String, Boolean> ingredients = mRecipeList.get(position).getTags();
+                String instructions = mRecipeList.get(position).getInstructions();
+                Boolean isFavorite = mRecipeList.get(position).getFavorite();
 
-                String ingredientsString = "";
+                String ingredientsString = "Ingredients:\n";
                 for (String ingredient : ingredients.keySet()) {
                     if (ingredients.get(ingredient)) {
                         ingredientsString += "\n- " + ingredient;
                     }
                 }
 
-                RecipeDetailedFragment fragment = RecipeDetailedFragment.newInstance(id, title, description, ingredientsString, imageUrl);
+                RecipeDetailedFragment fragment = RecipeDetailedFragment.newInstance(id, title, description, ingredientsString
+                        , imageUrl,instructions,isFavorite,favRecipes,loggedInUserDocumentId);
 
                 getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fragment)
                         .addToBackStack(null).commit();
             }
 
             @Override
-            public void onFavoriteCick(int position) {
+            public void onFavoriteClick(int position) {
                 String id = mDocumentIDs.get(position);
+                String title = mRecipeList.get(position).getTitle();
 
                 if (favRecipes == null) {
                     favRecipes = new ArrayList<>();
@@ -259,11 +263,11 @@ public class HomeFragment extends Fragment implements RecipeAdapter.OnItemClickL
                 if (favRecipes.contains(id)) {
                     favRecipes.remove(id);
                     mRecipeList.get(position).setFavorite(false);
-                    Toast.makeText(getContext(), "Removed " + id + " from favorites", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "Removed " + title + " from favorites", Toast.LENGTH_SHORT).show();
                 } else {
                     favRecipes.add(id);
                     mRecipeList.get(position).setFavorite(true);
-                    Toast.makeText(getContext(), "Added " + id + " to favorites", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "Added " + title + " to favorites", Toast.LENGTH_SHORT).show();
                 }
                 mUser.setFavoriteRecipes(favRecipes);
                 DocumentReference favRecipesRef = usersReference.document(loggedInUserDocumentId);
@@ -367,7 +371,7 @@ public class HomeFragment extends Fragment implements RecipeAdapter.OnItemClickL
     }
 
     @Override
-    public void onFavoriteCick(int position) {
+    public void onFavoriteClick(int position) {
 
     }
 

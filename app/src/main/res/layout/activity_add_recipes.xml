@@ -48,13 +48,21 @@
         android:layout_below="@id/edit_text_description"
         android:hint="Ingredients"
         android:inputType="text" />
+    <EditText
+        android:id="@+id/edit_text_instructions"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/edit_text_tags"
+        android:hint="Instructions"
+        android:inputType="text"
+        />
 
     <ProgressBar
         android:id="@+id/addRecipes_progressbar"
         style="@style/Base.Widget.AppCompat.ProgressBar.Horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/edit_text_tags" />
+        android:layout_below="@id/edit_text_instructions" />
 
     <Button
         android:id="@+id/addRecipes_add_btn"

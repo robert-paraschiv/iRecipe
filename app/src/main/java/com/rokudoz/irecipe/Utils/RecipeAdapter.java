@@ -27,7 +27,7 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
     public interface OnItemClickListener {
         void onItemClick(int position);
 
-        void onFavoriteCick(int position);
+        void onFavoriteClick(int position);
 
         void onDeleteClick(int position);
     }
@@ -39,7 +39,7 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
     public class RecipeViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener,
             View.OnCreateContextMenuListener, MenuItem.OnMenuItemClickListener {
         TextView tvTitle, tvDescription;
-        ImageView mImageView,imgFavorited;
+        ImageView mImageView, imgFavorited;
         Map<String, Boolean> ingredientTags;
 
         public RecipeViewHolder(View itemView) {
@@ -58,7 +58,7 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
                     if (mListener != null) {
                         int position = getAdapterPosition();
                         if (position != RecyclerView.NO_POSITION) {
-                            mListener.onFavoriteCick(position);
+                            mListener.onFavoriteClick(position);
                         }
                     }
                 }
