@@ -139,7 +139,8 @@ public class HomeFragment extends Fragment implements RecipeAdapter.OnItemClickL
                 .getCurrentUser()).getUid())
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
-                    public void onEvent(@javax.annotation.Nullable QuerySnapshot queryDocumentSnapshots, @javax.annotation.Nullable FirebaseFirestoreException e) {
+                    public void onEvent(@javax.annotation.Nullable QuerySnapshot queryDocumentSnapshots,
+                                        @javax.annotation.Nullable FirebaseFirestoreException e) {
                         if (e != null) {
                             Log.w(TAG, "onEvent: ", e);
                             return;
@@ -218,6 +219,7 @@ public class HomeFragment extends Fragment implements RecipeAdapter.OnItemClickL
                                 .get(queryDocumentSnapshots.getDocuments().size() - 1);
                     }
                 }
+                Log.d(TAG, "onEvent: querry size" + queryDocumentSnapshots.size());
                 mAdapter.notifyDataSetChanged();
 
             }

@@ -11,6 +11,7 @@
         android:id="@+id/recipeDetailed_image"
         android:elevation="4dp"
         android:transitionName="example_transition"
+        tools:src="@color/grey"
         />
 
     <TextView
@@ -48,5 +49,32 @@
         -Ingredient5
         -Ingredient6"
         />
+
+
+
+    <EditText
+        android:id="@+id/recipeDetailed_et_commentInput"
+        android:layout_below="@id/tvIngredientsList"
+        android:layout_toStartOf="@+id/recipeDetailed_addComment_btn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Comment here"
+        />
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/recipeDetailed_addComment_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tvIngredientsList"
+        android:paddingEnd="8dp"
+        android:paddingStart="8dp"
+        android:layout_alignParentEnd="true"
+        android:text="Send"/>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/comment_recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/recipeDetailed_et_commentInput"
+        android:transitionName="example_transition"/>
 
 </RelativeLayout>
