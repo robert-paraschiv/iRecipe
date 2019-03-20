@@ -21,6 +21,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
@@ -28,6 +29,7 @@ import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
@@ -174,8 +176,10 @@ public class RecipeDetailedFragment extends Fragment {
     private void addComment() {
         String commentText = mCommentEditText.getText().toString();
 
+        String date = Timestamp.now().toDate().toString();
+
         final Comment comment = new Comment(documentID, FirebaseAuth.getInstance().getCurrentUser().getUid(),
-                currentUserImageUrl, currentUserName, commentText);
+                currentUserImageUrl, currentUserName, commentText, date);
 
 
         commentRef.add(comment)
@@ -260,11 +264,28 @@ public class RecipeDetailedFragment extends Fragment {
                         //get comments from commentRef
                         if (queryDocumentSnapshots != null) {
                             for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
-                                Comment comment = document.toObject(Comment.class);
+                                final Comment comment = document.toObject(Comment.class);
 //                                commentList.add(new Comment(documentID, comment.getmUserId(), comment.getmImageUrl(), comment.getmName(), comment.getmCommentText()));
                                 if (!newItemsToAdd.contains(document.getId())) {
                                     newItemsToAdd.add(document.getId());
-                                    commentList.add(comment);
+
+                                    usersRef.whereEqualTo("user_id", comment.getmUserId())
+                                            .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                                                @Override
+                                                public void onEvent(@javax.annotation.Nullable QuerySnapshot queryDocumentSnapshots, @javax.annotation.Nullable FirebaseFirestoreException e) {
+                                                    User user = null;
+                                                    if (queryDocumentSnapshots != null) {
+                                                        user = queryDocumentSnapshots.getDocuments().get(0).toObject(User.class);
+
+
+                                                    commentList.add(new Comment(documentID, comment.getmUserId(), user.getUserProfilePicUrl()
+                                                            , comment.getmName(), comment.getmCommentText(),comment.getmCommentTimeStamp()));
+                                                    Log.d(TAG, "onEvent: setting user profile pic ");
+                                                    mAdapter.notifyDataSetChanged();}
+                                                }
+                                            });
+
+//                                    commentList.add(new Comment(documentID, comment.getmUserId(), userImg[0], comment.getmName(), comment.getmCommentText()));
                                 }
 
                             }
@@ -277,6 +298,9 @@ public class RecipeDetailedFragment extends Fragment {
                         Log.d(TAG, "onEvent: querrysize " + queryDocumentSnapshots.size() + " ListSize: " + commentList.size());
                     }
                 });
+
+
+
     }
 
     private void getCurrentUserDetails() {

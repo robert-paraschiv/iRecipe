@@ -106,7 +106,7 @@ but the stuff is now food" />
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_below="@id/recipeDetailed_et_commentInput"
-                android:transitionName="example_transition" />
+                android:transitionName="example_transition"/>
         </RelativeLayout>
 
     </ScrollView>

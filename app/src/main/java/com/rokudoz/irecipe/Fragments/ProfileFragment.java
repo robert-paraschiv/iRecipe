@@ -174,7 +174,7 @@ public class ProfileFragment extends Fragment {
 
             StorageReference oldPicReference = FirebaseStorage.getInstance().getReference();
 
-            if (!userProfilePicUrl.equals("")){
+            if (!userProfilePicUrl.equals("")) {
 
                 oldPicReference = FirebaseStorage.getInstance().getReferenceFromUrl(userProfilePicUrl);
             }
@@ -196,14 +196,15 @@ public class ProfileFragment extends Fragment {
                                                 updateUserProfilePicUrl(imageUrl);
                                             }
                                         });
-                                    }else {
+                                    } else {
                                         updateUserProfilePicUrl(imageUrl);
                                     }
 
                                 }
                             });
-
-                            Toast.makeText(getContext(), "Upload Succesfull", Toast.LENGTH_SHORT).show();
+                            if (getContext() != null) {
+                                Toast.makeText(getContext(), "Upload Succesfull", Toast.LENGTH_SHORT).show();
+                            }
 
                         }
                     })
@@ -327,7 +328,7 @@ public class ProfileFragment extends Fragment {
                     int i = 0;
                     for (String tag : items) {
                         selectedIngredientsMap.put(tag, cbListView.isItemChecked(i));
-                        if (userIngredientList != null && userIngredientList.contains(tag)  &&!cbListView.isItemChecked(i)) {
+                        if (userIngredientList != null && userIngredientList.contains(tag) && !cbListView.isItemChecked(i)) {
                             userIngredientList.remove(tag);
                         } else if (userIngredientList != null && !userIngredientList.contains(tag) && cbListView.isItemChecked(i)) {
                             userIngredientList.add(tag);

@@ -41,6 +41,15 @@
             android:layout_toEndOf="@id/comment_rv_profile_img"
             android:layout_marginStart="8dp"
             tools:text="Comment here wow the recipe is so nice i want to eat it all lmfao get rekt boy lul" />
+        <TextView
+            android:id="@+id/comment_rv_time_created"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="8dp"
+            android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
+            android:layout_below="@id/comment_rv_tv_comment_text"
+            tools:text="time:time,date:date:date"/>
 
 
 

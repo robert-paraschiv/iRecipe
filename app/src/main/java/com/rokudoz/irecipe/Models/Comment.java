@@ -6,13 +6,15 @@ public class Comment {
     private String mImageUrl;
     private String mName;
     private String mCommentText;
+    private String mCommentTimeStamp;
 
-    public Comment(String mRecipeDocumentId,String mUserId, String mImageUrl, String mName, String mCommentText) {
+    public Comment(String mRecipeDocumentId,String mUserId, String mImageUrl, String mName, String mCommentText,String mCommentTimeStamp) {
         this.mRecipeDocumentId = mRecipeDocumentId;
         this.mUserId = mUserId;
         this.mImageUrl = mImageUrl;
         this.mName = mName;
         this.mCommentText = mCommentText;
+        this.mCommentTimeStamp = mCommentTimeStamp;
     }
 
     public Comment() {
@@ -58,6 +60,14 @@ public class Comment {
         this.mRecipeDocumentId = mRecipeDocumentId;
     }
 
+    public String getmCommentTimeStamp() {
+        return mCommentTimeStamp;
+    }
+
+    public void setmCommentTimeStamp(String mCommentTimeStamp) {
+        this.mCommentTimeStamp = mCommentTimeStamp;
+    }
+
     @Override
     public String toString() {
         return "Comment{" +
@@ -66,6 +76,7 @@ public class Comment {
                 ", mImageUrl='" + mImageUrl + '\'' +
                 ", mName='" + mName + '\'' +
                 ", mCommentText='" + mCommentText + '\'' +
+                ", mCommentTimeStamp='" + mCommentTimeStamp + '\'' +
                 '}';
     }
 }
