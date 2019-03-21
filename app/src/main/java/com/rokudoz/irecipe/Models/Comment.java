@@ -1,14 +1,20 @@
 package com.rokudoz.irecipe.Models;
 
+import com.google.firebase.firestore.ServerTimestamp;
+
+import java.util.Date;
+
 public class Comment {
     private String mRecipeDocumentId;
     private String mUserId;
     private String mImageUrl;
     private String mName;
     private String mCommentText;
-    private String mCommentTimeStamp;
 
-    public Comment(String mRecipeDocumentId,String mUserId, String mImageUrl, String mName, String mCommentText,String mCommentTimeStamp) {
+    private @ServerTimestamp
+    Date mCommentTimeStamp;
+
+    public Comment(String mRecipeDocumentId, String mUserId, String mImageUrl, String mName, String mCommentText, Date mCommentTimeStamp) {
         this.mRecipeDocumentId = mRecipeDocumentId;
         this.mUserId = mUserId;
         this.mImageUrl = mImageUrl;
@@ -60,11 +66,11 @@ public class Comment {
         this.mRecipeDocumentId = mRecipeDocumentId;
     }
 
-    public String getmCommentTimeStamp() {
+    public Date getmCommentTimeStamp() {
         return mCommentTimeStamp;
     }
 
-    public void setmCommentTimeStamp(String mCommentTimeStamp) {
+    public void setmCommentTimeStamp(Date mCommentTimeStamp) {
         this.mCommentTimeStamp = mCommentTimeStamp;
     }
 
@@ -76,7 +82,7 @@ public class Comment {
                 ", mImageUrl='" + mImageUrl + '\'' +
                 ", mName='" + mName + '\'' +
                 ", mCommentText='" + mCommentText + '\'' +
-                ", mCommentTimeStamp='" + mCommentTimeStamp + '\'' +
+                ", mCommentTimeStamp=" + mCommentTimeStamp +
                 '}';
     }
 }

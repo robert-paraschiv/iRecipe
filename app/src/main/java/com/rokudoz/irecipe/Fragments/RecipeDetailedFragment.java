@@ -44,6 +44,11 @@ import com.squareup.picasso.Picasso;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+
+import static com.google.firebase.firestore.DocumentSnapshot.ServerTimestampBehavior.ESTIMATE;
 
 public class RecipeDetailedFragment extends Fragment {
     private static final String TAG = "RecipeDetailedFragment";
@@ -175,11 +180,11 @@ public class RecipeDetailedFragment extends Fragment {
 
     private void addComment() {
         String commentText = mCommentEditText.getText().toString();
+        //TODO rework adding timestamp to FirestoreServer TimeStamp
 
-        String date = Timestamp.now().toDate().toString();
 
         final Comment comment = new Comment(documentID, FirebaseAuth.getInstance().getCurrentUser().getUid(),
-                currentUserImageUrl, currentUserName, commentText, date);
+                currentUserImageUrl, currentUserName, commentText, null);
 
 
         commentRef.add(comment)
@@ -247,10 +252,10 @@ public class RecipeDetailedFragment extends Fragment {
 
         Query commentQuery = null;
         if (mLastQueriedDocument != null) {
-            commentQuery = commentRef.whereEqualTo("mRecipeDocumentId", documentID)
+            commentQuery = commentRef.whereEqualTo("mRecipeDocumentId", documentID).orderBy("mCommentTimeStamp", Query.Direction.DESCENDING)
                     .startAfter(mLastQueriedDocument); // Necessary so we don't have the same results multiple times
         } else {
-            commentQuery = commentRef.whereEqualTo("mRecipeDocumentId", documentID);
+            commentQuery = commentRef.whereEqualTo("mRecipeDocumentId", documentID).orderBy("mCommentTimeStamp", Query.Direction.DESCENDING);
         }
 
         commentQuery
@@ -263,7 +268,8 @@ public class RecipeDetailedFragment extends Fragment {
                         }
                         //get comments from commentRef
                         if (queryDocumentSnapshots != null) {
-                            for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
+                            for (final QueryDocumentSnapshot document : queryDocumentSnapshots) {
+                                final QueryDocumentSnapshot.ServerTimestampBehavior behavior = ESTIMATE;
                                 final Comment comment = document.toObject(Comment.class);
 //                                commentList.add(new Comment(documentID, comment.getmUserId(), comment.getmImageUrl(), comment.getmName(), comment.getmCommentText()));
                                 if (!newItemsToAdd.contains(document.getId())) {
@@ -276,12 +282,15 @@ public class RecipeDetailedFragment extends Fragment {
                                                     User user = null;
                                                     if (queryDocumentSnapshots != null) {
                                                         user = queryDocumentSnapshots.getDocuments().get(0).toObject(User.class);
+                                                        Date date = document.getDate("mCommentTimeStamp",behavior);
 
+                                                        commentList.add(new Comment(documentID, comment.getmUserId(), user.getUserProfilePicUrl()
+                                                                , comment.getmName(), comment.getmCommentText(), date));
 
-                                                    commentList.add(new Comment(documentID, comment.getmUserId(), user.getUserProfilePicUrl()
-                                                            , comment.getmName(), comment.getmCommentText(),comment.getmCommentTimeStamp()));
-                                                    Log.d(TAG, "onEvent: setting user profile pic ");
-                                                    mAdapter.notifyDataSetChanged();}
+                                                        Log.d(TAG, "onEvent: comment timestamp : " + comment.getmCommentTimeStamp());
+                                                        mAdapter.notifyDataSetChanged();
+
+                                                    }
                                                 }
                                             });
 
@@ -298,7 +307,6 @@ public class RecipeDetailedFragment extends Fragment {
                         Log.d(TAG, "onEvent: querrysize " + queryDocumentSnapshots.size() + " ListSize: " + commentList.size());
                     }
                 });
-
 
 
     }

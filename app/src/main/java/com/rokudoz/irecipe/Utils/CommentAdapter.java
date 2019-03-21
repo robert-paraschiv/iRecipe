@@ -61,8 +61,9 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
         holder.mName.setText(currentItem.getmName());
         holder.mCommentText.setText(currentItem.getmCommentText());
         if (currentItem.getmCommentTimeStamp() != null && !currentItem.getmCommentTimeStamp().equals("")) {
-            holder.mCommentTimeStamp.setText(currentItem.getmCommentTimeStamp());
+            holder.mCommentTimeStamp.setText(currentItem.getmCommentTimeStamp().toString());
         }
+
     }
 
     @Override
