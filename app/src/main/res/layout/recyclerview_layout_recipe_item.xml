@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -7,8 +8,7 @@
     android:layout_marginStart="4dp"
     android:layout_marginTop="4dp"
     android:layout_marginEnd="4dp"
-    app:cardBackgroundColor="#eeeeee"
-    app:cardCornerRadius="10dp"
+    app:cardCornerRadius="18dp"
     android:elevation="4dp">
 
     <RelativeLayout
@@ -44,8 +44,8 @@
 
         <ImageView
             android:id="@+id/recyclerview_favorite"
-            android:layout_width="33dp"
-            android:layout_height="33dp"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
             android:elevation="4dp"
             android:layout_below="@id/recipeItem_image"
             android:layout_marginEnd="8dp"
@@ -54,4 +54,4 @@
             android:src="@drawable/ic_star_border_black_24dp" />
 
     </RelativeLayout>
-</androidx.cardview.widget.CardView>
+</com.google.android.material.card.MaterialCardView>

@@ -45,9 +45,12 @@
             android:layout_marginTop="15dp"/>
         </com.google.android.material.textfield.TextInputLayout>
 
-        <Button
-            android:layout_width="match_parent"
+        <com.google.android.material.button.MaterialButton
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            app:cornerRadius="18dp"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
             android:layout_marginTop="25dp"
             android:layout_marginBottom="25dp"
             android:text="Login"
@@ -66,7 +69,9 @@
             android:textColor="@color/colorAccent"/>
 
         <com.google.android.gms.common.SignInButton
+
             android:id="@+id/signInButton"
+            app:cornerRadius="18dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center">

@@ -82,12 +82,15 @@
         </com.google.android.material.textfield.TextInputLayout>
 
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_register"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="25dp"
             android:layout_marginBottom="25dp"
+            android:layout_gravity="center"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            app:cornerRadius="18dp"
             android:background="@drawable/white_onclick_grey"
             android:padding="12dp"
             android:text="Register" />

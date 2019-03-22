@@ -1,17 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
     <ScrollView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        >
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="wrap_content">
 
             <ImageView
                 android:id="@+id/recipeDetailed_image"
@@ -41,8 +39,8 @@
                 android:layout_marginTop="8dp"
                 tools:text="Description Here" />
             <ImageView
-                android:layout_width="33dp"
-                android:layout_height="33dp"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
                 android:id="@+id/imageview_favorite_icon"
                 android:src="@drawable/ic_star_border_black_24dp"
                 android:layout_below="@id/recipeDetailed_image"
@@ -92,7 +90,8 @@ but the stuff is now food" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/recipeDetailed_addComment_btn"
-                style="@style/Widget.MaterialComponents.Button.TextButton.Dialog.IconButton"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                app:cornerRadius="18dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/tvInstructions"
@@ -110,6 +109,3 @@ but the stuff is now food" />
         </RelativeLayout>
 
     </ScrollView>
-
-
-</RelativeLayout>

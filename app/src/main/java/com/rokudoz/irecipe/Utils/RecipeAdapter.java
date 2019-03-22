@@ -116,9 +116,9 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
                 .fit()
                 .centerCrop()
                 .into(holder.mImageView);
-        holder.imgFavorited.setImageResource(R.drawable.ic_star_border_black_24dp);
+        holder.imgFavorited.setImageResource(R.drawable.ic_favorite_border_black_24dp);
         if (currentItem.getFavorite() != null && currentItem.getFavorite()) {
-            holder.imgFavorited.setImageResource(R.drawable.ic_star_gold_24dp);
+            holder.imgFavorited.setImageResource(R.drawable.ic_favorite_red_24dp);
         }
 
     }

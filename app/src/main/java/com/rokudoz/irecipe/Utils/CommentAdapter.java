@@ -1,5 +1,6 @@
 package com.rokudoz.irecipe.Utils;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,7 +10,11 @@ import com.rokudoz.irecipe.Models.Comment;
 import com.rokudoz.irecipe.R;
 import com.squareup.picasso.Picasso;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.Locale;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -60,9 +65,17 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
 
         holder.mName.setText(currentItem.getmName());
         holder.mCommentText.setText(currentItem.getmCommentText());
-        if (currentItem.getmCommentTimeStamp() != null && !currentItem.getmCommentTimeStamp().equals("")) {
-            holder.mCommentTimeStamp.setText(currentItem.getmCommentTimeStamp().toString());
+
+        Date date = currentItem.getmCommentTimeStamp();
+        if (date != null) {
+            DateFormat dateFormat = new SimpleDateFormat("HH:mm, MMM d");
+            String creationDate = dateFormat.format(date);
+            Log.d("TAG", creationDate);
+            if (currentItem.getmCommentTimeStamp() != null && !currentItem.getmCommentTimeStamp().equals("")) {
+                holder.mCommentTimeStamp.setText(creationDate);
+            }
         }
+
 
     }
 

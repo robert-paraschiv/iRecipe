@@ -193,7 +193,11 @@ public class RecipeDetailedFragment extends Fragment {
                     public void onSuccess(DocumentReference documentReference) {
                         mCommentEditText.setText("");
                         Toast.makeText(getContext(), "Successfully added comment ", Toast.LENGTH_SHORT).show();
-                        mAdapter.notifyDataSetChanged();
+
+//                        commentList.add(0, comment);
+//                        newItemsToAdd.add(documentReference.getId());
+//                        Log.d(TAG, "onSuccess: docref" + documentReference.getId());
+//                        mAdapter.notifyDataSetChanged();
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
@@ -234,9 +238,9 @@ public class RecipeDetailedFragment extends Fragment {
 
     private void setFavoriteIcon(Boolean isFavorite) {
         if (isFavorite) {
-            mFavoriteIcon.setImageResource(R.drawable.ic_star_gold_24dp);
+            mFavoriteIcon.setImageResource(R.drawable.ic_favorite_red_24dp);
         } else {
-            mFavoriteIcon.setImageResource(R.drawable.ic_star_border_black_24dp);
+            mFavoriteIcon.setImageResource(R.drawable.ic_favorite_border_black_24dp);
         }
     }
 
@@ -252,10 +256,10 @@ public class RecipeDetailedFragment extends Fragment {
 
         Query commentQuery = null;
         if (mLastQueriedDocument != null) {
-            commentQuery = commentRef.whereEqualTo("mRecipeDocumentId", documentID).orderBy("mCommentTimeStamp", Query.Direction.DESCENDING)
+            commentQuery = commentRef.whereEqualTo("mRecipeDocumentId", documentID).orderBy("mCommentTimeStamp", Query.Direction.ASCENDING)
                     .startAfter(mLastQueriedDocument); // Necessary so we don't have the same results multiple times
         } else {
-            commentQuery = commentRef.whereEqualTo("mRecipeDocumentId", documentID).orderBy("mCommentTimeStamp", Query.Direction.DESCENDING);
+            commentQuery = commentRef.whereEqualTo("mRecipeDocumentId", documentID).orderBy("mCommentTimeStamp", Query.Direction.ASCENDING);
         }
 
         commentQuery
@@ -274,7 +278,7 @@ public class RecipeDetailedFragment extends Fragment {
 //                                commentList.add(new Comment(documentID, comment.getmUserId(), comment.getmImageUrl(), comment.getmName(), comment.getmCommentText()));
                                 if (!newItemsToAdd.contains(document.getId())) {
                                     newItemsToAdd.add(document.getId());
-
+                                    Log.d(TAG, "onEvent: doc id" + document.getId());
                                     usersRef.whereEqualTo("user_id", comment.getmUserId())
                                             .addSnapshotListener(new EventListener<QuerySnapshot>() {
                                                 @Override
@@ -282,19 +286,17 @@ public class RecipeDetailedFragment extends Fragment {
                                                     User user = null;
                                                     if (queryDocumentSnapshots != null) {
                                                         user = queryDocumentSnapshots.getDocuments().get(0).toObject(User.class);
-                                                        Date date = document.getDate("mCommentTimeStamp",behavior);
+                                                        Date date = document.getDate("mCommentTimeStamp", behavior);
 
-                                                        commentList.add(new Comment(documentID, comment.getmUserId(), user.getUserProfilePicUrl()
+                                                        commentList.add(0,new Comment(documentID, comment.getmUserId(), user.getUserProfilePicUrl()
                                                                 , comment.getmName(), comment.getmCommentText(), date));
 
-                                                        Log.d(TAG, "onEvent: comment timestamp : " + comment.getmCommentTimeStamp());
                                                         mAdapter.notifyDataSetChanged();
 
                                                     }
                                                 }
                                             });
 
-//                                    commentList.add(new Comment(documentID, comment.getmUserId(), userImg[0], comment.getmName(), comment.getmCommentText()));
                                 }
 
                             }

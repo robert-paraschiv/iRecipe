@@ -68,10 +68,12 @@
         android:layout_centerVertical="true"
         android:visibility="visible" />
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/profileFragment_signOut"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+        app:cornerRadius="18dp"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:text="Sign Out" />
