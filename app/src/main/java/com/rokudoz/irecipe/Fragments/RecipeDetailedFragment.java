@@ -47,6 +47,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.List;
 
 import static com.google.firebase.firestore.DocumentSnapshot.ServerTimestampBehavior.ESTIMATE;
 
@@ -61,6 +62,7 @@ public class RecipeDetailedFragment extends Fragment {
     private static final String ARG_INSTRUCTIONS = "argInstructions";
     private static final String ARG_ISFAVORITE = "argIsFavorite";
     private static final String ARG_FAVRECIPES = "argFavRecipes";
+    private static final String ARG_USERSWHOFAVED = "argUsersWhoFaved";
     private static final String ARG_LOGGEDINUSERDOCUMENTID = "argLoggedInUserDocumentId";
 
     private String documentID = "";
@@ -74,13 +76,14 @@ public class RecipeDetailedFragment extends Fragment {
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
 
-    private TextView tvTitle, tvDescription, tvIngredients, tvInstructions;
+    private TextView tvTitle, tvDescription, tvIngredients, tvInstructions,mFavoriteNumber;
     private ImageView mImageView, mFavoriteIcon;
     private Button mAddCommentBtn;
     private EditText mCommentEditText;
 
     private ArrayList<Comment> commentList = new ArrayList<>();
     private ArrayList<String> favRecipes = new ArrayList<>();
+    private List<String> ListofUsersWhoFavedThisRecipe;
     private ArrayList<String> newItemsToAdd = new ArrayList<>();
     private User mUser;
 
@@ -93,7 +96,7 @@ public class RecipeDetailedFragment extends Fragment {
     private CollectionReference commentRef = db.collection("Comments");
 
     public static RecipeDetailedFragment newInstance(String id, String title, String description, String ingredients, String imageUrl
-            , String instructions, Boolean isFavorite, ArrayList<String> favRecipes, String loggedInUserDocumentId) {
+            , String instructions, Boolean isFavorite, ArrayList<String> favRecipes, String loggedInUserDocumentId, ArrayList<String> listofUsersWhoFavedThisRecipe) {
         RecipeDetailedFragment fragment = new RecipeDetailedFragment();
         Bundle args = new Bundle();
         args.putString(ARG_ID, id);
@@ -105,6 +108,7 @@ public class RecipeDetailedFragment extends Fragment {
         args.putBoolean(ARG_ISFAVORITE, isFavorite);
         args.putStringArrayList(ARG_FAVRECIPES, favRecipes);
         args.putString(ARG_LOGGEDINUSERDOCUMENTID, loggedInUserDocumentId);
+        args.putStringArrayList(ARG_USERSWHOFAVED, listofUsersWhoFavedThisRecipe);
         fragment.setArguments(args);
         return fragment;
     }
@@ -125,6 +129,8 @@ public class RecipeDetailedFragment extends Fragment {
         mCommentEditText = view.findViewById(R.id.recipeDetailed_et_commentInput);
         tvInstructions = view.findViewById(R.id.tvInstructions);
         mFavoriteIcon = view.findViewById(R.id.imageview_favorite_icon);
+        mFavoriteNumber = view.findViewById(R.id.recipeDetailed_numberOfFaved);
+
 
         mAddCommentBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -144,16 +150,23 @@ public class RecipeDetailedFragment extends Fragment {
                 }
                 if (favRecipes.contains(documentID)) {
                     favRecipes.remove(documentID);
+                    ListofUsersWhoFavedThisRecipe.remove(mUser.getUser_id());
                     isRecipeFavorite = false;
                     Toast.makeText(getContext(), "Removed " + title + " from favorites", Toast.LENGTH_SHORT).show();
                 } else {
                     favRecipes.add(documentID);
                     isRecipeFavorite = true;
+                    ListofUsersWhoFavedThisRecipe.add(mUser.getUser_id());
                     Toast.makeText(getContext(), "Added " + title + " to favorites", Toast.LENGTH_SHORT).show();
                 }
+
+                mFavoriteNumber.setText(Integer.toString(ListofUsersWhoFavedThisRecipe.size()));
                 setFavoriteIcon(isRecipeFavorite);
                 DocumentReference favRecipesRef = usersRef.document(loggedInUserDocumentId);
+                DocumentReference usersWhoFavedRecipe = recipesRef.document(documentID);
+
                 favRecipesRef.update("favoriteRecipes", favRecipes);
+                usersWhoFavedRecipe.update("usersWhoFavedList", ListofUsersWhoFavedThisRecipe);
             }
         });
 
@@ -218,12 +231,15 @@ public class RecipeDetailedFragment extends Fragment {
             String instructions = getArguments().getString(ARG_INSTRUCTIONS);
             isRecipeFavorite = getArguments().getBoolean(ARG_ISFAVORITE);
             favRecipes = getArguments().getStringArrayList(ARG_FAVRECIPES);
+            ListofUsersWhoFavedThisRecipe = getArguments().getStringArrayList(ARG_USERSWHOFAVED);
+
             loggedInUserDocumentId = getArguments().getString(ARG_LOGGEDINUSERDOCUMENTID);
 
             tvTitle.setText(title);
             tvDescription.setText(description);
             tvIngredients.setText(ingredients);
             tvInstructions.setText("Instructions: \n\n" + instructions);
+            mFavoriteNumber.setText(Integer.toString(ListofUsersWhoFavedThisRecipe.size()));
 
 
             setFavoriteIcon(isRecipeFavorite);
@@ -288,7 +304,7 @@ public class RecipeDetailedFragment extends Fragment {
                                                         user = queryDocumentSnapshots.getDocuments().get(0).toObject(User.class);
                                                         Date date = document.getDate("mCommentTimeStamp", behavior);
 
-                                                        commentList.add(0,new Comment(documentID, comment.getmUserId(), user.getUserProfilePicUrl()
+                                                        commentList.add(0, new Comment(documentID, comment.getmUserId(), user.getUserProfilePicUrl()
                                                                 , comment.getmName(), comment.getmCommentText(), date));
 
                                                         mAdapter.notifyDataSetChanged();

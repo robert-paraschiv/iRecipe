@@ -190,23 +190,25 @@ public class SearchFragment extends Fragment implements RecipeAdapter.OnItemClic
                 if (queryDocumentSnapshots != null) {
                     for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
                         Recipe recipe = document.toObject(Recipe.class);
-                        mDocumentIDs.add(document.getId());
 
                         if (favRecipes != null && favRecipes.contains(document.getId())) {
                             recipe.setFavorite(true);
                         } else {
                             recipe.setFavorite(false);
                         }
-                        if (recipe.getIngredient_array() != null && finalUserIngredientsArray != null) {
-                            //Check if recipe contains any ingredient that user has
-                            boolean noElementsInCommon = Collections.disjoint(recipe.getIngredient_array(), finalUserIngredientsArray);
-                            if (!noElementsInCommon && recipe.getIngredient_array().containsAll(finalUserIngredientsArray)) {
-                                mRecipeList.add(recipe);
-                                Log.d(TAG, "onEvent: Recipe ingredientsArray " + recipe.getIngredient_array().toString()
-                                        + " User ingredients: " + finalUserIngredientsArray);
-                            } else {
-                                Log.d(TAG, "onEvent: Rejected recipe: " + recipe.getTitle()
-                                        + ", ingredients: " + recipe.getIngredient_array().toString());
+                        if (!mDocumentIDs.contains(document.getId())) {
+                            mDocumentIDs.add(document.getId());
+                            if (recipe.getIngredient_array() != null && finalUserIngredientsArray != null) {
+                                //Check if recipe contains any ingredient that user has
+                                boolean noElementsInCommon = Collections.disjoint(recipe.getIngredient_array(), finalUserIngredientsArray);
+                                if (!noElementsInCommon && recipe.getIngredient_array().containsAll(finalUserIngredientsArray)) {
+                                    mRecipeList.add(recipe);
+                                    Log.d(TAG, "onEvent: Recipe ingredientsArray " + recipe.getIngredient_array().toString()
+                                            + " User ingredients: " + finalUserIngredientsArray);
+                                } else {
+                                    Log.d(TAG, "onEvent: Rejected recipe: " + recipe.getTitle()
+                                            + ", ingredients: " + recipe.getIngredient_array().toString());
+                                }
                             }
                         }
                     }
@@ -234,6 +236,7 @@ public class SearchFragment extends Fragment implements RecipeAdapter.OnItemClic
                 Map<String, Boolean> ingredients = mRecipeList.get(position).getTags();
                 String instructions = mRecipeList.get(position).getInstructions();
                 Boolean isFavorite = mRecipeList.get(position).getFavorite();
+                ArrayList<String> usersWhoFavedRecipe = new ArrayList<>(mRecipeList.get(position).getUsersWhoFavedList());
 
                 String ingredientsString = "Ingredients:\n";
                 for (String ingredient : ingredients.keySet()) {
@@ -243,7 +246,7 @@ public class SearchFragment extends Fragment implements RecipeAdapter.OnItemClic
                 }
 
                 RecipeDetailedFragment fragment = RecipeDetailedFragment.newInstance(id, title, description, ingredientsString
-                        , imageUrl,instructions,isFavorite,favRecipes,loggedInUserDocumentId);
+                        , imageUrl, instructions, isFavorite, favRecipes, loggedInUserDocumentId, usersWhoFavedRecipe);
 
                 getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fragment)
                         .addToBackStack(null).commit();
@@ -254,8 +257,18 @@ public class SearchFragment extends Fragment implements RecipeAdapter.OnItemClic
                 String id = mDocumentIDs.get(position);
                 String title = mRecipeList.get(position).getTitle();
 
+                List<String> ListofUsersWhoFavedThisRecipe = new ArrayList<>();
+                if (mRecipeList.get(position).getUsersWhoFavedList() != null) {
+                    ListofUsersWhoFavedThisRecipe = mRecipeList.get(position).getUsersWhoFavedList();
+                }
+
                 if (favRecipes == null) {
                     favRecipes = new ArrayList<>();
+                }
+                if (ListofUsersWhoFavedThisRecipe.contains(mUser.getUser_id())) {
+                    ListofUsersWhoFavedThisRecipe.remove(mUser.getUser_id());
+                } else {
+                    ListofUsersWhoFavedThisRecipe.add(mUser.getUser_id());
                 }
                 if (favRecipes.contains(id)) {
                     favRecipes.remove(id);
@@ -268,7 +281,11 @@ public class SearchFragment extends Fragment implements RecipeAdapter.OnItemClic
                 }
                 mUser.setFavoriteRecipes(favRecipes);
                 DocumentReference favRecipesRef = usersReference.document(loggedInUserDocumentId);
+                DocumentReference userswhoFavedrecipe = recipeRef.document(id);
+
+
                 favRecipesRef.update("favoriteRecipes", favRecipes);
+                userswhoFavedrecipe.update("usersWhoFavedList", ListofUsersWhoFavedThisRecipe);
 
                 mAdapter.notifyDataSetChanged();
             }

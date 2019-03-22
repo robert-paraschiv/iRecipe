@@ -49,6 +49,16 @@
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="8dp"
                 />
+            <TextView
+                android:id="@+id/recipeDetailed_numberOfFaved"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:text="88"
+                android:layout_toStartOf="@id/imageview_favorite_icon"
+                android:layout_below="@id/recipeDetailed_image"
+                android:layout_marginTop="14dp"
+                android:layout_marginEnd="4dp"
+                style="@style/TextAppearance.MaterialComponents.Chip"/>
 
             <TextView
                 android:id="@+id/tvIngredientsList"

@@ -38,7 +38,7 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
 
     public class RecipeViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener,
             View.OnCreateContextMenuListener, MenuItem.OnMenuItemClickListener {
-        TextView tvTitle, tvDescription;
+        TextView tvTitle, tvDescription, tvNumberofFaved;
         ImageView mImageView, imgFavorited;
         Map<String, Boolean> ingredientTags;
 
@@ -48,6 +48,7 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
             tvDescription = itemView.findViewById(R.id.text_view_description);
             mImageView = itemView.findViewById(R.id.recipeItem_image);
             imgFavorited = itemView.findViewById(R.id.recyclerview_favorite);
+            tvNumberofFaved = itemView.findViewById(R.id.recyclerview_numberOfFaved);
 
             itemView.setOnClickListener(this);
             itemView.setOnCreateContextMenuListener(this);
@@ -116,6 +117,11 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
                 .fit()
                 .centerCrop()
                 .into(holder.mImageView);
+
+        if (currentItem.getUsersWhoFavedList() != null){
+            holder.tvNumberofFaved.setText(Integer.toString(currentItem.getUsersWhoFavedList().size()));
+        }
+
         holder.imgFavorited.setImageResource(R.drawable.ic_favorite_border_black_24dp);
         if (currentItem.getFavorite() != null && currentItem.getFavorite()) {
             holder.imgFavorited.setImageResource(R.drawable.ic_favorite_red_24dp);
