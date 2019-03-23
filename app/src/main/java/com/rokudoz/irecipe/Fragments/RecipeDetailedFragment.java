@@ -76,7 +76,7 @@ public class RecipeDetailedFragment extends Fragment {
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
 
-    private TextView tvTitle, tvDescription, tvIngredients, tvInstructions,mFavoriteNumber;
+    private TextView tvTitle, tvDescription, tvIngredients, tvInstructions, mFavoriteNumber;
     private ImageView mImageView, mFavoriteIcon;
     private Button mAddCommentBtn;
     private EditText mCommentEditText;
@@ -293,8 +293,10 @@ public class RecipeDetailedFragment extends Fragment {
                                 final Comment comment = document.toObject(Comment.class);
 //                                commentList.add(new Comment(documentID, comment.getmUserId(), comment.getmImageUrl(), comment.getmName(), comment.getmCommentText()));
                                 if (!newItemsToAdd.contains(document.getId())) {
-                                    newItemsToAdd.add(document.getId());
+
                                     Log.d(TAG, "onEvent: doc id" + document.getId());
+
+                                    final String currentCommentID = document.getId();
                                     usersRef.whereEqualTo("user_id", comment.getmUserId())
                                             .addSnapshotListener(new EventListener<QuerySnapshot>() {
                                                 @Override
@@ -304,10 +306,13 @@ public class RecipeDetailedFragment extends Fragment {
                                                         user = queryDocumentSnapshots.getDocuments().get(0).toObject(User.class);
                                                         Date date = document.getDate("mCommentTimeStamp", behavior);
 
-                                                        commentList.add(0, new Comment(documentID, comment.getmUserId(), user.getUserProfilePicUrl()
-                                                                , comment.getmName(), comment.getmCommentText(), date));
+                                                        if (!newItemsToAdd.contains(currentCommentID)){
+                                                            commentList.add(0, new Comment(documentID, comment.getmUserId(), user.getUserProfilePicUrl()
+                                                                    , comment.getmName(), comment.getmCommentText(), date));
+                                                            newItemsToAdd.add(document.getId());
+                                                            mAdapter.notifyDataSetChanged();
+                                                        }
 
-                                                        mAdapter.notifyDataSetChanged();
 
                                                     }
                                                 }

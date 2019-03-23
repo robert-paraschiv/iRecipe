@@ -172,7 +172,7 @@ public class FavoritesFragment extends Fragment implements RecipeAdapter.OnItemC
                                 if (queryDocumentSnapshots!=null){
                                     for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
                                         Recipe recipe = document.toObject(Recipe.class);
-                                        if (favRecipes != null && favRecipes.contains(document.getId())) {
+                                        if (favRecipes != null && favRecipes.contains(document.getId()) && !mDocumentIDs.contains(document.getId())) {
                                             recipe.setFavorite(true);
                                             mDocumentIDs.add(document.getId()); // Need to add it only if it is fav
                                             mRecipeList.add(recipe);
