@@ -236,7 +236,6 @@ public class SearchFragment extends Fragment implements RecipeAdapter.OnItemClic
                 Map<String, Boolean> ingredients = mRecipeList.get(position).getTags();
                 String instructions = mRecipeList.get(position).getInstructions();
                 Boolean isFavorite = mRecipeList.get(position).getFavorite();
-                ArrayList<String> usersWhoFavedRecipe = new ArrayList<>(mRecipeList.get(position).getUsersWhoFavedList());
 
                 String ingredientsString = "Ingredients:\n";
                 for (String ingredient : ingredients.keySet()) {
@@ -246,7 +245,7 @@ public class SearchFragment extends Fragment implements RecipeAdapter.OnItemClic
                 }
 
                 RecipeDetailedFragment fragment = RecipeDetailedFragment.newInstance(id, title, description, ingredientsString
-                        , imageUrl, instructions, isFavorite, favRecipes, loggedInUserDocumentId, usersWhoFavedRecipe);
+                        , imageUrl, instructions, isFavorite, favRecipes, loggedInUserDocumentId, 0);
 
                 getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fragment)
                         .addToBackStack(null).commit();
@@ -258,10 +257,6 @@ public class SearchFragment extends Fragment implements RecipeAdapter.OnItemClic
                 String title = mRecipeList.get(position).getTitle();
 
                 List<String> ListofUsersWhoFavedThisRecipe = new ArrayList<>();
-                if (mRecipeList.get(position).getUsersWhoFavedList() != null) {
-                    ListofUsersWhoFavedThisRecipe = mRecipeList.get(position).getUsersWhoFavedList();
-                }
-
                 if (favRecipes == null) {
                     favRecipes = new ArrayList<>();
                 }

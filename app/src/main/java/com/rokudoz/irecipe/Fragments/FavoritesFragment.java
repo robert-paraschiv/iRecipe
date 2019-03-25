@@ -204,7 +204,6 @@ public class FavoritesFragment extends Fragment implements RecipeAdapter.OnItemC
                                 Map<String, Boolean> ingredients = mRecipeList.get(position).getTags();
                                 String instructions = mRecipeList.get(position).getInstructions();
                                 Boolean isFavorite = mRecipeList.get(position).getFavorite();
-                                ArrayList<String> usersWhoFavedRecipe = new ArrayList<>(mRecipeList.get(position).getUsersWhoFavedList());
 
                                 String ingredientsString = "Ingredients:\n";
                                 for (String ingredient : ingredients.keySet()) {
@@ -214,7 +213,7 @@ public class FavoritesFragment extends Fragment implements RecipeAdapter.OnItemC
                                 }
 
                                 RecipeDetailedFragment fragment = RecipeDetailedFragment.newInstance(id, title, description, ingredientsString
-                                        , imageUrl,instructions,isFavorite,favRecipes,loggedinUserDocument,usersWhoFavedRecipe);
+                                        , imageUrl,instructions,isFavorite,favRecipes,loggedinUserDocument,0);
 
                                 getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fragment)
                                         .addToBackStack(null).commit();
@@ -226,9 +225,6 @@ public class FavoritesFragment extends Fragment implements RecipeAdapter.OnItemC
                                 String title = mRecipeList.get(position).getTitle();
 
                                 List<String> ListofUsersWhoFavedThisRecipe = new ArrayList<>();
-                                if (mRecipeList.get(position).getUsersWhoFavedList() != null) {
-                                    ListofUsersWhoFavedThisRecipe = mRecipeList.get(position).getUsersWhoFavedList();
-                                }
 
                                 if (favRecipes == null) {
                                     favRecipes = new ArrayList<>();

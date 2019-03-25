@@ -39,6 +39,7 @@ import com.rokudoz.irecipe.Account.LoginActivity;
 import com.rokudoz.irecipe.AddRecipesActivity;
 import com.rokudoz.irecipe.Models.Recipe;
 import com.rokudoz.irecipe.Models.User;
+import com.rokudoz.irecipe.Models.UserWhoFaved;
 import com.rokudoz.irecipe.R;
 import com.rokudoz.irecipe.Utils.RecipeAdapter;
 
@@ -73,6 +74,8 @@ public class HomeFragment extends Fragment implements RecipeAdapter.OnItemClickL
     private ArrayList<Recipe> mRecipeList = new ArrayList<>();
     private ArrayList<String> favRecipes = new ArrayList<>();
     private String loggedInUserDocumentId = "";
+    private String userFavDocId = "";
+    private Integer numberofFaves = 0;
 
     private DocumentSnapshot mLastQueriedDocument;
 
@@ -161,7 +164,6 @@ public class HomeFragment extends Fragment implements RecipeAdapter.OnItemClickL
                             }
 //                            Toast.makeText(MainActivity.this, tags.toString(), Toast.LENGTH_SHORT).show();
                         }
-                        Log.d(TAG, "onEvent: User ingredientsArray " + userIngredientsArray);
                         Query notesQuery = null;
                         if (mLastQueriedDocument != null) {
                             notesQuery = recipeRef.whereLessThanOrEqualTo("tags", tags)
@@ -193,6 +195,7 @@ public class HomeFragment extends Fragment implements RecipeAdapter.OnItemClickL
                 if (queryDocumentSnapshots != null) {
                     for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
                         Recipe recipe = document.toObject(Recipe.class);
+                        recipe.setDocumentId(document.getId());
 
 
                         if (favRecipes != null && favRecipes.contains(document.getId())) {
@@ -207,8 +210,6 @@ public class HomeFragment extends Fragment implements RecipeAdapter.OnItemClickL
                                 boolean noElementsInCommon = Collections.disjoint(recipe.getIngredient_array(), finalUserIngredientsArray);
                                 if (!noElementsInCommon && finalUserIngredientsArray.containsAll(recipe.getIngredient_array())) {
                                     mRecipeList.add(recipe);
-                                    Log.d(TAG, "onEvent: Recipe ingredientsArray " + recipe.getIngredient_array().toString()
-                                            + " User ingredients: " + finalUserIngredientsArray);
                                 } else {
                                     Log.d(TAG, "onEvent: Rejected recipe: " + recipe.getTitle()
                                             + ", ingredients: " + recipe.getIngredient_array().toString());
@@ -216,14 +217,12 @@ public class HomeFragment extends Fragment implements RecipeAdapter.OnItemClickL
                             }
                         }
 
-
                     }
 
                     if (queryDocumentSnapshots.getDocuments().size() != 0) {
                         mLastQueriedDocument = queryDocumentSnapshots.getDocuments()
                                 .get(queryDocumentSnapshots.getDocuments().size() - 1);
                     }
-                    Log.d(TAG, "onEvent: querry size" + queryDocumentSnapshots.size());
                 }
                 mAdapter.notifyDataSetChanged();
 
@@ -242,7 +241,6 @@ public class HomeFragment extends Fragment implements RecipeAdapter.OnItemClickL
                 Map<String, Boolean> ingredients = mRecipeList.get(position).getTags();
                 String instructions = mRecipeList.get(position).getInstructions();
                 Boolean isFavorite = mRecipeList.get(position).getFavorite();
-                ArrayList<String> usersWhoFavedRecipe = new ArrayList<>(mRecipeList.get(position).getUsersWhoFavedList());
 
                 String ingredientsString = "Ingredients:\n";
                 for (String ingredient : ingredients.keySet()) {
@@ -252,46 +250,85 @@ public class HomeFragment extends Fragment implements RecipeAdapter.OnItemClickL
                 }
 
                 RecipeDetailedFragment fragment = RecipeDetailedFragment.newInstance(id, title, description, ingredientsString
-                        , imageUrl, instructions, isFavorite, favRecipes, loggedInUserDocumentId, usersWhoFavedRecipe);
+                        , imageUrl, instructions, isFavorite, favRecipes, loggedInUserDocumentId, numberofFaves);
 
                 getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fragment)
                         .addToBackStack(null).commit();
             }
 
             @Override
-            public void onFavoriteClick(int position) {
+            public void onFavoriteClick(final int position) {
                 String id = mDocumentIDs.get(position);
                 String title = mRecipeList.get(position).getTitle();
+                DocumentReference currentRecipeRef = recipeRef.document(id);
+                final CollectionReference currentRecipeSubCollection = currentRecipeRef.collection("UsersWhoFaved");
 
-                List<String> ListofUsersWhoFavedThisRecipe = new ArrayList<>();
-                if (mRecipeList.get(position).getUsersWhoFavedList() != null) {
-                    ListofUsersWhoFavedThisRecipe = mRecipeList.get(position).getUsersWhoFavedList();
-                }
+                mUser.setFavoriteRecipes(favRecipes);
+                DocumentReference favRecipesRef = usersReference.document(loggedInUserDocumentId);
+
+
+                Log.d(TAG, "onFavoriteClick: " + mRecipeList.get(position).getDocumentId());
+
+//                currentRecipeSubCollection.whereEqualTo("userID", mUser.getUser_id()).get()
+//                        .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+//                            @Override
+//                            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+//                                if (queryDocumentSnapshots != null && queryDocumentSnapshots.size() != 0) {
+//                                    userFavDocId = queryDocumentSnapshots.getDocuments().get(0).getId();
+//                                    Log.d(TAG, "onEvent: " + userFavDocId);
+//                                }
+//
+//                            }
+//                        });
 
                 if (favRecipes == null) {
                     favRecipes = new ArrayList<>();
                 }
-                if (ListofUsersWhoFavedThisRecipe.contains(mUser.getUser_id())) {
-                    ListofUsersWhoFavedThisRecipe.remove(mUser.getUser_id());
-                } else {
-                    ListofUsersWhoFavedThisRecipe.add(mUser.getUser_id());
-                }
                 if (favRecipes.contains(id)) {
                     favRecipes.remove(id);
                     mRecipeList.get(position).setFavorite(false);
-                    Toast.makeText(getContext(), "Removed " + title + " from favorites", Toast.LENGTH_SHORT).show();
+
+                    currentRecipeSubCollection.whereEqualTo("userID", mUser.getUser_id())
+                            .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                                @Override
+                                public void onEvent(@javax.annotation.Nullable QuerySnapshot queryDocumentSnapshots, @javax.annotation.Nullable FirebaseFirestoreException e) {
+                                    if (e != null) {
+                                        Log.w(TAG, "onEvent: ", e);
+                                        return;
+                                    }
+                                    if (queryDocumentSnapshots != null && queryDocumentSnapshots.size() != 0) {
+                                        userFavDocId = queryDocumentSnapshots.getDocuments().get(0).getId();
+                                        Log.d(TAG, "onEvent: docID" + userFavDocId);
+                                    }
+                                    if (!mRecipeList.get(position).getFavorite())
+                                    if (!userFavDocId.equals("")) {
+                                        currentRecipeSubCollection.document(userFavDocId).delete()
+                                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                    @Override
+                                                    public void onSuccess(Void aVoid) {
+                                                        Toast.makeText(getContext(), "Removed from favorites", Toast.LENGTH_SHORT).show();
+                                                    }
+                                                });
+
+
+                                    }else {
+                                        Log.d(TAG, "onFavoriteClick: empty docID");
+                                    }
+
+                                }
+                            });
+
                 } else {
                     favRecipes.add(id);
                     mRecipeList.get(position).setFavorite(true);
+                    UserWhoFaved userWhoFaved = new UserWhoFaved(mUser.getUser_id(), null);
+                    currentRecipeSubCollection.add(userWhoFaved);
                     Toast.makeText(getContext(), "Added " + title + " to favorites", Toast.LENGTH_SHORT).show();
                 }
+
                 mUser.setFavoriteRecipes(favRecipes);
-                DocumentReference favRecipesRef = usersReference.document(loggedInUserDocumentId);
-                DocumentReference userswhoFavedrecipe = recipeRef.document(id);
-
-
                 favRecipesRef.update("favoriteRecipes", favRecipes);
-                userswhoFavedrecipe.update("usersWhoFavedList", ListofUsersWhoFavedThisRecipe);
+
 
                 mAdapter.notifyDataSetChanged();
             }

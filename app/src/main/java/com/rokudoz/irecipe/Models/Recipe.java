@@ -14,13 +14,15 @@ public class Recipe {
     private Boolean isFavorite;
     private List<String> ingredient_array;
     private String instructions;
-    private List<String> usersWhoFavedList;
+    private Integer numberOfFaves;
 
     public Recipe() {
         //public no-arg constructor needed
     }
 
-    public Recipe(String title, String description, Map<String, Boolean> tags, String imageUrl, Boolean isFavorite, List<String> ingredient_array, String instructions, List<String> usersWhoFavedList) {
+    public Recipe(String title, String description, Map<String, Boolean> tags, String imageUrl, Boolean isFavorite, List<String> ingredient_array
+            , String instructions, Integer numberOfFaves) {
+
         if (title.trim().equals("")) {
             title = "No Title";
         }
@@ -31,7 +33,7 @@ public class Recipe {
         this.isFavorite = isFavorite;
         this.ingredient_array = ingredient_array;
         this.instructions = instructions;
-        this.usersWhoFavedList = usersWhoFavedList;
+        this.numberOfFaves = numberOfFaves;
     }
 
     @Exclude
@@ -95,11 +97,11 @@ public class Recipe {
         isFavorite = favorite;
     }
 
-    public List<String> getUsersWhoFavedList() {
-        return usersWhoFavedList;
+    public Integer getNumberOfFaves() {
+        return numberOfFaves;
     }
 
-    public void setUsersWhoFavedList(List<String> usersWhoFavedList) {
-        this.usersWhoFavedList = usersWhoFavedList;
+    public void setNumberOfFaves(Integer numberOfFaves) {
+        this.numberOfFaves = numberOfFaves;
     }
 }

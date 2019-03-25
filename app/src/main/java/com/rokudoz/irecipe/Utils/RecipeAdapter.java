@@ -3,6 +3,7 @@ package com.rokudoz.irecipe.Utils;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -12,12 +13,19 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.rokudoz.irecipe.Models.Recipe;
 import com.rokudoz.irecipe.R;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.Objects;
 
 
 public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeViewHolder> {
@@ -107,8 +115,8 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
     }
 
     @Override
-    public void onBindViewHolder(@NonNull RecipeViewHolder holder, int position) {
-        Recipe currentItem = mRecipeList.get(position);
+    public void onBindViewHolder(@NonNull final RecipeViewHolder holder, int position) {
+        final Recipe currentItem = mRecipeList.get(position);
 
         holder.tvTitle.setText(currentItem.getTitle());
         holder.tvDescription.setText(currentItem.getDescription());
@@ -118,9 +126,22 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
                 .centerCrop()
                 .into(holder.mImageView);
 
-        if (currentItem.getUsersWhoFavedList() != null){
-            holder.tvNumberofFaved.setText(Integer.toString(currentItem.getUsersWhoFavedList().size()));
-        }
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        CollectionReference currentRecipeSubCollection = db.collection("Recipes").document(currentItem.getDocumentId()).collection("UsersWhoFaved");
+
+        currentRecipeSubCollection.addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@javax.annotation.Nullable QuerySnapshot queryDocumentSnapshots, @javax.annotation.Nullable FirebaseFirestoreException e) {
+                if (e != null) {
+                    return;
+                }
+                currentItem.setNumberOfFaves(queryDocumentSnapshots.size());
+                if (currentItem.getNumberOfFaves() != null) {
+                    holder.tvNumberofFaved.setText(Integer.toString(currentItem.getNumberOfFaves()));
+                }
+            }
+        });
+
 
         holder.imgFavorited.setImageResource(R.drawable.ic_favorite_border_black_24dp);
         if (currentItem.getFavorite() != null && currentItem.getFavorite()) {

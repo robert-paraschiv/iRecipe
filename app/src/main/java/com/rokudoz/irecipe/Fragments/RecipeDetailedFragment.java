@@ -21,7 +21,6 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
@@ -29,7 +28,6 @@ import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
-import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
@@ -42,10 +40,7 @@ import com.rokudoz.irecipe.R;
 import com.rokudoz.irecipe.Utils.CommentAdapter;
 import com.squareup.picasso.Picasso;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
@@ -62,7 +57,7 @@ public class RecipeDetailedFragment extends Fragment {
     private static final String ARG_INSTRUCTIONS = "argInstructions";
     private static final String ARG_ISFAVORITE = "argIsFavorite";
     private static final String ARG_FAVRECIPES = "argFavRecipes";
-    private static final String ARG_USERSWHOFAVED = "argUsersWhoFaved";
+    private static final String ARG_NUMBEROFFAVES = "argNumberOfFaves";
     private static final String ARG_LOGGEDINUSERDOCUMENTID = "argLoggedInUserDocumentId";
 
     private String documentID = "";
@@ -96,7 +91,7 @@ public class RecipeDetailedFragment extends Fragment {
     private CollectionReference commentRef = db.collection("Comments");
 
     public static RecipeDetailedFragment newInstance(String id, String title, String description, String ingredients, String imageUrl
-            , String instructions, Boolean isFavorite, ArrayList<String> favRecipes, String loggedInUserDocumentId, ArrayList<String> listofUsersWhoFavedThisRecipe) {
+            , String instructions, Boolean isFavorite, ArrayList<String> favRecipes, String loggedInUserDocumentId, Integer numberofFaves) {
         RecipeDetailedFragment fragment = new RecipeDetailedFragment();
         Bundle args = new Bundle();
         args.putString(ARG_ID, id);
@@ -108,7 +103,7 @@ public class RecipeDetailedFragment extends Fragment {
         args.putBoolean(ARG_ISFAVORITE, isFavorite);
         args.putStringArrayList(ARG_FAVRECIPES, favRecipes);
         args.putString(ARG_LOGGEDINUSERDOCUMENTID, loggedInUserDocumentId);
-        args.putStringArrayList(ARG_USERSWHOFAVED, listofUsersWhoFavedThisRecipe);
+        args.putInt(ARG_NUMBEROFFAVES, numberofFaves);
         fragment.setArguments(args);
         return fragment;
     }
@@ -231,7 +226,7 @@ public class RecipeDetailedFragment extends Fragment {
             String instructions = getArguments().getString(ARG_INSTRUCTIONS);
             isRecipeFavorite = getArguments().getBoolean(ARG_ISFAVORITE);
             favRecipes = getArguments().getStringArrayList(ARG_FAVRECIPES);
-            ListofUsersWhoFavedThisRecipe = getArguments().getStringArrayList(ARG_USERSWHOFAVED);
+            ListofUsersWhoFavedThisRecipe = getArguments().getStringArrayList(ARG_NUMBEROFFAVES);
 
             loggedInUserDocumentId = getArguments().getString(ARG_LOGGEDINUSERDOCUMENTID);
 
@@ -306,7 +301,7 @@ public class RecipeDetailedFragment extends Fragment {
                                                         user = queryDocumentSnapshots.getDocuments().get(0).toObject(User.class);
                                                         Date date = document.getDate("mCommentTimeStamp", behavior);
 
-                                                        if (!newItemsToAdd.contains(currentCommentID)){
+                                                        if (!newItemsToAdd.contains(currentCommentID)) {
                                                             commentList.add(0, new Comment(documentID, comment.getmUserId(), user.getUserProfilePicUrl()
                                                                     , comment.getmName(), comment.getmCommentText(), date));
                                                             newItemsToAdd.add(document.getId());
