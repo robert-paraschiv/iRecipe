@@ -30,19 +30,20 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.rokudoz.irecipe.Account.LoginActivity;
 import com.rokudoz.irecipe.Models.Comment;
 import com.rokudoz.irecipe.Models.User;
+import com.rokudoz.irecipe.Models.UserWhoFaved;
 import com.rokudoz.irecipe.R;
 import com.rokudoz.irecipe.Utils.CommentAdapter;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 import static com.google.firebase.firestore.DocumentSnapshot.ServerTimestampBehavior.ESTIMATE;
 
@@ -65,6 +66,7 @@ public class RecipeDetailedFragment extends Fragment {
     private String currentUserName = "";
     private String loggedInUserDocumentId = "";
     private String title = "";
+    private String userFavDocId = "";
     private Boolean isRecipeFavorite;
 
     private RecyclerView mRecyclerView;
@@ -78,7 +80,7 @@ public class RecipeDetailedFragment extends Fragment {
 
     private ArrayList<Comment> commentList = new ArrayList<>();
     private ArrayList<String> favRecipes = new ArrayList<>();
-    private List<String> ListofUsersWhoFavedThisRecipe;
+    private Integer numberOfFav;
     private ArrayList<String> newItemsToAdd = new ArrayList<>();
     private User mUser;
 
@@ -86,7 +88,8 @@ public class RecipeDetailedFragment extends Fragment {
 
     private FirebaseAuth.AuthStateListener mAuthListener;
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
-    private CollectionReference recipesRef = db.collection("Recipes");
+    private ListenerRegistration currentSubCollectionListener, usersRefListener, commentListener;
+    private CollectionReference recipeRef = db.collection("Recipes");
     private CollectionReference usersRef = db.collection("Users");
     private CollectionReference commentRef = db.collection("Comments");
 
@@ -127,6 +130,11 @@ public class RecipeDetailedFragment extends Fragment {
         mFavoriteNumber = view.findViewById(R.id.recipeDetailed_numberOfFaved);
 
 
+        getRecipeArgsPassed();
+
+        DocumentReference currentRecipeRef = recipeRef.document(documentID);
+        final CollectionReference currentRecipeSubCollection = currentRecipeRef.collection("UsersWhoFaved");
+
         mAddCommentBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -145,27 +153,62 @@ public class RecipeDetailedFragment extends Fragment {
                 }
                 if (favRecipes.contains(documentID)) {
                     favRecipes.remove(documentID);
-                    ListofUsersWhoFavedThisRecipe.remove(mUser.getUser_id());
                     isRecipeFavorite = false;
-                    Toast.makeText(getContext(), "Removed " + title + " from favorites", Toast.LENGTH_SHORT).show();
+
+                    currentSubCollectionListener = currentRecipeSubCollection.whereEqualTo("userID", mUser.getUser_id())
+                            .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                                @Override
+                                public void onEvent(@javax.annotation.Nullable QuerySnapshot queryDocumentSnapshots, @javax.annotation.Nullable FirebaseFirestoreException e) {
+                                    if (e != null) {
+                                        Log.w(TAG, "onEvent: ", e);
+                                        return;
+                                    }
+                                    if (queryDocumentSnapshots != null && queryDocumentSnapshots.size() != 0) {
+                                        userFavDocId = queryDocumentSnapshots.getDocuments().get(0).getId();
+                                        Log.d(TAG, "onEvent: docID" + userFavDocId);
+                                    }
+                                    if (!isRecipeFavorite)
+                                        if (!userFavDocId.equals("")) {
+                                            currentRecipeSubCollection.document(userFavDocId).delete()
+                                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                        @Override
+                                                        public void onSuccess(Void aVoid) {
+                                                            Toast.makeText(getContext(), "Removed from favorites", Toast.LENGTH_SHORT).show();
+                                                        }
+                                                    });
+
+
+                                        } else {
+                                            Log.d(TAG, "onFavoriteClick: empty docID");
+                                        }
+
+                                }
+                            });
                 } else {
                     favRecipes.add(documentID);
                     isRecipeFavorite = true;
-                    ListofUsersWhoFavedThisRecipe.add(mUser.getUser_id());
+                    UserWhoFaved userWhoFaved = new UserWhoFaved(mUser.getUser_id(), null);
+                    currentRecipeSubCollection.add(userWhoFaved);
                     Toast.makeText(getContext(), "Added " + title + " to favorites", Toast.LENGTH_SHORT).show();
                 }
-
-                mFavoriteNumber.setText(Integer.toString(ListofUsersWhoFavedThisRecipe.size()));
                 setFavoriteIcon(isRecipeFavorite);
-                DocumentReference favRecipesRef = usersRef.document(loggedInUserDocumentId);
-                DocumentReference usersWhoFavedRecipe = recipesRef.document(documentID);
 
+                DocumentReference favRecipesRef = usersRef.document(loggedInUserDocumentId);
                 favRecipesRef.update("favoriteRecipes", favRecipes);
-                usersWhoFavedRecipe.update("usersWhoFavedList", ListofUsersWhoFavedThisRecipe);
             }
         });
 
-        getRecipeArgsPassed();
+        currentRecipeSubCollection.addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@javax.annotation.Nullable QuerySnapshot queryDocumentSnapshots, @javax.annotation.Nullable FirebaseFirestoreException e) {
+                if (e != null) {
+                    return;
+                }
+                numberOfFav = queryDocumentSnapshots.size();
+                mFavoriteNumber.setText(Integer.toString(numberOfFav));
+            }
+        });
+
         buildRecyclerView();
         setupFirebaseAuth();
 
@@ -184,11 +227,25 @@ public class RecipeDetailedFragment extends Fragment {
         if (mAuthListener != null) {
             FirebaseAuth.getInstance().removeAuthStateListener(mAuthListener);
         }
+        if (currentSubCollectionListener != null) {
+            currentSubCollectionListener.remove();
+            currentSubCollectionListener = null;
+        }
+        if (usersRefListener != null) {
+            usersRefListener.remove();
+            usersRefListener = null;
+        }
+        if (commentListener != null) {
+            commentListener.remove();
+            commentListener = null;
+        }
+        Log.d(TAG, "onStop: ");
+
     }
+
 
     private void addComment() {
         String commentText = mCommentEditText.getText().toString();
-        //TODO rework adding timestamp to FirestoreServer TimeStamp
 
 
         final Comment comment = new Comment(documentID, FirebaseAuth.getInstance().getCurrentUser().getUid(),
@@ -226,7 +283,7 @@ public class RecipeDetailedFragment extends Fragment {
             String instructions = getArguments().getString(ARG_INSTRUCTIONS);
             isRecipeFavorite = getArguments().getBoolean(ARG_ISFAVORITE);
             favRecipes = getArguments().getStringArrayList(ARG_FAVRECIPES);
-            ListofUsersWhoFavedThisRecipe = getArguments().getStringArrayList(ARG_NUMBEROFFAVES);
+            numberOfFav = getArguments().getInt(ARG_NUMBEROFFAVES);
 
             loggedInUserDocumentId = getArguments().getString(ARG_LOGGEDINUSERDOCUMENTID);
 
@@ -234,7 +291,7 @@ public class RecipeDetailedFragment extends Fragment {
             tvDescription.setText(description);
             tvIngredients.setText(ingredients);
             tvInstructions.setText("Instructions: \n\n" + instructions);
-            mFavoriteNumber.setText(Integer.toString(ListofUsersWhoFavedThisRecipe.size()));
+            mFavoriteNumber.setText(Integer.toString(numberOfFav));
 
 
             setFavoriteIcon(isRecipeFavorite);
@@ -273,7 +330,7 @@ public class RecipeDetailedFragment extends Fragment {
             commentQuery = commentRef.whereEqualTo("mRecipeDocumentId", documentID).orderBy("mCommentTimeStamp", Query.Direction.ASCENDING);
         }
 
-        commentQuery
+        commentListener = commentQuery
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
                     public void onEvent(@javax.annotation.Nullable QuerySnapshot queryDocumentSnapshots, @javax.annotation.Nullable FirebaseFirestoreException e) {
@@ -292,7 +349,7 @@ public class RecipeDetailedFragment extends Fragment {
                                     Log.d(TAG, "onEvent: doc id" + document.getId());
 
                                     final String currentCommentID = document.getId();
-                                    usersRef.whereEqualTo("user_id", comment.getmUserId())
+                                    usersRefListener = usersRef.whereEqualTo("user_id", comment.getmUserId())
                                             .addSnapshotListener(new EventListener<QuerySnapshot>() {
                                                 @Override
                                                 public void onEvent(@javax.annotation.Nullable QuerySnapshot queryDocumentSnapshots, @javax.annotation.Nullable FirebaseFirestoreException e) {

@@ -30,6 +30,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -65,6 +66,7 @@ public class HomeFragment extends Fragment implements RecipeAdapter.OnItemClickL
     private CollectionReference recipeRef = db.collection("Recipes");
     private CollectionReference usersReference = db.collection("Users");
     private FirebaseStorage mStorageRef;
+    private ListenerRegistration currentSubCollectionListener;
 
     private RecyclerView mRecyclerView;
     private RecipeAdapter mAdapter;
@@ -75,7 +77,6 @@ public class HomeFragment extends Fragment implements RecipeAdapter.OnItemClickL
     private ArrayList<String> favRecipes = new ArrayList<>();
     private String loggedInUserDocumentId = "";
     private String userFavDocId = "";
-    private Integer numberofFaves = 0;
 
     private DocumentSnapshot mLastQueriedDocument;
 
@@ -120,6 +121,10 @@ public class HomeFragment extends Fragment implements RecipeAdapter.OnItemClickL
         super.onStop();
         if (mAuthListener != null) {
             FirebaseAuth.getInstance().removeAuthStateListener(mAuthListener);
+        }
+        if (currentSubCollectionListener!=null){
+            currentSubCollectionListener.remove();
+            currentSubCollectionListener=null;
         }
     }
 
@@ -241,6 +246,7 @@ public class HomeFragment extends Fragment implements RecipeAdapter.OnItemClickL
                 Map<String, Boolean> ingredients = mRecipeList.get(position).getTags();
                 String instructions = mRecipeList.get(position).getInstructions();
                 Boolean isFavorite = mRecipeList.get(position).getFavorite();
+                Integer numberOfFaves = mRecipeList.get(position).getNumberOfFaves();
 
                 String ingredientsString = "Ingredients:\n";
                 for (String ingredient : ingredients.keySet()) {
@@ -250,7 +256,7 @@ public class HomeFragment extends Fragment implements RecipeAdapter.OnItemClickL
                 }
 
                 RecipeDetailedFragment fragment = RecipeDetailedFragment.newInstance(id, title, description, ingredientsString
-                        , imageUrl, instructions, isFavorite, favRecipes, loggedInUserDocumentId, numberofFaves);
+                        , imageUrl, instructions, isFavorite, favRecipes, loggedInUserDocumentId, numberOfFaves);
 
                 getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fragment)
                         .addToBackStack(null).commit();
@@ -269,18 +275,6 @@ public class HomeFragment extends Fragment implements RecipeAdapter.OnItemClickL
 
                 Log.d(TAG, "onFavoriteClick: " + mRecipeList.get(position).getDocumentId());
 
-//                currentRecipeSubCollection.whereEqualTo("userID", mUser.getUser_id()).get()
-//                        .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-//                            @Override
-//                            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-//                                if (queryDocumentSnapshots != null && queryDocumentSnapshots.size() != 0) {
-//                                    userFavDocId = queryDocumentSnapshots.getDocuments().get(0).getId();
-//                                    Log.d(TAG, "onEvent: " + userFavDocId);
-//                                }
-//
-//                            }
-//                        });
-
                 if (favRecipes == null) {
                     favRecipes = new ArrayList<>();
                 }
@@ -288,7 +282,7 @@ public class HomeFragment extends Fragment implements RecipeAdapter.OnItemClickL
                     favRecipes.remove(id);
                     mRecipeList.get(position).setFavorite(false);
 
-                    currentRecipeSubCollection.whereEqualTo("userID", mUser.getUser_id())
+                    currentSubCollectionListener = currentRecipeSubCollection.whereEqualTo("userID", mUser.getUser_id())
                             .addSnapshotListener(new EventListener<QuerySnapshot>() {
                                 @Override
                                 public void onEvent(@javax.annotation.Nullable QuerySnapshot queryDocumentSnapshots, @javax.annotation.Nullable FirebaseFirestoreException e) {
@@ -301,19 +295,19 @@ public class HomeFragment extends Fragment implements RecipeAdapter.OnItemClickL
                                         Log.d(TAG, "onEvent: docID" + userFavDocId);
                                     }
                                     if (!mRecipeList.get(position).getFavorite())
-                                    if (!userFavDocId.equals("")) {
-                                        currentRecipeSubCollection.document(userFavDocId).delete()
-                                                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                    @Override
-                                                    public void onSuccess(Void aVoid) {
-                                                        Toast.makeText(getContext(), "Removed from favorites", Toast.LENGTH_SHORT).show();
-                                                    }
-                                                });
+                                        if (!userFavDocId.equals("")) {
+                                            currentRecipeSubCollection.document(userFavDocId).delete()
+                                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                        @Override
+                                                        public void onSuccess(Void aVoid) {
+                                                            Toast.makeText(getContext(), "Removed from favorites", Toast.LENGTH_SHORT).show();
+                                                        }
+                                                    });
 
 
-                                    }else {
-                                        Log.d(TAG, "onFavoriteClick: empty docID");
-                                    }
+                                        } else {
+                                            Log.d(TAG, "onFavoriteClick: empty docID");
+                                        }
 
                                 }
                             });
