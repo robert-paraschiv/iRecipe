@@ -29,6 +29,8 @@
         android:layout_margin="16dp"
         android:onClick="navigateToAddRecipes"
         android:src="@drawable/ic_add"
-        app:fabCustomSize="50dp" />
+        app:fabCustomSize="50dp"
+        app:elevation="4dp"
+        app:backgroundTint="@color/colorPrimary"/>
 
 </RelativeLayout>

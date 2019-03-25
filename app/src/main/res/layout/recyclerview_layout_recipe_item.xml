@@ -19,7 +19,7 @@
         <ImageView
             android:id="@+id/recipeItem_image"
             android:layout_width="match_parent"
-            android:layout_height="150dp"
+            android:layout_height="200dp"
             android:layout_marginTop="4dp"
             android:layout_centerHorizontal="true"
             tools:src="@color/colorAccent"/>
@@ -54,8 +54,8 @@
             style="@style/TextAppearance.MaterialComponents.Chip"/>
         <ImageView
             android:id="@+id/recyclerview_favorite"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
+            android:layout_width="33dp"
+            android:layout_height="33dp"
             android:elevation="4dp"
             android:layout_below="@id/recipeItem_image"
             android:layout_marginEnd="8dp"

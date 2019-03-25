@@ -165,7 +165,7 @@ public class RecipeDetailedFragment extends Fragment {
                                     }
                                     if (queryDocumentSnapshots != null && queryDocumentSnapshots.size() != 0) {
                                         userFavDocId = queryDocumentSnapshots.getDocuments().get(0).getId();
-                                        Log.d(TAG, "onEvent: docID" + userFavDocId);
+                                        Log.d(TAG, "onEvent: docID " + userFavDocId);
                                     }
                                     if (!isRecipeFavorite)
                                         if (!userFavDocId.equals("")) {
@@ -270,11 +270,6 @@ public class RecipeDetailedFragment extends Fragment {
                     public void onSuccess(DocumentReference documentReference) {
                         mCommentEditText.setText("");
                         Toast.makeText(getContext(), "Successfully added comment ", Toast.LENGTH_SHORT).show();
-
-//                        commentList.add(0, comment);
-//                        newItemsToAdd.add(documentReference.getId());
-//                        Log.d(TAG, "onSuccess: docref" + documentReference.getId());
-//                        mAdapter.notifyDataSetChanged();
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {

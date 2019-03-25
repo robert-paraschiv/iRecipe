@@ -66,7 +66,7 @@ public class HomeFragment extends Fragment implements RecipeAdapter.OnItemClickL
     private CollectionReference recipeRef = db.collection("Recipes");
     private CollectionReference usersReference = db.collection("Users");
     private FirebaseStorage mStorageRef;
-    private ListenerRegistration currentSubCollectionListener,userDetailsListener, recipesListener;
+    private ListenerRegistration currentSubCollectionListener, userDetailsListener, recipesListener;
 
     private RecyclerView mRecyclerView;
     private RecipeAdapter mAdapter;
@@ -126,9 +126,9 @@ public class HomeFragment extends Fragment implements RecipeAdapter.OnItemClickL
     }
 
     private void DetatchFirestoreListeners() {
-        if (currentSubCollectionListener!=null){
+        if (currentSubCollectionListener != null) {
             currentSubCollectionListener.remove();
-            currentSubCollectionListener=null;
+            currentSubCollectionListener = null;
         }
         if (userDetailsListener != null) {
             userDetailsListener.remove();
@@ -284,7 +284,6 @@ public class HomeFragment extends Fragment implements RecipeAdapter.OnItemClickL
                 mUser.setFavoriteRecipes(favRecipes);
                 DocumentReference favRecipesRef = usersReference.document(loggedInUserDocumentId);
 
-
                 Log.d(TAG, "onFavoriteClick: " + mRecipeList.get(position).getDocumentId());
 
                 if (favRecipes == null) {
@@ -304,26 +303,24 @@ public class HomeFragment extends Fragment implements RecipeAdapter.OnItemClickL
                                     }
                                     if (queryDocumentSnapshots != null && queryDocumentSnapshots.size() != 0) {
                                         userFavDocId = queryDocumentSnapshots.getDocuments().get(0).getId();
-                                        Log.d(TAG, "onEvent: docID" + userFavDocId);
+                                        Log.d(TAG, "onEvent: docID " + userFavDocId);
+
+                                        if (!mRecipeList.get(position).getFavorite())
+                                            if (!userFavDocId.equals("")) {
+                                                currentRecipeSubCollection.document(userFavDocId).delete()
+                                                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                            @Override
+                                                            public void onSuccess(Void aVoid) {
+                                                                if (getContext() != null)
+                                                                    Toast.makeText(getContext(), "Removed from favorites", Toast.LENGTH_SHORT).show();
+                                                            }
+                                                        });
+                                            } else {
+                                                Log.d(TAG, "onFavoriteClick: empty docID");
+                                            }
                                     }
-                                    if (!mRecipeList.get(position).getFavorite())
-                                        if (!userFavDocId.equals("")) {
-                                            currentRecipeSubCollection.document(userFavDocId).delete()
-                                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                        @Override
-                                                        public void onSuccess(Void aVoid) {
-                                                            Toast.makeText(getContext(), "Removed from favorites", Toast.LENGTH_SHORT).show();
-                                                        }
-                                                    });
-
-
-                                        } else {
-                                            Log.d(TAG, "onFavoriteClick: empty docID");
-                                        }
-
                                 }
                             });
-
                 } else {
                     favRecipes.add(id);
                     mRecipeList.get(position).setFavorite(true);

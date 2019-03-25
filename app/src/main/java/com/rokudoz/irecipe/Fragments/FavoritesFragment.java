@@ -269,12 +269,14 @@ public class FavoritesFragment extends Fragment implements RecipeAdapter.OnItemC
                                                         userFavDocId = queryDocumentSnapshots.getDocuments().get(0).getId();
                                                         Log.d(TAG, "onEvent: docID" + userFavDocId);
 
-                                                        if (!userFavDocId.equals("") && !mRecipeList.get(position).getFavorite()) {
+                                                        if (mRecipeList.size() >= position && !userFavDocId.equals("") && !mRecipeList.get(position).getFavorite()) {
                                                             currentRecipeSubCollection.document(userFavDocId).delete()
                                                                     .addOnSuccessListener(new OnSuccessListener<Void>() {
                                                                         @Override
                                                                         public void onSuccess(Void aVoid) {
-                                                                            Toast.makeText(getContext(), "Removed from favorites", Toast.LENGTH_SHORT).show();
+                                                                            if (getContext()!=null){
+                                                                                Toast.makeText(getContext(), "Removed from favorites", Toast.LENGTH_SHORT).show();
+                                                                            }
                                                                         }
                                                                     });
                                                             mRecipeList.remove(position);
