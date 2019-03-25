@@ -61,7 +61,7 @@ public class FavoritesFragment extends Fragment implements RecipeAdapter.OnItemC
     private CollectionReference recipeRef = db.collection("Recipes");
     private CollectionReference usersReference = db.collection("Users");
     private FirebaseStorage mStorageRef;
-    private ListenerRegistration registration;
+    private ListenerRegistration favoriteRecipesListener, userDetailsListener, recipesListener;
 
     private RecyclerView mRecyclerView;
     private RecipeAdapter mAdapter;
@@ -115,11 +115,22 @@ public class FavoritesFragment extends Fragment implements RecipeAdapter.OnItemC
         if (mAuthListener != null) {
             FirebaseAuth.getInstance().removeAuthStateListener(mAuthListener);
         }
-        if (registration != null) {
-            registration.remove();
-            registration = null;
-        }
+        DetatchFirestoreListeners();
+    }
 
+    private void DetatchFirestoreListeners() {
+        if (favoriteRecipesListener != null) {
+            favoriteRecipesListener.remove();
+            favoriteRecipesListener = null;
+        }
+        if (userDetailsListener != null) {
+            userDetailsListener.remove();
+            userDetailsListener = null;
+        }
+        if (recipesListener != null) {
+            recipesListener.remove();
+            recipesListener = null;
+        }
     }
 
 
@@ -137,7 +148,7 @@ public class FavoritesFragment extends Fragment implements RecipeAdapter.OnItemC
 
 
     private void performQuery() {
-        usersReference.whereEqualTo("user_id", Objects.requireNonNull(FirebaseAuth.getInstance()
+        userDetailsListener = usersReference.whereEqualTo("user_id", Objects.requireNonNull(FirebaseAuth.getInstance()
                 .getCurrentUser()).getUid())
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
@@ -169,7 +180,7 @@ public class FavoritesFragment extends Fragment implements RecipeAdapter.OnItemC
 //                                    .limit(3);
                         }
 
-                        notesQuery.addSnapshotListener(new EventListener<QuerySnapshot>() {
+                        recipesListener = notesQuery.addSnapshotListener(new EventListener<QuerySnapshot>() {
                             @Override
                             public void onEvent(@javax.annotation.Nullable QuerySnapshot queryDocumentSnapshots,
                                                 @javax.annotation.Nullable FirebaseFirestoreException e) {
@@ -246,7 +257,7 @@ public class FavoritesFragment extends Fragment implements RecipeAdapter.OnItemC
                                     mRecipeList.get(position).setFavorite(false);
                                     userFavDocId = "";
 
-                                    registration = currentRecipeSubCollection.whereEqualTo("userID", mUser.getUser_id())
+                                    favoriteRecipesListener = currentRecipeSubCollection.whereEqualTo("userID", mUser.getUser_id())
                                             .addSnapshotListener(new EventListener<QuerySnapshot>() {
                                                 @Override
                                                 public void onEvent(@javax.annotation.Nullable QuerySnapshot queryDocumentSnapshots, @javax.annotation.Nullable FirebaseFirestoreException e) {
@@ -331,11 +342,6 @@ public class FavoritesFragment extends Fragment implements RecipeAdapter.OnItemC
 
     }
 
-
-    public void navigateToAddRecipes() {
-        Intent intent = new Intent(getContext(), AddRecipesActivity.class);
-        startActivity(intent);
-    }
 
     /*
         ----------------------------- Firebase setup ---------------------------------

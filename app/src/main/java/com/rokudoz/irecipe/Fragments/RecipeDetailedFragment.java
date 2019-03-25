@@ -88,7 +88,7 @@ public class RecipeDetailedFragment extends Fragment {
 
     private FirebaseAuth.AuthStateListener mAuthListener;
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
-    private ListenerRegistration currentSubCollectionListener, usersRefListener, commentListener;
+    private ListenerRegistration currentSubCollectionListener, usersRefListener, commentListener, numberofFavListener, currentUserDetailsListener;
     private CollectionReference recipeRef = db.collection("Recipes");
     private CollectionReference usersRef = db.collection("Users");
     private CollectionReference commentRef = db.collection("Comments");
@@ -198,7 +198,7 @@ public class RecipeDetailedFragment extends Fragment {
             }
         });
 
-        currentRecipeSubCollection.addSnapshotListener(new EventListener<QuerySnapshot>() {
+        numberofFavListener = currentRecipeSubCollection.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@javax.annotation.Nullable QuerySnapshot queryDocumentSnapshots, @javax.annotation.Nullable FirebaseFirestoreException e) {
                 if (e != null) {
@@ -227,6 +227,12 @@ public class RecipeDetailedFragment extends Fragment {
         if (mAuthListener != null) {
             FirebaseAuth.getInstance().removeAuthStateListener(mAuthListener);
         }
+        DetatchFirestoreListeners();
+        Log.d(TAG, "onStop: ");
+
+    }
+
+    private void DetatchFirestoreListeners() {
         if (currentSubCollectionListener != null) {
             currentSubCollectionListener.remove();
             currentSubCollectionListener = null;
@@ -239,8 +245,14 @@ public class RecipeDetailedFragment extends Fragment {
             commentListener.remove();
             commentListener = null;
         }
-        Log.d(TAG, "onStop: ");
-
+        if (currentUserDetailsListener != null) {
+            currentUserDetailsListener.remove();
+            currentUserDetailsListener = null;
+        }
+        if (numberofFavListener != null) {
+            numberofFavListener.remove();
+            numberofFavListener = null;
+        }
     }
 
 
@@ -387,7 +399,8 @@ public class RecipeDetailedFragment extends Fragment {
     }
 
     private void getCurrentUserDetails() {
-        usersRef.whereEqualTo("user_id", FirebaseAuth.getInstance().getCurrentUser().getUid())
+
+        currentUserDetailsListener = usersRef.whereEqualTo("user_id", FirebaseAuth.getInstance().getCurrentUser().getUid())
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
                     public void onEvent(@javax.annotation.Nullable QuerySnapshot queryDocumentSnapshots, @javax.annotation.Nullable FirebaseFirestoreException e) {

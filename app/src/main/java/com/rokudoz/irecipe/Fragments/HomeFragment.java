@@ -66,7 +66,7 @@ public class HomeFragment extends Fragment implements RecipeAdapter.OnItemClickL
     private CollectionReference recipeRef = db.collection("Recipes");
     private CollectionReference usersReference = db.collection("Users");
     private FirebaseStorage mStorageRef;
-    private ListenerRegistration currentSubCollectionListener;
+    private ListenerRegistration currentSubCollectionListener,userDetailsListener, recipesListener;
 
     private RecyclerView mRecyclerView;
     private RecipeAdapter mAdapter;
@@ -122,9 +122,21 @@ public class HomeFragment extends Fragment implements RecipeAdapter.OnItemClickL
         if (mAuthListener != null) {
             FirebaseAuth.getInstance().removeAuthStateListener(mAuthListener);
         }
+        DetatchFirestoreListeners();
+    }
+
+    private void DetatchFirestoreListeners() {
         if (currentSubCollectionListener!=null){
             currentSubCollectionListener.remove();
             currentSubCollectionListener=null;
+        }
+        if (userDetailsListener != null) {
+            userDetailsListener.remove();
+            userDetailsListener = null;
+        }
+        if (recipesListener != null) {
+            recipesListener.remove();
+            recipesListener = null;
         }
     }
 
@@ -143,7 +155,7 @@ public class HomeFragment extends Fragment implements RecipeAdapter.OnItemClickL
 
 
     private void performQuery() {
-        usersReference.whereEqualTo("user_id", Objects.requireNonNull(FirebaseAuth.getInstance()
+        userDetailsListener = usersReference.whereEqualTo("user_id", Objects.requireNonNull(FirebaseAuth.getInstance()
                 .getCurrentUser()).getUid())
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
@@ -193,7 +205,7 @@ public class HomeFragment extends Fragment implements RecipeAdapter.OnItemClickL
     }
 
     private void PerformMainQuery(Query notesQuery, final List<String> finalUserIngredientsArray) {
-        notesQuery.addSnapshotListener(new EventListener<QuerySnapshot>() {
+        recipesListener = notesQuery.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@javax.annotation.Nullable QuerySnapshot queryDocumentSnapshots,
                                 @javax.annotation.Nullable FirebaseFirestoreException e) {

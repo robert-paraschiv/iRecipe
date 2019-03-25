@@ -21,6 +21,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -62,6 +63,7 @@ public class SearchFragment extends Fragment implements RecipeAdapter.OnItemClic
     private CollectionReference recipeRef = db.collection("Recipes");
     private CollectionReference usersReference = db.collection("Users");
     private FirebaseStorage mStorageRef;
+    private ListenerRegistration userDetailsListener, currentSubCollectionListener, recipesListener;
 
     private RecyclerView mRecyclerView;
     private RecipeAdapter mAdapter;
@@ -117,6 +119,22 @@ public class SearchFragment extends Fragment implements RecipeAdapter.OnItemClic
         if (mAuthListener != null) {
             FirebaseAuth.getInstance().removeAuthStateListener(mAuthListener);
         }
+        DetatchFirestoreListeners();
+    }
+
+    private void DetatchFirestoreListeners() {
+        if (currentSubCollectionListener != null) {
+            currentSubCollectionListener.remove();
+            currentSubCollectionListener = null;
+        }
+        if (userDetailsListener != null) {
+            userDetailsListener.remove();
+            userDetailsListener = null;
+        }
+        if (recipesListener != null) {
+            recipesListener.remove();
+            recipesListener = null;
+        }
     }
 
 
@@ -134,7 +152,7 @@ public class SearchFragment extends Fragment implements RecipeAdapter.OnItemClic
 
 
     private void performQuery() {
-        usersReference.whereEqualTo("user_id", Objects.requireNonNull(FirebaseAuth.getInstance()
+        userDetailsListener = usersReference.whereEqualTo("user_id", Objects.requireNonNull(FirebaseAuth.getInstance()
                 .getCurrentUser()).getUid())
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
@@ -185,7 +203,7 @@ public class SearchFragment extends Fragment implements RecipeAdapter.OnItemClic
     }
 
     private void PerformMainQuery(Query notesQuery, final List<String> finalUserIngredientsArray) {
-        notesQuery.addSnapshotListener(new EventListener<QuerySnapshot>() {
+        recipesListener = notesQuery.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@javax.annotation.Nullable QuerySnapshot queryDocumentSnapshots,
                                 @javax.annotation.Nullable FirebaseFirestoreException e) {
@@ -275,7 +293,7 @@ public class SearchFragment extends Fragment implements RecipeAdapter.OnItemClic
                     favRecipes.remove(id);
                     mRecipeList.get(position).setFavorite(false);
 
-                    currentRecipeSubCollection.whereEqualTo("userID", mUser.getUser_id())
+                    currentSubCollectionListener = currentRecipeSubCollection.whereEqualTo("userID", mUser.getUser_id())
                             .addSnapshotListener(new EventListener<QuerySnapshot>() {
                                 @Override
                                 public void onEvent(@javax.annotation.Nullable QuerySnapshot queryDocumentSnapshots, @javax.annotation.Nullable FirebaseFirestoreException e) {
@@ -298,7 +316,7 @@ public class SearchFragment extends Fragment implements RecipeAdapter.OnItemClic
                                                     });
 
 
-                                        }else {
+                                        } else {
                                             Log.d(TAG, "onFavoriteClick: empty docID");
                                         }
 
