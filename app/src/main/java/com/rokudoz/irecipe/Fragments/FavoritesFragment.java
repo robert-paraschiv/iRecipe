@@ -116,7 +116,9 @@ public class FavoritesFragment extends Fragment implements RecipeAdapter.OnItemC
             FirebaseAuth.getInstance().removeAuthStateListener(mAuthListener);
         }
         DetatchFirestoreListeners();
+        Log.d(TAG, "onStop: ");
     }
+
 
     private void DetatchFirestoreListeners() {
         if (favoriteRecipesListener != null) {
@@ -268,13 +270,13 @@ public class FavoritesFragment extends Fragment implements RecipeAdapter.OnItemC
                                                     if (queryDocumentSnapshots != null && queryDocumentSnapshots.size() != 0) {
                                                         userFavDocId = queryDocumentSnapshots.getDocuments().get(0).getId();
                                                         Log.d(TAG, "onEvent: docID" + userFavDocId);
-
-                                                        if (mRecipeList.size() >= position && !userFavDocId.equals("") && !mRecipeList.get(position).getFavorite()) {
+                                                        Log.d(TAG, "onEvent: mrecipeSize " + mRecipeList.size() + "  position " + position);
+                                                        if (mRecipeList.size() > position && !userFavDocId.equals("") && !mRecipeList.get(position).getFavorite()) {
                                                             currentRecipeSubCollection.document(userFavDocId).delete()
                                                                     .addOnSuccessListener(new OnSuccessListener<Void>() {
                                                                         @Override
                                                                         public void onSuccess(Void aVoid) {
-                                                                            if (getContext()!=null){
+                                                                            if (getContext() != null) {
                                                                                 Toast.makeText(getContext(), "Removed from favorites", Toast.LENGTH_SHORT).show();
                                                                             }
                                                                         }

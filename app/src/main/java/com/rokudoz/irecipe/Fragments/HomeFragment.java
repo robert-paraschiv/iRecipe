@@ -123,6 +123,7 @@ public class HomeFragment extends Fragment implements RecipeAdapter.OnItemClickL
             FirebaseAuth.getInstance().removeAuthStateListener(mAuthListener);
         }
         DetatchFirestoreListeners();
+        Log.d(TAG, "onStop: ");
     }
 
     private void DetatchFirestoreListeners() {
@@ -305,19 +306,18 @@ public class HomeFragment extends Fragment implements RecipeAdapter.OnItemClickL
                                         userFavDocId = queryDocumentSnapshots.getDocuments().get(0).getId();
                                         Log.d(TAG, "onEvent: docID " + userFavDocId);
 
-                                        if (!mRecipeList.get(position).getFavorite())
-                                            if (!userFavDocId.equals("")) {
-                                                currentRecipeSubCollection.document(userFavDocId).delete()
-                                                        .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                            @Override
-                                                            public void onSuccess(Void aVoid) {
-                                                                if (getContext() != null)
-                                                                    Toast.makeText(getContext(), "Removed from favorites", Toast.LENGTH_SHORT).show();
-                                                            }
-                                                        });
-                                            } else {
-                                                Log.d(TAG, "onFavoriteClick: empty docID");
-                                            }
+                                        if (!userFavDocId.equals("") && !mRecipeList.get(position).getFavorite()) {
+                                            currentRecipeSubCollection.document(userFavDocId).delete()
+                                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                        @Override
+                                                        public void onSuccess(Void aVoid) {
+                                                            if (getContext() != null)
+                                                                Toast.makeText(getContext(), "Removed from favorites", Toast.LENGTH_SHORT).show();
+                                                        }
+                                                    });
+                                        } else {
+                                            Log.d(TAG, "onFavoriteClick: empty docID");
+                                        }
                                     }
                                 }
                             });

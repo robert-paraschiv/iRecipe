@@ -91,7 +91,7 @@ public class RecipeDetailedFragment extends Fragment {
     private ListenerRegistration currentSubCollectionListener, usersRefListener, commentListener, numberofFavListener, currentUserDetailsListener;
     private CollectionReference recipeRef = db.collection("Recipes");
     private CollectionReference usersRef = db.collection("Users");
-    private CollectionReference commentRef = db.collection("Comments");
+
 
     public static RecipeDetailedFragment newInstance(String id, String title, String description, String ingredients, String imageUrl
             , String instructions, Boolean isFavorite, ArrayList<String> favRecipes, String loggedInUserDocumentId, Integer numberofFaves) {
@@ -262,7 +262,8 @@ public class RecipeDetailedFragment extends Fragment {
 
         final Comment comment = new Comment(documentID, FirebaseAuth.getInstance().getCurrentUser().getUid(),
                 currentUserImageUrl, currentUserName, commentText, null);
-
+        DocumentReference currentRecipeRef = recipeRef.document(documentID);
+        CollectionReference commentRef = currentRecipeRef.collection("Comments");
 
         commentRef.add(comment)
                 .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
@@ -329,12 +330,15 @@ public class RecipeDetailedFragment extends Fragment {
 
     private void getCommentsFromDb() {
 
+        DocumentReference currentRecipeRef = recipeRef.document(documentID);
+        CollectionReference commentRef = currentRecipeRef.collection("Comments");
+
         Query commentQuery = null;
         if (mLastQueriedDocument != null) {
-            commentQuery = commentRef.whereEqualTo("mRecipeDocumentId", documentID).orderBy("mCommentTimeStamp", Query.Direction.ASCENDING)
+            commentQuery = commentRef.orderBy("mCommentTimeStamp", Query.Direction.ASCENDING)
                     .startAfter(mLastQueriedDocument); // Necessary so we don't have the same results multiple times
         } else {
-            commentQuery = commentRef.whereEqualTo("mRecipeDocumentId", documentID).orderBy("mCommentTimeStamp", Query.Direction.ASCENDING);
+            commentQuery = commentRef.orderBy("mCommentTimeStamp", Query.Direction.ASCENDING);
         }
 
         commentListener = commentQuery
