@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginStart="4dp"
+    android:layout_marginStart="16dp"
     android:layout_marginTop="4dp"
     android:layout_marginEnd="4dp"
     android:layout_marginBottom="4dp"
@@ -63,38 +63,5 @@
                 tools:text="time:time,date:date:date" />
 
         </RelativeLayout>
-
-        <RelativeLayout
-            android:id="@+id/llExpandArea"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:visibility="gone"
-            tools:visibility="visible">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/comment_rv_reply_editText"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_alignParentStart="true"
-                android:layout_toStartOf="@id/comment_rv_addReply_btn"
-                android:hint="Reply here" />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/comment_rv_addReply_btn"
-                style="@style/Widget.MaterialComponents.Button.TextButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:text="Reply" />
-
-        </RelativeLayout>
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/comment_rv_childRecyclerView"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_below="@id/recipeDetailed_et_commentInput"
-            android:transitionName="example_transition"/>
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

@@ -1,10 +1,12 @@
 package com.rokudoz.irecipe.Models;
 
+import com.google.firebase.firestore.Exclude;
 import com.google.firebase.firestore.ServerTimestamp;
 
 import java.util.Date;
 
 public class Comment {
+    private String documentId;
     private String mRecipeDocumentId;
     private String mUserId;
     private String mImageUrl;
@@ -24,6 +26,14 @@ public class Comment {
     }
 
     public Comment() {
+    }
+    @Exclude
+    public String getDocumentId() {
+        return documentId;
+    }
+
+    public void setDocumentId(String documentId) {
+        this.documentId = documentId;
     }
 
     public String getmImageUrl() {

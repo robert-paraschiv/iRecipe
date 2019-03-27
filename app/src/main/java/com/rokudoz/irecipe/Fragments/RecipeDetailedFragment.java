@@ -73,6 +73,8 @@ public class RecipeDetailedFragment extends Fragment {
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
 
+
+
     private TextView tvTitle, tvDescription, tvIngredients, tvInstructions, mFavoriteNumber;
     private ImageView mImageView, mFavoriteIcon;
     private Button mAddCommentBtn;
@@ -370,13 +372,14 @@ public class RecipeDetailedFragment extends Fragment {
                                                         Date date = document.getDate("mCommentTimeStamp", behavior);
 
                                                         if (!newItemsToAdd.contains(currentCommentID)) {
-                                                            commentList.add(0, new Comment(documentID, comment.getmUserId(), user.getUserProfilePicUrl()
-                                                                    , comment.getmName(), comment.getmCommentText(), date));
+                                                            Comment commentx = new Comment(documentID, comment.getmUserId(), user.getUserProfilePicUrl()
+                                                                    , comment.getmName(), comment.getmCommentText(), date);
+                                                            commentx.setDocumentId(document.getId());
+                                                            commentList.add(0, commentx);
+                                                            Log.d(TAG, "onEvent: currrent commentID " + document.getId());
                                                             newItemsToAdd.add(document.getId());
                                                             mAdapter.notifyDataSetChanged();
                                                         }
-
-
                                                     }
                                                 }
                                             });
