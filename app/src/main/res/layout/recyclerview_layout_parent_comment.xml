@@ -88,13 +88,13 @@
                 android:layout_alignParentEnd="true"
                 android:text="Reply" />
 
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/comment_rv_childRecyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_below="@id/comment_rv_addReply_btn"
+                android:transitionName="example_transition"/>
         </RelativeLayout>
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/comment_rv_childRecyclerView"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_below="@id/recipeDetailed_et_commentInput"
-            android:transitionName="example_transition"/>
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>
