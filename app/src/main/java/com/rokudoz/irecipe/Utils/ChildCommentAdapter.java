@@ -70,7 +70,6 @@ public class ChildCommentAdapter extends RecyclerView.Adapter<ChildCommentAdapte
         if (date != null) {
             DateFormat dateFormat = new SimpleDateFormat("HH:mm, MMM d");
             String creationDate = dateFormat.format(date);
-            Log.d("TAG", creationDate);
             if (currentItem.getmCommentTimeStamp() != null && !currentItem.getmCommentTimeStamp().equals("")) {
                 holder.mCommentTimeStamp.setText(creationDate);
             }

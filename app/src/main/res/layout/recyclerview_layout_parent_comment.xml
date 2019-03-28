@@ -14,7 +14,6 @@
         android:id="@+id/llCardBack"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:animateLayoutChanges="true"
         android:background="@android:color/white"
         android:orientation="vertical"
         android:padding="4dp">
@@ -69,6 +68,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:visibility="gone"
+            android:animateLayoutChanges="true"
             tools:visibility="visible">
 
             <com.google.android.material.textfield.TextInputEditText
