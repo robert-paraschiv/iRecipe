@@ -39,7 +39,7 @@ import com.rokudoz.irecipe.Models.Comment;
 import com.rokudoz.irecipe.Models.User;
 import com.rokudoz.irecipe.Models.UserWhoFaved;
 import com.rokudoz.irecipe.R;
-import com.rokudoz.irecipe.Utils.ParentCommentAdapter;
+import com.rokudoz.irecipe.Utils.CommentAdapter;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -325,7 +325,7 @@ public class RecipeDetailedFragment extends Fragment {
     private void buildRecyclerView() {
         mRecyclerView.setHasFixedSize(true);
         mLayoutManager = new LinearLayoutManager(getContext());
-        mAdapter = new ParentCommentAdapter(getContext(),commentList);
+        mAdapter = new CommentAdapter(commentList);
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setAdapter(mAdapter);
     }

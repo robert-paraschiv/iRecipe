@@ -1,12 +1,13 @@
 package com.rokudoz.irecipe.Utils;
 
-import android.content.Context;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.rokudoz.irecipe.Models.Comment;
 import com.rokudoz.irecipe.R;
@@ -16,19 +17,20 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Locale;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.transition.TransitionManager;
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class ParentCommentAdapter
-        extends RecyclerView.Adapter<ParentCommentAdapter.CommentViewHolder>
+public class CommentAdapter
+        extends RecyclerView.Adapter<CommentAdapter.CommentViewHolder>
         implements View.OnClickListener {
 
-    private static final String TAG = "ParentCommentAdapter";
+    private static final String TAG = "CommentAdapter";
     private Integer expandedPosition = -1;
     private ArrayList<Comment> mCommentList;
-    Context ctx;
 
     public class CommentViewHolder extends RecyclerView.ViewHolder {
         public CircleImageView mImageView;
@@ -36,7 +38,6 @@ public class ParentCommentAdapter
         public TextView mCommentText;
         public TextView mCommentTimeStamp;
         RelativeLayout llExpandArea;
-        RecyclerView rv_child;
 
         public CommentViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -45,12 +46,10 @@ public class ParentCommentAdapter
             mCommentText = itemView.findViewById(R.id.comment_rv_tv_comment_text);
             mCommentTimeStamp = itemView.findViewById(R.id.comment_rv_time_created);
             llExpandArea = itemView.findViewById(R.id.llExpandArea);
-            rv_child = itemView.findViewById(R.id.comment_rv_childRecyclerView);
         }
     }
 
-    public ParentCommentAdapter(Context ctx, ArrayList<Comment> commentArrayList) {
-        this.ctx = ctx;
+    public CommentAdapter(ArrayList<Comment> commentArrayList) {
         mCommentList = commentArrayList;
     }
 
@@ -60,7 +59,7 @@ public class ParentCommentAdapter
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.recyclerview_layout_parent_comment, parent, false);
         CommentViewHolder cvh = new CommentViewHolder(v);
 
-        cvh.itemView.setOnClickListener(ParentCommentAdapter.this);
+        cvh.itemView.setOnClickListener(CommentAdapter.this);
         cvh.itemView.setTag(cvh);
         return cvh;
     }
@@ -113,15 +112,7 @@ public class ParentCommentAdapter
             holder.llExpandArea.setVisibility(View.GONE);
         }
 
-        CommentViewHolder cvh = (CommentViewHolder) holder;
 
-        initchildLayout(cvh.rv_child, mCommentList);
-    }
-
-    private void initchildLayout(RecyclerView rv_child, ArrayList<Comment> childData) {
-        rv_child.setLayoutManager(new NestedRecyclerLinearLayoutManager(ctx));
-        ChildCommentAdapter childAdapter = new ChildCommentAdapter(childData);
-        rv_child.setAdapter(childAdapter);
     }
 
     @Override
