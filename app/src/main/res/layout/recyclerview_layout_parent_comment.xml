@@ -16,7 +16,8 @@
         android:layout_height="wrap_content"
         android:background="@android:color/white"
         android:orientation="vertical"
-        android:padding="4dp">
+        android:padding="4dp"
+        android:animateLayoutChanges="true">
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -68,7 +69,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:visibility="gone"
-            android:animateLayoutChanges="true"
             tools:visibility="visible">
 
             <com.google.android.material.textfield.TextInputEditText

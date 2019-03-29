@@ -1,5 +1,6 @@
 package com.rokudoz.irecipe.Account;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
@@ -25,13 +26,25 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.api.LogDescriptor;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.rokudoz.irecipe.MainActivity;
+import com.rokudoz.irecipe.Models.User;
 import com.rokudoz.irecipe.R;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 public class LoginActivity extends AppCompatActivity implements
@@ -47,6 +60,9 @@ public class LoginActivity extends AppCompatActivity implements
     //Firebase
     private FirebaseAuth.AuthStateListener mAuthListener;
     private GoogleSignInClient mGoogleSignInClient;
+    private FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private CollectionReference userRef = db.collection("Users");
+    private CollectionReference ingredientsReference = db.collection("Ingredients");
 
     //widgets
     private TextView mRegister;
@@ -54,6 +70,13 @@ public class LoginActivity extends AppCompatActivity implements
     private Button mLogin;
     private ProgressBar mProgressBar;
     private ImageView mLogo;
+
+    //vars
+    private Context mContext;
+    private String email, name, password;
+    private User mUser;
+    private List<String> ingredientList;
+    private String[] ingStringArray;
 
 
     @Override
@@ -65,6 +88,8 @@ public class LoginActivity extends AppCompatActivity implements
         mPassword = findViewById(R.id.input_password);
         mLogin = findViewById(R.id.btn_login);
         mLogo = findViewById(R.id.logo);
+        mContext = LoginActivity.this;
+        mUser = new User();
 
         findViewById(R.id.signInButton).setOnClickListener(this);
 
@@ -270,10 +295,19 @@ public class LoginActivity extends AppCompatActivity implements
                             // Sign in success, update UI with the signed-in user's information
                             Log.d(TAG, "signInWithCredential:success");
                             FirebaseUser user = mAuth.getCurrentUser();
+                            name = user.getDisplayName();
                             Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                            startActivity(intent);
-                            finish();
+                            boolean newuser = task.getResult().getAdditionalUserInfo().isNewUser();
+                            if (newuser){
+                                Log.d(TAG, "onComplete: NEW USER");
+                                getIngredientList();
+
+                            }else {
+                                Log.d(TAG, "onComplete: NOT a new USER");
+                                startActivity(intent);
+                                finish();
+                            }
 
                         } else {
                             // If sign in fails, display a message to the user.
@@ -294,4 +328,47 @@ public class LoginActivity extends AppCompatActivity implements
         startActivityForResult(signInIntent, RC_SIGN_IN);
     }
     // [END signin]
+
+    /**
+     * Adds data to the node: "users"
+     */
+    public void addNewUser() {
+        String[] possibleIngredients = ingStringArray;
+
+        final Map<String, Boolean> tags = new HashMap<>();
+        for (String ingredient : possibleIngredients) {
+            tags.put(ingredient, false);
+        }
+
+        String userid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+        Log.d(TAG, "addNewUser: Adding new User: \n user_id:" + userid);
+        mUser.setName(name);
+        mUser.setUser_id(userid);
+        mUser.setTags(tags);
+        mUser.setIngredient_array(new ArrayList<String>());
+        mUser.setUserProfilePicUrl("");
+
+        //User user = new User(name, userid);
+        userRef.add(mUser);
+        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        finish();
+    }
+
+
+    private void getIngredientList() {
+        ingredientsReference.document("ingredient_list")
+                .addSnapshotListener(new EventListener<DocumentSnapshot>() {
+                    @Override
+                    public void onEvent(@javax.annotation.Nullable DocumentSnapshot documentSnapshot, @javax.annotation.Nullable FirebaseFirestoreException e) {
+                        if (e == null) {
+                            ingredientList = (List<String>) documentSnapshot.get("ingredient_list");
+                            ingStringArray = ingredientList.toArray(new String[ingredientList.size()]);
+                            addNewUser();
+                        }
+                    }
+                });
+    }
 }

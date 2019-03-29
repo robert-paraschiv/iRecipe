@@ -98,6 +98,8 @@ public class ParentCommentAdapter
 
         if (holder.llExpandArea.getVisibility() == View.VISIBLE) {
             holder.llExpandArea.setVisibility(View.GONE);
+
+//            notifyItemChanged(holder.getAdapterPosition());
         } else {
             holder.llExpandArea.setVisibility(View.VISIBLE);
         }
