@@ -57,7 +57,7 @@ public class ProfileFragment extends Fragment {
 
     private static final int PICK_IMAGE_REQUEST = 1;
     private Uri mImageUri;
-    private TextView textViewData, tvHelloUserName;
+    private TextView tvHelloUserName;
     private ProgressBar pbLoading;
     private ListView cbListView;
     private Button signOutBtn;
@@ -91,8 +91,7 @@ public class ProfileFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
-
-        textViewData = view.findViewById(R.id.tv_data);
+//        textViewData = view.findViewById(R.id.tv_data);
         cbListView = view.findViewById(R.id.checkable_list);
         pbLoading = view.findViewById(R.id.pbLoading);
         pbLoading.setVisibility(View.VISIBLE);
@@ -270,7 +269,6 @@ public class ProfileFragment extends Fragment {
                             }
                             Log.d(TAG, "onEvent: " + ingredientsUserHas.toString());
 
-                            textViewData.setText(data);
 
                             tvHelloUserName.setText(String.format("Hello, %s", user.getName()));
 
@@ -309,6 +307,13 @@ public class ProfileFragment extends Fragment {
             //supply data items to ListView
             ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(getContext(), R.layout.checkable_list_layout, R.id.txt_title, items);
             cbListView.setAdapter(arrayAdapter);
+
+            //When the Ingredients List has more elements than the UserTAGS(IngredientsUserHas), initialize elements as false to avoid crash
+            for (String ing : ingStringArray) {
+                if (!userIngredientList.contains(ing)){
+                    ingredientsUserHas.put(ing,false);
+                }
+            }
 
             // sets the initial checkbox values taken from database
             int index = 0;
