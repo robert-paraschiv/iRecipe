@@ -103,25 +103,17 @@ public class HomeFragment extends Fragment implements RecipeAdapter.OnItemClickL
 
         fab.hide();
         buildRecyclerView();
-        setupFirebaseAuth();
+        performQuery();
 
         return view; // HAS TO BE THE LAST ONE 
     }
 
 
-    @Override
-    public void onStart() {
-        super.onStart();
-        FirebaseAuth.getInstance().addAuthStateListener(mAuthListener);
-    }
 
 
     @Override
     public void onStop() {
         super.onStop();
-        if (mAuthListener != null) {
-            FirebaseAuth.getInstance().removeAuthStateListener(mAuthListener);
-        }
         DetachFirestoreListeners();
         Log.d(TAG, "onStop: ");
     }
@@ -379,51 +371,6 @@ public class HomeFragment extends Fragment implements RecipeAdapter.OnItemClickL
         startActivity(intent);
     }
 
-    /*
-        ----------------------------- Firebase setup ---------------------------------
-     */
-    private void setupFirebaseAuth() {
-        Log.d(TAG, "setupFirebaseAuth: started");
-
-        mAuthListener = new FirebaseAuth.AuthStateListener() {
-            @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                FirebaseUser user = firebaseAuth.getCurrentUser();
-                if (user != null) {
-
-                    //check if email is verified
-                    if (user.isEmailVerified()) {
-//                        Log.d(TAG, "onAuthStateChanged: signed_in: " + user.getUid());
-//                        Toast.makeText(MainActivity.this, "Authenticated with: " + user.getEmail(), Toast.LENGTH_SHORT).show();
-                        if (user.getEmail().equals("paraschivlongin@gmail.com")) {
-                            fab.show();
-                            fab.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    navigateToAddRecipes();
-                                }
-                            });
-                        }
-                        //If use is authenticated, perform query
-                        performQuery();
-                    } else {
-                        Toast.makeText(getContext(), "Email is not Verified\nCheck your Inbox", Toast.LENGTH_SHORT).show();
-                        FirebaseAuth.getInstance().signOut();
-                    }
-
-                } else {
-                    // User is signed out
-                    Log.d(TAG, "onAuthStateChanged: signed_out");
-                    Toast.makeText(getContext(), "Not logged in", Toast.LENGTH_SHORT).show();
-                    Intent intent = new Intent(getContext(), LoginActivity.class);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                    startActivity(intent);
-                    getActivity().finish();
-                }
-                // ...
-            }
-        };
-    }
 
     @Override
     public void onItemClick(int position) {
