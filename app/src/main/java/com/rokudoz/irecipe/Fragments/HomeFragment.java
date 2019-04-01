@@ -105,7 +105,7 @@ public class HomeFragment extends Fragment implements RecipeAdapter.OnItemClickL
         buildRecyclerView();
         setupFirebaseAuth();
 
-        return view; // HAS TO BE THE LAST ONE ---------------------------------
+        return view; // HAS TO BE THE LAST ONE 
     }
 
 
@@ -122,11 +122,11 @@ public class HomeFragment extends Fragment implements RecipeAdapter.OnItemClickL
         if (mAuthListener != null) {
             FirebaseAuth.getInstance().removeAuthStateListener(mAuthListener);
         }
-        DetatchFirestoreListeners();
+        DetachFirestoreListeners();
         Log.d(TAG, "onStop: ");
     }
 
-    private void DetatchFirestoreListeners() {
+    private void DetachFirestoreListeners() {
         if (currentSubCollectionListener != null) {
             currentSubCollectionListener.remove();
             currentSubCollectionListener = null;
