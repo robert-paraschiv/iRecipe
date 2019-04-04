@@ -9,6 +9,8 @@ import androidx.annotation.Nullable;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -43,6 +45,7 @@ import com.rokudoz.irecipe.Models.User;
 import com.rokudoz.irecipe.Models.UserWhoFaved;
 import com.rokudoz.irecipe.R;
 import com.rokudoz.irecipe.Utils.RecipeAdapter;
+import com.rokudoz.irecipe.Viewmodels.HomeFragmentViewModel;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -71,6 +74,9 @@ public class HomeFragment extends Fragment implements RecipeAdapter.OnItemClickL
     private RecyclerView mRecyclerView;
     private RecipeAdapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
+
+    //MVVM
+    private HomeFragmentViewModel homeFragmentViewModel;
 
     private ArrayList<String> mDocumentIDs = new ArrayList<>();
     private ArrayList<Recipe> mRecipeList = new ArrayList<>();
@@ -101,9 +107,19 @@ public class HomeFragment extends Fragment implements RecipeAdapter.OnItemClickL
         mStorageRef = FirebaseStorage.getInstance();
 
 
+        homeFragmentViewModel = ViewModelProviders.of(this).get(HomeFragmentViewModel.class);
+        homeFragmentViewModel.init();
+        homeFragmentViewModel.getRecipes().observe(this, new Observer<ArrayList<Recipe>>() {
+            @Override
+            public void onChanged(ArrayList<Recipe> recipes) {
+                mAdapter.notifyDataSetChanged();
+                Log.d(TAG, "onChanged: NOTIFIED HOMEFRAGMENT ADAPTER");
+            }
+        });
+
         fab.hide();
         buildRecyclerView();
-        performQuery();
+        //performQuery();
 
         return view; // HAS TO BE THE LAST ONE 
     }
@@ -138,7 +154,7 @@ public class HomeFragment extends Fragment implements RecipeAdapter.OnItemClickL
         mRecyclerView.setHasFixedSize(true);
         mLayoutManager = new LinearLayoutManager(getContext());
 
-        mAdapter = new RecipeAdapter(mRecipeList);
+        mAdapter = new RecipeAdapter(homeFragmentViewModel.getRecipes().getValue());
 
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setAdapter(mAdapter);
