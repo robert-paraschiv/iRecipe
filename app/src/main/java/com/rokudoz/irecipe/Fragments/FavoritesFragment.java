@@ -220,7 +220,7 @@ public class FavoritesFragment extends Fragment implements RecipeAdapter.OnItemC
                                     }
                                 }
 
-                                RecipeDetailedFragment fragment = RecipeDetailedFragment.newInstance(id, title, description, ingredientsString
+                                RecipeDetailedFragment fragment = RecipeDetailedFragment.newInstance(position,id, title, description, ingredientsString
                                         , imageUrl, instructions, isFavorite, favRecipes, loggedInUserDocumentId, numberOfFav);
 
                                 getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fragment)
