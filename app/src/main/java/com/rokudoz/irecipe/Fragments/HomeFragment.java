@@ -60,7 +60,6 @@ public class HomeFragment extends Fragment implements RecipeAdapter.OnItemClickL
     public View view;
 
     private ProgressBar pbLoading;
-    private FloatingActionButton fab;
 
     //FireBase
     private FirebaseAuth.AuthStateListener mAuthListener;
@@ -102,7 +101,6 @@ public class HomeFragment extends Fragment implements RecipeAdapter.OnItemClickL
         mUser = new User();
         getUserDocID();
         pbLoading = view.findViewById(R.id.homeFragment_pbLoading);
-        fab = view.findViewById(R.id.fab_add_recipe);
         mRecyclerView = view.findViewById(R.id.recycler_view);
 
         pbLoading.setVisibility(View.VISIBLE);
@@ -121,7 +119,6 @@ public class HomeFragment extends Fragment implements RecipeAdapter.OnItemClickL
             }
         });
 
-        fab.hide();
         buildRecyclerView();
 
         return view; // HAS TO BE THE LAST ONE 

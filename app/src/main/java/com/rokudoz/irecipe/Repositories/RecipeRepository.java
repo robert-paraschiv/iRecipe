@@ -123,9 +123,7 @@ public class RecipeRepository {
                                                 }
                                             }
                                         }
-
                                     }
-
                                     if (queryDocumentSnapshots.getDocuments().size() != 0) {
                                         mLastQueriedDocument = queryDocumentSnapshots.getDocuments()
                                                 .get(queryDocumentSnapshots.getDocuments().size() - 1);
