@@ -67,8 +67,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        setupFirebaseAuth();
-
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -105,17 +103,18 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             }
         });
-        if (savedInstanceState == null && FirebaseAuth.getInstance().getCurrentUser() != null) {
+
+        if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
                     new HomeFragment()).commit();
             navigationView.setCheckedItem(R.id.nav_home);
-            Log.d(TAG, "onCreate: HOMEFRAGMENT Created");
         }
 
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar,
                 R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
+        setupFirebaseAuth();
     }
 
     @Override
