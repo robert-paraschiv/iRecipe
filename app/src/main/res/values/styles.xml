@@ -8,7 +8,6 @@
         <item name="colorAccent">@color/colorAccent</item>
         <item name="android:windowAnimationStyle">@style/CustomActivityAnimation</item>
         <item name="android:windowContentTransitions">true</item>
-        <item name="android:statusBarColor">@android:color/transparent</item>
     </style>
 
     <style name="CustomActivityAnimation" parent="@android:style/Animation.Activity">

@@ -45,6 +45,7 @@ public class ParentCommentAdapter
         implements View.OnClickListener {
 
     private static final String TAG = "ParentCommentAdapter";
+    private Integer expandedPosition = -1;
     private ArrayList<Comment> mCommentList;
     private ChildCommentAdapter childAdapter;
     private User mUser;
@@ -97,6 +98,8 @@ public class ParentCommentAdapter
 
         if (holder.llExpandArea.getVisibility() == View.VISIBLE) {
             holder.llExpandArea.setVisibility(View.GONE);
+
+//            notifyItemChanged(holder.getAdapterPosition());
         } else {
             holder.llExpandArea.setVisibility(View.VISIBLE);
         }
@@ -142,7 +145,7 @@ public class ParentCommentAdapter
                             .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                                 @Override
                                 public void onSuccess(DocumentReference documentReference) {
-                                    Toast.makeText(ctx, "Successfully Added Reply", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(ctx, "Succesfully Added Reply", Toast.LENGTH_SHORT).show();
                                     holder.mReplyText.setText("");
                                 }
                             })
@@ -158,7 +161,7 @@ public class ParentCommentAdapter
         });
 
         //Initialize Child Comment RecyclerView
-        initChildLayout(holder.rv_child, getChildComments(currentItem));
+        initchildLayout(holder.rv_child, getChildComments(currentItem));
     }
 
     private void getCurrentUserDetails() {
@@ -181,7 +184,7 @@ public class ParentCommentAdapter
     private ArrayList<Comment> getChildComments(Comment comment) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         final ArrayList<Comment> childComments = new ArrayList<>();
-        final ArrayList<String> childCommentID = new ArrayList<>();
+        final ArrayList<String> childcommentID = new ArrayList<>();
         db.collection("Recipes").document(comment.getmRecipeDocumentId()).collection("Comments")
                 .document(comment.getDocumentId()).collection("ChildComments").orderBy("mCommentTimeStamp", Query.Direction.ASCENDING)
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
@@ -193,8 +196,8 @@ public class ParentCommentAdapter
                 }
                 for (DocumentSnapshot document : queryDocumentSnapshots) {
                     Comment commentToAdd = document.toObject(Comment.class);
-                    if (!childCommentID.contains(document.getId())) {
-                        childCommentID.add(document.getId());
+                    if (!childcommentID.contains(document.getId())) {
+                        childcommentID.add(document.getId());
                         childComments.add(0, commentToAdd);
                     }
 
@@ -208,7 +211,7 @@ public class ParentCommentAdapter
     }
 
 
-    private void initChildLayout(RecyclerView rv_child, ArrayList<Comment> childData) {
+    private void initchildLayout(RecyclerView rv_child, ArrayList<Comment> childData) {
         rv_child.setLayoutManager(new LinearLayoutManager(ctx));
         childAdapter = new ChildCommentAdapter(childData);
         rv_child.setAdapter(childAdapter);
