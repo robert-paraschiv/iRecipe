@@ -256,7 +256,7 @@ public class SearchFragment extends Fragment implements RecipeAdapter.OnItemClic
                     }
                 }
 
-                RecipeDetailedFragment fragment = RecipeDetailedFragment.newInstance(position,id, title, description, ingredientsString
+                RecipeDetailedFragment fragment = RecipeDetailedFragment.newInstance(id, title, description, ingredientsString
                         , imageUrl, instructions, isFavorite, favRecipes, loggedInUserDocumentId, numberOfFav);
 
                 getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fragment)

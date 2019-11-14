@@ -6,7 +6,6 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -41,7 +40,6 @@ import com.rokudoz.irecipe.Models.User;
 import com.rokudoz.irecipe.Models.UserWhoFaved;
 import com.rokudoz.irecipe.R;
 import com.rokudoz.irecipe.Utils.ParentCommentAdapter;
-import com.rokudoz.irecipe.Viewmodels.HomeFragmentViewModel;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -52,8 +50,6 @@ import static com.google.firebase.firestore.DocumentSnapshot.ServerTimestampBeha
 public class RecipeDetailedFragment extends Fragment {
     private static final String TAG = "RecipeDetailedFragment";
 
-
-    private static final String ARG_POSITION = "argPosition";
     private static final String ARG_ID = "argId";
     private static final String ARG_TITLE = "argTitle";
     private static final String ARG_DESCRIPTION = "argDescription";
@@ -65,7 +61,6 @@ public class RecipeDetailedFragment extends Fragment {
     private static final String ARG_NUMBEROFFAVES = "argNumberOfFaves";
     private static final String ARG_LOGGEDINUSERDOCUMENTID = "argLoggedInUserDocumentId";
 
-    private Integer position;
     private String documentID = "";
     private String currentUserImageUrl = "";
     private String currentUserName = "";
@@ -79,6 +74,7 @@ public class RecipeDetailedFragment extends Fragment {
     private RecyclerView.LayoutManager mLayoutManager;
 
 
+
     private TextView tvTitle, tvDescription, tvIngredients, tvInstructions, mFavoriteNumber;
     private ImageView mImageView, mFavoriteIcon;
     private Button mAddCommentBtn;
@@ -86,12 +82,11 @@ public class RecipeDetailedFragment extends Fragment {
 
     private ArrayList<Comment> commentList = new ArrayList<>();
     private ArrayList<String> favRecipes = new ArrayList<>();
-    private Integer numberOfFav=0;
+    private Integer numberOfFav;
     private ArrayList<String> newItemsToAdd = new ArrayList<>();
     private User mUser;
 
     private DocumentSnapshot mLastQueriedDocument;
-    private HomeFragmentViewModel homeFragmentViewModel;
 
     private FirebaseAuth.AuthStateListener mAuthListener;
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -100,11 +95,10 @@ public class RecipeDetailedFragment extends Fragment {
     private CollectionReference usersRef = db.collection("Users");
 
 
-    public static RecipeDetailedFragment newInstance(Integer position, String id, String title, String description, String ingredients, String imageUrl
+    public static RecipeDetailedFragment newInstance(String id, String title, String description, String ingredients, String imageUrl
             , String instructions, Boolean isFavorite, ArrayList<String> favRecipes, String loggedInUserDocumentId, Integer numberofFaves) {
         RecipeDetailedFragment fragment = new RecipeDetailedFragment();
         Bundle args = new Bundle();
-        args.putInt(ARG_POSITION, position);
         args.putString(ARG_ID, id);
         args.putString(ARG_TITLE, title);
         args.putString(ARG_DESCRIPTION, description);
@@ -124,9 +118,6 @@ public class RecipeDetailedFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_recipe_detailed, container, false);
-
-        homeFragmentViewModel = ViewModelProviders.of(this).get(HomeFragmentViewModel.class);
-        homeFragmentViewModel.init();
 
         mUser = new User();
         tvTitle = view.findViewById(R.id.tvTitle);
@@ -202,7 +193,6 @@ public class RecipeDetailedFragment extends Fragment {
                     currentRecipeSubCollection.add(userWhoFaved);
                     Toast.makeText(getContext(), "Added " + title + " to favorites", Toast.LENGTH_SHORT).show();
                 }
-                homeFragmentViewModel.getRecipes().getValue().get(position).setFavorite(isRecipeFavorite);
                 setFavoriteIcon(isRecipeFavorite);
 
                 DocumentReference favRecipesRef = usersRef.document(loggedInUserDocumentId);
@@ -296,7 +286,6 @@ public class RecipeDetailedFragment extends Fragment {
             isRecipeFavorite = getArguments().getBoolean(ARG_ISFAVORITE);
             favRecipes = getArguments().getStringArrayList(ARG_FAVRECIPES);
             numberOfFav = getArguments().getInt(ARG_NUMBEROFFAVES);
-            position = getArguments().getInt(ARG_POSITION);
 
             loggedInUserDocumentId = getArguments().getString(ARG_LOGGEDINUSERDOCUMENTID);
 
@@ -328,7 +317,7 @@ public class RecipeDetailedFragment extends Fragment {
     private void buildRecyclerView() {
         mRecyclerView.setHasFixedSize(true);
         mLayoutManager = new LinearLayoutManager(getContext());
-        mAdapter = new ParentCommentAdapter(getContext(), commentList);
+        mAdapter = new ParentCommentAdapter(getContext(),commentList);
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setAdapter(mAdapter);
     }
