@@ -3,5 +3,9 @@
     <color name="colorPrimary">#2962ff</color>
     <color name="colorPrimaryDark">#0039cb</color>
     <color name="colorAccent">#29b6f6</color>
-    <color name="grey">#aeaeae</color>
+    <color name="statusBarColor">#e0e0e0</color>
+    <color name="grey">#c7c7c7</color>
+    <color name="black">#000000</color>
+    <color name="background">#fafafa</color>
+
 </resources>

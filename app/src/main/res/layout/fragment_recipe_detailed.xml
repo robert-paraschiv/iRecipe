@@ -14,7 +14,7 @@
             <ImageView
                 android:id="@+id/recipeDetailed_image"
                 android:layout_width="match_parent"
-                android:layout_height="300dp"
+                android:layout_height="320dp"
                 android:elevation="4dp"
                 android:transitionName="example_transition"
                 tools:src="@color/grey" />
@@ -35,7 +35,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/tvTitle"
-                android:layout_marginStart="16dp"
+                android:layout_marginStart="8dp"
                 android:layout_marginTop="8dp"
                 tools:text="Description Here" />
             <ImageView
@@ -114,6 +114,7 @@ but the stuff is now food" />
                 android:id="@+id/comment_recycler_view"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:layout_marginTop="10dp"
                 android:layout_below="@id/recipeDetailed_et_commentInput"
                 android:transitionName="example_transition"/>
         </RelativeLayout>
