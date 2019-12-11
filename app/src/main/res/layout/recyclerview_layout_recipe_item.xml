@@ -22,7 +22,7 @@
             android:layout_height="170dp"
             android:layout_marginTop="4dp"
             android:layout_centerHorizontal="true"
-            tools:src="@color/colorAccent"/>
+            tools:src="@color/colorPrimary"/>
 
         <TextView
             android:id="@+id/text_view_title"
