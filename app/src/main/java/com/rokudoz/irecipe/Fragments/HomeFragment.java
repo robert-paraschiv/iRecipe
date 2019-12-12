@@ -42,6 +42,7 @@ import com.rokudoz.irecipe.Models.Recipe;
 import com.rokudoz.irecipe.Models.User;
 import com.rokudoz.irecipe.Models.UserWhoFaved;
 import com.rokudoz.irecipe.R;
+import com.rokudoz.irecipe.UpdateRecipesActivity;
 import com.rokudoz.irecipe.Utils.RecipeAdapter;
 
 import java.util.ArrayList;
@@ -57,7 +58,8 @@ public class HomeFragment extends Fragment implements RecipeAdapter.OnItemClickL
     public View view;
 
     private ProgressBar pbLoading;
-    private FloatingActionButton fab;
+    private FloatingActionButton fab_addRecipes;
+    private FloatingActionButton fab_updateRecipes;
 
     //FireBase
     private FirebaseAuth.AuthStateListener mAuthListener;
@@ -94,14 +96,16 @@ public class HomeFragment extends Fragment implements RecipeAdapter.OnItemClickL
         }
         mUser = new User();
         pbLoading = view.findViewById(R.id.homeFragment_pbLoading);
-        fab = view.findViewById(R.id.fab_add_recipe);
+        fab_addRecipes = view.findViewById(R.id.fab_add_recipe);
+        fab_updateRecipes = view.findViewById(R.id.fab_update_recipes);
         mRecyclerView = view.findViewById(R.id.recycler_view);
 
         pbLoading.setVisibility(View.VISIBLE);
         mStorageRef = FirebaseStorage.getInstance();
 
 
-        fab.hide();
+        fab_addRecipes.hide();
+        fab_updateRecipes.hide();
         buildRecyclerView();
         setupFirebaseAuth();
 
@@ -195,7 +199,6 @@ public class HomeFragment extends Fragment implements RecipeAdapter.OnItemClickL
                         final List<String> finalUserIngredientsArray = userIngredientsArray;
 
                         PerformMainQuery(notesQuery, finalUserIngredientsArray);
-
                         pbLoading.setVisibility(View.INVISIBLE);
 
                         initializeRecyclerViewAdapterOnClicks();
@@ -206,6 +209,7 @@ public class HomeFragment extends Fragment implements RecipeAdapter.OnItemClickL
     }
 
     private void PerformMainQuery(Query notesQuery, final List<String> finalUserIngredientsArray) {
+
         recipesListener = notesQuery.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@javax.annotation.Nullable QuerySnapshot queryDocumentSnapshots,
@@ -228,11 +232,15 @@ public class HomeFragment extends Fragment implements RecipeAdapter.OnItemClickL
                                 boolean noElementsInCommon = Collections.disjoint(recipe.getIngredient_array(), finalUserIngredientsArray);
                                 if (!noElementsInCommon && finalUserIngredientsArray.containsAll(recipe.getIngredient_array())) {
                                     mRecipeList.add(recipe);
+                                    Log.d(TAG, "onEvent: Recipe ingredientsArray " + recipe.getIngredient_array().toString()
+                                            + " User ingredients: " + finalUserIngredientsArray);
                                 } else {
                                     Log.d(TAG, "onEvent: Rejected recipe: " + recipe.getTitle()
                                             + ", ingredients: " + recipe.getIngredient_array().toString());
                                 }
                             }
+                        } else {
+                            Log.d(TAG, "onEvent: Already Contains docID");
                         }
 
                     }
@@ -241,6 +249,8 @@ public class HomeFragment extends Fragment implements RecipeAdapter.OnItemClickL
                         mLastQueriedDocument = queryDocumentSnapshots.getDocuments()
                                 .get(queryDocumentSnapshots.getDocuments().size() - 1);
                     }
+                } else {
+                    Log.d(TAG, "onEvent: Querry result is null");
                 }
                 mAdapter.notifyDataSetChanged();
 
@@ -379,6 +389,11 @@ public class HomeFragment extends Fragment implements RecipeAdapter.OnItemClickL
         startActivity(intent);
     }
 
+    public void navigateToUpdateRecipes() {
+        Intent intent = new Intent(getContext(), UpdateRecipesActivity.class);
+        startActivity(intent);
+    }
+
     /*
         ----------------------------- Firebase setup ---------------------------------
      */
@@ -396,13 +411,21 @@ public class HomeFragment extends Fragment implements RecipeAdapter.OnItemClickL
 //                        Log.d(TAG, "onAuthStateChanged: signed_in: " + user.getUid());
 //                        Toast.makeText(MainActivity.this, "Authenticated with: " + user.getEmail(), Toast.LENGTH_SHORT).show();
                         if (user.getEmail().equals("paraschivlongin@gmail.com")) {
-                            fab.show();
-                            fab.setOnClickListener(new View.OnClickListener() {
+                            fab_addRecipes.show();
+                            fab_addRecipes.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
                                     navigateToAddRecipes();
                                 }
                             });
+                            fab_updateRecipes.show();
+                            fab_updateRecipes.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    navigateToUpdateRecipes();
+                                }
+                            });
+
                         }
                         //If use is authenticated, perform query
                         performQuery();

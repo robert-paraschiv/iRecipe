@@ -49,7 +49,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 public class SearchFragment extends Fragment implements RecipeAdapter.OnItemClickListener {
-    private static final String TAG = "HomeFragment";
+    private static final String TAG = "SearchFragment";
 
     public View view;
 
@@ -222,13 +222,19 @@ public class SearchFragment extends Fragment implements RecipeAdapter.OnItemClic
                             if (recipe.getIngredient_array() != null && finalUserIngredientsArray != null) {
                                 //Check if recipe contains any ingredient that user has
                                 boolean noElementsInCommon = Collections.disjoint(recipe.getIngredient_array(), finalUserIngredientsArray);
-                                if (!noElementsInCommon && recipe.getIngredient_array().containsAll(finalUserIngredientsArray)) {
+                                int moreElements = 0;
+                                for (int i = 0; i < finalUserIngredientsArray.size(); i++) {
+                                    if (!recipe.getIngredient_array().contains(finalUserIngredientsArray.get(i))) {
+                                        moreElements++;
+                                    }
+                                }
+                                if (!noElementsInCommon && moreElements <= 3) {
                                     mRecipeList.add(recipe);
                                     Log.d(TAG, "onEvent: Recipe ingredientsArray " + recipe.getIngredient_array().toString()
                                             + " User ingredients: " + finalUserIngredientsArray);
                                 } else {
                                     Log.d(TAG, "onEvent: Rejected recipe: " + recipe.getTitle()
-                                            + ", ingredients: " + recipe.getIngredient_array().toString());
+                                            + " " + moreElements + ", ingredients: " + recipe.getIngredient_array().toString());
                                 }
                             }
                         }

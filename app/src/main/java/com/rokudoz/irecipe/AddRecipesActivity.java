@@ -143,25 +143,21 @@ public class AddRecipesActivity extends AppCompatActivity {
         final String instructions = editTextInstructions.getText().toString();
 
         String tagInput = editTextTags.getText().toString();
-        String[] possibleIngredients = possibleIngredientStringArray; /////////////////////////////////////////////////////////////////////////////////
-        final String[] inputIngredientArray = tagInput.split("\\s*,\\s*");
+        List<String> inputIngredientList = Arrays.asList(tagInput.split("\\s*,\\s*"));
 
         recipeIngredientList = new ArrayList<>();
 
         final Map<String, Boolean> tags = new HashMap<>();
-        for (String ingredient : possibleIngredients) {
-            tags.put(ingredient, false);
-        }
 
-        //Checks if ingredients in edit text are included in the PossibleIngredients Array
-        if (!tagInput.trim().equals("")) {
-            for (String tag : inputIngredientArray) {
-                if (Arrays.asList(possibleIngredients).contains(tag)) {
+        if (!tagInput.trim().equals(""))
+            for (String tag : possibleIngredientList) {
+                if (possibleIngredientList.contains(tag) && inputIngredientList.contains(tag)) {
                     tags.put(tag, true);
                     recipeIngredientList.add(tag);
+                } else if (possibleIngredientList.contains(tag) && !inputIngredientList.contains(tag)) {
+                    tags.put(tag, false);
                 }
             }
-        }
 
 
         // Uploading image to Firestore
@@ -179,7 +175,7 @@ public class AddRecipesActivity extends AppCompatActivity {
                                     final String imageUrl = uri.toString();
 
                                     // Sends recipe data to Firestore database
-                                    Recipe recipe = new Recipe(title, description, tags, imageUrl, false, recipeIngredientList,instructions,0);
+                                    Recipe recipe = new Recipe(title, description, tags, imageUrl, false, recipeIngredientList, instructions, 0);
 
                                     collectionReference.add(recipe)
                                             .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
