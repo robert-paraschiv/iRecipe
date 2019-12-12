@@ -3,38 +3,36 @@ package com.rokudoz.irecipe;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
-import android.widget.Toast;
+import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.google.firebase.storage.OnProgressListener;
-import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.rokudoz.irecipe.Models.Recipe;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+
+import javax.annotation.Nullable;
 
 public class UpdateRecipesActivity extends AppCompatActivity {
 
-    private String[] possibleIngredientStringArray;
+    private static final String TAG = "UpdateRecipesActivity";
     private List<String> possibleIngredientList;
-    private List<Recipe> recipeList;
 
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
-    private CollectionReference collectionReference = db.collection("Recipes");
+    private CollectionReference recipesReference = db.collection("Recipes");
     private CollectionReference ingredientsReference = db.collection("Ingredients");
 
 
@@ -42,6 +40,15 @@ public class UpdateRecipesActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_update_recipes);
+
+        Button updateBtn = findViewById(R.id.updateRecipesBtn);
+
+        updateBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getIngredientList();
+            }
+        });
     }
 
 
@@ -52,30 +59,48 @@ public class UpdateRecipesActivity extends AppCompatActivity {
                     public void onEvent(@javax.annotation.Nullable DocumentSnapshot documentSnapshot, @javax.annotation.Nullable FirebaseFirestoreException e) {
                         if (e == null) {
                             possibleIngredientList = (List<String>) documentSnapshot.get("ingredient_list");
-                            possibleIngredientStringArray = possibleIngredientList.toArray(new String[possibleIngredientList.size()]);
 
-                            //UpdateRecipe();
+                            GetRecipesList();
                         }
                     }
                 });
     }
 
-    // Update Recipe -----------------------------------------------------------------------------
-    public void UpdateRecipe(List<String> recipe_ingredient_list) {
+    private void UpdateRecipe(final Recipe recipe) {
 
         final Map<String, Boolean> tags = new HashMap<>();
 
         //Checks if ingredients in recipe ingredient list are included in the PossibleIngredients List
         for (String tag : possibleIngredientList) {
-            if (possibleIngredientList.contains(tag) && recipe_ingredient_list.contains(tag)) {
+            if (possibleIngredientList.contains(tag) && recipe.getIngredient_array().contains(tag)) {
                 tags.put(tag, true);
-            } else if (possibleIngredientList.contains(tag) && !recipe_ingredient_list.contains(tag)) {
+            } else if (possibleIngredientList.contains(tag) && !recipe.getIngredient_array().contains(tag)) {
                 tags.put(tag, false);
             }
         }
 
+        recipesReference.document(recipe.getDocumentId()).update("tags", tags).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                Log.d(TAG, "onComplete: Updated Recipe : " + recipe.getTitle());
+            }
+        });
     }
-//  ----------------------------------------------------------------------------------------------
 
+    private void GetRecipesList() {
+        recipesReference.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()) {
+                    for (QueryDocumentSnapshot document : Objects.requireNonNull(task.getResult())) {
+                        Recipe recipe = document.toObject(Recipe.class);
+                        recipe.setDocumentId(document.getId());
+
+                        UpdateRecipe(recipe);
+                    }
+                }
+            }
+        });
+    }
 
 }
