@@ -189,9 +189,7 @@ public class SearchFragment extends Fragment implements RecipeAdapter.OnItemClic
 //                                    .limit(3);
                         }
 
-                        final List<String> finalUserIngredientsArray = userIngredientsArray;
-
-                        PerformMainQuery(notesQuery, finalUserIngredientsArray);
+                        PerformMainQuery(notesQuery, userIngredientsArray);
 
                         pbLoading.setVisibility(View.INVISIBLE);
 
@@ -202,7 +200,7 @@ public class SearchFragment extends Fragment implements RecipeAdapter.OnItemClic
 
     }
 
-    private void PerformMainQuery(Query notesQuery, final List<String> finalUserIngredientsArray) {
+    private void PerformMainQuery(Query notesQuery, final List<String> userIngredientsArray) {
         recipesListener = notesQuery.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@javax.annotation.Nullable QuerySnapshot queryDocumentSnapshots,
@@ -219,22 +217,30 @@ public class SearchFragment extends Fragment implements RecipeAdapter.OnItemClic
                         }
                         if (!mDocumentIDs.contains(document.getId())) {
                             mDocumentIDs.add(document.getId());
-                            if (recipe.getIngredient_array() != null && finalUserIngredientsArray != null) {
-                                //Check if recipe contains any ingredient that user has
-                                boolean noElementsInCommon = Collections.disjoint(recipe.getIngredient_array(), finalUserIngredientsArray);
+                            if (recipe.getIngredient_array() != null && userIngredientsArray != null) {
+
+                                //See if the recipe has only [selected number] of ingredients more than the user has
+
                                 int moreElements = 0;
-                                for (int i = 0; i < finalUserIngredientsArray.size(); i++) {
-                                    if (!recipe.getIngredient_array().contains(finalUserIngredientsArray.get(i))) {
-                                        moreElements++;
+                                int nrOfElementsInCommon = 0;
+
+                                for (String recipeIngredient : recipe.getIngredient_array())
+                                    for (String userIngredient : userIngredientsArray) {
+                                        if (recipeIngredient.equals(userIngredient)) {
+                                            nrOfElementsInCommon++;
+                                        }
                                     }
-                                }
-                                if (!noElementsInCommon && moreElements <= 3) {
+                                moreElements = recipe.getIngredient_array().size() - nrOfElementsInCommon;
+
+                                if (moreElements <= 3) {
                                     mRecipeList.add(recipe);
-                                    Log.d(TAG, "onEvent: Recipe ingredientsArray " + recipe.getIngredient_array().toString()
-                                            + " User ingredients: " + finalUserIngredientsArray);
+                                    Log.d(TAG, "onEvent: Accepted recipe " + recipe.getTitle()
+                                            + " because it has " + moreElements + " more elements " + ", ingredients: "
+                                            + recipe.getIngredient_array().toString());
                                 } else {
                                     Log.d(TAG, "onEvent: Rejected recipe: " + recipe.getTitle()
-                                            + " " + moreElements + ", ingredients: " + recipe.getIngredient_array().toString());
+                                            + " because it has " + moreElements + " more elements " + ", ingredients: "
+                                            + recipe.getIngredient_array().toString());
                                 }
                             }
                         }
