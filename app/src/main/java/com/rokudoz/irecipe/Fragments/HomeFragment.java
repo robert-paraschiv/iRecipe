@@ -235,6 +235,7 @@ public class HomeFragment extends Fragment implements RecipeAdapter.OnItemClickL
                                     Log.d(TAG, "onEvent: Recipe ingredientsArray " + recipe.getIngredient_array().toString()
                                             + " User ingredients: " + finalUserIngredientsArray);
                                 } else {
+                                    mDocumentIDs.remove(document.getId());
                                     Log.d(TAG, "onEvent: Rejected recipe: " + recipe.getTitle()
                                             + ", ingredients: " + recipe.getIngredient_array().toString());
                                 }
@@ -280,6 +281,8 @@ public class HomeFragment extends Fragment implements RecipeAdapter.OnItemClickL
 
                 RecipeDetailedFragment fragment = RecipeDetailedFragment.newInstance(id, title, description, ingredientsString
                         , imageUrl, instructions, isFavorite, favRecipes, loggedInUserDocumentId, numberOfFaves);
+
+                Log.d(TAG, "onItemClick: CLICKED " + title + " id " + id);
 
                 getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fragment)
                         .addToBackStack(null).commit();

@@ -1,10 +1,13 @@
 package com.rokudoz.irecipe;
 
 import androidx.annotation.NonNull;
+
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.appcompat.app.AppCompatActivity;
+
 import android.os.Bundle;
 import android.view.MenuItem;
 
@@ -66,11 +69,11 @@ public class MainActivity extends AppCompatActivity {
                         setFragment(SearchFragment.newInstance(), FRAGMENT_SEARCH);
                         return true;
                     case R.id.nav_favorites:
-                        if (!isBackPressed){
+                        if (!isBackPressed) {
                             pushFragmentIntoStack(R.id.nav_favorites);
                         }
-                        isBackPressed=false;
-                        setFragment(FavoritesFragment.newInstance(),FRAGMENT_FAVORITES);
+                        isBackPressed = false;
+                        setFragment(FavoritesFragment.newInstance(), FRAGMENT_FAVORITES);
                         return true;
                     case R.id.nav_account:
                         if (!isBackPressed) {
@@ -88,7 +91,7 @@ public class MainActivity extends AppCompatActivity {
         bottomNav.setOnNavigationItemReselectedListener(new BottomNavigationView.OnNavigationItemReselectedListener() {
             @Override
             public void onNavigationItemReselected(@NonNull MenuItem item) {
-                if (item.getItemId()==R.id.nav_home){
+                if (item.getItemId() == R.id.nav_home) {
                     setFragment(HomeFragment.newInstance(), FRAGMENT_HOME);
                 }
             }

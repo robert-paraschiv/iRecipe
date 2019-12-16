@@ -74,7 +74,6 @@ public class RecipeDetailedFragment extends Fragment {
     private RecyclerView.LayoutManager mLayoutManager;
 
 
-
     private TextView tvTitle, tvDescription, tvIngredients, tvInstructions, mFavoriteNumber;
     private ImageView mImageView, mFavoriteIcon;
     private Button mAddCommentBtn;
@@ -176,6 +175,7 @@ public class RecipeDetailedFragment extends Fragment {
                                                         @Override
                                                         public void onSuccess(Void aVoid) {
                                                             Toast.makeText(getContext(), "Removed from favorites", Toast.LENGTH_SHORT).show();
+                                                            Log.d(TAG, "onSuccess: REMOVED " + title + " " + documentID + " from favorites");
                                                         }
                                                     });
 
@@ -192,6 +192,7 @@ public class RecipeDetailedFragment extends Fragment {
                     UserWhoFaved userWhoFaved = new UserWhoFaved(mUser.getUser_id(), null);
                     currentRecipeSubCollection.add(userWhoFaved);
                     Toast.makeText(getContext(), "Added " + title + " to favorites", Toast.LENGTH_SHORT).show();
+                    Log.d(TAG, "onClick: ADDED + " + title + " " + documentID + " to favorites");
                 }
                 setFavoriteIcon(isRecipeFavorite);
 
@@ -300,7 +301,11 @@ public class RecipeDetailedFragment extends Fragment {
             tvTitle.setText(title);
             tvDescription.setText(description);
             tvIngredients.setText(ingredients);
-            tvInstructions.setText("Instructions: \n\n" + instructions);
+            if (instructions != null) {
+                tvInstructions.setText("Instructions: \n\n" + instructions.replace("newline", "\n"));
+            } else {
+                tvInstructions.setText("Instructions : \n\n");
+            }
             mFavoriteNumber.setText(Integer.toString(numberOfFav));
 
 
@@ -325,7 +330,7 @@ public class RecipeDetailedFragment extends Fragment {
     private void buildRecyclerView() {
         mRecyclerView.setHasFixedSize(true);
         mLayoutManager = new LinearLayoutManager(getContext());
-        mAdapter = new ParentCommentAdapter(getContext(),commentList);
+        mAdapter = new ParentCommentAdapter(getContext(), commentList);
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setAdapter(mAdapter);
     }
@@ -369,7 +374,9 @@ public class RecipeDetailedFragment extends Fragment {
                                                     User user = null;
                                                     if (queryDocumentSnapshots != null) {
                                                         user = queryDocumentSnapshots.getDocuments().get(0).toObject(User.class);
-                                                        Date date = document.getDate("mCommentTimeStamp", behavior);
+
+                                                        //Date date = document.getDate("mCommentTimeStamp", behavior);
+                                                        Date date = comment.getmCommentTimeStamp();
 
                                                         if (!newItemsToAdd.contains(currentCommentID)) {
                                                             Comment commentx = new Comment(documentID, comment.getmUserId(), user.getUserProfilePicUrl()
