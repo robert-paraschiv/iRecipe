@@ -45,6 +45,7 @@ import java.util.Objects;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -278,11 +279,17 @@ public class SearchFragment extends Fragment implements RecipeAdapter.OnItemClic
                     }
                 }
 
-                RecipeDetailedFragment fragment = RecipeDetailedFragment.newInstance(id, title, description, ingredientsString
-                        , imageUrl, instructions, isFavorite, favRecipes, loggedInUserDocumentId, numberOfFav);
+                // Navigation logic
+                String[] favRecipesArray = new String[favRecipes.size()];
+                for (int i = 0; i < favRecipes.size(); i++) {
+                    favRecipesArray[i] = favRecipes.get(i);
+                }
 
-                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fragment)
-                        .addToBackStack(null).commit();
+                if (instructions == null)
+                    instructions = " ";
+                Navigation.findNavController(view).navigate(SearchFragmentDirections.actionSearchFragmentToRecipeDetailedFragment(id, title, description, ingredientsString
+                        , imageUrl, instructions, isFavorite, favRecipesArray, loggedInUserDocumentId, numberOfFav));
+
             }
 
             @Override

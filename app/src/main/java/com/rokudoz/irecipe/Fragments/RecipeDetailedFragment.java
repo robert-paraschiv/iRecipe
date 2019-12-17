@@ -93,24 +93,24 @@ public class RecipeDetailedFragment extends Fragment {
     private CollectionReference recipeRef = db.collection("Recipes");
     private CollectionReference usersRef = db.collection("Users");
 
-
-    public static RecipeDetailedFragment newInstance(String id, String title, String description, String ingredients, String imageUrl
-            , String instructions, Boolean isFavorite, ArrayList<String> favRecipes, String loggedInUserDocumentId, Integer numberofFaves) {
-        RecipeDetailedFragment fragment = new RecipeDetailedFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_ID, id);
-        args.putString(ARG_TITLE, title);
-        args.putString(ARG_DESCRIPTION, description);
-        args.putString(ARG_IMAGEURL, imageUrl);
-        args.putString(ARG_INGREDIENTS, ingredients);
-        args.putString(ARG_INSTRUCTIONS, instructions);
-        args.putBoolean(ARG_ISFAVORITE, isFavorite);
-        args.putStringArrayList(ARG_FAVRECIPES, favRecipes);
-        args.putString(ARG_LOGGEDINUSERDOCUMENTID, loggedInUserDocumentId);
-        args.putInt(ARG_NUMBEROFFAVES, numberofFaves);
-        fragment.setArguments(args);
-        return fragment;
-    }
+//
+//    public static RecipeDetailedFragment newInstance(String id, String title, String description, String ingredients, String imageUrl
+//            , String instructions, Boolean isFavorite, ArrayList<String> favRecipes, String loggedInUserDocumentId, Integer numberofFaves) {
+//        RecipeDetailedFragment fragment = new RecipeDetailedFragment();
+//        Bundle args = new Bundle();
+//        args.putString(ARG_ID, id);
+//        args.putString(ARG_TITLE, title);
+//        args.putString(ARG_DESCRIPTION, description);
+//        args.putString(ARG_IMAGEURL, imageUrl);
+//        args.putString(ARG_INGREDIENTS, ingredients);
+//        args.putString(ARG_INSTRUCTIONS, instructions);
+//        args.putBoolean(ARG_ISFAVORITE, isFavorite);
+//        args.putStringArrayList(ARG_FAVRECIPES, favRecipes);
+//        args.putString(ARG_LOGGEDINUSERDOCUMENTID, loggedInUserDocumentId);
+//        args.putInt(ARG_NUMBEROFFAVES, numberofFaves);
+//        fragment.setArguments(args);
+//        return fragment;
+//    }
 
 
     @Nullable
@@ -131,7 +131,9 @@ public class RecipeDetailedFragment extends Fragment {
         mFavoriteNumber = view.findViewById(R.id.recipeDetailed_numberOfFaved);
 
 
-        getRecipeArgsPassed();
+        RecipeDetailedFragmentArgs recipeDetailedFragmentArgs = RecipeDetailedFragmentArgs.fromBundle(getArguments());
+        getRecipeArgsPassed(recipeDetailedFragmentArgs);
+
 
         DocumentReference currentRecipeRef = recipeRef.document(documentID);
         final CollectionReference currentRecipeSubCollection = currentRecipeRef.collection("UsersWhoFaved");
@@ -284,39 +286,44 @@ public class RecipeDetailedFragment extends Fragment {
                 });
     }
 
-    private void getRecipeArgsPassed() {
-        if (getArguments() != null) {
-            documentID = getArguments().getString(ARG_ID);
-            title = getArguments().getString(ARG_TITLE);
-            String description = getArguments().getString(ARG_DESCRIPTION);
-            String imageUrl = getArguments().getString(ARG_IMAGEURL);
-            String ingredients = getArguments().getString(ARG_INGREDIENTS);
-            String instructions = getArguments().getString(ARG_INSTRUCTIONS);
-            isRecipeFavorite = getArguments().getBoolean(ARG_ISFAVORITE);
-            favRecipes = getArguments().getStringArrayList(ARG_FAVRECIPES);
-            numberOfFav = getArguments().getInt(ARG_NUMBEROFFAVES);
+    private void getRecipeArgsPassed(RecipeDetailedFragmentArgs recipeDetailedFragmentArgs) {
 
-            loggedInUserDocumentId = getArguments().getString(ARG_LOGGEDINUSERDOCUMENTID);
+        documentID = recipeDetailedFragmentArgs.getDocumentID();
+        title = recipeDetailedFragmentArgs.getTitle();
+        String description = recipeDetailedFragmentArgs.getDescription();
+        String imageUrl = recipeDetailedFragmentArgs.getImageUrl();
+        String ingredients = recipeDetailedFragmentArgs.getIngredients();
+        String instructions = recipeDetailedFragmentArgs.getInstructions();
+        isRecipeFavorite = recipeDetailedFragmentArgs.getIsFavorite();
 
-            tvTitle.setText(title);
-            tvDescription.setText(description);
-            tvIngredients.setText(ingredients);
-            if (instructions != null) {
-                tvInstructions.setText("Instructions: \n\n" + instructions.replace("newline", "\n"));
-            } else {
-                tvInstructions.setText("Instructions : \n\n");
-            }
-            mFavoriteNumber.setText(Integer.toString(numberOfFav));
-
-
-            setFavoriteIcon(isRecipeFavorite);
-
-            Picasso.get()
-                    .load(imageUrl)
-                    .fit()
-                    .centerCrop()
-                    .into(mImageView);
+        String[] favRecipesArray = recipeDetailedFragmentArgs.getFavRecipes();
+        for (int i = 0; i < favRecipesArray.length; i++) {
+            favRecipes.add(i, favRecipesArray[i]);
         }
+
+        numberOfFav = recipeDetailedFragmentArgs.getNumberOfFaves();
+
+        loggedInUserDocumentId = recipeDetailedFragmentArgs.getLoggedInUserDocumentId();
+
+        tvTitle.setText(title);
+        tvDescription.setText(description);
+        tvIngredients.setText(ingredients);
+        if (instructions != null) {
+            tvInstructions.setText("Instructions: \n\n" + instructions.replace("newline", "\n"));
+        } else {
+            tvInstructions.setText("Instructions : \n\n");
+        }
+        mFavoriteNumber.setText(Integer.toString(numberOfFav));
+
+
+        setFavoriteIcon(isRecipeFavorite);
+
+        Picasso.get()
+                .load(imageUrl)
+                .fit()
+                .centerCrop()
+                .into(mImageView);
+
     }
 
     private void setFavoriteIcon(Boolean isFavorite) {

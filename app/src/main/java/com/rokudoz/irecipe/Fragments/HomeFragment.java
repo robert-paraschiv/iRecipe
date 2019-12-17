@@ -9,6 +9,9 @@ import androidx.annotation.Nullable;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import androidx.fragment.app.Fragment;
+import androidx.navigation.NavAction;
+import androidx.navigation.NavDirections;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -279,13 +282,20 @@ public class HomeFragment extends Fragment implements RecipeAdapter.OnItemClickL
                     }
                 }
 
-                RecipeDetailedFragment fragment = RecipeDetailedFragment.newInstance(id, title, description, ingredientsString
-                        , imageUrl, instructions, isFavorite, favRecipes, loggedInUserDocumentId, numberOfFaves);
 
                 Log.d(TAG, "onItemClick: CLICKED " + title + " id " + id);
 
-                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fragment)
-                        .addToBackStack(null).commit();
+                // Navigation logic
+                String[] favRecipesArray = new String[favRecipes.size()];
+                for (int i = 0; i < favRecipes.size(); i++) {
+                    favRecipesArray[i] = favRecipes.get(i);
+                }
+
+                if (instructions == null)
+                    instructions = " ";
+                Navigation.findNavController(view).navigate(HomeFragmentDirections.actionHomeFragmentToRecipeDetailedFragment(id, title, description, ingredientsString
+                        , imageUrl, instructions, isFavorite, favRecipesArray, loggedInUserDocumentId, numberOfFaves));
+
             }
 
             @Override

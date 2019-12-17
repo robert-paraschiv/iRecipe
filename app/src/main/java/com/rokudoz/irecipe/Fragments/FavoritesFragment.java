@@ -6,6 +6,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -230,12 +231,18 @@ public class FavoritesFragment extends Fragment implements RecipeAdapter.OnItemC
                                         ingredientsString += "\n- " + ingredient;
                                     }
                                 }
+//
+                                // Navigation logic
+                                String[] favRecipesArray = new String[favRecipes.size()];
+                                for (int i = 0; i < favRecipes.size(); i++) {
+                                    favRecipesArray[i] = favRecipes.get(i);
+                                }
 
-                                RecipeDetailedFragment fragment = RecipeDetailedFragment.newInstance(id, title, description, ingredientsString
-                                        , imageUrl, instructions, isFavorite, favRecipes, loggedInUserDocumentId, numberOfFav);
+                                if (instructions == null)
+                                    instructions = " ";
+                                Navigation.findNavController(view).navigate(FavoritesFragmentDirections.actionFavoritesFragmentToRecipeDetailedFragment(id, title, description, ingredientsString
+                                        , imageUrl, instructions, isFavorite, favRecipesArray, loggedInUserDocumentId, numberOfFav));
 
-                                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fragment)
-                                        .addToBackStack(null).commit();
                             }
 
                             @Override
