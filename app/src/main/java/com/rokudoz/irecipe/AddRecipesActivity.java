@@ -12,10 +12,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.webkit.MimeTypeMap;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
@@ -47,7 +50,7 @@ public class AddRecipesActivity extends AppCompatActivity {
     private List<String> possibleIngredientList;
     private String[] possibleIngredientStringArray;
     private List<String> recipeIngredientList;
-
+    private String category;
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private CollectionReference collectionReference = db.collection("Recipes");
     private CollectionReference ingredientsReference = db.collection("Ingredients");
@@ -73,6 +76,8 @@ public class AddRecipesActivity extends AppCompatActivity {
         mAddRecipeBtn = findViewById(R.id.addRecipes_add_btn);
         editTextInstructions = findViewById(R.id.edit_text_instructions);
 
+        setUpCategorySpinner();
+
 
         mChooseFileBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -92,6 +97,28 @@ public class AddRecipesActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+    private void setUpCategorySpinner() {
+        Spinner dropdown = findViewById(R.id.spinner_category);
+        String[] items = new String[]{"breakfast", "lunch", "dinner"};
+        //create an adapter to describe how the items are displayed, adapters are used in several places in android.
+        //There are multiple variations of this, but this is the basic variant.
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, items);
+        //set the spinners adapter to the previously created one.
+        dropdown.setAdapter(adapter);
+
+        dropdown.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                category = (String) parent.getItemAtPosition(position);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
     }
 
     private void openFileChooser() {
@@ -175,7 +202,7 @@ public class AddRecipesActivity extends AppCompatActivity {
                                     final String imageUrl = uri.toString();
 
                                     // Sends recipe data to Firestore database
-                                    Recipe recipe = new Recipe(title, description, tags, imageUrl, false, recipeIngredientList, instructions, 0);
+                                    Recipe recipe = new Recipe(title, category, description, tags, imageUrl, false, recipeIngredientList, instructions, 0);
 
                                     collectionReference.add(recipe)
                                             .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {

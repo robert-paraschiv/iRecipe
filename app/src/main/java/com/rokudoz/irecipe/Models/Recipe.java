@@ -8,6 +8,7 @@ import java.util.Map;
 public class Recipe {
     private String documentId;
     private String title;
+    private String category;
     private String description;
     private Map<String, Boolean> tags;
     private String imageUrl;
@@ -20,13 +21,14 @@ public class Recipe {
         //public no-arg constructor needed
     }
 
-    public Recipe(String title, String description, Map<String, Boolean> tags, String imageUrl, Boolean isFavorite, List<String> ingredient_array
+    public Recipe(String title, String category, String description, Map<String, Boolean> tags, String imageUrl, Boolean isFavorite, List<String> ingredient_array
             , String instructions, Integer numberOfFaves) {
 
         if (title.trim().equals("")) {
             title = "No Title";
         }
         this.title = title;
+        this.category = category;
         this.description = description;
         this.tags = tags;
         this.imageUrl = imageUrl;
@@ -34,6 +36,14 @@ public class Recipe {
         this.ingredient_array = ingredient_array;
         this.instructions = instructions;
         this.numberOfFaves = numberOfFaves;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
     }
 
     @Exclude

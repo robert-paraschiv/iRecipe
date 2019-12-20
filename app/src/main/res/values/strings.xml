@@ -2,4 +2,7 @@
     <string name="app_name">iRecipe</string>
     <string name="tv_search">Search for a recipe with the following ingredient_array :</string>
     <string name="select_myingredients_string">Select the ingredients you got around</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

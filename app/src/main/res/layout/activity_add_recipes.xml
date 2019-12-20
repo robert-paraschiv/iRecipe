@@ -32,11 +32,19 @@
         android:hint="Title"
         android:inputType="text" />
 
+    <Spinner
+        android:id="@+id/spinner_category"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/edit_text_title"
+        android:spinnerMode="dropdown"
+        />
+
     <EditText
         android:id="@+id/edit_text_description"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/edit_text_title"
+        android:layout_below="@id/spinner_category"
         android:hint="Description"
         android:inputType="text" />
 

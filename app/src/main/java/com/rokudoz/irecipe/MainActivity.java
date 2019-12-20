@@ -3,6 +3,7 @@ package com.rokudoz.irecipe;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.NavigationUI;
 
@@ -26,8 +27,8 @@ public class MainActivity extends AppCompatActivity {
     private void setUpNavigation() {
         bottomNavigationView = findViewById(R.id.bottom_navigation);
         NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
-        NavigationUI.setupWithNavController(bottomNavigationView, navHostFragment.getNavController());
-
+        NavController navController = navHostFragment.getNavController();
+        NavigationUI.setupWithNavController(bottomNavigationView, navController);
     }
 
 

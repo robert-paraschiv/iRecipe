@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -35,6 +36,8 @@ public class UpdateRecipesActivity extends AppCompatActivity {
     private CollectionReference recipesReference = db.collection("Recipes");
     private CollectionReference ingredientsReference = db.collection("Ingredients");
 
+    int totalRecipesToUpdate = 0;
+    int recipesUpdated = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,6 +86,13 @@ public class UpdateRecipesActivity extends AppCompatActivity {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
                 Log.d(TAG, "onComplete: Updated Recipe : " + recipe.getTitle());
+
+                recipesUpdated++;
+                if (recipesUpdated == totalRecipesToUpdate) {
+                    Toast.makeText(UpdateRecipesActivity.this, "Updated all of the recipes", Toast.LENGTH_SHORT).show();
+                    Log.d(TAG, "onComplete: Updated all of the Recipes");
+                }
+
             }
         });
     }
@@ -96,6 +106,7 @@ public class UpdateRecipesActivity extends AppCompatActivity {
                         Recipe recipe = document.toObject(Recipe.class);
                         recipe.setDocumentId(document.getId());
 
+                        totalRecipesToUpdate++;
                         UpdateRecipe(recipe);
                     }
                 }
