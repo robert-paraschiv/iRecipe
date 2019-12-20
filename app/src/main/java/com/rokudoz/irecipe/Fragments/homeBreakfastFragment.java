@@ -224,7 +224,6 @@ public class homeBreakfastFragment extends Fragment implements RecipeAdapter.OnI
                         Recipe recipe = document.toObject(Recipe.class);
                         recipe.setDocumentId(document.getId());
 
-
                         if (favRecipes != null && favRecipes.contains(document.getId())) {
                             recipe.setFavorite(true);
                         } else {
@@ -271,7 +270,7 @@ public class homeBreakfastFragment extends Fragment implements RecipeAdapter.OnI
                 String id = mDocumentIDs.get(position);
                 String title = mRecipeList.get(position).getTitle();
                 String description = mRecipeList.get(position).getDescription();
-                String imageUrl = mRecipeList.get(position).getImageUrl();
+                List<String> imageUrlList = mRecipeList.get(position).getImageUrl();
                 Map<String, Boolean> ingredients = mRecipeList.get(position).getTags();
                 String instructions = mRecipeList.get(position).getInstructions();
                 Boolean isFavorite = mRecipeList.get(position).getFavorite();
@@ -293,10 +292,16 @@ public class homeBreakfastFragment extends Fragment implements RecipeAdapter.OnI
                     favRecipesArray[i] = favRecipes.get(i);
                 }
 
+                //Image Url List to Array
+                String[] imageUrlArray = new String[imageUrlList.size()];
+                for (int i = 0; i < imageUrlList.size(); i++) {
+                    imageUrlArray[i] = imageUrlList.get(i);
+                }
+
                 if (instructions == null)
                     instructions = " ";
                 Navigation.findNavController(view).navigate(HomeFragmentDirections.actionHomeFragmentToRecipeDetailedFragment(id, title, description, ingredientsString
-                        , imageUrl, instructions, isFavorite, favRecipesArray, loggedInUserDocumentId, numberOfFaves));
+                        , imageUrlArray, instructions, isFavorite, favRecipesArray, loggedInUserDocumentId, numberOfFaves));
 
             }
 
@@ -361,40 +366,6 @@ public class homeBreakfastFragment extends Fragment implements RecipeAdapter.OnI
                 mAdapter.notifyDataSetChanged();
             }
 
-            @Override
-            public void onDeleteClick(final int position) {
-                Recipe selectedRecipe = mRecipeList.get(position);
-                final String id = mDocumentIDs.get(position);
-
-                //Deleting image from FirebaseStorage
-                StorageReference imageRef = mStorageRef.getReferenceFromUrl(selectedRecipe.getImageUrl());
-                imageRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        //Deleting Document of the item selected
-                        recipeRef.document(id).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void aVoid) {
-                                Toast.makeText(getContext(), "Deleted from Db", Toast.LENGTH_SHORT).show();
-                                mRecipeList.remove(position);
-                                mDocumentIDs.remove(position);
-                                performQuery();
-                            }
-                        }).addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
-                            }
-                        });
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
-                    }
-                });
-//                                Toast.makeText(MainActivity.this, "Delete click at " + position, Toast.LENGTH_SHORT).show();
-            }
         });
     }
 
@@ -473,8 +444,4 @@ public class homeBreakfastFragment extends Fragment implements RecipeAdapter.OnI
 
     }
 
-    @Override
-    public void onDeleteClick(int position) {
-
-    }
 }

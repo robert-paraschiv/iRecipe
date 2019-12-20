@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
 import com.google.android.material.tabs.TabLayout;
@@ -49,7 +50,7 @@ public class HomeFragment extends Fragment {
 
 
     private void setupViewPager(ViewPager viewPager){
-        SectionsPagerAdapter adapter = new SectionsPagerAdapter(getChildFragmentManager());
+        SectionsPagerAdapter adapter = new SectionsPagerAdapter(getChildFragmentManager(), FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
         adapter.addFragment(new homeBreakfastFragment(),"Breakfast");
         adapter.addFragment(new homeLunchFragment(),"Lunch");
         adapter.addFragment(new homeDinnerFragment(),"Dinner");

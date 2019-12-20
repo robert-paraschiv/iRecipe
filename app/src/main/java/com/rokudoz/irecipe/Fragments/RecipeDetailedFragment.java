@@ -8,6 +8,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.viewpager.widget.ViewPager;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -40,26 +41,28 @@ import com.rokudoz.irecipe.Models.User;
 import com.rokudoz.irecipe.Models.UserWhoFaved;
 import com.rokudoz.irecipe.R;
 import com.rokudoz.irecipe.Utils.ParentCommentAdapter;
+import com.rokudoz.irecipe.Utils.RecipeDetailedViewPagerAdapter;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import static com.google.firebase.firestore.DocumentSnapshot.ServerTimestampBehavior.ESTIMATE;
 
 public class RecipeDetailedFragment extends Fragment {
     private static final String TAG = "RecipeDetailedFragment";
 
-    private static final String ARG_ID = "argId";
-    private static final String ARG_TITLE = "argTitle";
-    private static final String ARG_DESCRIPTION = "argDescription";
-    private static final String ARG_IMAGEURL = "argImageurl";
-    private static final String ARG_INGREDIENTS = "argIngredients";
-    private static final String ARG_INSTRUCTIONS = "argInstructions";
-    private static final String ARG_ISFAVORITE = "argIsFavorite";
-    private static final String ARG_FAVRECIPES = "argFavRecipes";
-    private static final String ARG_NUMBEROFFAVES = "argNumberOfFaves";
-    private static final String ARG_LOGGEDINUSERDOCUMENTID = "argLoggedInUserDocumentId";
+//    private static final String ARG_ID = "argId";
+//    private static final String ARG_TITLE = "argTitle";
+//    private static final String ARG_DESCRIPTION = "argDescription";
+//    private static final String ARG_IMAGEURL = "argImageurl";
+//    private static final String ARG_INGREDIENTS = "argIngredients";
+//    private static final String ARG_INSTRUCTIONS = "argInstructions";
+//    private static final String ARG_ISFAVORITE = "argIsFavorite";
+//    private static final String ARG_FAVRECIPES = "argFavRecipes";
+//    private static final String ARG_NUMBEROFFAVES = "argNumberOfFaves";
+//    private static final String ARG_LOGGEDINUSERDOCUMENTID = "argLoggedInUserDocumentId";
 
     private String documentID = "";
     private String currentUserImageUrl = "";
@@ -68,6 +71,9 @@ public class RecipeDetailedFragment extends Fragment {
     private String title = "";
     private String userFavDocId = "";
     private Boolean isRecipeFavorite;
+
+    public String[] imageUrls;
+    private ViewPager viewPager;
 
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
@@ -122,7 +128,7 @@ public class RecipeDetailedFragment extends Fragment {
         tvTitle = view.findViewById(R.id.tvTitle);
         tvDescription = view.findViewById(R.id.tvDescription);
         tvIngredients = view.findViewById(R.id.tvIngredientsList);
-        mImageView = view.findViewById(R.id.recipeDetailed_image);
+//        mImageView = view.findViewById(R.id.recipeDetailed_image);
         mAddCommentBtn = view.findViewById(R.id.recipeDetailed_addComment_btn);
         mRecyclerView = view.findViewById(R.id.comment_recycler_view);
         mCommentEditText = view.findViewById(R.id.recipeDetailed_et_commentInput);
@@ -217,7 +223,17 @@ public class RecipeDetailedFragment extends Fragment {
         buildRecyclerView();
         setupFirebaseAuth();
 
+
+        setupViewPager(view);
+
         return view; // HAS TO BE THE LAST ONE ---------------------------------
+    }
+
+    private void setupViewPager(View view) {
+
+        viewPager = view.findViewById(R.id.view_pager);
+        RecipeDetailedViewPagerAdapter adapter = new RecipeDetailedViewPagerAdapter(getContext(), imageUrls);
+        viewPager.setAdapter(adapter);
     }
 
     @Override
@@ -291,7 +307,7 @@ public class RecipeDetailedFragment extends Fragment {
         documentID = recipeDetailedFragmentArgs.getDocumentID();
         title = recipeDetailedFragmentArgs.getTitle();
         String description = recipeDetailedFragmentArgs.getDescription();
-        String imageUrl = recipeDetailedFragmentArgs.getImageUrl();
+        imageUrls = recipeDetailedFragmentArgs.getImageUrls();
         String ingredients = recipeDetailedFragmentArgs.getIngredients();
         String instructions = recipeDetailedFragmentArgs.getInstructions();
         isRecipeFavorite = recipeDetailedFragmentArgs.getIsFavorite();
@@ -318,11 +334,11 @@ public class RecipeDetailedFragment extends Fragment {
 
         setFavoriteIcon(isRecipeFavorite);
 
-        Picasso.get()
-                .load(imageUrl)
-                .fit()
-                .centerCrop()
-                .into(mImageView);
+//        Picasso.get()
+//                .load(imageUrl)
+//                .fit()
+//                .centerCrop()
+//                .into(mImageView);
 
     }
 

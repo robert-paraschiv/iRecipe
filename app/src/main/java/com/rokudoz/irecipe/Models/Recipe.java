@@ -11,7 +11,7 @@ public class Recipe {
     private String category;
     private String description;
     private Map<String, Boolean> tags;
-    private String imageUrl;
+    private List<String> imageUrl;
     private Boolean isFavorite;
     private List<String> ingredient_array;
     private String instructions;
@@ -21,7 +21,9 @@ public class Recipe {
         //public no-arg constructor needed
     }
 
-    public Recipe(String title, String category, String description, Map<String, Boolean> tags, String imageUrl, Boolean isFavorite, List<String> ingredient_array
+    public Recipe(String title, String category, String description
+            , Map<String, Boolean> tags, List<String> imageUrl
+            , Boolean isFavorite, List<String> ingredient_array
             , String instructions, Integer numberOfFaves) {
 
         if (title.trim().equals("")) {
@@ -75,11 +77,11 @@ public class Recipe {
         return tags;
     }
 
-    public String getImageUrl() {
+    public List<String> getImageUrl() {
         return imageUrl;
     }
 
-    public void setImageUrl(String imageUrl) {
+    public void setImageUrl(List<String> imageUrl) {
         this.imageUrl = imageUrl;
     }
 

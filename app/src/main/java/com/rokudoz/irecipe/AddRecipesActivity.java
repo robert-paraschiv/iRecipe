@@ -1,5 +1,6 @@
 package com.rokudoz.irecipe;
 
+import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.net.Uri;
@@ -10,6 +11,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.webkit.MimeTypeMap;
 import android.widget.AdapterView;
@@ -45,8 +47,13 @@ import java.util.Map;
 
 public class AddRecipesActivity extends AppCompatActivity {
 
-    private static final int PICK_IMAGE_REQUEST = 1;
+    private static final String TAG = "AddRecipesActivity";
+
+    private static final int SELECT_PICTURES = 1;
+    private int nrOfPhotosUploaded = 0;
     private Uri mImageUri;
+    private Uri[] mImageUriArray;
+    private String[] imageUrlArray;
     private List<String> possibleIngredientList;
     private String[] possibleIngredientStringArray;
     private List<String> recipeIngredientList;
@@ -122,23 +129,37 @@ public class AddRecipesActivity extends AppCompatActivity {
     }
 
     private void openFileChooser() {
-        Intent intent = new Intent();
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
         intent.setType("image/*");
-        intent.setAction(Intent.ACTION_GET_CONTENT);
-        startActivityForResult(intent, PICK_IMAGE_REQUEST);
+        intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+        startActivityForResult(Intent.createChooser(intent, "Select picture"), SELECT_PICTURES);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK
-                && data != null && data.getData() != null) {
-            mImageUri = data.getData();
+        if (requestCode == SELECT_PICTURES && resultCode == Activity.RESULT_OK && data != null) {
+            if (data.getClipData() != null) {
+                //Multiple images have been selected
 
-            //Picasso.with(this).load(mImageUri).into(mImageView);  --OLD lib
-            Picasso.get().load(mImageUri).into(mImageView);
-        }
+                int count = data.getClipData().getItemCount();
+                mImageUriArray = new Uri[count];
+
+                for (int i = 0; i < count; i++) {
+                    mImageUriArray[i] = data.getClipData().getItemAt(i).getUri();
+                    mImageUri = data.getClipData().getItemAt(i).getUri();
+                }
+                Picasso.get().load(mImageUri).into(mImageView);
+
+            } else if (data.getData() != null) {
+                //Only one image has been selected
+                mImageUri = data.getData();
+                Picasso.get().load(mImageUri).into(mImageView);
+            }
+
+        } else
+            Log.d(TAG, "onActivityResult: FailedToGetActiviayReasuslt");
     }
 
     private String getFileExtension(Uri uri) {
@@ -157,42 +178,20 @@ public class AddRecipesActivity extends AppCompatActivity {
                             possibleIngredientList = (List<String>) documentSnapshot.get("ingredient_list");
                             possibleIngredientStringArray = possibleIngredientList.toArray(new String[possibleIngredientList.size()]);
 
-                            addRecipe();
+
+                            getPhotoUploadCount();
                         }
                     }
                 });
     }
 
-    // Adding Recipes -----------------------------------------------------------------------------
-    public void addRecipe() {
-        final String title = editTextTitle.getText().toString();
-        final String description = editTextDescription.getText().toString();
-        final String instructions = editTextInstructions.getText().toString();
-
-        String tagInput = editTextTags.getText().toString();
-        List<String> inputIngredientList = Arrays.asList(tagInput.split("\\s*,\\s*"));
-
-        recipeIngredientList = new ArrayList<>();
-
-        final Map<String, Boolean> tags = new HashMap<>();
-
-        if (!tagInput.trim().equals(""))
-            for (String tag : possibleIngredientList) {
-                if (possibleIngredientList.contains(tag) && inputIngredientList.contains(tag)) {
-                    tags.put(tag, true);
-                    recipeIngredientList.add(tag);
-                } else if (possibleIngredientList.contains(tag) && !inputIngredientList.contains(tag)) {
-                    tags.put(tag, false);
-                }
-            }
-
-
+    private void addPhotoToFirestore(Uri uri, final int position) {
         // Uploading image to Firestore
-        if (mImageUri != null) {
+        if (mImageUriArray != null) {
             final StorageReference fileReference = mStorageRef.child(System.currentTimeMillis()
-                    + "." + getFileExtension(mImageUri));
+                    + "." + getFileExtension(mImageUriArray[position]));
 
-            mUploadTask = fileReference.putFile(mImageUri)
+            mUploadTask = fileReference.putFile(mImageUriArray[position])
                     .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                         @Override
                         public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
@@ -200,24 +199,11 @@ public class AddRecipesActivity extends AppCompatActivity {
                                 @Override
                                 public void onSuccess(Uri uri) {
                                     final String imageUrl = uri.toString();
+                                    imageUrlArray[position] = imageUrl;
+                                    nrOfPhotosUploaded++;
 
-                                    // Sends recipe data to Firestore database
-                                    Recipe recipe = new Recipe(title, category, description, tags, imageUrl, false, recipeIngredientList, instructions, 0);
-
-                                    collectionReference.add(recipe)
-                                            .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                                                @Override
-                                                public void onSuccess(DocumentReference documentReference) {
-                                                    Toast.makeText(AddRecipesActivity.this, "Succesfully added " + title + " to the recipes list", Toast.LENGTH_SHORT).show();
-
-                                                }
-                                            })
-                                            .addOnFailureListener(new OnFailureListener() {
-                                                @Override
-                                                public void onFailure(@NonNull Exception e) {
-                                                    Toast.makeText(AddRecipesActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
-                                                }
-                                            });
+                                    if (nrOfPhotosUploaded == mImageUriArray.length)
+                                        addRecipe();
                                 }
                             });
 
@@ -252,6 +238,58 @@ public class AddRecipesActivity extends AppCompatActivity {
 
         } else {
             Toast.makeText(this, "No file selected", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    // Adding Recipes -----------------------------------------------------------------------------
+    public void addRecipe() {
+        final String title = editTextTitle.getText().toString();
+        final String description = editTextDescription.getText().toString();
+        final String instructions = editTextInstructions.getText().toString();
+
+        String tagInput = editTextTags.getText().toString();
+        List<String> inputIngredientList = Arrays.asList(tagInput.split("\\s*,\\s*"));
+
+        recipeIngredientList = new ArrayList<>();
+
+        final Map<String, Boolean> tags = new HashMap<>();
+
+        if (!tagInput.trim().equals(""))
+            for (String tag : possibleIngredientList) {
+                if (possibleIngredientList.contains(tag) && inputIngredientList.contains(tag)) {
+                    tags.put(tag, true);
+                    recipeIngredientList.add(tag);
+                } else if (possibleIngredientList.contains(tag) && !inputIngredientList.contains(tag)) {
+                    tags.put(tag, false);
+                }
+            }
+
+        // Sends recipe data to Firestore database
+        Recipe recipe = new Recipe(title, category, description, tags, Arrays.asList(imageUrlArray), false, recipeIngredientList, instructions, 0);
+
+        collectionReference.add(recipe)
+                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                    @Override
+                    public void onSuccess(DocumentReference documentReference) {
+                        Toast.makeText(AddRecipesActivity.this, "Succesfully added " + title + " to the recipes list", Toast.LENGTH_SHORT).show();
+
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Toast.makeText(AddRecipesActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+
+    }
+
+    private void getPhotoUploadCount() {
+        //Getting uploaded to FireStore
+        imageUrlArray = new String[mImageUriArray.length];
+        for (int i = 0; i < mImageUriArray.length; i++) {
+            addPhotoToFirestore(mImageUriArray[i], i);
         }
     }
 //  ----------------------------------------------------------------------------------------------

@@ -73,8 +73,8 @@
             android:name="ingredients"
             app:argType="string" />
         <argument
-            android:name="imageUrl"
-            app:argType="string" />
+            android:name="imageUrls"
+            app:argType="string[]" />
         <argument
             android:name="instructions"
             app:argType="string" />

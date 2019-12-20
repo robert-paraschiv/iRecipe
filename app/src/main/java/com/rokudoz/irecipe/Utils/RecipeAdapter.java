@@ -36,16 +36,13 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
         void onItemClick(int position);
 
         void onFavoriteClick(int position);
-
-        void onDeleteClick(int position);
     }
 
     public void setOnItemClickListener(OnItemClickListener listener) {
         mListener = listener;
     }
 
-    public class RecipeViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener,
-            View.OnCreateContextMenuListener, MenuItem.OnMenuItemClickListener {
+    public class RecipeViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         TextView tvTitle, tvDescription, tvNumberofFaved;
         ImageView mImageView, imgFavorited;
         Map<String, Boolean> ingredientTags;
@@ -59,7 +56,6 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
             tvNumberofFaved = itemView.findViewById(R.id.recyclerview_numberOfFaved);
 
             itemView.setOnClickListener(this);
-            itemView.setOnCreateContextMenuListener(this);
 
             imgFavorited.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -84,24 +80,6 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
             }
         }
 
-        @Override
-        public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-            menu.setHeaderTitle("Select Action");
-            MenuItem delete = menu.add(Menu.NONE, 1, 1, "Delete");
-
-            delete.setOnMenuItemClickListener(this);
-        }
-
-        @Override
-        public boolean onMenuItemClick(MenuItem item) {
-            if (mListener != null) {
-                int position = getAdapterPosition();
-                if (position != RecyclerView.NO_POSITION) {
-                    mListener.onDeleteClick(position);
-                }
-            }
-            return false;
-        }
     }
 
     public RecipeAdapter(ArrayList<Recipe> recipeList) {
@@ -121,7 +99,7 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
         holder.tvTitle.setText(currentItem.getTitle());
         holder.tvDescription.setText(currentItem.getDescription());
         Picasso.get()
-                .load(currentItem.getImageUrl())
+                .load(currentItem.getImageUrl().get(0))
                 .fit()
                 .centerCrop()
                 .into(holder.mImageView);
