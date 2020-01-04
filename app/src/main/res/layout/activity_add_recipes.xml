@@ -1,90 +1,102 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="16dp"
     tools:context=".AddRecipesActivity">
 
-    <ImageView
-        android:id="@+id/addRecipes_image"
-        android:layout_width="250dp"
-        android:layout_height="250dp"
-        android:layout_centerHorizontal="true"
-        tools:src="@drawable/ic_launcher_background"/>
-
-    <Button
-        android:id="@+id/addRecipes_choose_path_btn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/addRecipes_image"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="16dp"
-        android:text="Choose File" />
-
-    <EditText
-        android:id="@+id/edit_text_title"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/addRecipes_choose_path_btn"
-        android:hint="Title"
-        android:inputType="text" />
+        android:layout_height="match_parent"
+        android:padding="16dp">
 
-    <Spinner
-        android:id="@+id/spinner_category"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/edit_text_title"
-        android:spinnerMode="dropdown"
-        />
+        <ImageView
+            android:id="@+id/addRecipes_image"
+            android:layout_width="250dp"
+            android:layout_height="250dp"
+            android:layout_centerHorizontal="true"
+            tools:src="@drawable/ic_launcher_background" />
 
-    <EditText
-        android:id="@+id/edit_text_description"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/spinner_category"
-        android:hint="Description"
-        android:inputType="text" />
+        <Button
+            android:id="@+id/addRecipes_choose_path_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/addRecipes_image"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="16dp"
+            android:text="Choose File" />
+
+        <EditText
+            android:id="@+id/edit_text_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/addRecipes_choose_path_btn"
+            android:hint="Title"
+            android:inputType="text" />
+
+        <Spinner
+            android:id="@+id/spinner_category"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/edit_text_title"
+            android:spinnerMode="dropdown" />
+
+        <EditText
+            android:id="@+id/edit_text_description"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/spinner_category"
+            android:hint="Description"
+            android:inputType="text" />
 
 
-    <EditText
-        android:id="@+id/edit_text_tags"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/edit_text_description"
-        android:hint="Ingredients"
-        android:inputType="text" />
-    <EditText
-        android:id="@+id/edit_text_instructions"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/edit_text_tags"
-        android:hint="Instructions"
-        android:inputType="text"
-        />
+        <LinearLayout
+            android:id="@+id/linear_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/edit_text_description"
+            android:orientation="vertical" />
 
-    <ProgressBar
-        android:id="@+id/addRecipes_progressbar"
-        style="@style/Base.Widget.AppCompat.ProgressBar.Horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/edit_text_instructions" />
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnAddIngredient"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/linear_layout"
+            android:layout_centerHorizontal="true"
+            android:text="Add Ingredient" />
 
-    <Button
-        android:id="@+id/addRecipes_add_btn"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/addRecipes_progressbar"
-        android:layout_marginTop="16dp"
-        android:text="Add" />
+        <EditText
+            android:id="@+id/edit_text_instructions"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/btnAddIngredient"
+            android:hint="Instructions"
+            android:inputType="text" />
 
-    <Button
-        android:id="@+id/addRecipes_back_btn"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/addRecipes_add_btn"
-        android:onClick="backToSearch"
-        android:text="Back to Search" />
-</RelativeLayout>
+        <ProgressBar
+            android:id="@+id/addRecipes_progressbar"
+            style="@style/Base.Widget.AppCompat.ProgressBar.Horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/edit_text_instructions" />
+
+        <Button
+            android:id="@+id/addRecipes_add_btn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/addRecipes_progressbar"
+            android:layout_marginTop="16dp"
+            android:text="Add" />
+
+        <Button
+            android:id="@+id/addRecipes_back_btn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/addRecipes_add_btn"
+            android:onClick="backToSearch"
+            android:text="Back to Search" />
+
+    </RelativeLayout>
+</ScrollView>

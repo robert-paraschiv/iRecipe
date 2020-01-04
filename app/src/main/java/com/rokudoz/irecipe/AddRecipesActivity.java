@@ -3,6 +3,7 @@ package com.rokudoz.irecipe;
 import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Handler;
 
@@ -11,6 +12,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.webkit.MimeTypeMap;
@@ -19,6 +21,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.Toast;
@@ -57,6 +60,7 @@ public class AddRecipesActivity extends AppCompatActivity {
     private List<String> possibleIngredientList;
     private String[] possibleIngredientStringArray;
     private List<String> recipeIngredientList;
+    private Map<String, Float> recipeIngredientQuantityMap;
     private String category;
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private CollectionReference collectionReference = db.collection("Recipes");
@@ -64,8 +68,12 @@ public class AddRecipesActivity extends AppCompatActivity {
     private StorageReference mStorageRef = FirebaseStorage.getInstance().getReference("RecipePhotos");
     private StorageTask mUploadTask;
 
-    private EditText editTextTitle, editTextDescription, editTextTags, editTextInstructions;
-    private Button mChooseFileBtn, mAddRecipeBtn;
+    private LinearLayout linearLayout;
+    private ArrayList<EditText> ingredientEtList;
+    private ArrayList<EditText> ingredientQuantityEtList;
+
+    private EditText editTextTitle, editTextDescription, editTextInstructions;
+    private Button mChooseFileBtn, mAddRecipeBtn, mAddIngredientBtn;
     private ImageView mImageView;
     private ProgressBar mProgressBar;
 
@@ -74,17 +82,23 @@ public class AddRecipesActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_recipes);
 
+        linearLayout = findViewById(R.id.linear_layout);
+
         editTextTitle = findViewById(R.id.edit_text_title);
         editTextDescription = findViewById(R.id.edit_text_description);
-        editTextTags = findViewById(R.id.edit_text_tags);
         mProgressBar = findViewById(R.id.addRecipes_progressbar);
         mImageView = findViewById(R.id.addRecipes_image);
         mChooseFileBtn = findViewById(R.id.addRecipes_choose_path_btn);
         mAddRecipeBtn = findViewById(R.id.addRecipes_add_btn);
         editTextInstructions = findViewById(R.id.edit_text_instructions);
+        mAddIngredientBtn = findViewById(R.id.btnAddIngredient);
+
+        ingredientEtList = new ArrayList<>();
+        ingredientQuantityEtList = new ArrayList<>();
+        recipeIngredientQuantityMap = new HashMap<>();
 
         setUpCategorySpinner();
-
+        addEditText();
 
         mChooseFileBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -101,6 +115,12 @@ public class AddRecipesActivity extends AppCompatActivity {
                 } else {
                     getIngredientList();
                 }
+            }
+        });
+        mAddIngredientBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                addEditText();
             }
         });
 
@@ -155,6 +175,8 @@ public class AddRecipesActivity extends AppCompatActivity {
             } else if (data.getData() != null) {
                 //Only one image has been selected
                 mImageUri = data.getData();
+                mImageUriArray = new Uri[1];
+                mImageUriArray[0] = mImageUri;
                 Picasso.get().load(mImageUri).into(mImageView);
             }
 
@@ -215,7 +237,6 @@ public class AddRecipesActivity extends AppCompatActivity {
                                 }
                             }, 50);
                             Toast.makeText(AddRecipesActivity.this, "Upload Succesfull", Toast.LENGTH_SHORT).show();
-                            editTextTags.setText("");
                             editTextDescription.setText("");
                             editTextTitle.setText("");
                             mImageView.setImageResource(android.R.color.transparent);
@@ -247,25 +268,40 @@ public class AddRecipesActivity extends AppCompatActivity {
         final String description = editTextDescription.getText().toString();
         final String instructions = editTextInstructions.getText().toString();
 
-        String tagInput = editTextTags.getText().toString();
-        List<String> inputIngredientList = Arrays.asList(tagInput.split("\\s*,\\s*"));
+        List<String> inputIngredientList = new ArrayList<>();
 
-        recipeIngredientList = new ArrayList<>();
 
-        final Map<String, Boolean> tags = new HashMap<>();
+        //Get ingredients and quantity from the edit texts
+        for (int i = 0; i < ingredientEtList.size(); i++) {
+            if (ingredientEtList.get(i) != null && !ingredientEtList.get(i).getText().toString().isEmpty()
+                    && !ingredientEtList.get(i).getText().toString().equals("Ingredient")) {
 
-        if (!tagInput.trim().equals(""))
-            for (String tag : possibleIngredientList) {
-                if (possibleIngredientList.contains(tag) && inputIngredientList.contains(tag)) {
-                    tags.put(tag, true);
-                    recipeIngredientList.add(tag);
-                } else if (possibleIngredientList.contains(tag) && !inputIngredientList.contains(tag)) {
-                    tags.put(tag, false);
+                inputIngredientList.add(ingredientEtList.get(i).getText().toString());
+
+                if (ingredientQuantityEtList.get(i) != null && !ingredientQuantityEtList.get(i).getText().toString().isEmpty()
+                        && !ingredientQuantityEtList.get(i).getText().toString().equals("Quantity")) {
+
+                    recipeIngredientQuantityMap.put(ingredientEtList.get(i).getText().toString(), Float.parseFloat(ingredientQuantityEtList.get(i).getText().toString()));
                 }
             }
+        }
+
+
+        recipeIngredientList = new ArrayList<>();
+        final Map<String, Boolean> tags = new HashMap<>();
+
+        for (String tag : possibleIngredientList) {
+            if (possibleIngredientList.contains(tag) && inputIngredientList.contains(tag)) {
+                tags.put(tag, true);
+                recipeIngredientList.add(tag);
+            } else if (possibleIngredientList.contains(tag) && !inputIngredientList.contains(tag)) {
+                tags.put(tag, false);
+            }
+        }
 
         // Sends recipe data to Firestore database
-        Recipe recipe = new Recipe(title, category, description, tags, Arrays.asList(imageUrlArray), false, recipeIngredientList, instructions, 0);
+        Recipe recipe = new Recipe(title, category, description, tags, Arrays.asList(imageUrlArray),
+                false, recipeIngredientList, recipeIngredientQuantityMap, instructions, 0);
 
         collectionReference.add(recipe)
                 .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
@@ -283,6 +319,45 @@ public class AddRecipesActivity extends AppCompatActivity {
                 });
 
 
+    }
+
+    private void addEditText() {
+        final LinearLayout editTextLayout = new LinearLayout(this);
+        editTextLayout.setOrientation(LinearLayout.HORIZONTAL);
+        linearLayout.addView(editTextLayout);
+
+        EditText editText = new EditText(this);
+        editText.setHint("Ingredient ");
+        setEditTextAttributes(editText);
+        editTextLayout.addView(editText);
+        ingredientEtList.add(editText);
+
+        EditText editText2 = new EditText(this);
+        editText2.setHint("Quantity ");
+        setEditTextAttributes(editText2);
+        editTextLayout.addView(editText2);
+        ingredientQuantityEtList.add(editText2);
+    }
+
+    private void setEditTextAttributes(EditText editText) {
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                convertDpToPixel(180),
+                LinearLayout.LayoutParams.WRAP_CONTENT);
+
+        params.setMargins(convertDpToPixel(16),
+                convertDpToPixel(16),
+                convertDpToPixel(16),
+                0
+        );
+
+        editText.setLayoutParams(params);
+    }
+
+    //This function to convert DPs to pixels
+    private int convertDpToPixel(float dp) {
+        DisplayMetrics metrics = Resources.getSystem().getDisplayMetrics();
+        float px = dp * (metrics.densityDpi / 160f);
+        return Math.round(px);
     }
 
     private void getPhotoUploadCount() {

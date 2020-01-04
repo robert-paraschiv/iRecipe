@@ -14,6 +14,7 @@ public class Recipe {
     private List<String> imageUrl;
     private Boolean isFavorite;
     private List<String> ingredient_array;
+    private Map<String, Float> ingredient_quantity;
     private String instructions;
     private Integer numberOfFaves;
 
@@ -23,7 +24,7 @@ public class Recipe {
 
     public Recipe(String title, String category, String description
             , Map<String, Boolean> tags, List<String> imageUrl
-            , Boolean isFavorite, List<String> ingredient_array
+            , Boolean isFavorite, List<String> ingredient_array, Map<String, Float> ingredient_quantity
             , String instructions, Integer numberOfFaves) {
 
         if (title.trim().equals("")) {
@@ -36,6 +37,7 @@ public class Recipe {
         this.imageUrl = imageUrl;
         this.isFavorite = isFavorite;
         this.ingredient_array = ingredient_array;
+        this.ingredient_quantity = ingredient_quantity;
         this.instructions = instructions;
         this.numberOfFaves = numberOfFaves;
     }
@@ -95,6 +97,14 @@ public class Recipe {
 
     public void setIngredient_array(List<String> ingredient_array) {
         this.ingredient_array = ingredient_array;
+    }
+
+    public Map<String, Float> getIngredient_quantity() {
+        return ingredient_quantity;
+    }
+
+    public void setIngredient_quantity(Map<String, Float> ingredient_quantity) {
+        this.ingredient_quantity = ingredient_quantity;
     }
 
     public String getInstructions() {
