@@ -36,16 +36,35 @@
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="16dp"
                 tools:text="TitleHere" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/missing_ingredientsNumber"
+                android:layout_below="@id/tvTitle"
+                tools:text="Missing 2 ingredients"
+                android:layout_centerHorizontal="true"
+                />
+            <com.google.android.material.button.MaterialButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/addMissingIngredients_btn"
+                android:layout_below="@id/missing_ingredientsNumber"
+                android:text="Add Missing Ingredients to Shopping List"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:layout_centerHorizontal="true"
+
+                />
 
             <TextView
                 android:id="@+id/tvDescription"
                 style="@style/TextAppearance.AppCompat"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/tvTitle"
+                android:layout_below="@+id/addMissingIngredients_btn"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="8dp"
-                tools:text="Description Here" />
+                tools:text="Description Here lmao it can have more text                      \n
+                 than you think lol wtf" />
             <ImageView
                 android:layout_width="33dp"
                 android:layout_height="33dp"
@@ -75,12 +94,12 @@
                 android:layout_below="@id/tvDescription"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="8dp"
-                tools:text="Ingredients list
-        -Ingredient1
-        -Ingredient2
-        -Ingredient3
-        -Ingredient4
-        -Ingredient5
+                tools:text="Ingredients list\n
+        -Ingredient1\n
+        -Ingredient2\n
+        -Ingredient3\n
+        -Ingredient4\n
+        -Ingredient5\n
         -Ingredient6" />
 
             <TextView
@@ -90,10 +109,11 @@
                 android:layout_below="@id/tvIngredientsList"
                 android:padding="8dp"
                 style="@style/TextAppearance.MaterialComponents.Chip"
-                tools:text="Okay so basically you do stuff here
-with the ingredients so ay lmao many lines
-but yeah so then we add the stuff together and then we don't have the stuff anymore
-but the stuff turns into some food so basically we do have stuff
+                tools:text="Okay so basically you do stuff here \n
+with the ingredients so ay lmao many lines\n
+but yeah so then we add the stuff together\n
+ and then we don't have the stuff anymore\n
+but the stuff turns into some food so basically we do have stuff\n
 but the stuff is now food" />
 
 

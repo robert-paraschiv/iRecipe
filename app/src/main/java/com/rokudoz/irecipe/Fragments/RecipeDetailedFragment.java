@@ -24,6 +24,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.button.MaterialButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
@@ -39,6 +40,7 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.rokudoz.irecipe.Account.LoginActivity;
 import com.rokudoz.irecipe.Models.Comment;
+import com.rokudoz.irecipe.Models.Ingredient;
 import com.rokudoz.irecipe.Models.Recipe;
 import com.rokudoz.irecipe.Models.User;
 import com.rokudoz.irecipe.Models.UserWhoFaved;
@@ -67,6 +69,8 @@ public class RecipeDetailedFragment extends Fragment {
     private String userFavDocId = "";
     private Boolean isRecipeFavorite;
     public List<String> imageUrls;
+    private List<Ingredient> userShoppingIngredientList = new ArrayList<>();
+
     private ViewPager viewPager;
     private RecipeDetailedViewPagerAdapter recipeDetailedViewPagerAdapter;
 
@@ -75,9 +79,10 @@ public class RecipeDetailedFragment extends Fragment {
     private RecyclerView.LayoutManager mLayoutManager;
 
 
-    private TextView tvTitle, tvDescription, tvIngredients, tvInstructions, mFavoriteNumber;
+    private TextView tvTitle, tvDescription, tvIngredients, tvInstructions, mFavoriteNumber, tvMissingIngredientsNumber;
     private ImageView mImageView, mFavoriteIcon;
     private Button mAddCommentBtn;
+    private MaterialButton mAddMissingIngredientsBtn;
     private EditText mCommentEditText;
 
     private ArrayList<Comment> commentList = new ArrayList<>();
@@ -111,7 +116,11 @@ public class RecipeDetailedFragment extends Fragment {
         tvInstructions = view.findViewById(R.id.tvInstructions);
         mFavoriteIcon = view.findViewById(R.id.imageview_favorite_icon);
         mFavoriteNumber = view.findViewById(R.id.recipeDetailed_numberOfFaved);
+        tvMissingIngredientsNumber = view.findViewById(R.id.missing_ingredientsNumber);
+        mAddMissingIngredientsBtn = view.findViewById(R.id.addMissingIngredients_btn);
 
+        tvMissingIngredientsNumber.setVisibility(View.INVISIBLE);
+        mAddMissingIngredientsBtn.setVisibility(View.INVISIBLE);
 
         RecipeDetailedFragmentArgs recipeDetailedFragmentArgs = RecipeDetailedFragmentArgs.fromBundle(getArguments());
         getRecipeArgsPassed(recipeDetailedFragmentArgs);
@@ -382,17 +391,35 @@ public class RecipeDetailedFragment extends Fragment {
 
                         for (DocumentChange documentSnapshot : queryDocumentSnapshots.getDocumentChanges()) {
                             mUser = documentSnapshot.getDocument().toObject(User.class);
+                            String userDocId = documentSnapshot.getDocument().getId();
                             currentUserImageUrl = mUser.getUserProfilePicUrl();
                             currentUserName = mUser.getName();
                             favRecipes = mUser.getFavoriteRecipes();
                             loggedInUserDocumentId = documentSnapshot.getDocument().getId();
                             isRecipeFavorite = favRecipes.contains(documentID);
                             setFavoriteIcon(isRecipeFavorite);
+
+                            getUserShoppingList(userDocId);
                         }
                         getRecipeDocument(view);
 
                     }
                 });
+    }
+
+    private void getUserShoppingList(String userDocId) {
+        usersRef.document(userDocId).collection("ShoppingList").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+            @Override
+            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                if (queryDocumentSnapshots != null) {
+                    for (QueryDocumentSnapshot querySnapshot : queryDocumentSnapshots) {
+                        Ingredient ingredient = querySnapshot.toObject(Ingredient.class);
+                        userShoppingIngredientList.add(ingredient);
+                    }
+                }
+            }
+        });
+
     }
 
     private void getRecipeDocument(final View view) {
@@ -412,6 +439,7 @@ public class RecipeDetailedFragment extends Fragment {
                     recipeDetailedViewPagerAdapter.notifyDataSetChanged();
 
                 Map<String, Float> ingredientsWithQuantity = recipe.getIngredient_quantity();
+                Map<String, Boolean> recipe_ingredients_tag = recipe.getTags();
                 String instructions = recipe.getInstructions();
 
                 tvTitle.setText(title);
@@ -424,6 +452,29 @@ public class RecipeDetailedFragment extends Fragment {
                     }
                 tvIngredients.setText(ingredientsToPutInTV.toString());
 
+                int nrOfMissingIngredients = 0;
+
+                List<Ingredient> ingredientsToAddToShoppingList = new ArrayList<>();
+                for (String ingredient : recipe_ingredients_tag.keySet()) {
+                    if (mUser.getTags().get(ingredient) != recipe_ingredients_tag.get(ingredient) && recipe_ingredients_tag.get(ingredient) == true) {
+                        Ingredient ingredientToAdd = new Ingredient(ingredient, ingredientsWithQuantity.get(ingredient), "gram", false);
+                        ingredientsToAddToShoppingList.add(ingredientToAdd);
+                        nrOfMissingIngredients++;
+                    }
+                }
+                if (nrOfMissingIngredients > 0) {
+                    tvMissingIngredientsNumber.setVisibility(View.VISIBLE);
+                    tvMissingIngredientsNumber.setText("Missing " + nrOfMissingIngredients + " ingredients");
+                    mAddMissingIngredientsBtn.setVisibility(View.VISIBLE);
+                    mAddMissingIngredientsBtn.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            // HERE WE IMPLEMENTS
+errrrrrrrrrrrrrrrrrrrrrrrrrrr
+
+                        }
+                    });
+                }
                 setupViewPager(view);
             }
         });
