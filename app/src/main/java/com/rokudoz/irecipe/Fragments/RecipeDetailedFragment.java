@@ -20,8 +20,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
@@ -37,6 +39,7 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.rokudoz.irecipe.Account.LoginActivity;
 import com.rokudoz.irecipe.Models.Comment;
+import com.rokudoz.irecipe.Models.Recipe;
 import com.rokudoz.irecipe.Models.User;
 import com.rokudoz.irecipe.Models.UserWhoFaved;
 import com.rokudoz.irecipe.R;
@@ -46,23 +49,15 @@ import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static com.google.firebase.firestore.DocumentSnapshot.ServerTimestampBehavior.ESTIMATE;
 
 public class RecipeDetailedFragment extends Fragment {
     private static final String TAG = "RecipeDetailedFragment";
 
-//    private static final String ARG_ID = "argId";
-//    private static final String ARG_TITLE = "argTitle";
-//    private static final String ARG_DESCRIPTION = "argDescription";
-//    private static final String ARG_IMAGEURL = "argImageurl";
-//    private static final String ARG_INGREDIENTS = "argIngredients";
-//    private static final String ARG_INSTRUCTIONS = "argInstructions";
-//    private static final String ARG_ISFAVORITE = "argIsFavorite";
-//    private static final String ARG_FAVRECIPES = "argFavRecipes";
-//    private static final String ARG_NUMBEROFFAVES = "argNumberOfFaves";
-//    private static final String ARG_LOGGEDINUSERDOCUMENTID = "argLoggedInUserDocumentId";
 
     private String documentID = "";
     private String currentUserImageUrl = "";
@@ -71,9 +66,9 @@ public class RecipeDetailedFragment extends Fragment {
     private String title = "";
     private String userFavDocId = "";
     private Boolean isRecipeFavorite;
-
-    public String[] imageUrls;
+    public List<String> imageUrls;
     private ViewPager viewPager;
+    private RecipeDetailedViewPagerAdapter recipeDetailedViewPagerAdapter;
 
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
@@ -99,32 +94,13 @@ public class RecipeDetailedFragment extends Fragment {
     private CollectionReference recipeRef = db.collection("Recipes");
     private CollectionReference usersRef = db.collection("Users");
 
-//
-//    public static RecipeDetailedFragment newInstance(String id, String title, String description, String ingredients, String imageUrl
-//            , String instructions, Boolean isFavorite, ArrayList<String> favRecipes, String loggedInUserDocumentId, Integer numberofFaves) {
-//        RecipeDetailedFragment fragment = new RecipeDetailedFragment();
-//        Bundle args = new Bundle();
-//        args.putString(ARG_ID, id);
-//        args.putString(ARG_TITLE, title);
-//        args.putString(ARG_DESCRIPTION, description);
-//        args.putString(ARG_IMAGEURL, imageUrl);
-//        args.putString(ARG_INGREDIENTS, ingredients);
-//        args.putString(ARG_INSTRUCTIONS, instructions);
-//        args.putBoolean(ARG_ISFAVORITE, isFavorite);
-//        args.putStringArrayList(ARG_FAVRECIPES, favRecipes);
-//        args.putString(ARG_LOGGEDINUSERDOCUMENTID, loggedInUserDocumentId);
-//        args.putInt(ARG_NUMBEROFFAVES, numberofFaves);
-//        fragment.setArguments(args);
-//        return fragment;
-//    }
-
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_recipe_detailed, container, false);
 
         mUser = new User();
+        imageUrls = new ArrayList<>();
         tvTitle = view.findViewById(R.id.tvTitle);
         tvDescription = view.findViewById(R.id.tvDescription);
         tvIngredients = view.findViewById(R.id.tvIngredientsList);
@@ -182,7 +158,8 @@ public class RecipeDetailedFragment extends Fragment {
                                                     .addOnSuccessListener(new OnSuccessListener<Void>() {
                                                         @Override
                                                         public void onSuccess(Void aVoid) {
-                                                            Toast.makeText(getContext(), "Removed from favorites", Toast.LENGTH_SHORT).show();
+                                                            if (getContext() != null)
+                                                                Toast.makeText(getContext(), "Removed from favorites", Toast.LENGTH_SHORT).show();
                                                             Log.d(TAG, "onSuccess: REMOVED " + title + " " + documentID + " from favorites");
                                                         }
                                                     });
@@ -221,10 +198,7 @@ public class RecipeDetailedFragment extends Fragment {
         });
 
         buildRecyclerView();
-        setupFirebaseAuth();
-
-
-        setupViewPager(view);
+        setupFirebaseAuth(view);
 
         return view; // HAS TO BE THE LAST ONE ---------------------------------
     }
@@ -232,8 +206,8 @@ public class RecipeDetailedFragment extends Fragment {
     private void setupViewPager(View view) {
 
         viewPager = view.findViewById(R.id.view_pager);
-        RecipeDetailedViewPagerAdapter adapter = new RecipeDetailedViewPagerAdapter(getContext(), imageUrls);
-        viewPager.setAdapter(adapter);
+        recipeDetailedViewPagerAdapter = new RecipeDetailedViewPagerAdapter(getContext(), imageUrls);
+        viewPager.setAdapter(recipeDetailedViewPagerAdapter);
     }
 
     @Override
@@ -303,43 +277,8 @@ public class RecipeDetailedFragment extends Fragment {
     }
 
     private void getRecipeArgsPassed(RecipeDetailedFragmentArgs recipeDetailedFragmentArgs) {
-
         documentID = recipeDetailedFragmentArgs.getDocumentID();
-        title = recipeDetailedFragmentArgs.getTitle();
-        String description = recipeDetailedFragmentArgs.getDescription();
-        imageUrls = recipeDetailedFragmentArgs.getImageUrls();
-        String ingredients = recipeDetailedFragmentArgs.getIngredients();
-        String instructions = recipeDetailedFragmentArgs.getInstructions();
-        isRecipeFavorite = recipeDetailedFragmentArgs.getIsFavorite();
-
-        String[] favRecipesArray = recipeDetailedFragmentArgs.getFavRecipes();
-        for (int i = 0; i < favRecipesArray.length; i++) {
-            favRecipes.add(i, favRecipesArray[i]);
-        }
-
         numberOfFav = recipeDetailedFragmentArgs.getNumberOfFaves();
-
-        loggedInUserDocumentId = recipeDetailedFragmentArgs.getLoggedInUserDocumentId();
-
-        tvTitle.setText(title);
-        tvDescription.setText(description);
-        tvIngredients.setText(ingredients);
-        if (instructions != null) {
-            tvInstructions.setText("Instructions: \n\n" + instructions.replace("newline", "\n"));
-        } else {
-            tvInstructions.setText("Instructions : \n\n");
-        }
-        mFavoriteNumber.setText(Integer.toString(numberOfFav));
-
-
-        setFavoriteIcon(isRecipeFavorite);
-
-//        Picasso.get()
-//                .load(imageUrl)
-//                .fit()
-//                .centerCrop()
-//                .into(mImageView);
-
     }
 
     private void setFavoriteIcon(Boolean isFavorite) {
@@ -430,7 +369,7 @@ public class RecipeDetailedFragment extends Fragment {
 
     }
 
-    private void getCurrentUserDetails() {
+    private void getCurrentUserDetails(final View view) {
 
         currentUserDetailsListener = usersRef.whereEqualTo("user_id", FirebaseAuth.getInstance().getCurrentUser().getUid())
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
@@ -445,18 +384,58 @@ public class RecipeDetailedFragment extends Fragment {
                             mUser = documentSnapshot.getDocument().toObject(User.class);
                             currentUserImageUrl = mUser.getUserProfilePicUrl();
                             currentUserName = mUser.getName();
+                            favRecipes = mUser.getFavoriteRecipes();
+                            loggedInUserDocumentId = documentSnapshot.getDocument().getId();
+                            isRecipeFavorite = favRecipes.contains(documentID);
+                            setFavoriteIcon(isRecipeFavorite);
                         }
+                        getRecipeDocument(view);
 
-                        getCommentsFromDb();
                     }
                 });
     }
 
+    private void getRecipeDocument(final View view) {
+
+        recipeRef.document(documentID).addSnapshotListener(new EventListener<DocumentSnapshot>() {
+            @Override
+            public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
+                if (e != null) {
+                    Log.w(TAG, "onEvent: ", e);
+                    return;
+                }
+                Recipe recipe = documentSnapshot.toObject(Recipe.class);
+                title = recipe.getTitle();
+                String description = recipe.getDescription();
+                imageUrls = recipe.getImageUrl();
+                if (recipeDetailedViewPagerAdapter != null)
+                    recipeDetailedViewPagerAdapter.notifyDataSetChanged();
+
+                Map<String, Float> ingredientsWithQuantity = recipe.getIngredient_quantity();
+                String instructions = recipe.getInstructions();
+
+                tvTitle.setText(title);
+                tvDescription.setText(description);
+
+                StringBuilder ingredientsToPutInTV = new StringBuilder();
+                if (ingredientsWithQuantity != null)
+                    for (String ingredient : ingredientsWithQuantity.keySet()) {
+                        ingredientsToPutInTV.append(ingredient).append(" ").append(ingredientsWithQuantity.get(ingredient)).append("\n");
+                    }
+                tvIngredients.setText(ingredientsToPutInTV.toString());
+
+                setupViewPager(view);
+            }
+        });
+
+
+        getCommentsFromDb();
+    }
 
     /*
         ----------------------------- Firebase setup ---------------------------------
      */
-    private void setupFirebaseAuth() {
+    private void setupFirebaseAuth(final View view) {
         Log.d(TAG, "setupFirebaseAuth: started");
 
         mAuthListener = new FirebaseAuth.AuthStateListener() {
@@ -471,7 +450,7 @@ public class RecipeDetailedFragment extends Fragment {
 //                        Toast.makeText(MainActivity.this, "Authenticated with: " + user.getEmail(), Toast.LENGTH_SHORT).show();
 
                         //If use is authenticated, perform query
-                        getCurrentUserDetails();
+                        getCurrentUserDetails(view);
                     } else {
                         Toast.makeText(getContext(), "Email is not Verified\nCheck your Inbox", Toast.LENGTH_SHORT).show();
                         FirebaseAuth.getInstance().signOut();

@@ -247,8 +247,7 @@ public class FavoritesFragment extends Fragment implements RecipeAdapter.OnItemC
 
                                 if (instructions == null)
                                     instructions = " ";
-                                Navigation.findNavController(view).navigate(FavoritesFragmentDirections.actionFavoritesFragmentToRecipeDetailedFragment(id, title, description, ingredientsString
-                                        , imageUrlArray, instructions, isFavorite, favRecipesArray, loggedInUserDocumentId, numberOfFav));
+                                Navigation.findNavController(view).navigate(FavoritesFragmentDirections.actionFavoritesFragmentToRecipeDetailedFragment(id, numberOfFav));
 
                             }
 

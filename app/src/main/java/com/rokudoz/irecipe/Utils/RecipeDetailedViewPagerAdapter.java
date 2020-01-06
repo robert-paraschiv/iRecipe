@@ -10,18 +10,20 @@ import androidx.viewpager.widget.PagerAdapter;
 
 import com.squareup.picasso.Picasso;
 
+import java.util.List;
+
 public class RecipeDetailedViewPagerAdapter extends PagerAdapter {
     private Context context;
-    private String[] imageUrls;
+    private List<String> imageUrls;
 
-    public RecipeDetailedViewPagerAdapter(Context context, String[] imageUrls) {
+    public RecipeDetailedViewPagerAdapter(Context context, List<String> imageUrls) {
         this.context = context;
         this.imageUrls = imageUrls;
     }
 
     @Override
     public int getCount() {
-        return imageUrls.length;
+        return imageUrls.size();
     }
 
     @Override
@@ -34,7 +36,7 @@ public class RecipeDetailedViewPagerAdapter extends PagerAdapter {
     public Object instantiateItem(@NonNull ViewGroup container, int position) {
         ImageView imageView = new ImageView(context);
         Picasso.get()
-                .load(imageUrls[position])
+                .load(imageUrls.get(position))
                 .fit()
                 .centerCrop()
                 .into(imageView);

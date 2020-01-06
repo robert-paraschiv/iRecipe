@@ -32,12 +32,15 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Locale;
+import java.util.Objects;
 
 import javax.annotation.Nullable;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class ParentCommentAdapter
@@ -110,20 +113,32 @@ public class ParentCommentAdapter
     public void onBindViewHolder(@NonNull final CommentViewHolder holder, int position) {
         final Comment currentItem = mCommentList.get(position);
 
-        if (!currentItem.getmImageUrl().equals("")) {
-            Picasso.get()
-                    .load(currentItem.getmImageUrl())
-                    .fit()
-                    .centerCrop()
-                    .into(holder.mImageView);
-        }
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection("Users").whereEqualTo("user_id", currentItem.getmUserId()).addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@androidx.annotation.Nullable QuerySnapshot queryDocumentSnapshots, @androidx.annotation.Nullable FirebaseFirestoreException e) {
+                if (e != null) {
+                    Log.w(TAG, "onEvent: ", e);
+                    return;
+                }
+                User user = Objects.requireNonNull(queryDocumentSnapshots).getDocuments().get(0).toObject(User.class);
+                if (user.getUserProfilePicUrl() != null) {
+                    Picasso.get()
+                            .load(user.getUserProfilePicUrl())
+                            .fit()
+                            .centerCrop()
+                            .into(holder.mImageView);
+                    holder.mName.setText(user.getName());
+                }
 
-        holder.mName.setText(currentItem.getmName());
+            }
+        });
+
         holder.mCommentText.setText(currentItem.getmCommentText());
 
         Date date = currentItem.getmCommentTimeStamp();
         if (date != null) {
-            DateFormat dateFormat = new SimpleDateFormat("HH:mm, MMM d");
+            DateFormat dateFormat = new SimpleDateFormat("HH:mm, MMM d", Locale.getDefault());
             String creationDate = dateFormat.format(date);
             if (currentItem.getmCommentTimeStamp() != null && !currentItem.getmCommentTimeStamp().equals("")) {
                 holder.mCommentTimeStamp.setText(creationDate);
@@ -188,23 +203,23 @@ public class ParentCommentAdapter
         db.collection("Recipes").document(comment.getmRecipeDocumentId()).collection("Comments")
                 .document(comment.getDocumentId()).collection("ChildComments").orderBy("mCommentTimeStamp", Query.Direction.ASCENDING)
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
-            @Override
-            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
-                if (e != null) {
-                    Log.w(TAG, "onEvent: ", e);
-                    return;
-                }
-                for (DocumentSnapshot document : queryDocumentSnapshots) {
-                    Comment commentToAdd = document.toObject(Comment.class);
-                    if (!childcommentID.contains(document.getId())) {
-                        childcommentID.add(document.getId());
-                        childComments.add(0, commentToAdd);
-                    }
+                    @Override
+                    public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                        if (e != null) {
+                            Log.w(TAG, "onEvent: ", e);
+                            return;
+                        }
+                        for (DocumentSnapshot document : queryDocumentSnapshots) {
+                            Comment commentToAdd = document.toObject(Comment.class);
+                            if (!childcommentID.contains(document.getId())) {
+                                childcommentID.add(document.getId());
+                                childComments.add(0, commentToAdd);
+                            }
 
-                }
-                childAdapter.notifyDataSetChanged();
-            }
-        });
+                        }
+                        childAdapter.notifyDataSetChanged();
+                    }
+                });
 //        childAdapter.notifyDataSetChanged();
         return childComments;
 

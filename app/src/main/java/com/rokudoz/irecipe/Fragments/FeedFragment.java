@@ -9,7 +9,6 @@ import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
@@ -26,7 +25,6 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
 import com.rokudoz.irecipe.Account.LoginActivity;
 import com.rokudoz.irecipe.AddRecipesActivity;
 import com.rokudoz.irecipe.Models.Recipe;
@@ -36,7 +34,6 @@ import com.rokudoz.irecipe.R;
 import com.rokudoz.irecipe.Utils.RecipeAdapter;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -49,8 +46,8 @@ import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-public class SearchFragment extends Fragment implements RecipeAdapter.OnItemClickListener {
-    private static final String TAG = "SearchFragment";
+public class FeedFragment extends Fragment implements RecipeAdapter.OnItemClickListener {
+    private static final String TAG = "FeedFragment";
 
     public View view;
 
@@ -78,8 +75,8 @@ public class SearchFragment extends Fragment implements RecipeAdapter.OnItemClic
 
     private DocumentSnapshot mLastQueriedDocument;
 
-    public static SearchFragment newInstance() {
-        SearchFragment fragment = new SearchFragment();
+    public static FeedFragment newInstance() {
+        FeedFragment fragment = new FeedFragment();
         return fragment;
     }
 
@@ -88,7 +85,7 @@ public class SearchFragment extends Fragment implements RecipeAdapter.OnItemClic
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         if (view == null) {
-            view = inflater.inflate(R.layout.fragment_search, container, false);
+            view = inflater.inflate(R.layout.fragment_feed, container, false);
         }
         mUser = new User();
         pbLoading = view.findViewById(R.id.homeFragment_pbLoading);
@@ -148,7 +145,7 @@ public class SearchFragment extends Fragment implements RecipeAdapter.OnItemClic
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setAdapter(mAdapter);
 
-        mAdapter.setOnItemClickListener(SearchFragment.this);
+        mAdapter.setOnItemClickListener(FeedFragment.this);
     }
 
 
@@ -292,8 +289,7 @@ public class SearchFragment extends Fragment implements RecipeAdapter.OnItemClic
 
                 if (instructions == null)
                     instructions = " ";
-                Navigation.findNavController(view).navigate(SearchFragmentDirections.actionSearchFragmentToRecipeDetailedFragment(id, title, description, ingredientsString
-                        , imageUrlArray, instructions, isFavorite, favRecipesArray, loggedInUserDocumentId, numberOfFav));
+                Navigation.findNavController(view).navigate(FeedFragmentDirections.actionSearchFragmentToRecipeDetailedFragment(id, numberOfFav));
 
             }
 

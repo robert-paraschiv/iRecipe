@@ -12,6 +12,9 @@ import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
 import com.google.android.material.tabs.TabLayout;
+import com.rokudoz.irecipe.Fragments.homeSubFragments.homeBreakfastFragment;
+import com.rokudoz.irecipe.Fragments.homeSubFragments.homeDinnerFragment;
+import com.rokudoz.irecipe.Fragments.homeSubFragments.homeLunchFragment;
 import com.rokudoz.irecipe.R;
 import com.rokudoz.irecipe.Utils.SectionsPagerAdapter;
 

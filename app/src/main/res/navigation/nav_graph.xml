@@ -12,7 +12,7 @@
         tools:layout="@layout/fragment_home" >
         <action
             android:id="@+id/action_homeFragment_to_searchFragment"
-            app:destination="@id/searchFragment"
+            app:destination="@id/feedFragment"
              />
         <action
             android:id="@+id/action_homeFragment_to_recipeDetailedFragment"
@@ -26,12 +26,15 @@
             android:id="@+id/action_homeFragment_to_profileFragment"
             app:destination="@id/profileFragment"
             />
+        <action
+            android:id="@+id/action_homeFragment_to_shoppingListFragment2"
+            app:destination="@id/shoppingListFragment" />
     </fragment>
     <fragment
-        android:id="@+id/searchFragment"
-        android:name="com.rokudoz.irecipe.Fragments.SearchFragment"
+        android:id="@+id/feedFragment"
+        android:name="com.rokudoz.irecipe.Fragments.FeedFragment"
         android:label="fragment_search"
-        tools:layout="@layout/fragment_search" >
+        tools:layout="@layout/fragment_feed" >
         <action
             android:id="@+id/action_searchFragment_to_recipeDetailedFragment"
             app:destination="@id/recipeDetailedFragment"
@@ -39,6 +42,9 @@
         <action
             android:id="@+id/action_searchFragment_to_profileFragment"
             app:destination="@id/profileFragment" />
+        <action
+            android:id="@+id/action_searchFragment_to_shoppingListFragment2"
+            app:destination="@id/shoppingListFragment" />
     </fragment>
     <fragment
         android:id="@+id/favoritesFragment"
@@ -49,6 +55,9 @@
             android:id="@+id/action_favoritesFragment_to_recipeDetailedFragment"
             app:destination="@id/recipeDetailedFragment"
             />
+        <action
+            android:id="@+id/action_favoritesFragment_to_shoppingListFragment2"
+            app:destination="@id/shoppingListFragment" />
     </fragment>
     <fragment
         android:id="@+id/profileFragment"
@@ -64,33 +73,14 @@
             android:name="documentID"
             app:argType="string" />
         <argument
-            android:name="title"
-            app:argType="string" />
-        <argument
-            android:name="description"
-            app:argType="string" />
-        <argument
-            android:name="ingredients"
-            app:argType="string" />
-        <argument
-            android:name="imageUrls"
-            app:argType="string[]" />
-        <argument
-            android:name="instructions"
-            app:argType="string" />
-        <argument
-            android:name="isFavorite"
-            app:argType="boolean" />
-        <argument
-            android:name="favRecipes"
-            app:argType="string[]" />
-        <argument
-            android:name="loggedInUserDocumentId"
-            app:argType="string" />
-        <argument
             android:name="numberOfFaves"
             app:argType="integer" />
 
 
     </fragment>
+    <fragment
+        android:id="@+id/shoppingListFragment"
+        android:name="com.rokudoz.irecipe.Fragments.ShoppingListFragment"
+        android:label="fragment_shopping_list"
+        tools:layout="@layout/fragment_shopping_list" />
 </navigation>

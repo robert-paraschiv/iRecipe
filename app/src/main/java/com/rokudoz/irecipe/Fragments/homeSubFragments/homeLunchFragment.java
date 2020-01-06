@@ -1,4 +1,4 @@
-package com.rokudoz.irecipe.Fragments;
+package com.rokudoz.irecipe.Fragments.homeSubFragments;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -9,12 +9,9 @@ import androidx.annotation.Nullable;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import androidx.fragment.app.Fragment;
-import androidx.navigation.NavAction;
-import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.viewpager.widget.ViewPager;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -23,9 +20,7 @@ import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
@@ -40,16 +35,15 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
 import com.rokudoz.irecipe.Account.LoginActivity;
 import com.rokudoz.irecipe.AddRecipesActivity;
+import com.rokudoz.irecipe.Fragments.HomeFragmentDirections;
 import com.rokudoz.irecipe.Models.Recipe;
 import com.rokudoz.irecipe.Models.User;
 import com.rokudoz.irecipe.Models.UserWhoFaved;
 import com.rokudoz.irecipe.R;
 import com.rokudoz.irecipe.UpdateRecipesActivity;
 import com.rokudoz.irecipe.Utils.RecipeAdapter;
-import com.rokudoz.irecipe.Utils.SectionsPagerAdapter;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -58,8 +52,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-public class homeBreakfastFragment extends Fragment implements RecipeAdapter.OnItemClickListener {
-    private static final String TAG = "homeBreakfastFragment";
+public class homeLunchFragment extends Fragment implements RecipeAdapter.OnItemClickListener {
+    private static final String TAG = "homeLunchFragment";
 
     public View view;
 
@@ -88,8 +82,8 @@ public class homeBreakfastFragment extends Fragment implements RecipeAdapter.OnI
 
     private DocumentSnapshot mLastQueriedDocument;
 
-    public static homeBreakfastFragment newInstance() {
-        homeBreakfastFragment fragment = new homeBreakfastFragment();
+    public static homeLunchFragment newInstance() {
+        homeLunchFragment fragment = new homeLunchFragment();
         return fragment;
     }
 
@@ -98,7 +92,7 @@ public class homeBreakfastFragment extends Fragment implements RecipeAdapter.OnI
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         if (view == null) {
-            view = inflater.inflate(R.layout.fragment_home_breakfast, container, false);
+            view = inflater.inflate(R.layout.fragment_home_lunch, container, false);
         }
         mUser = new User();
         pbLoading = view.findViewById(R.id.homeFragment_pbLoading);
@@ -160,7 +154,7 @@ public class homeBreakfastFragment extends Fragment implements RecipeAdapter.OnI
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setAdapter(mAdapter);
 
-        mAdapter.setOnItemClickListener(homeBreakfastFragment.this);
+        mAdapter.setOnItemClickListener(homeLunchFragment.this);
     }
 
 
@@ -193,11 +187,11 @@ public class homeBreakfastFragment extends Fragment implements RecipeAdapter.OnI
                         }
                         Query notesQuery = null;
                         if (mLastQueriedDocument != null) {
-                            notesQuery = recipeRef.whereLessThanOrEqualTo("tags", tags).whereEqualTo("category","breakfast")
+                            notesQuery = recipeRef.whereLessThanOrEqualTo("tags", tags).whereEqualTo("category","lunch")
                                     .startAfter(mLastQueriedDocument); // Necessary so we don't have the same results multiple times
 //                                    .limit(3);
                         } else {
-                            notesQuery = recipeRef.whereLessThanOrEqualTo("tags", tags).whereEqualTo("category","breakfast");
+                            notesQuery = recipeRef.whereLessThanOrEqualTo("tags", tags).whereEqualTo("category","lunch");
 //                                    .limit(3);
                         }
 
@@ -223,6 +217,7 @@ public class homeBreakfastFragment extends Fragment implements RecipeAdapter.OnI
                     for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
                         Recipe recipe = document.toObject(Recipe.class);
                         recipe.setDocumentId(document.getId());
+
 
                         if (favRecipes != null && favRecipes.contains(document.getId())) {
                             recipe.setFavorite(true);
@@ -300,8 +295,7 @@ public class homeBreakfastFragment extends Fragment implements RecipeAdapter.OnI
 
                 if (instructions == null)
                     instructions = " ";
-                Navigation.findNavController(view).navigate(HomeFragmentDirections.actionHomeFragmentToRecipeDetailedFragment(id, title, description, ingredientsString
-                        , imageUrlArray, instructions, isFavorite, favRecipesArray, loggedInUserDocumentId, numberOfFaves));
+                Navigation.findNavController(view).navigate(HomeFragmentDirections.actionHomeFragmentToRecipeDetailedFragment(id, numberOfFaves));
 
             }
 
