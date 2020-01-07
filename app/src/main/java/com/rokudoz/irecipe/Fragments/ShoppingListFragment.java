@@ -161,7 +161,9 @@ public class ShoppingListFragment extends Fragment {
                 if (queryDocumentSnapshots != null) {
                     for (QueryDocumentSnapshot querySnapshot : queryDocumentSnapshots) {
                         Ingredient ingredient = querySnapshot.toObject(Ingredient.class);
-                        shoppingListIngredients.add(ingredient);
+                        if (!shoppingListIngredients.contains(ingredient)) {
+                            shoppingListIngredients.add(ingredient);
+                        }
                     }
                     setupCheckList();
                 }
@@ -177,9 +179,13 @@ public class ShoppingListFragment extends Fragment {
             cbListView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
 
             final List<String> checkBoxItemList = new ArrayList<>();
+            final List<String> checkBoxItemNameList = new ArrayList<>();
+            final String[] possible_ingredientsArray = ingStringArray;
 
             for (Ingredient ingredient : shoppingListIngredients) {
-                checkBoxItemList.add(ingredient.getName() + " " + ingredient.getQuantity() +" "+ ingredient.getQuantity_type());
+                checkBoxItemList.add(ingredient.getName() + " " + ingredient.getQuantity() + " " + ingredient.getQuantity_type());
+                checkBoxItemNameList.add(ingredient.getName());
+                Log.d(TAG, "setupCheckList: " + ingredient.toString());
             }
 
             //supply data items to ListView
@@ -209,15 +215,22 @@ public class ShoppingListFragment extends Fragment {
                         userIngredientList = new ArrayList<>();
                     }
                     int i = 0;
-                    for (String tag : checkBoxItemList) {
+                    for (String tag : checkBoxItemNameList) {
                         selectedIngredientsMap.put(tag, cbListView.isItemChecked(i));
                         if (userIngredientList != null && userIngredientList.contains(tag) && !cbListView.isItemChecked(i)) {
                             userIngredientList.remove(tag);
+                            ingredientsUserHas.remove(tag);
+                            shoppingListIngredients.get(i).setOwned(false);
                         } else if (userIngredientList != null && !userIngredientList.contains(tag) && cbListView.isItemChecked(i)) {
                             userIngredientList.add(tag);
+                            ingredientsUserHas.put(tag, true);
+                            shoppingListIngredients.get(i).setOwned(true);
                         }
 
                         i++;
+                    }
+                    for (String ingredient : ingredientsUserHas.keySet()) {
+                        selectedIngredientsMap.put(ingredient, ingredientsUserHas.get(ingredient));
                     }
 
                     db.collection("Users").document(userDocumentID)
@@ -225,6 +238,27 @@ public class ShoppingListFragment extends Fragment {
 
                     db.collection("Users").document(userDocumentID)
                             .update("ingredient_array", userIngredientList);
+
+                    int indexx = 0;
+                    for (final String name : checkBoxItemNameList) {
+                        final int indx = indexx;
+                        db.collection("Users").document(userDocumentID).collection("ShoppingList").whereEqualTo("name", name)
+                                .get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                            @Override
+                            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                                if (queryDocumentSnapshots != null && queryDocumentSnapshots.size() != 0)
+                                    if (cbListView.isItemChecked(indx)) {
+                                        db.collection("Users").document(userDocumentID).collection("ShoppingList")
+                                                .document(queryDocumentSnapshots.getDocuments().get(0).getId()).update("owned", true);
+                                    } else {
+                                        db.collection("Users").document(userDocumentID).collection("ShoppingList")
+                                                .document(queryDocumentSnapshots.getDocuments().get(0).getId()).update("owned", false);
+                                    }
+
+                            }
+                        });
+                        indexx++;
+                    }
                 }
 
             });

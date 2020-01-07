@@ -60,4 +60,12 @@ public class Ingredient {
                 ", owned=" + owned +
                 '}';
     }
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof Ingredient))
+            return false;
+        if (obj == this)
+            return true;
+        return this.name.equals(((Ingredient) obj).name);
+    }
 }

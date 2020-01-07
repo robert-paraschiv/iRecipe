@@ -20,10 +20,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.android.material.button.MaterialButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -47,11 +45,9 @@ import com.rokudoz.irecipe.Models.UserWhoFaved;
 import com.rokudoz.irecipe.R;
 import com.rokudoz.irecipe.Utils.ParentCommentAdapter;
 import com.rokudoz.irecipe.Utils.RecipeDetailedViewPagerAdapter;
-import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -70,6 +66,7 @@ public class RecipeDetailedFragment extends Fragment {
     private Boolean isRecipeFavorite;
     public List<String> imageUrls;
     private List<Ingredient> userShoppingIngredientList = new ArrayList<>();
+    private List<Ingredient> recipeIngredientsToAddToShoppingList = new ArrayList<>();
 
     private ViewPager viewPager;
     private RecipeDetailedViewPagerAdapter recipeDetailedViewPagerAdapter;
@@ -95,7 +92,8 @@ public class RecipeDetailedFragment extends Fragment {
 
     private FirebaseAuth.AuthStateListener mAuthListener;
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
-    private ListenerRegistration currentSubCollectionListener, usersRefListener, commentListener, numberofFavListener, currentUserDetailsListener;
+    private ListenerRegistration currentSubCollectionListener, usersRefListener, commentListener, numberofFavListener, currentUserDetailsListener,
+            userShoppingListListener;
     private CollectionReference recipeRef = db.collection("Recipes");
     private CollectionReference usersRef = db.collection("Users");
 
@@ -257,6 +255,10 @@ public class RecipeDetailedFragment extends Fragment {
             numberofFavListener.remove();
             numberofFavListener = null;
         }
+        if (userShoppingListListener != null) {
+            userShoppingListListener.remove();
+            userShoppingListListener = null;
+        }
     }
 
 
@@ -399,27 +401,44 @@ public class RecipeDetailedFragment extends Fragment {
                             isRecipeFavorite = favRecipes.contains(documentID);
                             setFavoriteIcon(isRecipeFavorite);
 
-                            getUserShoppingList(userDocId);
+                            getUserShoppingList(userDocId, view);
                         }
-                        getRecipeDocument(view);
+
 
                     }
                 });
     }
 
-    private void getUserShoppingList(String userDocId) {
-        usersRef.document(userDocId).collection("ShoppingList").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+    private void getUserShoppingList(String userDocId, final View view) {
+//        usersRef.document(userDocId).collection("ShoppingList").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+//            @Override
+//            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+//                if (queryDocumentSnapshots != null) {
+//                    for (QueryDocumentSnapshot querySnapshot : queryDocumentSnapshots) {
+//                        Ingredient ingredient = querySnapshot.toObject(Ingredient.class);
+//                        userShoppingIngredientList.add(ingredient);
+//                        Log.d(TAG, "onSuccess: ADDED TO USERSHOPPING LIST " + ingredient.toString());
+//                    }
+//                }
+//                getRecipeDocument(view);
+//            }
+//        });
+
+
+        userShoppingListListener = usersRef.document(userDocId).collection("ShoppingList").addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
-            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                if (queryDocumentSnapshots != null) {
-                    for (QueryDocumentSnapshot querySnapshot : queryDocumentSnapshots) {
-                        Ingredient ingredient = querySnapshot.toObject(Ingredient.class);
-                        userShoppingIngredientList.add(ingredient);
-                    }
+            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                if (e != null) {
+                    Log.w(TAG, "onEvent: ", e);
                 }
+                for (DocumentChange documentSnapshot : queryDocumentSnapshots.getDocumentChanges()) {
+                    Ingredient ingredient = documentSnapshot.getDocument().toObject(Ingredient.class);
+                    userShoppingIngredientList.add(ingredient);
+                    Log.d(TAG, "onEvent: ADDED TO USER SHOPPING LIST " + ingredient.toString());
+                }
+                getRecipeDocument(view);
             }
         });
-
     }
 
     private void getRecipeDocument(final View view) {
@@ -454,15 +473,23 @@ public class RecipeDetailedFragment extends Fragment {
 
                 int nrOfMissingIngredients = 0;
 
-                List<Ingredient> ingredientsToAddToShoppingList = new ArrayList<>();
-                for (String ingredient : recipe_ingredients_tag.keySet()) {
-                    if (mUser.getTags().get(ingredient) != recipe_ingredients_tag.get(ingredient) && recipe_ingredients_tag.get(ingredient) == true) {
-                        Ingredient ingredientToAdd = new Ingredient(ingredient, ingredientsWithQuantity.get(ingredient), "gram", false);
-                        ingredientsToAddToShoppingList.add(ingredientToAdd);
-                        nrOfMissingIngredients++;
+                for (String ingredientName : recipe_ingredients_tag.keySet()) {
+                    if (mUser.getTags().get(ingredientName) != recipe_ingredients_tag.get(ingredientName)
+                            && recipe_ingredients_tag.get(ingredientName) == true) {
+                        Ingredient ingredient = new Ingredient(ingredientName, ingredientsWithQuantity.get(ingredientName), "gram", false);
+                        if (!recipeIngredientsToAddToShoppingList.contains(ingredient)) {
+                            recipeIngredientsToAddToShoppingList.add(ingredient);
+                            nrOfMissingIngredients++;
+
+                            Log.d(TAG, "onEvent: INGREDIENT NOT IN COMMON " + ingredient.toString());
+                        }else {
+                            recipeIngredientsToAddToShoppingList.remove(ingredient);
+                            nrOfMissingIngredients--;
+                        }
+
                     }
                 }
-                if (nrOfMissingIngredients > 0) {
+                if (nrOfMissingIngredients > 0 && !userShoppingIngredientList.containsAll(recipeIngredientsToAddToShoppingList)) {
                     tvMissingIngredientsNumber.setVisibility(View.VISIBLE);
                     tvMissingIngredientsNumber.setText("Missing " + nrOfMissingIngredients + " ingredients");
                     mAddMissingIngredientsBtn.setVisibility(View.VISIBLE);
@@ -470,7 +497,20 @@ public class RecipeDetailedFragment extends Fragment {
                         @Override
                         public void onClick(View v) {
                             // HERE WE IMPLEMENTS
-errrrrrrrrrrrrrrrrrrrrrrrrrrr
+                            for (final Ingredient ingredient : recipeIngredientsToAddToShoppingList) {
+                                if (!userShoppingIngredientList.contains(ingredient)) {
+                                    usersRef.document(loggedInUserDocumentId).collection("ShoppingList")
+                                            .add(ingredient).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                                        @Override
+                                        public void onSuccess(DocumentReference documentReference) {
+                                            Log.d(TAG, "onSuccess: ADDED TO SHOPPING LIST " + ingredient.toString());
+                                            userShoppingIngredientList.add(ingredient);
+                                        }
+                                    });
+                                }
+                            }
+                            mAddMissingIngredientsBtn.setVisibility(View.INVISIBLE);
+                            tvMissingIngredientsNumber.setVisibility(View.INVISIBLE);
 
                         }
                     });

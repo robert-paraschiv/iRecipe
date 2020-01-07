@@ -179,11 +179,11 @@ public class FeedFragment extends Fragment implements RecipeAdapter.OnItemClickL
                         Log.d(TAG, "onEvent: User ingredientsArray " + userIngredientsArray);
                         Query notesQuery = null;
                         if (mLastQueriedDocument != null) {
-                            notesQuery = recipeRef.whereGreaterThanOrEqualTo("tags", tags)
+                            notesQuery = recipeRef
                                     .startAfter(mLastQueriedDocument); // Necessary so we don't have the same results multiple times
 //                                    .limit(3);
                         } else {
-                            notesQuery = recipeRef.whereGreaterThanOrEqualTo("tags", tags);
+                            notesQuery = recipeRef;
 //                                    .limit(3);
                         }
 
@@ -236,6 +236,7 @@ public class FeedFragment extends Fragment implements RecipeAdapter.OnItemClickL
                                             + " because it has " + moreElements + " more elements " + ", ingredients: "
                                             + recipe.getIngredient_array().toString());
                                 } else {
+                                    mDocumentIDs.remove(document.getId());
                                     Log.d(TAG, "onEvent: Rejected recipe: " + recipe.getTitle()
                                             + " because it has " + moreElements + " more elements " + ", ingredients: "
                                             + recipe.getIngredient_array().toString());
