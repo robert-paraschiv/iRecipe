@@ -21,6 +21,15 @@
             android:layout_marginStart="4dp"
             android:layout_marginTop="4dp"
             android:layout_marginEnd="4dp" />
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/empty_basket_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+        app:cornerRadius="18dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:text="Empty basket" />
 
         <!--        <LinearLayout-->
         <!--            android:id="@+id/linear_layout"-->

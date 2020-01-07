@@ -1,8 +1,11 @@
 package com.rokudoz.irecipe.Models;
 
+import com.google.firebase.firestore.Exclude;
+
 import java.util.Map;
 
 public class Ingredient {
+    private String documentId;
     private String name;
     private Float quantity;
     private String quantity_type;
@@ -19,6 +22,14 @@ public class Ingredient {
         this.owned = owned;
     }
 
+    @Exclude
+    public String getDocumentId() {
+        return documentId;
+    }
+
+    public void setDocumentId(String documentId) {
+        this.documentId = documentId;
+    }
     public String getName() {
         return name;
     }

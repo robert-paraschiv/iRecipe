@@ -62,11 +62,12 @@ public class ShoppingListFragment extends Fragment {
     private ListView cbListView;
 
     private String userDocumentID = "";
-
+    private ArrayAdapter<String> checkBoxArrayAdapter;
     private List<String> ingredientList;
     private String[] ingStringArray;
     private ArrayList<Ingredient> shoppingListIngredients = new ArrayList<>();
     private List<String> userIngredientList;
+    private Button mEmptyBasketBtn;
 
     Map<String, Boolean> ingredientsUserHas = new HashMap<>();
 
@@ -88,7 +89,7 @@ public class ShoppingListFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_shopping_list, container, false);
 //        textViewData = view.findViewById(R.id.tv_data);
         cbListView = view.findViewById(R.id.checkable_list);
-
+        mEmptyBasketBtn = view.findViewById(R.id.empty_basket_btn);
 
         userIngredientList = new ArrayList<>();
 
@@ -162,9 +163,35 @@ public class ShoppingListFragment extends Fragment {
                     for (QueryDocumentSnapshot querySnapshot : queryDocumentSnapshots) {
                         Ingredient ingredient = querySnapshot.toObject(Ingredient.class);
                         if (!shoppingListIngredients.contains(ingredient)) {
+                            ingredient.setDocumentId(querySnapshot.getId());
                             shoppingListIngredients.add(ingredient);
                         }
                     }
+
+                    // EMPTY basket on click
+                    mEmptyBasketBtn.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+
+                            for (final Ingredient ingToDelete : shoppingListIngredients) {
+                                usersReference.document(userDocumentID).collection("ShoppingList").document(ingToDelete.getDocumentId())
+                                        .delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+                                        Log.d(TAG, "onSuccess: Deleted" + ingToDelete.toString() + " from shopping list");
+                                        shoppingListIngredients.remove(ingToDelete);
+
+                                        if (shoppingListIngredients.size() == 0) {
+                                            Log.d(TAG, "onSuccess: Basket Emptied");
+                                            checkBoxArrayAdapter.clear();
+                                            checkBoxArrayAdapter.notifyDataSetChanged();
+                                            Toast.makeText(getContext(), "Basket Emptied", Toast.LENGTH_SHORT).show();
+                                        }
+                                    }
+                                });
+                            }
+                        }
+                    });
                     setupCheckList();
                 }
             }
@@ -178,19 +205,19 @@ public class ShoppingListFragment extends Fragment {
         if (getActivity() != null) {
             cbListView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
 
-            final List<String> checkBoxItemList = new ArrayList<>();
+            final List<String> checkBoxItemListWithQuantity = new ArrayList<>();
             final List<String> checkBoxItemNameList = new ArrayList<>();
             final String[] possible_ingredientsArray = ingStringArray;
 
             for (Ingredient ingredient : shoppingListIngredients) {
-                checkBoxItemList.add(ingredient.getName() + " " + ingredient.getQuantity() + " " + ingredient.getQuantity_type());
+                checkBoxItemListWithQuantity.add(ingredient.getName() + " " + ingredient.getQuantity() + " " + ingredient.getQuantity_type());
                 checkBoxItemNameList.add(ingredient.getName());
                 Log.d(TAG, "setupCheckList: " + ingredient.toString());
             }
 
             //supply data items to ListView
-            ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(getContext(), R.layout.checkable_list_layout, R.id.txt_title, checkBoxItemList);
-            cbListView.setAdapter(arrayAdapter);
+            checkBoxArrayAdapter = new ArrayAdapter<String>(getContext(), R.layout.checkable_list_layout, R.id.txt_title, checkBoxItemListWithQuantity);
+            cbListView.setAdapter(checkBoxArrayAdapter);
 
             //When the Ingredients List has more elements than the UserTAGS(IngredientsUserHas), initialize elements as false to avoid crash
             for (String ing : ingStringArray) {
@@ -200,11 +227,13 @@ public class ShoppingListFragment extends Fragment {
             }
 
             // sets the initial checkbox values taken from database
-            int index = 0;
-            for (String item : checkBoxItemList) {
-                cbListView.setItemChecked(index, shoppingListIngredients.get(index).getOwned());
-                Log.d(TAG, item + " index " + index + " value " + shoppingListIngredients.get(index).getOwned());
-                index++;
+            for (String item : checkBoxItemNameList) {
+                int index = checkBoxItemNameList.indexOf(item);
+                if (ingredientsUserHas.get(item) && shoppingListIngredients.get(checkBoxItemNameList.indexOf(item)).getOwned())
+                    cbListView.setItemChecked(index, true);
+
+                Log.d(TAG, item + " index " + checkBoxItemNameList.indexOf(item) + " value "
+                        + shoppingListIngredients.get(checkBoxItemNameList.indexOf(item)).getOwned());
             }
 
             cbListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -214,20 +243,18 @@ public class ShoppingListFragment extends Fragment {
                     if (userIngredientList == null) {
                         userIngredientList = new ArrayList<>();
                     }
-                    int i = 0;
                     for (String tag : checkBoxItemNameList) {
-                        selectedIngredientsMap.put(tag, cbListView.isItemChecked(i));
-                        if (userIngredientList != null && userIngredientList.contains(tag) && !cbListView.isItemChecked(i)) {
+                        selectedIngredientsMap.put(tag, cbListView.isItemChecked(checkBoxItemNameList.indexOf(tag)));
+                        if (userIngredientList != null && userIngredientList.contains(tag) && !cbListView.isItemChecked(checkBoxItemNameList.indexOf(tag))) {
                             userIngredientList.remove(tag);
                             ingredientsUserHas.remove(tag);
-                            shoppingListIngredients.get(i).setOwned(false);
-                        } else if (userIngredientList != null && !userIngredientList.contains(tag) && cbListView.isItemChecked(i)) {
+                            shoppingListIngredients.get(checkBoxItemNameList.indexOf(tag)).setOwned(false);
+                        } else if (userIngredientList != null && !userIngredientList.contains(tag) && cbListView.isItemChecked(checkBoxItemNameList.indexOf(tag))) {
                             userIngredientList.add(tag);
                             ingredientsUserHas.put(tag, true);
-                            shoppingListIngredients.get(i).setOwned(true);
+                            shoppingListIngredients.get(checkBoxItemNameList.indexOf(tag)).setOwned(true);
                         }
 
-                        i++;
                     }
                     for (String ingredient : ingredientsUserHas.keySet()) {
                         selectedIngredientsMap.put(ingredient, ingredientsUserHas.get(ingredient));
@@ -239,15 +266,13 @@ public class ShoppingListFragment extends Fragment {
                     db.collection("Users").document(userDocumentID)
                             .update("ingredient_array", userIngredientList);
 
-                    int indexx = 0;
                     for (final String name : checkBoxItemNameList) {
-                        final int indx = indexx;
                         db.collection("Users").document(userDocumentID).collection("ShoppingList").whereEqualTo("name", name)
                                 .get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                             @Override
                             public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                                 if (queryDocumentSnapshots != null && queryDocumentSnapshots.size() != 0)
-                                    if (cbListView.isItemChecked(indx)) {
+                                    if (cbListView.isItemChecked(checkBoxItemListWithQuantity.indexOf(name))) {
                                         db.collection("Users").document(userDocumentID).collection("ShoppingList")
                                                 .document(queryDocumentSnapshots.getDocuments().get(0).getId()).update("owned", true);
                                     } else {
@@ -257,7 +282,6 @@ public class ShoppingListFragment extends Fragment {
 
                             }
                         });
-                        indexx++;
                     }
                 }
 

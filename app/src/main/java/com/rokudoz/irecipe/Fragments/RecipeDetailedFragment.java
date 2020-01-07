@@ -412,21 +412,7 @@ public class RecipeDetailedFragment extends Fragment {
                 });
     }
 
-    private void getUserShoppingList(String userDocId, final View view) {
-//        usersRef.document(userDocId).collection("ShoppingList").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-//            @Override
-//            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-//                if (queryDocumentSnapshots != null) {
-//                    for (QueryDocumentSnapshot querySnapshot : queryDocumentSnapshots) {
-//                        Ingredient ingredient = querySnapshot.toObject(Ingredient.class);
-//                        userShoppingIngredientList.add(ingredient);
-//                        Log.d(TAG, "onSuccess: ADDED TO USERSHOPPING LIST " + ingredient.toString());
-//                    }
-//                }
-//                getRecipeDocument(view);
-//            }
-//        });
-
+    private void getUserShoppingList(final String userDocId, final View view) {
 
         userShoppingListListener = usersRef.document(userDocId).collection("ShoppingList").addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
@@ -436,6 +422,7 @@ public class RecipeDetailedFragment extends Fragment {
                 }
                 for (DocumentChange documentSnapshot : queryDocumentSnapshots.getDocumentChanges()) {
                     Ingredient ingredient = documentSnapshot.getDocument().toObject(Ingredient.class);
+                    ingredient.setDocumentId(documentSnapshot.getDocument().getId());
                     userShoppingIngredientList.add(ingredient);
                     Log.d(TAG, "onEvent: ADDED TO USER SHOPPING LIST " + ingredient.toString());
                 }
@@ -479,14 +466,16 @@ public class RecipeDetailedFragment extends Fragment {
                 for (String ingredientName : recipe_ingredients_tag.keySet()) {
                     if (mUser.getTags().get(ingredientName) != recipe_ingredients_tag.get(ingredientName)
                             && recipe_ingredients_tag.get(ingredientName)) {
-                        Ingredient ingredient = new Ingredient(ingredientName, Objects.requireNonNull(ingredientsWithQuantity).get(ingredientName), "gram", false);
+                        Ingredient ingredient = new Ingredient(ingredientName, Objects.requireNonNull(ingredientsWithQuantity).get(ingredientName),
+                                "g", false);
                         if (!recipeIngredientsToAddToShoppingList.contains(ingredient)) {
                             if (userShoppingIngredientList.contains(ingredient)) {
+                                // If user has the ingredient in shopping list and it is checked as true, set it as owned
                                 if (userShoppingIngredientList.get(userShoppingIngredientList.indexOf(ingredient)).getOwned())
                                     ingredient.setOwned(true);
-                                recipeIngredientsToAddToShoppingList.add(ingredient);
 
                             }
+                            recipeIngredientsToAddToShoppingList.add(ingredient);
                             nrOfMissingIngredients++;
 
                             Log.d(TAG, "onEvent: INGREDIENT NOT IN COMMON " + ingredient.toString());
@@ -526,11 +515,20 @@ public class RecipeDetailedFragment extends Fragment {
                 // If the user has the missing ingredients in the shopping list, don't show button, but show message that they are in the list
                 else if (nrOfMissingIngredients > 0 && userShoppingIngredientList.containsAll(recipeIngredientsToAddToShoppingList)) {
                     for (Ingredient ing : recipeIngredientsToAddToShoppingList) {
-                        if (!recipeIngredientsToAddToShoppingList.get(recipeIngredientsToAddToShoppingList.indexOf(ing)).getOwned()){
+                        if (!recipeIngredientsToAddToShoppingList.get(recipeIngredientsToAddToShoppingList.indexOf(ing)).getOwned()) {
                             tvMissingIngredientsNumber.setVisibility(View.VISIBLE);
                             tvMissingIngredientsNumber.setText(nrOfMissingIngredients + " missing ingredients are in your shopping list");
                         }
                     }
+                }
+
+                if (nrOfMissingIngredients > 0) {
+                    Log.d(TAG, "onEvent: usershopping size: " + userShoppingIngredientList.size()
+                            + " recipe size : " + recipeIngredientsToAddToShoppingList.size());
+                    for (Ingredient testinguser : userShoppingIngredientList)
+                        Log.d(TAG, "onEvent: usershoppinglist: " + userShoppingIngredientList.toString());
+                    for (Ingredient testingrecipe : recipeIngredientsToAddToShoppingList)
+                        Log.d(TAG, "onEvent: recipeshoppinglist: " + recipeIngredientsToAddToShoppingList.toString());
                 }
                 setupViewPager(view);
             }
