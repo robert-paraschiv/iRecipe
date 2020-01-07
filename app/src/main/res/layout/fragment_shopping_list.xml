@@ -11,7 +11,8 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="50dp"
-            app:title="Shopping Cart" />
+            app:title="Shopping Cart"
+            />
 
         <ListView
             android:id="@+id/checkable_list"

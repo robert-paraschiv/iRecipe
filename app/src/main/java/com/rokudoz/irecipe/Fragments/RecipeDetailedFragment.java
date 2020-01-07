@@ -121,7 +121,7 @@ public class RecipeDetailedFragment extends Fragment {
         mAddMissingingredientsFAB = view.findViewById(R.id.fab_addMissingIngredients);
 
         tvMissingIngredientsNumber.setVisibility(View.INVISIBLE);
-        mAddMissingingredientsFAB.setVisibility(View.INVISIBLE);
+        mAddMissingingredientsFAB.hide();
 
         RecipeDetailedFragmentArgs recipeDetailedFragmentArgs = RecipeDetailedFragmentArgs.fromBundle(getArguments());
         getRecipeArgsPassed(recipeDetailedFragmentArgs);
@@ -489,7 +489,8 @@ public class RecipeDetailedFragment extends Fragment {
                 if (nrOfMissingIngredients > 0 && !userShoppingIngredientList.containsAll(recipeIngredientsToAddToShoppingList)) {
                     tvMissingIngredientsNumber.setVisibility(View.VISIBLE);
                     tvMissingIngredientsNumber.setText("Missing " + nrOfMissingIngredients + " ingredients");
-                    mAddMissingingredientsFAB.setVisibility(View.VISIBLE);
+                    mAddMissingingredientsFAB.setText("+" + nrOfMissingIngredients);
+                    mAddMissingingredientsFAB.show();
                     mAddMissingingredientsFAB.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
@@ -506,7 +507,7 @@ public class RecipeDetailedFragment extends Fragment {
                                     });
                                 }
                             }
-                            mAddMissingingredientsFAB.setVisibility(View.INVISIBLE);
+                            mAddMissingingredientsFAB.hide();
                             tvMissingIngredientsNumber.setVisibility(View.INVISIBLE);
 
                         }

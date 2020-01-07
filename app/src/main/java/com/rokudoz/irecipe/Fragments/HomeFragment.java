@@ -1,5 +1,6 @@
 package com.rokudoz.irecipe.Fragments;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,17 +12,21 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
+import com.rokudoz.irecipe.AddRecipesActivity;
 import com.rokudoz.irecipe.Fragments.homeSubFragments.homeBreakfastFragment;
 import com.rokudoz.irecipe.Fragments.homeSubFragments.homeDinnerFragment;
 import com.rokudoz.irecipe.Fragments.homeSubFragments.homeLunchFragment;
 import com.rokudoz.irecipe.R;
+import com.rokudoz.irecipe.UpdateRecipesActivity;
 import com.rokudoz.irecipe.Utils.SectionsPagerAdapter;
 
 public class HomeFragment extends Fragment {
     private static final String TAG = "HomeFragment";
 
     public View view;
+    private FloatingActionButton fab_addRecipes,fab_updateRecipes;
 
     //Tabs
     private SectionsPagerAdapter sectionsPagerAdapter;
@@ -39,6 +44,8 @@ public class HomeFragment extends Fragment {
         if (view == null) {
             view = inflater.inflate(R.layout.fragment_home, container, false);
         }
+        fab_updateRecipes=view.findViewById(R.id.fab_update_recipes);
+        fab_addRecipes=view.findViewById(R.id.fab_add_recipe);
 
         viewPager = view.findViewById(R.id.container);
         setupViewPager(viewPager);
@@ -46,8 +53,31 @@ public class HomeFragment extends Fragment {
         TabLayout tabLayout = view.findViewById(R.id.tabLayout);
         tabLayout.setupWithViewPager(viewPager);
 
+        fab_addRecipes.show();
+        fab_addRecipes.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                navigateToAddRecipes();
+            }
+        });
+        fab_updateRecipes.show();
+        fab_updateRecipes.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                navigateToUpdateRecipes();
+            }
+        });
 
         return view; // HAS TO BE THE LAST ONE ---------------------------------
+    }
+    public void navigateToAddRecipes() {
+        Intent intent = new Intent(getContext(), AddRecipesActivity.class);
+        startActivity(intent);
+    }
+
+    public void navigateToUpdateRecipes() {
+        Intent intent = new Intent(getContext(), UpdateRecipesActivity.class);
+        startActivity(intent);
     }
 
 

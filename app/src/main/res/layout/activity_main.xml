@@ -57,7 +57,8 @@
         app:itemIconTint="@drawable/selector_bottombar_item"
         app:itemTextColor="@drawable/selector_bottombar_text"
         android:elevation="4dp"
-        app:menu="@menu/bottom_navigation"/>
+        app:menu="@menu/bottom_navigation"
+        />
 
 
 </RelativeLayout>

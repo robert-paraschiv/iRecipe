@@ -58,8 +58,6 @@ public class homeLunchFragment extends Fragment implements RecipeAdapter.OnItemC
     public View view;
 
     private ProgressBar pbLoading;
-    private FloatingActionButton fab_addRecipes;
-    private FloatingActionButton fab_updateRecipes;
 
     //FireBase
     private FirebaseAuth.AuthStateListener mAuthListener;
@@ -96,15 +94,10 @@ public class homeLunchFragment extends Fragment implements RecipeAdapter.OnItemC
         }
         mUser = new User();
         pbLoading = view.findViewById(R.id.homeFragment_pbLoading);
-        fab_addRecipes = view.findViewById(R.id.fab_add_recipe);
-        fab_updateRecipes = view.findViewById(R.id.fab_update_recipes);
         mRecyclerView = view.findViewById(R.id.recycler_view);
 
         pbLoading.setVisibility(View.VISIBLE);
         mStorageRef = FirebaseStorage.getInstance();
-
-        fab_addRecipes.hide();
-        fab_updateRecipes.hide();
         buildRecyclerView();
         setupFirebaseAuth();
 
@@ -391,21 +384,6 @@ public class homeLunchFragment extends Fragment implements RecipeAdapter.OnItemC
 //                        Log.d(TAG, "onAuthStateChanged: signed_in: " + user.getUid());
 //                        Toast.makeText(MainActivity.this, "Authenticated with: " + user.getEmail(), Toast.LENGTH_SHORT).show();
                         if (user.getEmail().equals("paraschivlongin@gmail.com")) {
-                            fab_addRecipes.show();
-                            fab_addRecipes.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    navigateToAddRecipes();
-                                }
-                            });
-                            fab_updateRecipes.show();
-                            fab_updateRecipes.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    navigateToUpdateRecipes();
-                                }
-                            });
-
                         }
                         //If use is authenticated, perform query
                         performQuery();

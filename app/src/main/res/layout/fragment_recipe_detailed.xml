@@ -12,8 +12,8 @@
         android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"
         android:layout_margin="8dp"
-        style="@style/Widget.MaterialComponents.FloatingActionButton"
-        android:text="Add missing ingredients"/>
+        app:icon="@drawable/ic_shopping_basket_black_24dp"
+        android:text="+"/>
 
     <androidx.core.widget.NestedScrollView
         android:id="@+id/nestedScrollView"
