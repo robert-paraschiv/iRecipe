@@ -229,7 +229,7 @@ public class ShoppingListFragment extends Fragment {
             // sets the initial checkbox values taken from database
             for (String item : checkBoxItemNameList) {
                 int index = checkBoxItemNameList.indexOf(item);
-                if (ingredientsUserHas.get(item) && shoppingListIngredients.get(checkBoxItemNameList.indexOf(item)).getOwned())
+                if (ingredientsUserHas.get(item) && shoppingListIngredients.get(checkBoxItemNameList.indexOf(item)).getName().equals(item))
                     cbListView.setItemChecked(index, true);
 
                 Log.d(TAG, item + " index " + checkBoxItemNameList.indexOf(item) + " value "

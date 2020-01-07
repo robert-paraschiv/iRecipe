@@ -14,6 +14,8 @@ import androidx.viewpager.widget.ViewPager;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.rokudoz.irecipe.AddRecipesActivity;
 import com.rokudoz.irecipe.Fragments.homeSubFragments.homeBreakfastFragment;
 import com.rokudoz.irecipe.Fragments.homeSubFragments.homeDinnerFragment;
@@ -26,7 +28,7 @@ public class HomeFragment extends Fragment {
     private static final String TAG = "HomeFragment";
 
     public View view;
-    private FloatingActionButton fab_addRecipes,fab_updateRecipes;
+    private FloatingActionButton fab_addRecipes, fab_updateRecipes;
 
     //Tabs
     private SectionsPagerAdapter sectionsPagerAdapter;
@@ -44,8 +46,10 @@ public class HomeFragment extends Fragment {
         if (view == null) {
             view = inflater.inflate(R.layout.fragment_home, container, false);
         }
-        fab_updateRecipes=view.findViewById(R.id.fab_update_recipes);
-        fab_addRecipes=view.findViewById(R.id.fab_add_recipe);
+        fab_updateRecipes = view.findViewById(R.id.fab_update_recipes);
+        fab_addRecipes = view.findViewById(R.id.fab_add_recipe);
+
+        fab_updateRecipes.hide();
 
         viewPager = view.findViewById(R.id.container);
         setupViewPager(viewPager);
@@ -53,6 +57,23 @@ public class HomeFragment extends Fragment {
         TabLayout tabLayout = view.findViewById(R.id.tabLayout);
         tabLayout.setupWithViewPager(viewPager);
 
+        FirebaseAuth.AuthStateListener authStateListener = new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                FirebaseUser user = firebaseAuth.getCurrentUser();
+                if (user != null) {
+                    if (user.getEmail().equals("paraschivlongin@gmail.com")){
+                        fab_updateRecipes.show();
+                        fab_updateRecipes.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                navigateToUpdateRecipes();
+                            }
+                        });
+                    }
+                }
+            }
+        };
         fab_addRecipes.show();
         fab_addRecipes.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -60,16 +81,11 @@ public class HomeFragment extends Fragment {
                 navigateToAddRecipes();
             }
         });
-        fab_updateRecipes.show();
-        fab_updateRecipes.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                navigateToUpdateRecipes();
-            }
-        });
+
 
         return view; // HAS TO BE THE LAST ONE ---------------------------------
     }
+
     public void navigateToAddRecipes() {
         Intent intent = new Intent(getContext(), AddRecipesActivity.class);
         startActivity(intent);
@@ -81,12 +97,11 @@ public class HomeFragment extends Fragment {
     }
 
 
-
-    private void setupViewPager(ViewPager viewPager){
+    private void setupViewPager(ViewPager viewPager) {
         SectionsPagerAdapter adapter = new SectionsPagerAdapter(getChildFragmentManager(), FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
-        adapter.addFragment(new homeBreakfastFragment(),"Breakfast");
-        adapter.addFragment(new homeLunchFragment(),"Lunch");
-        adapter.addFragment(new homeDinnerFragment(),"Dinner");
+        adapter.addFragment(new homeBreakfastFragment(), "Breakfast");
+        adapter.addFragment(new homeLunchFragment(), "Lunch");
+        adapter.addFragment(new homeDinnerFragment(), "Dinner");
         viewPager.setAdapter(adapter);
     }
 
