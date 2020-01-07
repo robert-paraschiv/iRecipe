@@ -1,31 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+        android:id="@+id/fab_addMissingIngredients"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_margin="8dp"
+        style="@style/Widget.MaterialComponents.FloatingActionButton"
+        android:text="Add missing ingredients"/>
+
     <androidx.core.widget.NestedScrollView
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/nestedScrollView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        >
+        android:layout_height="match_parent">
 
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-<!--            <ImageView-->
-<!--                android:id="@+id/recipeDetailed_image"-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="320dp"-->
-<!--                android:elevation="4dp"-->
-<!--                android:transitionName="example_transition"-->
-<!--                tools:src="@color/grey" />-->
+            <!--            <ImageView-->
+            <!--                android:id="@+id/recipeDetailed_image"-->
+            <!--                android:layout_width="match_parent"-->
+            <!--                android:layout_height="320dp"-->
+            <!--                android:elevation="4dp"-->
+            <!--                android:transitionName="example_transition"-->
+            <!--                tools:src="@color/grey" />-->
 
             <androidx.viewpager.widget.ViewPager
                 android:id="@+id/view_pager"
                 android:layout_width="match_parent"
                 android:layout_height="320dp"
                 android:elevation="4dp"
-                android:transitionName="example_transition"
-                />
+                android:transitionName="example_transition" />
 
             <TextView
                 android:id="@+id/tvTitle"
@@ -36,56 +48,48 @@
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="16dp"
                 tools:text="TitleHere" />
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/missing_ingredientsNumber"
-                android:layout_below="@id/tvTitle"
-                tools:text="Missing 2 ingredients"
-                android:layout_centerHorizontal="true"
-                />
-            <com.google.android.material.button.MaterialButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/addMissingIngredients_btn"
-                android:layout_below="@id/missing_ingredientsNumber"
-                android:text="Add Missing Ingredients to Shopping List"
-                style="@style/Widget.MaterialComponents.Button.TextButton"
-                android:layout_centerHorizontal="true"
 
-                />
+            <TextView
+                android:id="@+id/missing_ingredientsNumber"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/tvTitle"
+                android:layout_centerHorizontal="true"
+                tools:text="Missing 2 ingredients" />
+
 
             <TextView
                 android:id="@+id/tvDescription"
                 style="@style/TextAppearance.AppCompat"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/addMissingIngredients_btn"
+                android:layout_below="@+id/missing_ingredientsNumber"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="8dp"
                 tools:text="Description Here lmao it can have more text                      \n
                  than you think lol wtf" />
+
             <ImageView
+                android:id="@+id/imageview_favorite_icon"
                 android:layout_width="33dp"
                 android:layout_height="33dp"
-                android:id="@+id/imageview_favorite_icon"
-                android:src="@drawable/ic_star_border_black_24dp"
                 android:layout_below="@id/view_pager"
                 android:layout_alignParentEnd="true"
-                android:elevation="4dp"
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="8dp"
-                />
+                android:elevation="4dp"
+                android:src="@drawable/ic_star_border_black_24dp" />
+
             <TextView
                 android:id="@+id/recipeDetailed_numberOfFaved"
+                style="@style/TextAppearance.MaterialComponents.Chip"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                tools:text="88"
-                android:layout_toStartOf="@id/imageview_favorite_icon"
                 android:layout_below="@id/view_pager"
                 android:layout_marginTop="14dp"
                 android:layout_marginEnd="4dp"
-                style="@style/TextAppearance.MaterialComponents.Chip"/>
+                android:layout_toStartOf="@id/imageview_favorite_icon"
+                tools:text="88" />
 
             <TextView
                 android:id="@+id/tvIngredientsList"
@@ -104,11 +108,11 @@
 
             <TextView
                 android:id="@+id/tvInstructions"
+                style="@style/TextAppearance.MaterialComponents.Chip"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/tvIngredientsList"
                 android:padding="8dp"
-                style="@style/TextAppearance.MaterialComponents.Chip"
                 tools:text="Okay so basically you do stuff here \n
 with the ingredients so ay lmao many lines\n
 but yeah so then we add the stuff together\n
@@ -129,22 +133,24 @@ but the stuff is now food" />
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/recipeDetailed_addComment_btn"
                 style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                app:cornerRadius="18dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/tvInstructions"
                 android:layout_alignParentEnd="true"
                 android:layout_marginStart="16dp"
                 android:layout_marginEnd="16dp"
-                android:text="Post" />
+                android:text="Post"
+                app:cornerRadius="18dp" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/comment_recycler_view"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_marginTop="10dp"
                 android:layout_below="@id/recipeDetailed_et_commentInput"
-                android:transitionName="example_transition"/>
+                android:layout_marginTop="10dp"
+                android:transitionName="example_transition" />
         </RelativeLayout>
 
     </androidx.core.widget.NestedScrollView>
+
+</RelativeLayout>

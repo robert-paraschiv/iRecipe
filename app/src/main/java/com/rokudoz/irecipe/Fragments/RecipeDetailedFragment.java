@@ -23,6 +23,8 @@ import android.widget.Toast;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
@@ -50,6 +52,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import static com.google.firebase.firestore.DocumentSnapshot.ServerTimestampBehavior.ESTIMATE;
 
@@ -79,7 +82,7 @@ public class RecipeDetailedFragment extends Fragment {
     private TextView tvTitle, tvDescription, tvIngredients, tvInstructions, mFavoriteNumber, tvMissingIngredientsNumber;
     private ImageView mImageView, mFavoriteIcon;
     private Button mAddCommentBtn;
-    private MaterialButton mAddMissingIngredientsBtn;
+    private ExtendedFloatingActionButton mAddMissingingredientsFAB;
     private EditText mCommentEditText;
 
     private ArrayList<Comment> commentList = new ArrayList<>();
@@ -115,10 +118,10 @@ public class RecipeDetailedFragment extends Fragment {
         mFavoriteIcon = view.findViewById(R.id.imageview_favorite_icon);
         mFavoriteNumber = view.findViewById(R.id.recipeDetailed_numberOfFaved);
         tvMissingIngredientsNumber = view.findViewById(R.id.missing_ingredientsNumber);
-        mAddMissingIngredientsBtn = view.findViewById(R.id.addMissingIngredients_btn);
+        mAddMissingingredientsFAB = view.findViewById(R.id.fab_addMissingIngredients);
 
         tvMissingIngredientsNumber.setVisibility(View.INVISIBLE);
-        mAddMissingIngredientsBtn.setVisibility(View.INVISIBLE);
+        mAddMissingingredientsFAB.setVisibility(View.INVISIBLE);
 
         RecipeDetailedFragmentArgs recipeDetailedFragmentArgs = RecipeDetailedFragmentArgs.fromBundle(getArguments());
         getRecipeArgsPassed(recipeDetailedFragmentArgs);
@@ -475,14 +478,19 @@ public class RecipeDetailedFragment extends Fragment {
 
                 for (String ingredientName : recipe_ingredients_tag.keySet()) {
                     if (mUser.getTags().get(ingredientName) != recipe_ingredients_tag.get(ingredientName)
-                            && recipe_ingredients_tag.get(ingredientName) == true) {
-                        Ingredient ingredient = new Ingredient(ingredientName, ingredientsWithQuantity.get(ingredientName), "gram", false);
+                            && recipe_ingredients_tag.get(ingredientName)) {
+                        Ingredient ingredient = new Ingredient(ingredientName, Objects.requireNonNull(ingredientsWithQuantity).get(ingredientName), "gram", false);
                         if (!recipeIngredientsToAddToShoppingList.contains(ingredient)) {
-                            recipeIngredientsToAddToShoppingList.add(ingredient);
+                            if (userShoppingIngredientList.contains(ingredient)) {
+                                if (userShoppingIngredientList.get(userShoppingIngredientList.indexOf(ingredient)).getOwned())
+                                    ingredient.setOwned(true);
+                                recipeIngredientsToAddToShoppingList.add(ingredient);
+
+                            }
                             nrOfMissingIngredients++;
 
                             Log.d(TAG, "onEvent: INGREDIENT NOT IN COMMON " + ingredient.toString());
-                        }else {
+                        } else {
                             recipeIngredientsToAddToShoppingList.remove(ingredient);
                             nrOfMissingIngredients--;
                         }
@@ -492,8 +500,8 @@ public class RecipeDetailedFragment extends Fragment {
                 if (nrOfMissingIngredients > 0 && !userShoppingIngredientList.containsAll(recipeIngredientsToAddToShoppingList)) {
                     tvMissingIngredientsNumber.setVisibility(View.VISIBLE);
                     tvMissingIngredientsNumber.setText("Missing " + nrOfMissingIngredients + " ingredients");
-                    mAddMissingIngredientsBtn.setVisibility(View.VISIBLE);
-                    mAddMissingIngredientsBtn.setOnClickListener(new View.OnClickListener() {
+                    mAddMissingingredientsFAB.setVisibility(View.VISIBLE);
+                    mAddMissingingredientsFAB.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
                             // HERE WE IMPLEMENTS
@@ -509,11 +517,20 @@ public class RecipeDetailedFragment extends Fragment {
                                     });
                                 }
                             }
-                            mAddMissingIngredientsBtn.setVisibility(View.INVISIBLE);
+                            mAddMissingingredientsFAB.setVisibility(View.INVISIBLE);
                             tvMissingIngredientsNumber.setVisibility(View.INVISIBLE);
 
                         }
                     });
+                }
+                // If the user has the missing ingredients in the shopping list, don't show button, but show message that they are in the list
+                else if (nrOfMissingIngredients > 0 && userShoppingIngredientList.containsAll(recipeIngredientsToAddToShoppingList)) {
+                    for (Ingredient ing : recipeIngredientsToAddToShoppingList) {
+                        if (!recipeIngredientsToAddToShoppingList.get(recipeIngredientsToAddToShoppingList.indexOf(ing)).getOwned()){
+                            tvMissingIngredientsNumber.setVisibility(View.VISIBLE);
+                            tvMissingIngredientsNumber.setText(nrOfMissingIngredients + " missing ingredients are in your shopping list");
+                        }
+                    }
                 }
                 setupViewPager(view);
             }
