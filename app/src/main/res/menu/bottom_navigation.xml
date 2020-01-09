@@ -3,15 +3,15 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
+        android:id="@+id/feedFragment"
+        android:icon="@drawable/ic_receipt_black_24dp"
+        app:showAsAction="ifRoom"
+        android:title="Feed"/>
+    <item
         android:id="@+id/homeFragment"
         android:icon="@drawable/ic_kitchen_black_24dp"
         app:showAsAction="ifRoom"
         android:title="Home"/>
-    <item
-        android:id="@+id/feedFragment"
-        android:icon="@drawable/ic_receipt_black_24dp"
-        app:showAsAction="ifRoom"
-        android:title="Search"/>
     <item
         android:id="@+id/favoritesFragment"
         android:icon="@drawable/ic_favorite_red_24dp"
