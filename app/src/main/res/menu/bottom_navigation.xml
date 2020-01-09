@@ -4,12 +4,12 @@
 
     <item
         android:id="@+id/homeFragment"
-        android:icon="@drawable/ic_receipt_black_24dp"
+        android:icon="@drawable/ic_kitchen_black_24dp"
         app:showAsAction="ifRoom"
         android:title="Home"/>
     <item
         android:id="@+id/feedFragment"
-        android:icon="@drawable/ic_rss_feed_black_24dp"
+        android:icon="@drawable/ic_receipt_black_24dp"
         app:showAsAction="ifRoom"
         android:title="Search"/>
     <item

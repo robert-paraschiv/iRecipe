@@ -91,6 +91,8 @@ public class ShoppingListFragment extends Fragment {
         cbListView = view.findViewById(R.id.checkable_list);
         mEmptyBasketBtn = view.findViewById(R.id.empty_basket_btn);
 
+        mEmptyBasketBtn.setVisibility(View.INVISIBLE);
+
         userIngredientList = new ArrayList<>();
 
         setupFirebaseAuth();
@@ -185,6 +187,7 @@ public class ShoppingListFragment extends Fragment {
                                             Log.d(TAG, "onSuccess: Basket Emptied");
                                             checkBoxArrayAdapter.clear();
                                             checkBoxArrayAdapter.notifyDataSetChanged();
+                                            mEmptyBasketBtn.setVisibility(View.INVISIBLE);
                                             Toast.makeText(getContext(), "Basket Emptied", Toast.LENGTH_SHORT).show();
                                         }
                                     }
@@ -219,6 +222,8 @@ public class ShoppingListFragment extends Fragment {
             checkBoxArrayAdapter = new ArrayAdapter<String>(getContext(), R.layout.checkable_list_layout, R.id.txt_title, checkBoxItemListWithQuantity);
             cbListView.setAdapter(checkBoxArrayAdapter);
 
+            if (checkBoxItemListWithQuantity.size() > 0)
+                mEmptyBasketBtn.setVisibility(View.VISIBLE);
             //When the Ingredients List has more elements than the UserTAGS(IngredientsUserHas), initialize elements as false to avoid crash
             for (String ing : ingStringArray) {
                 if (!userIngredientList.contains(ing)) {
