@@ -28,17 +28,22 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.StorageTask;
 import com.google.firebase.storage.UploadTask;
+import com.rokudoz.irecipe.Models.Ingredient;
+import com.rokudoz.irecipe.Models.Instruction;
 import com.rokudoz.irecipe.Models.Recipe;
 import com.squareup.picasso.Picasso;
 
@@ -52,28 +57,27 @@ public class AddRecipesActivity extends AppCompatActivity {
 
     private static final String TAG = "AddRecipesActivity";
 
+    //FireBase refs
+    private FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private CollectionReference recipesReference = db.collection("Recipes");
+    private CollectionReference usersReference = db.collection("Users");
+    private CollectionReference ingredientsReference = db.collection("Ingredients");
+    private StorageReference mStorageRef = FirebaseStorage.getInstance().getReference("RecipePhotos");
+
     private static final int SELECT_PICTURES = 1;
     private int nrOfPhotosUploaded = 0;
     private Uri mImageUri;
     private Uri[] mImageUriArray;
     private String[] imageUrlArray;
-    private List<String> possibleIngredientList;
-    private String[] possibleIngredientStringArray;
-    private List<String> recipeIngredientList;
-    private Map<String, Float> recipeIngredientQuantityMap;
-    private String category;
-    private FirebaseFirestore db = FirebaseFirestore.getInstance();
-    private CollectionReference collectionReference = db.collection("Recipes");
-    private CollectionReference ingredientsReference = db.collection("Ingredients");
-    private StorageReference mStorageRef = FirebaseStorage.getInstance().getReference("RecipePhotos");
     private StorageTask mUploadTask;
 
-    private LinearLayout linearLayout;
+    private LinearLayout ingredientsLinearLayout;
     private ArrayList<EditText> ingredientEtList;
     private ArrayList<EditText> ingredientQuantityEtList;
-
-    private EditText editTextTitle, editTextDescription, editTextInstructions;
-    private Button mChooseFileBtn, mAddRecipeBtn, mAddIngredientBtn;
+    private ArrayList<Spinner> ingredientQuantityTypeSpinnerList;
+    private List<Ingredient> allIngredientsList;
+    private EditText editTextTitle, editTextDescription, editTextKeywords;
+    private Button mChooseFileBtn, mPostRecipeBtn, mAddIngredientBtn;
     private ImageView mImageView;
     private ProgressBar mProgressBar;
 
@@ -82,22 +86,25 @@ public class AddRecipesActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_recipes);
 
-        linearLayout = findViewById(R.id.linear_layout);
+        ingredientsLinearLayout = findViewById(R.id.addRecipes_ingredients_linear_layout);
 
-        editTextTitle = findViewById(R.id.edit_text_title);
-        editTextDescription = findViewById(R.id.edit_text_description);
+        editTextTitle = findViewById(R.id.addRecipes_title_editText);
+        editTextDescription = findViewById(R.id.addRecipes_description_editText);
         mProgressBar = findViewById(R.id.addRecipes_progressbar);
         mImageView = findViewById(R.id.addRecipes_image);
         mChooseFileBtn = findViewById(R.id.addRecipes_choose_path_btn);
-        mAddRecipeBtn = findViewById(R.id.addRecipes_add_btn);
-        editTextInstructions = findViewById(R.id.edit_text_instructions);
-        mAddIngredientBtn = findViewById(R.id.btnAddIngredient);
+        mPostRecipeBtn = findViewById(R.id.addRecipes_add_btn);
+        editTextKeywords = findViewById(R.id.addRecipes_keywords_editText);
+        mAddIngredientBtn = findViewById(R.id.addRecipes_addIngredient_btn);
 
         ingredientEtList = new ArrayList<>();
         ingredientQuantityEtList = new ArrayList<>();
-        recipeIngredientQuantityMap = new HashMap<>();
+        ingredientQuantityTypeSpinnerList = new ArrayList<>();
+        allIngredientsList = new ArrayList<>();
 
-        setUpCategorySpinner();
+        mImageUriArray = new Uri[0];
+
+        setUpRecipeCategorySpinner();
         addEditText();
 
         mChooseFileBtn.setOnClickListener(new View.OnClickListener() {
@@ -106,7 +113,7 @@ public class AddRecipesActivity extends AppCompatActivity {
                 openFileChooser();
             }
         });
-        mAddRecipeBtn.setOnClickListener(new View.OnClickListener() {
+        mPostRecipeBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (mUploadTask != null && mUploadTask.isInProgress()) {
@@ -126,27 +133,6 @@ public class AddRecipesActivity extends AppCompatActivity {
 
     }
 
-    private void setUpCategorySpinner() {
-        Spinner dropdown = findViewById(R.id.spinner_category);
-        String[] items = new String[]{"breakfast", "lunch", "dinner"};
-        //create an adapter to describe how the items are displayed, adapters are used in several places in android.
-        //There are multiple variations of this, but this is the basic variant.
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, items);
-        //set the spinners adapter to the previously created one.
-        dropdown.setAdapter(adapter);
-
-        dropdown.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                category = (String) parent.getItemAtPosition(position);
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
-    }
 
     private void openFileChooser() {
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
@@ -181,7 +167,7 @@ public class AddRecipesActivity extends AppCompatActivity {
             }
 
         } else
-            Log.d(TAG, "onActivityResult: FailedToGetActiviayReasuslt");
+            Log.d(TAG, "onActivityResult: Failed to get ActivityResult");
     }
 
     private String getFileExtension(Uri uri) {
@@ -192,19 +178,21 @@ public class AddRecipesActivity extends AppCompatActivity {
 
 
     private void getIngredientList() {
-        ingredientsReference.document("ingredient_list")
-                .addSnapshotListener(new EventListener<DocumentSnapshot>() {
-                    @Override
-                    public void onEvent(@javax.annotation.Nullable DocumentSnapshot documentSnapshot, @javax.annotation.Nullable FirebaseFirestoreException e) {
-                        if (e == null) {
-                            possibleIngredientList = (List<String>) documentSnapshot.get("ingredient_list");
-                            possibleIngredientStringArray = possibleIngredientList.toArray(new String[possibleIngredientList.size()]);
-
-
-                            getPhotoUploadCount();
-                        }
+        ingredientsReference.get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+            @Override
+            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                if (queryDocumentSnapshots != null) {
+                    for (QueryDocumentSnapshot queryDocumentSnapshot : queryDocumentSnapshots) {
+                        Ingredient ingredient = queryDocumentSnapshot.toObject(Ingredient.class);
+                        allIngredientsList.add(ingredient);
                     }
-                });
+
+                    addRecipe();
+//                    getPhotoUploadCount();
+                }
+
+            }
+        });
     }
 
     private void addPhotoToFirestore(Uri uri, final int position) {
@@ -266,82 +254,99 @@ public class AddRecipesActivity extends AppCompatActivity {
     public void addRecipe() {
         final String title = editTextTitle.getText().toString();
         final String description = editTextDescription.getText().toString();
-        final String instructions = editTextInstructions.getText().toString();
+        final List<Ingredient> ingredient_list = new ArrayList<>();
+        final List<Instruction> instruction_list = new ArrayList<>();
+        final String creator_docId = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
-        List<String> inputIngredientList = new ArrayList<>();
+        Log.d(TAG, "addRecipe: " + creator_docId);
 
-
-        //Get ingredients and quantity from the edit texts
         for (int i = 0; i < ingredientEtList.size(); i++) {
-            if (ingredientEtList.get(i) != null && !ingredientEtList.get(i).getText().toString().isEmpty()
-                    && !ingredientEtList.get(i).getText().toString().equals("Ingredient")) {
-
-                inputIngredientList.add(ingredientEtList.get(i).getText().toString());
-
-                if (ingredientQuantityEtList.get(i) != null && !ingredientQuantityEtList.get(i).getText().toString().isEmpty()
-                        && !ingredientQuantityEtList.get(i).getText().toString().equals("Quantity")) {
-
-                    recipeIngredientQuantityMap.put(ingredientEtList.get(i).getText().toString(), Float.parseFloat(ingredientQuantityEtList.get(i).getText().toString()));
+            if (!ingredientEtList.get(i).getText().toString().equals("") && !ingredientQuantityEtList.get(i).getText().toString().equals("")) {
+                Ingredient ingredientToAdd = new Ingredient(ingredientEtList.get(i).getText().toString(), ""
+                        , Float.parseFloat(ingredientQuantityEtList.get(i).getText().toString())
+                        , ingredientQuantityTypeSpinnerList.get(i).getSelectedItem().toString(), false);
+                if (allIngredientsList.contains(ingredientToAdd)) {
+                    ingredientToAdd.setCategory(allIngredientsList.get(allIngredientsList.indexOf(ingredientToAdd)).getCategory());
+                    ingredient_list.add(ingredientToAdd);
                 }
+            } else {
+                Toast.makeText(this, "Make sure ingredient boxes are not empty", Toast.LENGTH_SHORT).show();
             }
         }
 
-
-        recipeIngredientList = new ArrayList<>();
-        final Map<String, Boolean> tags = new HashMap<>();
-
-        for (String tag : possibleIngredientList) {
-            if (possibleIngredientList.contains(tag) && inputIngredientList.contains(tag)) {
-                tags.put(tag, true);
-                recipeIngredientList.add(tag);
-            } else if (possibleIngredientList.contains(tag) && !inputIngredientList.contains(tag)) {
-                tags.put(tag, false);
-            }
-        }
-
-        // Sends recipe data to Firestore database
-        Recipe recipe = new Recipe(title, category, description, tags, Arrays.asList(imageUrlArray),
-                false, recipeIngredientList, recipeIngredientQuantityMap, instructions, 0);
-
-        collectionReference.add(recipe)
-                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                    @Override
-                    public void onSuccess(DocumentReference documentReference) {
-                        Toast.makeText(AddRecipesActivity.this, "Succesfully added " + title + " to the recipes list", Toast.LENGTH_SHORT).show();
-
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(AddRecipesActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
-                    }
-                });
+//        // Sends recipe data to Firestore database
+//        Recipe recipe = new Recipe(title, description);
+//
+//        collectionReference.add(recipe)
+//                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+//                    @Override
+//                    public void onSuccess(DocumentReference documentReference) {
+//                        Toast.makeText(AddRecipesActivity.this, "Succesfully added " + title + " to the recipes list", Toast.LENGTH_SHORT).show();
+//
+//                    }
+//                })
+//                .addOnFailureListener(new OnFailureListener() {
+//                    @Override
+//                    public void onFailure(@NonNull Exception e) {
+//                        Toast.makeText(AddRecipesActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+//                    }
+//                });
 
 
     }
 
     private void addEditText() {
-        final LinearLayout editTextLayout = new LinearLayout(this);
-        editTextLayout.setOrientation(LinearLayout.HORIZONTAL);
-        linearLayout.addView(editTextLayout);
+        final LinearLayout linearLayout = new LinearLayout(this);
+        linearLayout.setOrientation(LinearLayout.HORIZONTAL);
+        ingredientsLinearLayout.addView(linearLayout);
 
         EditText editText = new EditText(this);
         editText.setHint("Ingredient ");
         setEditTextAttributes(editText);
-        editTextLayout.addView(editText);
+        linearLayout.addView(editText);
         ingredientEtList.add(editText);
 
         EditText editText2 = new EditText(this);
         editText2.setHint("Quantity ");
         setEditTextAttributes(editText2);
-        editTextLayout.addView(editText2);
+        linearLayout.addView(editText2);
         ingredientQuantityEtList.add(editText2);
+
+        Spinner spinner = new Spinner(this);
+        String[] spinnerItems = {"g", "kg"};
+        linearLayout.addView(spinner);
+        setUpIngredientQuantitySpinner(spinner, spinnerItems);
+    }
+
+    private void setUpRecipeCategorySpinner() {
+        Spinner dropdown = findViewById(R.id.addRecipes_category_spinner);
+        String[] items = new String[]{"breakfast", "lunch", "dinner"};
+        //create an adapter to describe how the items are displayed, adapters are used in several places in android.
+        //There are multiple variations of this, but this is the basic variant.
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, items);
+        //set the spinners adapter to the previously created one.
+        dropdown.setAdapter(adapter);
+    }
+
+    private void setUpIngredientQuantitySpinner(Spinner spinner, String[] items) {
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, items);
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT);
+
+        params.setMargins(convertDpToPixel(16),
+                convertDpToPixel(16),
+                convertDpToPixel(16),
+                0
+        );
+        spinner.setLayoutParams(params);
+        spinner.setAdapter(adapter);
+        ingredientQuantityTypeSpinnerList.add(spinner);
     }
 
     private void setEditTextAttributes(EditText editText) {
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                convertDpToPixel(180),
+                LinearLayout.LayoutParams.WRAP_CONTENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT);
 
         params.setMargins(convertDpToPixel(16),
@@ -369,9 +374,4 @@ public class AddRecipesActivity extends AppCompatActivity {
     }
 //  ----------------------------------------------------------------------------------------------
 
-
-    public void backToSearch(View v) {
-        Intent intent = new Intent(this, MainActivity.class);
-        startActivity(intent);
-    }
 }

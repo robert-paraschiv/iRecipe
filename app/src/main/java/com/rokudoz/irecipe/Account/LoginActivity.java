@@ -25,8 +25,6 @@ import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
-import com.google.android.material.snackbar.Snackbar;
-import com.google.api.LogDescriptor;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
@@ -38,6 +36,7 @@ import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.rokudoz.irecipe.MainActivity;
+import com.rokudoz.irecipe.Models.Ingredient;
 import com.rokudoz.irecipe.Models.User;
 import com.rokudoz.irecipe.R;
 
@@ -345,12 +344,11 @@ public class LoginActivity extends AppCompatActivity implements
         Log.d(TAG, "addNewUser: Adding new User: \n user_id:" + userid);
         mUser.setName(name);
         mUser.setUser_id(userid);
-        mUser.setTags(tags);
-        mUser.setIngredient_array(new ArrayList<String>());
+        mUser.setIngredient_list(new ArrayList<Ingredient>());
         mUser.setUserProfilePicUrl("");
 
         //User user = new User(name, userid);
-        userRef.add(mUser);
+        userRef.document(mUser.getUser_id()).set(mUser);
         Intent intent = new Intent(LoginActivity.this, MainActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);

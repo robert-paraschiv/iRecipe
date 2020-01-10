@@ -25,11 +25,11 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.rokudoz.irecipe.Models.Ingredient;
 import com.rokudoz.irecipe.Models.User;
 import com.rokudoz.irecipe.R;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -220,24 +220,17 @@ public class RegisterActivity extends AppCompatActivity {
      * Adds data to the node: "users"
      */
     public void addNewUser() {
-        String[] possibleIngredients = ingStringArray;
-
-        final Map<String, Boolean> tags = new HashMap<>();
-        for (String ingredient : possibleIngredients) {
-            tags.put(ingredient, false);
-        }
 
         String userid = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
         Log.d(TAG, "addNewUser: Adding new User: \n user_id:" + userid);
         mUser.setName(name);
         mUser.setUser_id(userid);
-        mUser.setTags(tags);
-        mUser.setIngredient_array(new ArrayList<String>());
+        mUser.setIngredient_list(new ArrayList<Ingredient>());
         mUser.setUserProfilePicUrl("");
 
         //User user = new User(name, userid);
-        userRef.add(mUser);
+        userRef.document(mUser.getUser_id()).set(mUser);
         FirebaseAuth.getInstance().signOut();
         redirectLoginScreen();
     }

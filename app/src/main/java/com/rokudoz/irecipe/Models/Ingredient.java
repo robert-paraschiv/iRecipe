@@ -2,11 +2,10 @@ package com.rokudoz.irecipe.Models;
 
 import com.google.firebase.firestore.Exclude;
 
-import java.util.Map;
-
 public class Ingredient {
     private String documentId;
     private String name;
+    private String category;
     private Float quantity;
     private String quantity_type;
     private Boolean owned;
@@ -15,8 +14,9 @@ public class Ingredient {
         //public no-arg constructor needed
     }
 
-    public Ingredient(String name, Float quantity, String quantity_type,Boolean owned) {
+    public Ingredient(String name, String category, Float quantity, String quantity_type, Boolean owned) {
         this.name = name;
+        this.category = category;
         this.quantity = quantity;
         this.quantity_type = quantity_type;
         this.owned = owned;
@@ -30,6 +30,15 @@ public class Ingredient {
     public void setDocumentId(String documentId) {
         this.documentId = documentId;
     }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
     public String getName() {
         return name;
     }
@@ -65,12 +74,15 @@ public class Ingredient {
     @Override
     public String toString() {
         return "Ingredient{" +
-                "name='" + name + '\'' +
+                "documentId='" + documentId + '\'' +
+                ", name='" + name + '\'' +
+                ", category='" + category + '\'' +
                 ", quantity=" + quantity +
                 ", quantity_type='" + quantity_type + '\'' +
                 ", owned=" + owned +
                 '}';
     }
+
     @Override
     public boolean equals(Object obj) {
         if (!(obj instanceof Ingredient))

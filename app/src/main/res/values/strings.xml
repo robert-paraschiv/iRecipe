@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">iRecipe</string>
-    <string name="tv_search">Search for a recipe with the following ingredient_array :</string>
+    <string name="tv_search">Search for a recipe with the following ingredient_list :</string>
     <string name="select_myingredients_string">Select the ingredients you got around</string>
 
     <!-- TODO: Remove or change this placeholder text -->

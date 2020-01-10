@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".AddIngredientActivity">
+
+
+    <com.google.android.material.textfield.TextInputEditText
+        android:id="@+id/textinput_ingredientName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="50dp"
+        android:hint="Ingredient Name" />
+
+    <Spinner
+        android:id="@+id/spinner_ingredientCategory"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/textinput_ingredientName" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/materialBtn_addIngredientToDb"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/spinner_ingredientCategory"
+        android:layout_marginTop="50dp"
+        android:text="Add Ingredient to Db" />
+
+</RelativeLayout>

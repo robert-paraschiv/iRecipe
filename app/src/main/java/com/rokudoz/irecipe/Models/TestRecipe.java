@@ -4,7 +4,7 @@ import com.google.firebase.firestore.Exclude;
 
 import java.util.List;
 
-public class Recipe {
+public class TestRecipe {
     private String documentId;
     private String title;
     private String creator_docId;
@@ -19,11 +19,11 @@ public class Recipe {
     private Boolean isFavorite;
 
 
-    public Recipe() {
+    public TestRecipe() {
         //public no-arg constructor needed
     }
 
-    public Recipe(String title, String creator_docId, String category, String description, List<String> keywords
+    public TestRecipe(String title, String creator_docId, String category, String description, List<String> keywords
             , List<String> imageUrls_list, List<Ingredient> ingredients_list, List<Instruction> instructions_list
             , List<String> ratings_docId_list, Float avg_rating, Boolean isFavorite) {
 
@@ -159,10 +159,10 @@ public class Recipe {
     }
     @Override
     public boolean equals(Object obj) {
-        if (!(obj instanceof Recipe))
+        if (!(obj instanceof TestRecipe))
             return false;
         if (obj == this)
             return true;
-        return this.title.equals(((Recipe) obj).title);
+        return this.title.equals(((TestRecipe) obj).title);
     }
 }
