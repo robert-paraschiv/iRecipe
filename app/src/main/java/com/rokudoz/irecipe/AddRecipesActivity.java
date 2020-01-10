@@ -14,9 +14,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.webkit.MimeTypeMap;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -28,13 +28,11 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.button.MaterialButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
@@ -49,9 +47,7 @@ import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class AddRecipesActivity extends AppCompatActivity {
 
@@ -65,19 +61,34 @@ public class AddRecipesActivity extends AppCompatActivity {
     private StorageReference mStorageRef = FirebaseStorage.getInstance().getReference("RecipePhotos");
 
     private static final int SELECT_PICTURES = 1;
+    private static final int RECIPE_PICTURE = 0;
+    private static final int INSTRUCTION_PICTURE = 1;
+
     private int nrOfPhotosUploaded = 0;
-    private Uri mImageUri;
-    private Uri[] mImageUriArray;
-    private String[] imageUrlArray;
+    private Uri mRecipeImageUri;
+
+    private Uri[] mRecipeImageUriArray;
+    private String[] recipeImageUrlArray;
     private StorageTask mUploadTask;
 
+    //Ingredient
     private LinearLayout ingredientsLinearLayout;
-    private ArrayList<EditText> ingredientEtList;
+    private ArrayList<EditText> ingredientNameEtList;
     private ArrayList<EditText> ingredientQuantityEtList;
     private ArrayList<Spinner> ingredientQuantityTypeSpinnerList;
     private List<Ingredient> allIngredientsList;
+
+    //Instruction
+    private LinearLayout instructionsLinearLayout;
+    private ArrayList<EditText> instructionTextEtList;
+    private Uri mInstructionStepUri;
+    private List<Uri> mInstructionStepImageUriList;
+    private String[] instructionStepImageUrlArray;
+    private List<ImageView> instructionStepImageViewList;
+
     private EditText editTextTitle, editTextDescription, editTextKeywords;
-    private Button mChooseFileBtn, mPostRecipeBtn, mAddIngredientBtn;
+    private Button mChooseFileBtn, mPostRecipeBtn, mAddIngredientBtn, mAddInstructionBtn;
+    Spinner recipeCategorySpinner;
     private ImageView mImageView;
     private ProgressBar mProgressBar;
 
@@ -87,6 +98,7 @@ public class AddRecipesActivity extends AppCompatActivity {
         setContentView(R.layout.activity_add_recipes);
 
         ingredientsLinearLayout = findViewById(R.id.addRecipes_ingredients_linear_layout);
+        instructionsLinearLayout = findViewById(R.id.addRecipes_instructions_linear_layout);
 
         editTextTitle = findViewById(R.id.addRecipes_title_editText);
         editTextDescription = findViewById(R.id.addRecipes_description_editText);
@@ -96,21 +108,36 @@ public class AddRecipesActivity extends AppCompatActivity {
         mPostRecipeBtn = findViewById(R.id.addRecipes_add_btn);
         editTextKeywords = findViewById(R.id.addRecipes_keywords_editText);
         mAddIngredientBtn = findViewById(R.id.addRecipes_addIngredient_btn);
-
-        ingredientEtList = new ArrayList<>();
+        mAddInstructionBtn = findViewById(R.id.addRecipes_addInstruction_btn);
+        recipeCategorySpinner = findViewById(R.id.addRecipes_category_spinner);
+        ingredientNameEtList = new ArrayList<>();
         ingredientQuantityEtList = new ArrayList<>();
         ingredientQuantityTypeSpinnerList = new ArrayList<>();
+
+        instructionTextEtList = new ArrayList<>();
+        mInstructionStepImageUriList = new ArrayList<>();
+        instructionStepImageViewList = new ArrayList<>();
+
+
         allIngredientsList = new ArrayList<>();
 
-        mImageUriArray = new Uri[0];
+        mRecipeImageUriArray = new Uri[0];
 
         setUpRecipeCategorySpinner();
-        addEditText();
+        addIngredientLayout();
+        addInstructionLayout();
 
+        mAddInstructionBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+//                openFileChooser(INSTRUCTION_PICTURE);
+                addInstructionLayout();
+            }
+        });
         mChooseFileBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                openFileChooser();
+                openFileChooser(RECIPE_PICTURE);
             }
         });
         mPostRecipeBtn.setOnClickListener(new View.OnClickListener() {
@@ -127,47 +154,69 @@ public class AddRecipesActivity extends AppCompatActivity {
         mAddIngredientBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                addEditText();
+                addIngredientLayout();
             }
         });
 
     }
 
 
-    private void openFileChooser() {
+    private void openFileChooser(Integer functionThatCalled) {
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
         intent.setType("image/*");
         intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-        startActivityForResult(Intent.createChooser(intent, "Select picture"), SELECT_PICTURES);
+        startActivityForResult(Intent.createChooser(intent, "Select picture"), SELECT_PICTURES + functionThatCalled);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
+        if (requestCode == 1) {
+            Log.d(TAG, "onActivityResult: RecipePic");
+        } else if (requestCode == 2) {
+            Log.d(TAG, "onActivityResult: InstructionPic");
+        }
+
         if (requestCode == SELECT_PICTURES && resultCode == Activity.RESULT_OK && data != null) {
             if (data.getClipData() != null) {
                 //Multiple images have been selected
 
                 int count = data.getClipData().getItemCount();
-                mImageUriArray = new Uri[count];
+                mRecipeImageUriArray = new Uri[count];
 
                 for (int i = 0; i < count; i++) {
-                    mImageUriArray[i] = data.getClipData().getItemAt(i).getUri();
-                    mImageUri = data.getClipData().getItemAt(i).getUri();
+                    mRecipeImageUriArray[i] = data.getClipData().getItemAt(i).getUri();
+                    mRecipeImageUri = data.getClipData().getItemAt(i).getUri();
                 }
-                Picasso.get().load(mImageUri).into(mImageView);
+                Picasso.get().load(mRecipeImageUri).into(mImageView);
 
             } else if (data.getData() != null) {
                 //Only one image has been selected
-                mImageUri = data.getData();
-                mImageUriArray = new Uri[1];
-                mImageUriArray[0] = mImageUri;
-                Picasso.get().load(mImageUri).into(mImageView);
+                mRecipeImageUri = data.getData();
+                mRecipeImageUriArray = new Uri[1];
+                mRecipeImageUriArray[0] = mRecipeImageUri;
+                Picasso.get().load(mRecipeImageUri).into(mImageView);
             }
 
-        } else
-            Log.d(TAG, "onActivityResult: Failed to get ActivityResult");
+        } else if (requestCode >= SELECT_PICTURES + INSTRUCTION_PICTURE && resultCode == Activity.RESULT_OK && data != null) {
+            if (data.getClipData() != null) {
+
+                int count = data.getClipData().getItemCount();
+                for (int i = 0; i < count; i++) {
+                    mInstructionStepUri = data.getClipData().getItemAt(i).getUri();
+                }
+                mInstructionStepImageUriList.set(requestCode - (SELECT_PICTURES + INSTRUCTION_PICTURE), mInstructionStepUri);
+                Picasso.get().load(mInstructionStepImageUriList.get(requestCode - (SELECT_PICTURES + INSTRUCTION_PICTURE))).into(instructionStepImageViewList.get(instructionStepImageViewList.size() - 1));
+
+            } else if (data.getData() != null) {
+                //Only one image has been selected
+                mInstructionStepUri = data.getData();
+                mInstructionStepImageUriList.set(requestCode - (SELECT_PICTURES + INSTRUCTION_PICTURE), mInstructionStepUri);
+                Picasso.get().load(mInstructionStepImageUriList.get(requestCode - (SELECT_PICTURES + INSTRUCTION_PICTURE))).into(instructionStepImageViewList.get(instructionStepImageViewList.size() - 1));
+
+            }
+        }
     }
 
     private String getFileExtension(Uri uri) {
@@ -187,21 +236,52 @@ public class AddRecipesActivity extends AppCompatActivity {
                         allIngredientsList.add(ingredient);
                     }
 
-                    addRecipe();
-//                    getPhotoUploadCount();
+                    getRecipePhotoUploadCount();
                 }
 
             }
         });
     }
 
+    private void addStepPhotoToFireStore(Uri uri, final int position) {
+        if (mInstructionStepImageUriList != null) {
+            if (mInstructionStepImageUriList.get(position) != null && !mInstructionStepImageUriList.get(position).toString().equals("")) {
+                final StorageReference fileReference = mStorageRef.child(System.currentTimeMillis()
+                        + "." + getFileExtension(mInstructionStepImageUriList.get(position)));
+
+                fileReference.putFile(mInstructionStepImageUriList.get(position)).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                        fileReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                            @Override
+                            public void onSuccess(Uri uri) {
+                                final String imageUrl = uri.toString();
+                                instructionStepImageUrlArray[position] = imageUrl;
+                                nrOfPhotosUploaded++;
+                                if (nrOfPhotosUploaded == mRecipeImageUriArray.length + mInstructionStepImageUriList.size())
+                                    addRecipe();
+                            }
+                        });
+                    }
+                });
+            } else {
+                final String imageUrl = "";
+                instructionStepImageUrlArray[position] = imageUrl;
+                nrOfPhotosUploaded++;
+                if (nrOfPhotosUploaded == mRecipeImageUriArray.length + mInstructionStepImageUriList.size())
+                    addRecipe();
+            }
+
+        }
+    }
+
     private void addPhotoToFirestore(Uri uri, final int position) {
         // Uploading image to Firestore
-        if (mImageUriArray != null) {
+        if (mRecipeImageUriArray != null) {
             final StorageReference fileReference = mStorageRef.child(System.currentTimeMillis()
-                    + "." + getFileExtension(mImageUriArray[position]));
+                    + "." + getFileExtension(mRecipeImageUriArray[position]));
 
-            mUploadTask = fileReference.putFile(mImageUriArray[position])
+            mUploadTask = fileReference.putFile(mRecipeImageUriArray[position])
                     .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                         @Override
                         public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
@@ -209,11 +289,14 @@ public class AddRecipesActivity extends AppCompatActivity {
                                 @Override
                                 public void onSuccess(Uri uri) {
                                     final String imageUrl = uri.toString();
-                                    imageUrlArray[position] = imageUrl;
+                                    recipeImageUrlArray[position] = imageUrl;
                                     nrOfPhotosUploaded++;
 
-                                    if (nrOfPhotosUploaded == mImageUriArray.length)
-                                        addRecipe();
+                                    if (nrOfPhotosUploaded == mRecipeImageUriArray.length) {
+                                        getInstructionsPhotoUploadCount();
+//                                        addRecipe();
+                                    }
+
                                 }
                             });
 
@@ -224,10 +307,6 @@ public class AddRecipesActivity extends AppCompatActivity {
                                     mProgressBar.setProgress(0);
                                 }
                             }, 50);
-                            Toast.makeText(AddRecipesActivity.this, "Upload Succesfull", Toast.LENGTH_SHORT).show();
-                            editTextDescription.setText("");
-                            editTextTitle.setText("");
-                            mImageView.setImageResource(android.R.color.transparent);
 
                         }
                     })
@@ -254,57 +333,78 @@ public class AddRecipesActivity extends AppCompatActivity {
     public void addRecipe() {
         final String title = editTextTitle.getText().toString();
         final String description = editTextDescription.getText().toString();
-        final List<Ingredient> ingredient_list = new ArrayList<>();
-        final List<Instruction> instruction_list = new ArrayList<>();
         final String creator_docId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        final List<String> imageUrls_list = Arrays.asList(recipeImageUrlArray);
+        final String category = recipeCategorySpinner.getSelectedItem().toString();
+        final List<Ingredient> ingredients_list = new ArrayList<>();
+        final List<Instruction> instructions_list = new ArrayList<>();
+        final Boolean isFavorite = false;
 
         Log.d(TAG, "addRecipe: " + creator_docId);
 
-        for (int i = 0; i < ingredientEtList.size(); i++) {
-            if (!ingredientEtList.get(i).getText().toString().equals("") && !ingredientQuantityEtList.get(i).getText().toString().equals("")) {
-                Ingredient ingredientToAdd = new Ingredient(ingredientEtList.get(i).getText().toString(), ""
+
+        String keywordEt = editTextKeywords.getText().toString();
+        final List<String> keywords = Arrays.asList(keywordEt.split("\\s*,\\s*"));
+
+        //Get ingredients list items from edit texts
+        for (int i = 0; i < ingredientNameEtList.size(); i++) {
+            if (!ingredientNameEtList.get(i).getText().toString().equals("") && !ingredientQuantityEtList.get(i).getText().toString().equals("")) {
+                Ingredient ingredientToAdd = new Ingredient(ingredientNameEtList.get(i).getText().toString(), ""
                         , Float.parseFloat(ingredientQuantityEtList.get(i).getText().toString())
                         , ingredientQuantityTypeSpinnerList.get(i).getSelectedItem().toString(), false);
                 if (allIngredientsList.contains(ingredientToAdd)) {
                     ingredientToAdd.setCategory(allIngredientsList.get(allIngredientsList.indexOf(ingredientToAdd)).getCategory());
-                    ingredient_list.add(ingredientToAdd);
+                    ingredients_list.add(ingredientToAdd);
                 }
             } else {
                 Toast.makeText(this, "Make sure ingredient boxes are not empty", Toast.LENGTH_SHORT).show();
             }
         }
 
+        for (int j = 0; j < instructionTextEtList.size(); j++) {
+            String url = "";
+            if (!mInstructionStepImageUriList.get(j).toString().equals("")) {
+                url = instructionStepImageUrlArray[j];
+            }
+            Instruction instruction = new Instruction(j, instructionTextEtList.get(j).getText().toString(), url);
+            instructions_list.add(instruction);
+        }
+
+
+        Recipe recipe = new Recipe(title, creator_docId, category, description, keywords, imageUrls_list, ingredients_list, instructions_list
+                , 0f, isFavorite);
+
 //        // Sends recipe data to Firestore database
-//        Recipe recipe = new Recipe(title, description);
-//
-//        collectionReference.add(recipe)
-//                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-//                    @Override
-//                    public void onSuccess(DocumentReference documentReference) {
-//                        Toast.makeText(AddRecipesActivity.this, "Succesfully added " + title + " to the recipes list", Toast.LENGTH_SHORT).show();
-//
-//                    }
-//                })
-//                .addOnFailureListener(new OnFailureListener() {
-//                    @Override
-//                    public void onFailure(@NonNull Exception e) {
-//                        Toast.makeText(AddRecipesActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
-//                    }
-//                });
+        recipesReference.add(recipe)
+                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                    @Override
+                    public void onSuccess(DocumentReference documentReference) {
+                        Toast.makeText(AddRecipesActivity.this, "Succesfully added " + title + " to the recipes list", Toast.LENGTH_SHORT).show();
+
+                        finish();
+                        startActivity(getIntent());
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Toast.makeText(AddRecipesActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                });
 
 
     }
 
-    private void addEditText() {
+    private void addIngredientLayout() {
         final LinearLayout linearLayout = new LinearLayout(this);
-        linearLayout.setOrientation(LinearLayout.HORIZONTAL);
+        linearLayout.setOrientation(LinearLayout.VERTICAL);
         ingredientsLinearLayout.addView(linearLayout);
 
         EditText editText = new EditText(this);
         editText.setHint("Ingredient ");
         setEditTextAttributes(editText);
         linearLayout.addView(editText);
-        ingredientEtList.add(editText);
+        ingredientNameEtList.add(editText);
 
         EditText editText2 = new EditText(this);
         editText2.setHint("Quantity ");
@@ -318,20 +418,67 @@ public class AddRecipesActivity extends AppCompatActivity {
         setUpIngredientQuantitySpinner(spinner, spinnerItems);
     }
 
+    private void addInstructionLayout() {
+        final LinearLayout linearLayout = new LinearLayout(this);
+        linearLayout.setOrientation(LinearLayout.VERTICAL);
+        instructionsLinearLayout.addView(linearLayout);
+
+        Uri uri = Uri.parse("");
+        mInstructionStepImageUriList.add(uri);
+        Log.d(TAG, "addInstructionLayout: " + uri.toString());
+
+        final EditText editText = new EditText(this);
+        editText.setHint("Step Instructions ");
+        setEditTextAttributes(editText);
+        linearLayout.addView(editText);
+        instructionTextEtList.add(editText);
+
+        final MaterialButton button = new MaterialButton(this, null, R.attr.materialButtonOutlinedStyle);
+        button.setText("Add photo to this step");
+        button.setCornerRadius(convertDpToPixel(18));
+        setButtonAttributes(button);
+        linearLayout.addView(button);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openFileChooser(INSTRUCTION_PICTURE + instructionTextEtList.indexOf(editText));
+                button.setVisibility(View.INVISIBLE);
+                addImageView(linearLayout);
+            }
+        });
+
+
+    }
+
+    private void addImageView(LinearLayout linearLayout) {
+        ImageView imageView = new ImageView(this);
+
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, convertDpToPixel(100));
+
+        params.setMargins(convertDpToPixel(16),
+                convertDpToPixel(16),
+                convertDpToPixel(16),
+                0
+        );
+        imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        imageView.setLayoutParams(params);
+        linearLayout.addView(imageView);
+        instructionStepImageViewList.add(imageView);
+    }
+
     private void setUpRecipeCategorySpinner() {
-        Spinner dropdown = findViewById(R.id.addRecipes_category_spinner);
         String[] items = new String[]{"breakfast", "lunch", "dinner"};
         //create an adapter to describe how the items are displayed, adapters are used in several places in android.
         //There are multiple variations of this, but this is the basic variant.
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, items);
         //set the spinners adapter to the previously created one.
-        dropdown.setAdapter(adapter);
+        recipeCategorySpinner.setAdapter(adapter);
     }
 
     private void setUpIngredientQuantitySpinner(Spinner spinner, String[] items) {
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, items);
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT);
 
         params.setMargins(convertDpToPixel(16),
@@ -346,7 +493,7 @@ public class AddRecipesActivity extends AppCompatActivity {
 
     private void setEditTextAttributes(EditText editText) {
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT);
 
         params.setMargins(convertDpToPixel(16),
@@ -358,6 +505,21 @@ public class AddRecipesActivity extends AppCompatActivity {
         editText.setLayoutParams(params);
     }
 
+    private void setButtonAttributes(MaterialButton button) {
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT);
+
+        params.gravity = Gravity.CENTER_HORIZONTAL;
+        params.setMargins(convertDpToPixel(16),
+                convertDpToPixel(16),
+                convertDpToPixel(16),
+                0
+        );
+
+        button.setLayoutParams(params);
+    }
+
     //This function to convert DPs to pixels
     private int convertDpToPixel(float dp) {
         DisplayMetrics metrics = Resources.getSystem().getDisplayMetrics();
@@ -365,13 +527,23 @@ public class AddRecipesActivity extends AppCompatActivity {
         return Math.round(px);
     }
 
-    private void getPhotoUploadCount() {
+    private void getRecipePhotoUploadCount() {
         //Getting uploaded to FireStore
-        imageUrlArray = new String[mImageUriArray.length];
-        for (int i = 0; i < mImageUriArray.length; i++) {
-            addPhotoToFirestore(mImageUriArray[i], i);
+        recipeImageUrlArray = new String[mRecipeImageUriArray.length];
+        for (int i = 0; i < mRecipeImageUriArray.length; i++) {
+            addPhotoToFirestore(mRecipeImageUriArray[i], i);
         }
     }
+
+    private void getInstructionsPhotoUploadCount() {
+        //Getting uploaded to FireStore
+        instructionStepImageUrlArray = new String[mInstructionStepImageUriList.size()];
+        for (int j = 0; j < mInstructionStepImageUriList.size(); j++) {
+            addStepPhotoToFireStore(mInstructionStepImageUriList.get(j), j);
+        }
+    }
+
+
 //  ----------------------------------------------------------------------------------------------
 
 }

@@ -14,7 +14,6 @@ public class Recipe {
     private List<String> imageUrls_list;
     private List<Ingredient> ingredients_list;
     private List<Instruction> instructions_list;
-    private List<String> ratings_docId_list;
     private Float avg_rating;
     private Boolean isFavorite;
 
@@ -25,7 +24,7 @@ public class Recipe {
 
     public Recipe(String title, String creator_docId, String category, String description, List<String> keywords
             , List<String> imageUrls_list, List<Ingredient> ingredients_list, List<Instruction> instructions_list
-            , List<String> ratings_docId_list, Float avg_rating, Boolean isFavorite) {
+            ,Float avg_rating, Boolean isFavorite) {
 
         if (title.trim().equals("")) {
             title = "No Title";
@@ -38,7 +37,6 @@ public class Recipe {
         this.imageUrls_list = imageUrls_list;
         this.ingredients_list = ingredients_list;
         this.instructions_list = instructions_list;
-        this.ratings_docId_list = ratings_docId_list;
         this.avg_rating = avg_rating;
         this.isFavorite = isFavorite;
     }
@@ -116,14 +114,6 @@ public class Recipe {
         this.instructions_list = instructions_list;
     }
 
-    public List<String> getRatings_docId_list() {
-        return ratings_docId_list;
-    }
-
-    public void setRatings_docId_list(List<String> ratings_docId_list) {
-        this.ratings_docId_list = ratings_docId_list;
-    }
-
     public Float getAvg_rating() {
         return avg_rating;
     }
@@ -152,7 +142,6 @@ public class Recipe {
                 ", imageUrls_list=" + imageUrls_list +
                 ", ingredients_list=" + ingredients_list +
                 ", instructions_list=" + instructions_list +
-                ", ratings_docId_list=" + ratings_docId_list +
                 ", avg_rating=" + avg_rating +
                 ", isFavorite=" + isFavorite +
                 '}';
