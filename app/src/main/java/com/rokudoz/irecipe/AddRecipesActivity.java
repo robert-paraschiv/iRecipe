@@ -87,8 +87,7 @@ public class AddRecipesActivity extends AppCompatActivity {
     private List<ImageView> instructionStepImageViewList;
 
     private EditText editTextTitle, editTextDescription, editTextKeywords;
-    private Button mChooseFileBtn, mPostRecipeBtn, mAddIngredientBtn, mAddInstructionBtn;
-    Spinner recipeCategorySpinner;
+    private Spinner recipeCategorySpinner;
     private ImageView mImageView;
     private ProgressBar mProgressBar;
 
@@ -104,11 +103,11 @@ public class AddRecipesActivity extends AppCompatActivity {
         editTextDescription = findViewById(R.id.addRecipes_description_editText);
         mProgressBar = findViewById(R.id.addRecipes_progressbar);
         mImageView = findViewById(R.id.addRecipes_image);
-        mChooseFileBtn = findViewById(R.id.addRecipes_choose_path_btn);
-        mPostRecipeBtn = findViewById(R.id.addRecipes_add_btn);
+        Button mChooseFileBtn = findViewById(R.id.addRecipes_choose_path_btn);
+        Button mPostRecipeBtn = findViewById(R.id.addRecipes_add_btn);
         editTextKeywords = findViewById(R.id.addRecipes_keywords_editText);
-        mAddIngredientBtn = findViewById(R.id.addRecipes_addIngredient_btn);
-        mAddInstructionBtn = findViewById(R.id.addRecipes_addInstruction_btn);
+        Button mAddIngredientBtn = findViewById(R.id.addRecipes_addIngredient_btn);
+        Button mAddInstructionBtn = findViewById(R.id.addRecipes_addInstruction_btn);
         recipeCategorySpinner = findViewById(R.id.addRecipes_category_spinner);
         ingredientNameEtList = new ArrayList<>();
         ingredientQuantityEtList = new ArrayList<>();
@@ -207,13 +206,15 @@ public class AddRecipesActivity extends AppCompatActivity {
                     mInstructionStepUri = data.getClipData().getItemAt(i).getUri();
                 }
                 mInstructionStepImageUriList.set(requestCode - (SELECT_PICTURES + INSTRUCTION_PICTURE), mInstructionStepUri);
-                Picasso.get().load(mInstructionStepImageUriList.get(requestCode - (SELECT_PICTURES + INSTRUCTION_PICTURE))).into(instructionStepImageViewList.get(instructionStepImageViewList.size() - 1));
+                Picasso.get().load(mInstructionStepImageUriList.get(requestCode - (SELECT_PICTURES + INSTRUCTION_PICTURE)))
+                        .into(instructionStepImageViewList.get(instructionStepImageViewList.size() - 1));
 
             } else if (data.getData() != null) {
                 //Only one image has been selected
                 mInstructionStepUri = data.getData();
                 mInstructionStepImageUriList.set(requestCode - (SELECT_PICTURES + INSTRUCTION_PICTURE), mInstructionStepUri);
-                Picasso.get().load(mInstructionStepImageUriList.get(requestCode - (SELECT_PICTURES + INSTRUCTION_PICTURE))).into(instructionStepImageViewList.get(instructionStepImageViewList.size() - 1));
+                Picasso.get().load(mInstructionStepImageUriList.get(requestCode - (SELECT_PICTURES + INSTRUCTION_PICTURE)))
+                        .into(instructionStepImageViewList.get(instructionStepImageViewList.size() - 1));
 
             }
         }
@@ -366,13 +367,12 @@ public class AddRecipesActivity extends AppCompatActivity {
             if (!mInstructionStepImageUriList.get(j).toString().equals("")) {
                 url = instructionStepImageUrlArray[j];
             }
-            Instruction instruction = new Instruction(j, instructionTextEtList.get(j).getText().toString(), url);
+            Instruction instruction = new Instruction(j+1, instructionTextEtList.get(j).getText().toString(), url);
             instructions_list.add(instruction);
         }
 
 
-        Recipe recipe = new Recipe(title, creator_docId, category, description, keywords, imageUrls_list, ingredients_list, instructions_list
-                , 0f, isFavorite);
+        Recipe recipe = new Recipe(title, creator_docId, category, description, keywords, imageUrls_list,0f, isFavorite);
 
 //        // Sends recipe data to Firestore database
         recipesReference.add(recipe)
@@ -380,7 +380,25 @@ public class AddRecipesActivity extends AppCompatActivity {
                     @Override
                     public void onSuccess(DocumentReference documentReference) {
                         Toast.makeText(AddRecipesActivity.this, "Succesfully added " + title + " to the recipes list", Toast.LENGTH_SHORT).show();
+                        for (Ingredient ingredient : ingredients_list){
+                            recipesReference.document(documentReference.getId()).collection("RecipeIngredients")
+                                    .add(ingredient).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                                @Override
+                                public void onSuccess(DocumentReference documentReference) {
 
+                                }
+                            });
+                        }
+                        for (Instruction instruction : instructions_list){
+                            recipesReference.document(documentReference.getId()).collection("RecipeInstructions").
+                                    add(instruction).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                                @Override
+                                public void onSuccess(DocumentReference documentReference) {
+
+                                }
+                            });
+                        }
+                        Log.d(TAG, "onSuccess: doc id " + documentReference.getId());
                         finish();
                         startActivity(getIntent());
                     }

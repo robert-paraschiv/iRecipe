@@ -38,7 +38,7 @@
         app:fabCustomSize="50dp" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fab_update_recipes"
+        android:id="@+id/fab_add_ingredient"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"

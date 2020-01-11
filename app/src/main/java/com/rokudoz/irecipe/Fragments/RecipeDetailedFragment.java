@@ -421,7 +421,6 @@ public class RecipeDetailedFragment extends Fragment {
                 }
                 for (DocumentChange documentSnapshot : queryDocumentSnapshots.getDocumentChanges()) {
                     Ingredient ingredient = documentSnapshot.getDocument().toObject(Ingredient.class);
-                    ingredient.setDocumentId(documentSnapshot.getDocument().getId());
                     userShoppingIngredientList.add(ingredient);
                     Log.d(TAG, "onEvent: ADDED TO USER SHOPPING LIST " + ingredient.toString());
                 }
@@ -440,7 +439,6 @@ public class RecipeDetailedFragment extends Fragment {
                     return;
                 }
                 Recipe recipe = documentSnapshot.toObject(Recipe.class);
-                List<Ingredient> recipeIngredientList = recipe.getIngredients_list();
                 title = recipe.getTitle();
                 String description = recipe.getDescription();
                 imageUrls = recipe.getImageUrls_list();
@@ -451,11 +449,8 @@ public class RecipeDetailedFragment extends Fragment {
                 tvDescription.setText(description);
 
                 StringBuilder ingredientsToPutInTV = new StringBuilder();
-                if (recipeIngredientList != null)
-                    for (Ingredient ingredient : recipeIngredientList) {
-                        ingredientsToPutInTV.append(ingredient.getName()).append(" ").append(ingredient.getQuantity()).append(" ")
-                                .append(ingredient.getQuantity_type()).append("\n");
-                    }
+                ////////////////////////////////////////////////////////// LOGIC TO GET RECIPES INGREDIENTS AND INSTRUCTIONS HERE
+
                 tvIngredients.setText(ingredientsToPutInTV.toString());
 
                 int nrOfMissingIngredients = 0;

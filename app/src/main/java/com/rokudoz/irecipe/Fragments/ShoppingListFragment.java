@@ -146,7 +146,6 @@ public class ShoppingListFragment extends Fragment {
                     for (QueryDocumentSnapshot querySnapshot : queryDocumentSnapshots) {
                         Ingredient ingredient = querySnapshot.toObject(Ingredient.class);
                         if (!shoppingListIngredients.contains(ingredient)) {
-                            ingredient.setDocumentId(querySnapshot.getId());
                             shoppingListIngredients.add(ingredient);
                         }
                     }
@@ -156,24 +155,24 @@ public class ShoppingListFragment extends Fragment {
                         @Override
                         public void onClick(View v) {
 
-                            for (final Ingredient ingToDelete : shoppingListIngredients) {
-                                usersReference.document(userDocumentID).collection("ShoppingList").document(ingToDelete.getDocumentId())
-                                        .delete().addOnSuccessListener(new OnSuccessListener<Void>() {
-                                    @Override
-                                    public void onSuccess(Void aVoid) {
-                                        Log.d(TAG, "onSuccess: Deleted" + ingToDelete.toString() + " from shopping list");
-                                        shoppingListIngredients.remove(ingToDelete);
-
-                                        if (shoppingListIngredients.size() == 0) {
-                                            Log.d(TAG, "onSuccess: Basket Emptied");
-                                            checkBoxArrayAdapter.clear();
-                                            checkBoxArrayAdapter.notifyDataSetChanged();
-                                            mEmptyBasketBtn.setVisibility(View.INVISIBLE);
-                                            Toast.makeText(getContext(), "Basket Emptied", Toast.LENGTH_SHORT).show();
-                                        }
-                                    }
-                                });
-                            }
+//                            for (final Ingredient ingToDelete : shoppingListIngredients) {
+//                                usersReference.document(userDocumentID).collection("ShoppingList").document(ingToDelete())
+//                                        .delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+//                                    @Override
+//                                    public void onSuccess(Void aVoid) {
+//                                        Log.d(TAG, "onSuccess: Deleted" + ingToDelete.toString() + " from shopping list");
+//                                        shoppingListIngredients.remove(ingToDelete);
+//
+//                                        if (shoppingListIngredients.size() == 0) {
+//                                            Log.d(TAG, "onSuccess: Basket Emptied");
+//                                            checkBoxArrayAdapter.clear();
+//                                            checkBoxArrayAdapter.notifyDataSetChanged();
+//                                            mEmptyBasketBtn.setVisibility(View.INVISIBLE);
+//                                            Toast.makeText(getContext(), "Basket Emptied", Toast.LENGTH_SHORT).show();
+//                                        }
+//                                    }
+//                                });
+//                            }
                         }
                     });
                     setupCheckList();

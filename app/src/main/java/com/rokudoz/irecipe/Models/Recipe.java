@@ -12,8 +12,6 @@ public class Recipe {
     private String description;
     private List<String> keywords;
     private List<String> imageUrls_list;
-    private List<Ingredient> ingredients_list;
-    private List<Instruction> instructions_list;
     private Float avg_rating;
     private Boolean isFavorite;
 
@@ -23,8 +21,7 @@ public class Recipe {
     }
 
     public Recipe(String title, String creator_docId, String category, String description, List<String> keywords
-            , List<String> imageUrls_list, List<Ingredient> ingredients_list, List<Instruction> instructions_list
-            ,Float avg_rating, Boolean isFavorite) {
+            , List<String> imageUrls_list,Float avg_rating, Boolean isFavorite) {
 
         if (title.trim().equals("")) {
             title = "No Title";
@@ -35,8 +32,6 @@ public class Recipe {
         this.description = description;
         this.keywords = keywords;
         this.imageUrls_list = imageUrls_list;
-        this.ingredients_list = ingredients_list;
-        this.instructions_list = instructions_list;
         this.avg_rating = avg_rating;
         this.isFavorite = isFavorite;
     }
@@ -98,22 +93,6 @@ public class Recipe {
         this.imageUrls_list = imageUrls_list;
     }
 
-    public List<Ingredient> getIngredients_list() {
-        return ingredients_list;
-    }
-
-    public void setIngredients_list(List<Ingredient> ingredients_list) {
-        this.ingredients_list = ingredients_list;
-    }
-
-    public List<Instruction> getInstructions_list() {
-        return instructions_list;
-    }
-
-    public void setInstructions_list(List<Instruction> instructions_list) {
-        this.instructions_list = instructions_list;
-    }
-
     public Float getAvg_rating() {
         return avg_rating;
     }
@@ -140,8 +119,6 @@ public class Recipe {
                 ", description='" + description + '\'' +
                 ", keywords=" + keywords +
                 ", imageUrls_list=" + imageUrls_list +
-                ", ingredients_list=" + ingredients_list +
-                ", instructions_list=" + instructions_list +
                 ", avg_rating=" + avg_rating +
                 ", isFavorite=" + isFavorite +
                 '}';

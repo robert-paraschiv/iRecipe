@@ -59,7 +59,7 @@ public class ProfileFragment extends Fragment {
     private Uri mImageUri;
     private TextView tvHelloUserName;
     private ProgressBar pbLoading;
-    private ListView cbListView;
+//    private ListView cbListView;
     private Button signOutBtn;
     private CircleImageView mProfileImage;
 
@@ -92,7 +92,7 @@ public class ProfileFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
 //        textViewData = view.findViewById(R.id.tv_data);
-        cbListView = view.findViewById(R.id.checkable_list);
+//        cbListView = view.findViewById(R.id.checkable_list);
         pbLoading = view.findViewById(R.id.pbLoading);
         pbLoading.setVisibility(View.VISIBLE);
         signOutBtn = view.findViewById(R.id.profileFragment_signOut);
@@ -244,7 +244,7 @@ public class ProfileFragment extends Fragment {
                             ingredientList = (List<String>) documentSnapshot.get("ingredient_list");
                             ingStringArray = ingredientList.toArray(new String[ingredientList.size()]);
 
-                            setupCheckList();
+//                            setupCheckList();
                         }
                     }
                 });
@@ -289,46 +289,46 @@ public class ProfileFragment extends Fragment {
     }
 
 
-    private void setupCheckList() {
-        //create an instance of ListView
-        //set multiple selection mode
-        if (getActivity() != null) {
-            cbListView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
-//            final String[] items = PossibleIngredients.getIngredientsNames();
-            final String[] items = ingStringArray;
-
-            //supply data items to ListView
-            ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(getContext(), R.layout.checkable_list_layout, R.id.txt_title, items);
-            cbListView.setAdapter(arrayAdapter);
-
-            //When the Ingredients List has more elements than the UserTAGS(IngredientsUserHas), initialize elements as false to avoid crash
-            for (String ing : ingStringArray) {
-                if (!userIngredientList.contains(ing)){
-                    ingredientsUserHas.put(ing,false);
-                }
-            }
-
-            // sets the initial checkbox values taken from database
-            int index = 0;
-            for (String item : items) {
-                cbListView.setItemChecked(index, ingredientsUserHas.get(item));
-                Log.d(TAG, item + " index " + index + " value " + ingredientsUserHas.get(item));
-                index++;
-            }
-
-            cbListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    // gets checkBox value and updates database with it
-
-
-
-                    //////////////////////////////////////////////////////// CHECKBOXXXXXXXX
-
-                }
-
-            });
-        }
-    }
+//    private void setupCheckList() {
+//        //create an instance of ListView
+//        //set multiple selection mode
+//        if (getActivity() != null) {
+//            cbListView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+////            final String[] items = PossibleIngredients.getIngredientsNames();
+//            final String[] items = ingStringArray;
+//
+//            //supply data items to ListView
+//            ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(getContext(), R.layout.checkable_list_layout, R.id.txt_title, items);
+//            cbListView.setAdapter(arrayAdapter);
+//
+//            //When the Ingredients List has more elements than the UserTAGS(IngredientsUserHas), initialize elements as false to avoid crash
+//            for (String ing : ingStringArray) {
+//                if (!userIngredientList.contains(ing)){
+//                    ingredientsUserHas.put(ing,false);
+//                }
+//            }
+//
+//            // sets the initial checkbox values taken from database
+//            int index = 0;
+//            for (String item : items) {
+//                cbListView.setItemChecked(index, ingredientsUserHas.get(item));
+//                Log.d(TAG, item + " index " + index + " value " + ingredientsUserHas.get(item));
+//                index++;
+//            }
+//
+//            cbListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+//                    // gets checkBox value and updates database with it
+//
+//
+//
+//                    //////////////////////////////////////////////////////// CHECKBOXXXXXXXX
+//
+//                }
+//
+//            });
+//        }
+//    }
 
     public void signOut() {
         FirebaseAuth.getInstance().signOut();

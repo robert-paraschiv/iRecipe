@@ -207,24 +207,9 @@ public class homeLunchFragment extends Fragment implements RecipeAdapter.OnItemC
                         }
                         if (!mDocumentIDs.contains(document.getId())) {
                             mDocumentIDs.add(document.getId());
-                            if (recipe.getIngredients_list() != null && userIngredient_list != null) {
-                                //Check if recipe contains any ingredient that user has
-                                Boolean recipeHasMoreIngredients = false;
-                                for (Ingredient ingredient : recipe.getIngredients_list()) {
-                                    if (!userIngredient_list.get(userIngredient_list.indexOf(ingredient)).getOwned()) {
-                                        recipeHasMoreIngredients = true;
-                                    }
-                                }
-                                if (!recipeHasMoreIngredients) {
-                                    mRecipeList.add(recipe);
-                                    Log.d(TAG, "onEvent: Recipe ingredientsArray " + recipe.getIngredients_list().toString()
-                                            + " User ingredients: " + userIngredient_list);
-                                } else {
-                                    mDocumentIDs.remove(document.getId());
-                                    Log.d(TAG, "onEvent: Rejected recipe: " + recipe.getTitle()
-                                            + ", ingredients: " + recipe.getIngredients_list().toString());
-                                }
-                            }
+                            ////////////////////////////////////////////////////////// LOGIC TO GET RECIPES HERE
+
+                            mRecipeList.add(recipe);
                         } else {
                             Log.d(TAG, "onEvent: Already Contains docID");
                         }

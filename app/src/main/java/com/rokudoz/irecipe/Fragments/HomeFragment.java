@@ -16,6 +16,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.rokudoz.irecipe.AddIngredientActivity;
 import com.rokudoz.irecipe.AddRecipesActivity;
 import com.rokudoz.irecipe.Fragments.homeSubFragments.homeBreakfastFragment;
 import com.rokudoz.irecipe.Fragments.homeSubFragments.homeDinnerFragment;
@@ -28,6 +29,7 @@ public class HomeFragment extends Fragment {
 
     public View view;
     private FloatingActionButton fab_addRecipes;
+    private FloatingActionButton fab_addIngredient;
 
     //Tabs
     private SectionsPagerAdapter sectionsPagerAdapter;
@@ -46,6 +48,7 @@ public class HomeFragment extends Fragment {
             view = inflater.inflate(R.layout.fragment_home, container, false);
         }
         fab_addRecipes = view.findViewById(R.id.fab_add_recipe);
+        fab_addIngredient = view.findViewById(R.id.fab_add_ingredient);
 
 
         viewPager = view.findViewById(R.id.container);
@@ -54,11 +57,16 @@ public class HomeFragment extends Fragment {
         TabLayout tabLayout = view.findViewById(R.id.tabLayout);
         tabLayout.setupWithViewPager(viewPager);
 
-        fab_addRecipes.show();
         fab_addRecipes.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 navigateToAddRecipes();
+            }
+        });
+        fab_addIngredient.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                navigateToAddIngredient();
             }
         });
 
@@ -71,10 +79,10 @@ public class HomeFragment extends Fragment {
         startActivity(intent);
     }
 
-//    public void navigateToUpdateRecipes() {
-//        Intent intent = new Intent(getContext(), UpdateRecipesActivity.class);
-//        startActivity(intent);
-//    }
+    public void navigateToAddIngredient() {
+        Intent intent = new Intent(getContext(), AddIngredientActivity.class);
+        startActivity(intent);
+    }
 
 
     private void setupViewPager(ViewPager viewPager) {
