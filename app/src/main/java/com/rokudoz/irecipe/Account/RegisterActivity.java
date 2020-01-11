@@ -55,19 +55,15 @@ public class RegisterActivity extends AppCompatActivity {
     private String email, name, password;
     private User mUser;
 
-    private List<String> ingredientList;
-    private String[] ingStringArray;
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
-        mRegister = (Button) findViewById(R.id.btn_register);
-        mEmail = (EditText) findViewById(R.id.input_email);
-        mPassword = (EditText) findViewById(R.id.input_password);
-        mConfirmPassword = (EditText) findViewById(R.id.input_confirm_password);
-        mName = (EditText) findViewById(R.id.input_name);
+        mRegister = findViewById(R.id.btn_register);
+        mEmail = findViewById(R.id.input_email);
+        mPassword = findViewById(R.id.input_password);
+        mConfirmPassword = findViewById(R.id.input_confirm_password);
+        mName = findViewById(R.id.input_name);
         mContext = RegisterActivity.this;
         mUser = new User();
         Log.d(TAG, "onCreate: started");
@@ -202,7 +198,7 @@ public class RegisterActivity extends AppCompatActivity {
                             sendVerificationEmail();
 
                             //add user details to firebase database
-                            getIngredientList();
+                            addNewUser();
                         }
                         if (!task.isSuccessful()) {
                             Toast.makeText(mContext, "Someone with that email already exists",
@@ -222,35 +218,21 @@ public class RegisterActivity extends AppCompatActivity {
     public void addNewUser() {
 
         String userid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        String userEmail = FirebaseAuth.getInstance().getCurrentUser().getEmail();
+        String userProfilePic = FirebaseAuth.getInstance().getCurrentUser().getPhotoUrl().toString();
 
         Log.d(TAG, "addNewUser: Adding new User: \n user_id:" + userid);
         mUser.setName(name);
         mUser.setUser_id(userid);
+        mUser.setEmail(userEmail);
         mUser.setIngredient_list(new ArrayList<Ingredient>());
-        mUser.setUserProfilePicUrl("");
+        mUser.setUserProfilePicUrl(userProfilePic);
 
         //User user = new User(name, userid);
         userRef.document(mUser.getUser_id()).set(mUser);
         FirebaseAuth.getInstance().signOut();
         redirectLoginScreen();
     }
-
-
-    private void getIngredientList() {
-        ingredientsReference.document("ingredient_list")
-                .addSnapshotListener(new EventListener<DocumentSnapshot>() {
-                    @Override
-                    public void onEvent(@javax.annotation.Nullable DocumentSnapshot documentSnapshot, @javax.annotation.Nullable FirebaseFirestoreException e) {
-                        if (e == null) {
-                            ingredientList = (List<String>) documentSnapshot.get("ingredient_list");
-                            ingStringArray = ingredientList.toArray(new String[ingredientList.size()]);
-                            addNewUser();
-                        }
-                    }
-                });
-    }
-
-
     /**
      * sends an email verification link to the user
      */

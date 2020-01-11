@@ -75,7 +75,6 @@ public class LoginActivity extends AppCompatActivity implements
     private String email, name, password;
     private User mUser;
     private List<String> ingredientList;
-    private String[] ingStringArray;
 
 
     @Override
@@ -300,7 +299,7 @@ public class LoginActivity extends AppCompatActivity implements
                             boolean newuser = task.getResult().getAdditionalUserInfo().isNewUser();
                             if (newuser){
                                 Log.d(TAG, "onComplete: NEW USER");
-                                getIngredientList();
+                                addNewUser();
 
                             }else {
                                 Log.d(TAG, "onComplete: NOT a new USER");
@@ -332,41 +331,22 @@ public class LoginActivity extends AppCompatActivity implements
      * Adds data to the node: "users"
      */
     public void addNewUser() {
-        String[] possibleIngredients = ingStringArray;
+        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        String userEmail = FirebaseAuth.getInstance().getCurrentUser().getEmail();
+        String userProfilePic = FirebaseAuth.getInstance().getCurrentUser().getPhotoUrl().toString();
 
-        final Map<String, Boolean> tags = new HashMap<>();
-        for (String ingredient : possibleIngredients) {
-            tags.put(ingredient, false);
-        }
-
-        String userid = FirebaseAuth.getInstance().getCurrentUser().getUid();
-
-        Log.d(TAG, "addNewUser: Adding new User: \n user_id:" + userid);
+        Log.d(TAG, "addNewUser: Adding new User: \n user_id:" + userId);
         mUser.setName(name);
-        mUser.setUser_id(userid);
+        mUser.setUser_id(userId);
+        mUser.setEmail(userEmail);
         mUser.setIngredient_list(new ArrayList<Ingredient>());
-        mUser.setUserProfilePicUrl("");
+        mUser.setUserProfilePicUrl(userProfilePic);
 
-        //User user = new User(name, userid);
+        //User user = new User(name, userId);
         userRef.document(mUser.getUser_id()).set(mUser);
         Intent intent = new Intent(LoginActivity.this, MainActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
         finish();
-    }
-
-
-    private void getIngredientList() {
-        ingredientsReference.document("ingredient_list")
-                .addSnapshotListener(new EventListener<DocumentSnapshot>() {
-                    @Override
-                    public void onEvent(@javax.annotation.Nullable DocumentSnapshot documentSnapshot, @javax.annotation.Nullable FirebaseFirestoreException e) {
-                        if (e == null) {
-                            ingredientList = (List<String>) documentSnapshot.get("ingredient_list");
-                            ingStringArray = ingredientList.toArray(new String[ingredientList.size()]);
-                            addNewUser();
-                        }
-                    }
-                });
     }
 }

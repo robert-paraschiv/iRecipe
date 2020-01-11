@@ -7,6 +7,7 @@ public class User {
     private String user_id;
     private String name;
     private String username;
+    private String email;
     private Date birth_date;
     private String sex;
     private String nationality;
@@ -18,12 +19,13 @@ public class User {
         //Empty constructor
     }
 
-    public User(String user_id, String name, String username, Date birth_date, String sex
+    public User(String user_id, String name, String username,String email, Date birth_date, String sex
             , String nationality, String userProfilePicUrl, List<Ingredient> ingredient_list
             , List<String> favoriteRecipes) {
         this.user_id = user_id;
         this.name = name;
         this.username = username;
+        this.email = email;
         this.birth_date = birth_date;
         this.sex = sex;
         this.nationality = nationality;
@@ -54,6 +56,14 @@ public class User {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public Date getBirth_date() {
@@ -110,6 +120,7 @@ public class User {
                 "user_id='" + user_id + '\'' +
                 ", name='" + name + '\'' +
                 ", username='" + username + '\'' +
+                ", email='" + email + '\'' +
                 ", birth_date=" + birth_date +
                 ", sex='" + sex + '\'' +
                 ", nationality='" + nationality + '\'' +

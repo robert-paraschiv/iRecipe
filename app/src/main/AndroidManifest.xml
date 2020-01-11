@@ -16,14 +16,7 @@
         <activity android:name=".TestActivity"></activity>
         <activity android:name=".UpdateRecipesActivity" />
         <activity android:name=".Account.RegisterActivity" />
-        <activity android:name=".AddRecipesActivity" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-
-        </activity>
+        <activity android:name=".AddRecipesActivity"/>
         <activity android:name=".Account.LoginActivity" />
         <activity android:name=".MainActivity">
             <intent-filter>

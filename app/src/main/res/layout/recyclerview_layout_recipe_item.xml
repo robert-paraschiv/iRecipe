@@ -43,7 +43,7 @@
             android:text="Description" />
 
         <TextView
-            android:id="@+id/recyclerview_numberOfFaved"
+            android:id="@+id/recyclerview_avgRating_textView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             tools:text="88"

@@ -72,9 +72,6 @@
         <argument
             android:name="documentID"
             app:argType="string" />
-        <argument
-            android:name="numberOfFaves"
-            app:argType="integer" />
 
 
     </fragment>
