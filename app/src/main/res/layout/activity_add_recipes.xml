@@ -40,28 +40,39 @@
             android:text="Choose Photo"
             app:cornerRadius="18dp" />
 
-        <EditText
+        <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/addRecipes_title_editText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/addRecipes_choose_path_btn"
             android:hint="Title"
-            android:inputType="text" />
+            android:inputType="textCapSentences" />
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/addRecipes_category_tv"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="8dp"
+            android:textStyle="bold"
+            android:textSize="18sp"
+            android:layout_below="@id/addRecipes_title_editText"
+            android:text="Category"/>
         <Spinner
             android:id="@+id/addRecipes_category_spinner"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/addRecipes_title_editText"
-            android:spinnerMode="dropdown" />
+            android:layout_below="@id/addRecipes_category_tv"
+            android:spinnerMode="dropdown"
+            />
 
-        <EditText
+        <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/addRecipes_description_editText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/addRecipes_category_spinner"
             android:hint="Description"
-            android:inputType="text" />
+            android:inputType="textCapSentences" />
 
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/addRecipes_ingredientsLayout_materialCardView"

@@ -12,6 +12,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
+import android.text.InputType;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
@@ -420,12 +421,14 @@ public class AddRecipesActivity extends AppCompatActivity {
 
         EditText editText = new EditText(this);
         editText.setHint("Ingredient ");
+        editText.setInputType(InputType.TYPE_TEXT_FLAG_CAP_WORDS);
         setEditTextAttributes(editText);
         linearLayout.addView(editText);
         ingredientNameEtList.add(editText);
 
         EditText editText2 = new EditText(this);
         editText2.setHint("Quantity ");
+        editText2.setInputType(InputType.TYPE_CLASS_NUMBER);
         setEditTextAttributes(editText2);
         linearLayout.addView(editText2);
         ingredientQuantityEtList.add(editText2);
@@ -447,6 +450,7 @@ public class AddRecipesActivity extends AppCompatActivity {
 
         final EditText editText = new EditText(this);
         editText.setHint("Step Instructions ");
+        editText.setInputType(InputType.TYPE_TEXT_FLAG_CAP_SENTENCES);
         setEditTextAttributes(editText);
         linearLayout.addView(editText);
         instructionTextEtList.add(editText);

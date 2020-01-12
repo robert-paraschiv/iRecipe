@@ -1,108 +1,100 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:tools="http://schemas.android.com/tools"
     android:padding="4dp">
 
-    <de.hdodenhof.circleimageview.CircleImageView
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:id="@+id/profileFragment_profileImage"
-        android:layout_width="120dp"
-        android:layout_height="120dp"
-        tools:src="@drawable/ic_launcher_background"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="8dp"
-        app:civ_border_width="1dp"
-        app:civ_border_color="#FF000000"/>
-
-    <TextView
-        android:id="@+id/profileFragment_helloUser_textview"
-        tools:text="Hello, Rokudo"
-        android:textSize="15sp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_below="@id/profileFragment_profileImage"
-        android:layout_margin="4dp"
-        />
-
     <com.google.android.material.card.MaterialCardView
-        android:id="@+id/profileFragment_ingredientCbList_MaterialCard"
+        android:id="@+id/profileFragment_userDetails_MaterialCard"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="8dp"
-        app:cardCornerRadius="18dp"
-        android:layout_below="@+id/profileFragment_helloUser_textview">
+        android:layout_margin="8dp"
+        app:cardCornerRadius="18dp">
+
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-            <TextView
-                android:id="@+id/profileFragment_tv_search"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp">
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/profileFragment_profileImage"
+                android:layout_width="120dp"
+                android:layout_height="120dp"
+                android:layout_alignParentStart="true"
+                app:civ_border_color="#FF000000"
+                app:civ_border_width="0.5dp"
+                tools:src="@drawable/ic_launcher_background" />
+
+            <RelativeLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
-                android:layout_marginStart="4dp"
-                android:layout_marginTop="4dp"
-                android:text="@string/select_myingredients_string"
-                android:textSize="20sp" />
-            <com.google.android.material.checkbox.MaterialCheckBox
-                android:id="@+id/testmaterialcheckbox"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Material CheckBox"
-                android:layout_below="@+id/profileFragment_tv_search"
-                />
-            <androidx.appcompat.widget.AppCompatCheckBox
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/testcheckbox"
-                android:layout_below="@id/testmaterialcheckbox"
-                android:text="Default CheckBox"/>
-            <com.google.android.material.textview.MaterialTextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/testcheckbox"
-                android:text="Dadadadadadadadadadadaaadadada\n
-nunununununununununununununununu\n"/>
+                android:layout_toEndOf="@id/profileFragment_profileImage">
+
+                <TextView
+                    android:id="@+id/profileFragment_user_name_TextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="30dp"
+                    android:textSize="16sp"
+                    style="@style/TextAppearance.MaterialComponents.Headline6"
+                    tools:text="Name" />
+
+                <TextView
+                    android:id="@+id/profileFragment_userName_TextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/profileFragment_user_name_TextView"
+                    android:layout_marginStart="30dp"
+                    android:textSize="15sp"
+                    style="@style/TextAppearance.MaterialComponents.Caption"
+                    tools:text="UserName" />
+
+                <TextView
+                    android:id="@+id/profileFragment_user_description_TextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/profileFragment_userName_TextView"
+                    android:layout_marginStart="30dp"
+                    android:layout_marginTop="8dp"
+                    style="@style/TextAppearance.MaterialComponents.Headline2"
+                    android:textSize="14sp"
+                    tools:text="Description" />
+            </RelativeLayout>
 
         </RelativeLayout>
-
-
     </com.google.android.material.card.MaterialCardView>
 
-    <!--<androidx.core.widget.NestedScrollView-->
-        <!--android:id="@+id/nestedScrollview"-->
-        <!--android:layout_below="@+id/checkable_list"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="wrap_content">-->
-
-        <!--<TextView-->
-            <!--android:id="@+id/tv_data"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:textSize="20sp" />-->
-
-    <!--</androidx.core.widget.NestedScrollView>-->
-
-    <ProgressBar
-        android:id="@+id/pbLoading"
-        android:layout_width="wrap_content"
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/profileFragment_TabLayout_MaterialCard"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
-        android:visibility="visible" />
+        android:layout_below="@id/profileFragment_userDetails_MaterialCard"
+        android:layout_margin="4dp"
+        app:cardCornerRadius="18dp">
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/profileFragment_signOut"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-        app:cornerRadius="18dp"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:text="Sign Out" />
+        <com.google.android.material.appbar.AppBarLayout
+            android:id="@+id/profileFragment_app_bar"
+            android:layout_width="match_parent"
+            android:layout_height="35dp">
+
+            <com.google.android.material.tabs.TabLayout
+                android:id="@+id/profileFragment_tabLayout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+        </com.google.android.material.appbar.AppBarLayout>
+
+        <androidx.viewpager.widget.ViewPager
+            android:id="@+id/profileFragment_container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@id/profileFragment_app_bar"
+            android:layout_marginTop="35dp"/>
+    </com.google.android.material.card.MaterialCardView>
+
 
 </RelativeLayout>

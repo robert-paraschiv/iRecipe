@@ -339,7 +339,6 @@ public class LoginActivity extends AppCompatActivity implements
         mUser.setName(name);
         mUser.setUser_id(userId);
         mUser.setEmail(userEmail);
-        mUser.setIngredient_list(new ArrayList<Ingredient>());
         mUser.setUserProfilePicUrl(userProfilePic);
 
         //User user = new User(name, userId);

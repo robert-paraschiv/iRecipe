@@ -225,7 +225,6 @@ public class RegisterActivity extends AppCompatActivity {
         mUser.setName(name);
         mUser.setUser_id(userid);
         mUser.setEmail(userEmail);
-        mUser.setIngredient_list(new ArrayList<Ingredient>());
         mUser.setUserProfilePicUrl(userProfilePic);
 
         //User user = new User(name, userid);

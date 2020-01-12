@@ -126,7 +126,6 @@ public class ShoppingListFragment extends Fragment {
 
                             User user = queryDocumentSnapshots.getDocuments().get(0).toObject(User.class);
                             userDocumentID = queryDocumentSnapshots.getDocuments().get(0).getId();
-                            userIngredientList = user.getIngredient_list();
 
                             Log.d(TAG, "onEvent: " + ingredientsUserHas.toString());
 

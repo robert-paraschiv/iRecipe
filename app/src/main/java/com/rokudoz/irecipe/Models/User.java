@@ -8,29 +8,28 @@ public class User {
     private String name;
     private String username;
     private String email;
+    private String description;
     private Date birth_date;
     private String sex;
     private String nationality;
     private String userProfilePicUrl;
-    private List<Ingredient> ingredient_list;
     private List<String> favoriteRecipes;
 
     public User() {
         //Empty constructor
     }
 
-    public User(String user_id, String name, String username,String email, Date birth_date, String sex
-            , String nationality, String userProfilePicUrl, List<Ingredient> ingredient_list
-            , List<String> favoriteRecipes) {
+    public User(String user_id, String name, String username, String email, String description, Date birth_date, String sex
+            , String nationality, String userProfilePicUrl,List<String> favoriteRecipes) {
         this.user_id = user_id;
         this.name = name;
         this.username = username;
         this.email = email;
+        this.description = description;
         this.birth_date = birth_date;
         this.sex = sex;
         this.nationality = nationality;
         this.userProfilePicUrl = userProfilePicUrl;
-        this.ingredient_list = ingredient_list;
         this.favoriteRecipes = favoriteRecipes;
     }
 
@@ -66,6 +65,14 @@ public class User {
         this.email = email;
     }
 
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
     public Date getBirth_date() {
         return birth_date;
     }
@@ -98,13 +105,6 @@ public class User {
         this.userProfilePicUrl = userProfilePicUrl;
     }
 
-    public List<Ingredient> getIngredient_list() {
-        return ingredient_list;
-    }
-
-    public void setIngredient_list(List<Ingredient> ingredient_list) {
-        this.ingredient_list = ingredient_list;
-    }
 
     public List<String> getFavoriteRecipes() {
         return favoriteRecipes;
@@ -121,11 +121,11 @@ public class User {
                 ", name='" + name + '\'' +
                 ", username='" + username + '\'' +
                 ", email='" + email + '\'' +
+                ", description='" + description + '\'' +
                 ", birth_date=" + birth_date +
                 ", sex='" + sex + '\'' +
                 ", nationality='" + nationality + '\'' +
                 ", userProfilePicUrl='" + userProfilePicUrl + '\'' +
-                ", ingredient_list=" + ingredient_list +
                 ", favoriteRecipes=" + favoriteRecipes +
                 '}';
     }

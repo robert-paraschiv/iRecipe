@@ -168,7 +168,6 @@ public class homeBreakfastFragment extends Fragment implements RecipeAdapter.OnI
                             mUser = documentSnapshot.getDocument().toObject(User.class);
                             loggedInUserDocumentId = queryDocumentSnapshots.getDocuments().get(0).getId();
                             userFavRecipesList = mUser.getFavoriteRecipes();
-                            userIngredient_list = mUser.getIngredient_list();
                         }
                         Query recipesQuery = null;
                         if (mLastQueriedDocument != null) {
