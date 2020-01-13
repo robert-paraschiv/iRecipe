@@ -16,6 +16,7 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
@@ -183,7 +184,7 @@ public class RegisterActivity extends AppCompatActivity {
      * @param email
      * @param password
      */
-    public void registerNewEmail(final String email, String password) {
+    public void registerNewEmail(final String email, final String password) {
 
         showProgressBar();
 
@@ -195,10 +196,17 @@ public class RegisterActivity extends AppCompatActivity {
 
                         if (task.isSuccessful()) {
                             //send email verificaiton
-                            sendVerificationEmail();
+                            FirebaseAuth.getInstance().signInWithEmailAndPassword(email, password).addOnSuccessListener(new OnSuccessListener<AuthResult>() {
+                                @Override
+                                public void onSuccess(AuthResult authResult) {
+                                    sendVerificationEmail();
+                                    //add user details to firebase database
+                                    addNewUser();
+                                }
+                            });
 
-                            //add user details to firebase database
-                            addNewUser();
+
+
                         }
                         if (!task.isSuccessful()) {
                             Toast.makeText(mContext, "Someone with that email already exists",
@@ -219,7 +227,7 @@ public class RegisterActivity extends AppCompatActivity {
 
         String userid = FirebaseAuth.getInstance().getCurrentUser().getUid();
         String userEmail = FirebaseAuth.getInstance().getCurrentUser().getEmail();
-        String userProfilePic = FirebaseAuth.getInstance().getCurrentUser().getPhotoUrl().toString();
+        String userProfilePic = "";
 
         Log.d(TAG, "addNewUser: Adding new User: \n user_id:" + userid);
         mUser.setName(name);
@@ -232,11 +240,13 @@ public class RegisterActivity extends AppCompatActivity {
         FirebaseAuth.getInstance().signOut();
         redirectLoginScreen();
     }
+
     /**
      * sends an email verification link to the user
      */
     public void sendVerificationEmail() {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
 
         if (user != null) {
             user.sendEmailVerification()

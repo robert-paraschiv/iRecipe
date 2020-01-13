@@ -23,6 +23,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -66,6 +67,7 @@ public class ProfileFragment extends Fragment {
     private TextView UserUsernameTv;
     private TextView UserDescriptionTv;
     private CircleImageView mProfileImage;
+    private MaterialButton mSignOutBtn;
 
     private ViewPager viewPager;
 
@@ -94,6 +96,7 @@ public class ProfileFragment extends Fragment {
         UserUsernameTv = view.findViewById(R.id.profileFragment_userName_TextView);
         UserDescriptionTv = view.findViewById(R.id.profileFragment_user_description_TextView);
         mProfileImage = view.findViewById(R.id.profileFragment_profileImage);
+        mSignOutBtn = view.findViewById(R.id.profileFragment_signOut_materialButton);
 
         //Tab layout
         viewPager = view.findViewById(R.id.profileFragment_container);
@@ -103,6 +106,15 @@ public class ProfileFragment extends Fragment {
 
         getUserInfo();
 
+        mSignOutBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FirebaseAuth.getInstance().signOut();
+                Intent intent = new Intent(getActivity(),LoginActivity.class);
+                startActivity(intent);
+                getActivity().finish();
+            }
+        });
         mProfileImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

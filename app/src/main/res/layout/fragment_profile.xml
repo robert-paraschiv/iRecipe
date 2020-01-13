@@ -43,6 +43,15 @@
                     style="@style/TextAppearance.MaterialComponents.Headline6"
                     tools:text="Name" />
 
+                <com.google.android.material.button.MaterialButton
+                    android:layout_width="35dp"
+                    android:layout_height="45dp"
+                    android:id="@+id/profileFragment_signOut_materialButton"
+                    android:layout_alignParentEnd="true"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:drawableTop="@drawable/ic_log_out"
+                    />
+
                 <TextView
                     android:id="@+id/profileFragment_userName_TextView"
                     android:layout_width="wrap_content"
