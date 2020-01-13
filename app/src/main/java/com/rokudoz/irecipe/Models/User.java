@@ -1,6 +1,6 @@
 package com.rokudoz.irecipe.Models;
 
-import java.util.Date;
+import java.util.Calendar;
 import java.util.List;
 
 public class User {
@@ -9,8 +9,7 @@ public class User {
     private String username;
     private String email;
     private String description;
-    private Date birth_date;
-    private String sex;
+    private String gender;
     private String nationality;
     private String userProfilePicUrl;
     private List<String> favoriteRecipes;
@@ -19,15 +18,14 @@ public class User {
         //Empty constructor
     }
 
-    public User(String user_id, String name, String username, String email, String description, Date birth_date, String sex
+    public User(String user_id, String name, String username, String email, String description, String gender
             , String nationality, String userProfilePicUrl,List<String> favoriteRecipes) {
         this.user_id = user_id;
         this.name = name;
         this.username = username;
         this.email = email;
         this.description = description;
-        this.birth_date = birth_date;
-        this.sex = sex;
+        this.gender = gender;
         this.nationality = nationality;
         this.userProfilePicUrl = userProfilePicUrl;
         this.favoriteRecipes = favoriteRecipes;
@@ -73,20 +71,12 @@ public class User {
         this.description = description;
     }
 
-    public Date getBirth_date() {
-        return birth_date;
+    public String getGender() {
+        return gender;
     }
 
-    public void setBirth_date(Date birth_date) {
-        this.birth_date = birth_date;
-    }
-
-    public String getSex() {
-        return sex;
-    }
-
-    public void setSex(String sex) {
-        this.sex = sex;
+    public void setGender(String gender) {
+        this.gender = gender;
     }
 
     public String getNationality() {
@@ -122,8 +112,7 @@ public class User {
                 ", username='" + username + '\'' +
                 ", email='" + email + '\'' +
                 ", description='" + description + '\'' +
-                ", birth_date=" + birth_date +
-                ", sex='" + sex + '\'' +
+                ", gender='" + gender + '\'' +
                 ", nationality='" + nationality + '\'' +
                 ", userProfilePicUrl='" + userProfilePicUrl + '\'' +
                 ", favoriteRecipes=" + favoriteRecipes +

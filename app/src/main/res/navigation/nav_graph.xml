@@ -67,6 +67,9 @@
         <action
             android:id="@+id/action_profileFragment_to_recipeDetailedFragment"
             app:destination="@id/recipeDetailedFragment" />
+        <action
+            android:id="@+id/action_profileFragment_to_profileEditProfile"
+            app:destination="@id/profileEditProfile" />
     </fragment>
     <fragment
         android:id="@+id/recipeDetailedFragment"
@@ -84,4 +87,14 @@
         android:name="com.rokudoz.irecipe.Fragments.ShoppingListFragment"
         android:label="fragment_shopping_list"
         tools:layout="@layout/fragment_shopping_list" />
+    <fragment
+        android:id="@+id/profileEditProfile"
+        android:name="com.rokudoz.irecipe.Fragments.profileSubFragments.profileEditProfile"
+        android:label="fragment_profile_edit_profile"
+        tools:layout="@layout/fragment_profile_edit_profile" >
+        <action
+            android:id="@+id/action_profileEditProfile_to_profileFragment"
+            app:destination="@id/profileFragment"
+            app:popUpTo="@+id/profileFragment" />
+    </fragment>
 </navigation>

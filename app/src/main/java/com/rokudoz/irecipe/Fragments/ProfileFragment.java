@@ -9,6 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentPagerAdapter;
+import androidx.navigation.Navigation;
 import androidx.viewpager.widget.ViewPager;
 
 import android.util.Log;
@@ -67,7 +68,7 @@ public class ProfileFragment extends Fragment {
     private TextView UserUsernameTv;
     private TextView UserDescriptionTv;
     private CircleImageView mProfileImage;
-    private MaterialButton mSignOutBtn;
+    private MaterialButton mSignOutBtn, mEditProfileBtn;
 
     private ViewPager viewPager;
 
@@ -90,13 +91,14 @@ public class ProfileFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_profile, container, false);
+        final View view = inflater.inflate(R.layout.fragment_profile, container, false);
 
         UserNameTv = view.findViewById(R.id.profileFragment_user_name_TextView);
         UserUsernameTv = view.findViewById(R.id.profileFragment_userName_TextView);
         UserDescriptionTv = view.findViewById(R.id.profileFragment_user_description_TextView);
         mProfileImage = view.findViewById(R.id.profileFragment_profileImage);
         mSignOutBtn = view.findViewById(R.id.profileFragment_signOut_materialButton);
+        mEditProfileBtn = view.findViewById(R.id.profileFragment_editProfile_materialButton);
 
         //Tab layout
         viewPager = view.findViewById(R.id.profileFragment_container);
@@ -110,9 +112,15 @@ public class ProfileFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 FirebaseAuth.getInstance().signOut();
-                Intent intent = new Intent(getActivity(),LoginActivity.class);
+                Intent intent = new Intent(getActivity(), LoginActivity.class);
                 startActivity(intent);
                 getActivity().finish();
+            }
+        });
+        mEditProfileBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Navigation.findNavController(view).navigate(ProfileFragmentDirections.actionProfileFragmentToProfileEditProfile());
             }
         });
         mProfileImage.setOnClickListener(new View.OnClickListener() {
@@ -169,7 +177,7 @@ public class ProfileFragment extends Fragment {
 
             StorageReference oldPicReference = FirebaseStorage.getInstance().getReference();
 
-            if (!userProfilePicUrl.equals("")) {
+            if (userProfilePicUrl != null && !userProfilePicUrl.equals("")) {
 
                 oldPicReference = FirebaseStorage.getInstance().getReferenceFromUrl(userProfilePicUrl);
             }
@@ -183,7 +191,7 @@ public class ProfileFragment extends Fragment {
                                 @Override
                                 public void onSuccess(Uri uri) {
                                     final String imageUrl = uri.toString();
-                                    if (!userProfilePicUrl.equals("")) {
+                                    if (userProfilePicUrl != null && !userProfilePicUrl.equals("")) {
                                         finalOldPicReference.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
                                             @Override
                                             public void onSuccess(Void aVoid) {
@@ -235,7 +243,7 @@ public class ProfileFragment extends Fragment {
         usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).addSnapshotListener(new EventListener<DocumentSnapshot>() {
             @Override
             public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
-                if (e == null){
+                if (e == null) {
                     User user = documentSnapshot.toObject(User.class);
                     userDocumentID = documentSnapshot.getId();
                     userProfilePicUrl = user.getUserProfilePicUrl();
@@ -244,18 +252,18 @@ public class ProfileFragment extends Fragment {
                     UserUsernameTv.setText(user.getUsername());
                     UserDescriptionTv.setText(user.getDescription());
 
-                    if (!userProfilePicUrl.equals("")) {
+                    if (userProfilePicUrl != null && !userProfilePicUrl.equals("")) {
                         Picasso.get()
                                 .load(userProfilePicUrl)
-                                .error(R.drawable.ic_home_black_24dp)
+                                .error(R.drawable.ic_account_circle_black_24dp)
                                 .fit()
                                 .centerCrop()
                                 .into(mProfileImage);
 
-                    } else if (userProfilePicUrl.equals("")) {
+                    } else {
                         Picasso.get()
-                                .load(R.drawable.ic_home_black_24dp)
-                                .placeholder(R.drawable.ic_home_black_24dp)
+                                .load(R.drawable.ic_account_circle_black_24dp)
+                                .placeholder(R.drawable.ic_account_circle_black_24dp)
                                 .into(mProfileImage);
 
 
