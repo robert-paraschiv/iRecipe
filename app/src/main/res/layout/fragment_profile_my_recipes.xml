@@ -5,10 +5,19 @@
     android:layout_height="match_parent"
     tools:context=".Fragments.profileSubFragments.profileMyRecipesFragment">
 
-    <TextView
+    <ProgressBar
+        android:id="@+id/profileMyRecipesFragment_pbLoading"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:text="To the be the best to the add the your recipes here \n pls code it yourself" />
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:visibility="visible" />
 
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/profileMyRecipesFragment_recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="2dp"
+        android:transitionName="example_transition" />
 </RelativeLayout>

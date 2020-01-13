@@ -11,6 +11,7 @@ import androidx.fragment.app.Fragment;
 
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.InflateException;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -41,6 +42,9 @@ import java.util.Objects;
 
 public class profileMyIngredientsFragment extends Fragment {
     private static final String TAG = "profileMyIngredientsFra";
+
+    private View view;
+
     private String userDocId;
     private List<Ingredient> userIngredientList;
     private List<Ingredient> allIngredientsList;
@@ -62,7 +66,19 @@ public class profileMyIngredientsFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_profile_my_ingredients, container, false);
+
+        if (view != null) {
+            ViewGroup parent = (ViewGroup) view.getParent();
+            if (parent != null) {
+                parent.removeView(view);
+            }
+        }
+        try {
+            view = inflater.inflate(R.layout.fragment_profile_my_ingredients, container, false);
+        } catch (InflateException e) {
+            Log.e(TAG, "onCreateView: ", e);
+        }
+
 
         ingredientsLinearLayout = view.findViewById(R.id.profileMyIngredientsFragment_ingredients_linear_layout);
 
@@ -72,6 +88,7 @@ public class profileMyIngredientsFragment extends Fragment {
 
         getUserInfo();
 
+        Log.d(TAG, "onCreateView: ");
         return view;
     }
 
@@ -159,7 +176,7 @@ public class profileMyIngredientsFragment extends Fragment {
 
     private void addCategoryOfIngredientsLayout(List<Ingredient> ingredientList, String categoryName) {
         if (getActivity() != null && !ingredientList.isEmpty()) {
-
+            Log.d(TAG, "addCategoryOfIngredientsLayout: ");
             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.MATCH_PARENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT
@@ -175,7 +192,7 @@ public class profileMyIngredientsFragment extends Fragment {
             categoryNameTextView.setTextSize(12);
 //            categoryNameTextView.setTypeface(Typeface.DEFAULT_BOLD);
             categoryNameTextView.setTextAppearance(R.style.TextAppearance_MaterialComponents_Headline6);
-            categoryNameTextView.setPadding(convertDpToPixel(8),4,0,0);
+            categoryNameTextView.setPadding(convertDpToPixel(8), 4, 0, 0);
             linearLayout.addView(categoryNameTextView);
 
             for (Ingredient ingredient : ingredientList) {
