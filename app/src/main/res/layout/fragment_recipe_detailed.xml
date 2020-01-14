@@ -91,20 +91,32 @@
                 android:layout_toStartOf="@id/imageview_favorite_icon"
                 tools:text="88" />
 
-            <TextView
-                android:id="@+id/tvIngredientsList"
-                android:layout_width="wrap_content"
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/tvDescription"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="8dp"
-                tools:text="Ingredients list\n
+                app:cardCornerRadius="18dp"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="4dp"
+                android:layout_marginTop="20dp"
+                android:id="@+id/recipeDetailed_ingredients_Card"
+                android:layout_below="@id/tvDescription">
+
+                <TextView
+                    android:id="@+id/tvIngredientsList"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="16sp"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="8dp"
+                    tools:text="Ingredients list\n
         -Ingredient1\n
         -Ingredient2\n
         -Ingredient3\n
         -Ingredient4\n
         -Ingredient5\n
         -Ingredient6" />
+            </com.google.android.material.card.MaterialCardView>
+
 
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
@@ -115,7 +127,7 @@
                 android:layout_marginTop="20dp"
                 app:cardCornerRadius="18dp"
                 android:id="@+id/recipeDetailed_instruction_Card"
-                android:layout_below="@id/tvIngredientsList"
+                android:layout_below="@id/recipeDetailed_ingredients_Card"
                 >
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -126,7 +138,7 @@
                         android:layout_height="wrap_content"
                         android:text="Instructions step by step"
                         android:textSize="18sp"
-                        android:layout_marginBottom="20dp"
+                        android:layout_marginBottom="10dp"
                         android:layout_marginStart="12dp"
                         />
                     <LinearLayout

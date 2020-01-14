@@ -576,7 +576,7 @@ public class RecipeDetailedFragment extends Fragment {
 
                 tvIngredients.setText("Ingredients: \n");
                 for (int i = 0; i < recipeIngredientList.size(); i++) {
-                    tvIngredients.append(recipeIngredientList.get(i).getName() + " " + Math.round(recipeIngredientList.get(i).getQuantity())
+                    tvIngredients.append(" "+recipeIngredientList.get(i).getName() + " " + Math.round(recipeIngredientList.get(i).getQuantity())
                             + " " + recipeIngredientList.get(i).getQuantity_type() + "\n");
                 }
 
@@ -619,22 +619,22 @@ public class RecipeDetailedFragment extends Fragment {
                     LinearLayout.LayoutParams.MATCH_PARENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT
             );
-            params.setMargins(0, 4, 0, 4);
+            params.setMargins(4, 4, 4, 4);
             final LinearLayout linearLayout = new LinearLayout(getContext());
             linearLayout.setOrientation(LinearLayout.VERTICAL);
             linearLayout.setLayoutParams(params);
 
             TextView stepNumberTextView = new TextView(getActivity());
             stepNumberTextView.setText("Step " + instruction.getStepNumber());
-            stepNumberTextView.setTextSize(20);
-            stepNumberTextView.setPadding(22, 25, 0, 0);
+            stepNumberTextView.setTextSize(18);
+            stepNumberTextView.setPadding(22, 25, 0, 8);
             stepNumberTextView.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
             linearLayout.addView(stepNumberTextView);
 
             TextView instructionTextView = new TextView(getActivity());
             instructionTextView.setText(instruction.getText());
-            instructionTextView.setTextSize(16);
-            instructionTextView.setPadding(16,0,0,0);
+            instructionTextView.setTextSize(14);
+            instructionTextView.setPadding(16,0,0,12);
             instructionTextView.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
             linearLayout.addView(instructionTextView);
 
@@ -648,7 +648,7 @@ public class RecipeDetailedFragment extends Fragment {
                     @Override
                     public void onClick(View v) {
                         // TODO: 14-Jan-20 IMPLEMENT CLICK TO EXPAND IMAGE VIEW
-                        Toast.makeText(getActivity(), "Da", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity(), "Maybe in the future it will expand :)", Toast.LENGTH_SHORT).show();
                     }
                 });
             }
