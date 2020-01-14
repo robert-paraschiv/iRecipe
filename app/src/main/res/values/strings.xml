@@ -8,4 +8,8 @@
         <item>Male</item>
         <item>Female</item>
     </string-array>
+    <string-array name="Privacy">
+        <item>Everyone</item>
+        <item>Only Me</item>
+    </string-array>
 </resources>

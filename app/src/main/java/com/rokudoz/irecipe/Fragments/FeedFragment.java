@@ -171,11 +171,11 @@ public class FeedFragment extends Fragment implements RecipeAdapter.OnItemClickL
                         }
                         Query recipesQuery = null;
                         if (mLastQueriedDocument != null) {
-                            recipesQuery = recipeRef
+                            recipesQuery = recipeRef.whereEqualTo("privacy","Everyone")
                                     .startAfter(mLastQueriedDocument); // Necessary so we don't have the same results multiple times
 //                                    .limit(3);
                         } else {
-                            recipesQuery = recipeRef;
+                            recipesQuery = recipeRef.whereEqualTo("privacy","Everyone");
 //                                    .limit(3);
                         }
 

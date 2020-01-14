@@ -64,7 +64,7 @@ public class homeDinnerFragment extends Fragment implements RecipeAdapter.OnItem
     private CollectionReference recipeRef = db.collection("Recipes");
     private CollectionReference usersReference = db.collection("Users");
     private FirebaseStorage mStorageRef;
-    private ListenerRegistration currentSubCollectionListener, userDetailsListener, recipesListener;
+    private ListenerRegistration currentSubCollectionListener, userDetailsListener, recipesListener, privateRecipesListener;
 
     private RecyclerView mRecyclerView;
     private RecipeAdapter mAdapter;
@@ -134,6 +134,10 @@ public class homeDinnerFragment extends Fragment implements RecipeAdapter.OnItem
             recipesListener.remove();
             recipesListener = null;
         }
+        if (privateRecipesListener != null) {
+            privateRecipesListener.remove();
+            privateRecipesListener = null;
+        }
     }
 
 
@@ -171,11 +175,11 @@ public class homeDinnerFragment extends Fragment implements RecipeAdapter.OnItem
                         }
                         Query recipesQuery = null;
                         if (mLastQueriedDocument != null) {
-                            recipesQuery = recipeRef.whereEqualTo("category", "dinner")
+                            recipesQuery = recipeRef.whereEqualTo("category", "dinner").whereEqualTo("privacy","Everyone")
                                     .startAfter(mLastQueriedDocument); // Necessary so we don't have the same results multiple times
 //                                    .limit(3);
                         } else {
-                            recipesQuery = recipeRef.whereEqualTo("category", "dinner");
+                            recipesQuery = recipeRef.whereEqualTo("category", "dinner").whereEqualTo("privacy","Everyone");
 //                                    .limit(3);
                         }
 
@@ -186,6 +190,7 @@ public class homeDinnerFragment extends Fragment implements RecipeAdapter.OnItem
 
                     }
                 });
+
 
     }
 
@@ -227,6 +232,54 @@ public class homeDinnerFragment extends Fragment implements RecipeAdapter.OnItem
 
             }
         });
+
+        //Get Recipes where the recipes created by the logged in user are private
+        Query privateRecipesQuery = null;
+        if (mLastQueriedDocument != null) {
+            privateRecipesQuery = recipeRef.whereEqualTo("category", "dinner").whereEqualTo("creator_docId", loggedInUserDocumentId)
+                    .startAfter(mLastQueriedDocument); // Necessary so we don't have the same results multiple times
+//                                    .limit(3);
+        } else {
+            privateRecipesQuery = recipeRef.whereEqualTo("category", "dinner").whereEqualTo("creator_docId", loggedInUserDocumentId);
+//                                    .limit(3);
+        }
+        privateRecipesListener = privateRecipesQuery.addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                if (queryDocumentSnapshots != null) {
+                    for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
+                        Recipe recipe = document.toObject(Recipe.class);
+                        recipe.setDocumentId(document.getId());
+
+                        if (userFavRecipesList != null && userFavRecipesList.contains(document.getId())) {
+                            recipe.setFavorite(true);
+                        } else {
+                            recipe.setFavorite(false);
+                        }
+                        if (!mDocumentIDs.contains(document.getId())) {
+                            mDocumentIDs.add(document.getId());
+
+                            ////////////////////////////////////////////////////////// LOGIC TO GET RECIPES HERE
+
+                            mRecipeList.add(recipe);
+                        } else {
+                            Log.d(TAG, "onEvent: Already Contains docID");
+                        }
+
+                    }
+
+                    if (queryDocumentSnapshots.getDocuments().size() != 0) {
+                        mLastQueriedDocument = queryDocumentSnapshots.getDocuments()
+                                .get(queryDocumentSnapshots.getDocuments().size() - 1);
+                    }
+                } else {
+                    Log.d(TAG, "onEvent: Querry result is null");
+                }
+                mAdapter.notifyDataSetChanged();
+
+            }
+        });
+
     }
 
     private void initializeRecyclerViewAdapterOnClicks() {

@@ -14,6 +14,7 @@ public class Recipe {
     private List<String> imageUrls_list;
     private Float avg_rating;
     private Boolean isFavorite;
+    private String privacy;
 
 
     public Recipe() {
@@ -21,7 +22,7 @@ public class Recipe {
     }
 
     public Recipe(String title, String creator_docId, String category, String description, List<String> keywords
-            , List<String> imageUrls_list,Float avg_rating, Boolean isFavorite) {
+            , List<String> imageUrls_list,Float avg_rating, Boolean isFavorite,String privacy) {
 
         if (title.trim().equals("")) {
             title = "No Title";
@@ -34,6 +35,7 @@ public class Recipe {
         this.imageUrls_list = imageUrls_list;
         this.avg_rating = avg_rating;
         this.isFavorite = isFavorite;
+        this.privacy = privacy;
     }
 
     @Exclude
@@ -109,9 +111,17 @@ public class Recipe {
         isFavorite = favorite;
     }
 
+    public String getPrivacy() {
+        return privacy;
+    }
+
+    public void setPrivacy(String privacy) {
+        this.privacy = privacy;
+    }
+
     @Override
     public String toString() {
-        return "TestRecipe{" +
+        return "Recipe{" +
                 "documentId='" + documentId + '\'' +
                 ", title='" + title + '\'' +
                 ", creator_docId='" + creator_docId + '\'' +
@@ -121,8 +131,10 @@ public class Recipe {
                 ", imageUrls_list=" + imageUrls_list +
                 ", avg_rating=" + avg_rating +
                 ", isFavorite=" + isFavorite +
+                ", privacy='" + privacy + '\'' +
                 '}';
     }
+
     @Override
     public boolean equals(Object obj) {
         if (!(obj instanceof Recipe))

@@ -93,7 +93,7 @@ public class AddRecipesActivity extends AppCompatActivity {
     private List<ImageView> instructionStepImageViewList;
 
     private TextInputEditText editTextTitle, editTextDescription, editTextKeywords;
-    private Spinner recipeCategorySpinner;
+    private Spinner recipeCategorySpinner, privacySpinner;
     private ImageView mImageView;
     private ProgressBar mProgressBar;
 
@@ -115,6 +115,7 @@ public class AddRecipesActivity extends AppCompatActivity {
         Button mAddIngredientBtn = findViewById(R.id.addRecipes_addIngredient_btn);
         Button mAddInstructionBtn = findViewById(R.id.addRecipes_addInstruction_btn);
         recipeCategorySpinner = findViewById(R.id.addRecipes_category_spinner);
+        privacySpinner = findViewById(R.id.addRecipes_privacy_spinner);
         ingredientNameEtList = new ArrayList<>();
         ingredientQuantityEtList = new ArrayList<>();
         ingredientQuantityTypeSpinnerList = new ArrayList<>();
@@ -307,7 +308,7 @@ public class AddRecipesActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 25, baos);
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 35, baos);
             byte[] data = baos.toByteArray();
 
             mUploadTask = fileReference.putBytes(data)
@@ -368,7 +369,7 @@ public class AddRecipesActivity extends AppCompatActivity {
         final List<Ingredient> ingredients_list = new ArrayList<>();
         final List<Instruction> instructions_list = new ArrayList<>();
         final Boolean isFavorite = false;
-
+        final String privacy = privacySpinner.getSelectedItem().toString();
         Log.d(TAG, "addRecipe: " + creator_docId);
 
 
@@ -400,7 +401,7 @@ public class AddRecipesActivity extends AppCompatActivity {
         }
 
 
-        Recipe recipe = new Recipe(title, creator_docId, category, description, keywords, imageUrls_list, 0f, isFavorite);
+        Recipe recipe = new Recipe(title, creator_docId, category, description, keywords, imageUrls_list, 0f, isFavorite,privacy);
 
 //        // Sends recipe data to Firestore database
         recipesReference.add(recipe)

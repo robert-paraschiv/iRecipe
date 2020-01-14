@@ -175,11 +175,30 @@
                 android:inputType="text" />
         </com.google.android.material.textfield.TextInputLayout>
 
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Who can see this recipe"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            />
+
+        <Spinner
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/addRecipes_privacy_spinner"
+            android:spinnerMode="dropdown"
+            android:entries="@array/Privacy"
+            />
         <ProgressBar
             android:id="@+id/addRecipes_progressbar"
             style="@style/Base.Widget.AppCompat.ProgressBar.Horizontal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
             android:padding="4dp" />
 
         <com.google.android.material.button.MaterialButton

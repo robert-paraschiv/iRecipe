@@ -38,7 +38,7 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
 
     public class RecipeViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         TextView tvTitle, tvDescription, tvAvgRating;
-        ImageView mImageView, imgFavorited;
+        ImageView mImageView, imgFavorited, imgPrivacy;
         Map<String, Boolean> ingredientTags;
 
         public RecipeViewHolder(View itemView) {
@@ -48,6 +48,7 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
             mImageView = itemView.findViewById(R.id.recipeItem_image);
             imgFavorited = itemView.findViewById(R.id.recyclerview_favorite);
             tvAvgRating = itemView.findViewById(R.id.recyclerview_avgRating_textView);
+            imgPrivacy = itemView.findViewById(R.id.recycler_view_privacy);
 
             itemView.setOnClickListener(this);
 
@@ -100,6 +101,9 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
 
         holder.tvAvgRating.setText(currentItem.getAvg_rating().toString());
 
+        if (mRecipeList.get(position).getPrivacy().equals("Everyone")){
+            holder.imgPrivacy.setVisibility(View.GONE);
+        }
 
         holder.imgFavorited.setImageResource(R.drawable.ic_favorite_border_black_24dp);
         if (currentItem.getFavorite() != null && currentItem.getFavorite()) {
