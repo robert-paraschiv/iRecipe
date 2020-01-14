@@ -108,8 +108,8 @@ public class AddIngredientActivity extends AppCompatActivity {
 
     private void setUpCategorySpinner() {
         Spinner dropdown = findViewById(R.id.spinner_ingredientCategory);
-        String[] items = new String[]{"vegetables", "fruits", "meats", "dairy", "seafood", "condiments"
-                , "oils", "flour/grains/cereals", "batter/breading/pastas"};
+        String[] items = new String[]{"Vegetables", "Fruits", "Meats", "Dairy", "Seafood", "Condiments"
+                , "Oils", "Flour/Grains/Cereals", "Batter/Breading/Pastas"};
         //create an adapter to describe how the items are displayed, adapters are used in several places in android.
         //There are multiple variations of this, but this is the basic variant.
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, items);

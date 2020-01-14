@@ -2,15 +2,16 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/addRecipes_scrollView"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true"
-    android:id="@+id/addRecipes_scrollView"
     tools:context=".AddRecipesActivity">
 
-    <RelativeLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
         android:padding="16dp">
 
         <com.google.android.material.card.MaterialCardView
@@ -34,74 +35,79 @@
             style="@style/Widget.MaterialComponents.Button.OutlinedButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/addRecipes_materialCardView"
-            android:layout_centerHorizontal="true"
+            android:layout_gravity="center_horizontal"
             android:layout_marginTop="16dp"
             android:text="Choose Photo"
             app:cornerRadius="18dp" />
 
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/addRecipes_title_editText"
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/addRecipes_choose_path_btn"
-            android:hint="Title"
-            android:inputType="textCapSentences" />
+            android:hint="Title">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/addRecipes_title_editText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textCapSentences" />
+        </com.google.android.material.textfield.TextInputLayout>
 
         <TextView
+            android:id="@+id/addRecipes_category_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/addRecipes_category_tv"
             android:layout_marginStart="4dp"
             android:layout_marginTop="8dp"
-            android:textStyle="bold"
+            android:text="Category"
             android:textSize="18sp"
-            android:layout_below="@id/addRecipes_title_editText"
-            android:text="Category"/>
+            android:textStyle="bold" />
+
         <Spinner
             android:id="@+id/addRecipes_category_spinner"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/addRecipes_category_tv"
-            android:spinnerMode="dropdown"
-            />
+            android:spinnerMode="dropdown" />
 
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/addRecipes_description_editText"
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/addRecipes_category_spinner"
-            android:hint="Description"
-            android:inputType="textCapSentences" />
+            android:hint="Description">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/addRecipes_description_editText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textCapSentences" />
+        </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/addRecipes_ingredientsLayout_materialCardView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/addRecipes_description_editText"
-            android:layout_centerHorizontal="true"
             android:layout_marginTop="8dp"
             app:cardCornerRadius="18dp">
 
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
+
                 <TextView
+                    android:id="@+id/addRecipes_ingredientsTitle_tv"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Ingredients"
-                    android:id="@+id/addRecipes_ingredientsTitle_tv"
                     android:layout_marginStart="14dp"
                     android:layout_marginTop="8dp"
-                    android:textStyle="bold"
+                    android:text="Ingredients"
                     android:textSize="18sp"
-                    />
+                    android:textStyle="bold" />
 
                 <LinearLayout
                     android:id="@+id/addRecipes_ingredients_linear_layout"
-                    android:layout_below="@+id/addRecipes_ingredientsTitle_tv"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_below="@+id/addRecipes_ingredientsTitle_tv"
                     android:orientation="vertical" />
 
                 <com.google.android.material.button.MaterialButton
@@ -120,30 +126,28 @@
             android:id="@+id/addRecipes_instructionsLayout_materialCardView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/addRecipes_ingredientsLayout_materialCardView"
-            android:layout_centerHorizontal="true"
             android:layout_marginTop="8dp"
             app:cardCornerRadius="18dp">
 
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
+
                 <TextView
+                    android:id="@+id/addRecipes_instructionsTitle_tv"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Instructions"
-                    android:id="@+id/addRecipes_instructionsTitle_tv"
                     android:layout_marginStart="14dp"
                     android:layout_marginTop="8dp"
-                    android:textStyle="bold"
+                    android:text="Instructions"
                     android:textSize="18sp"
-                    />
+                    android:textStyle="bold" />
 
                 <LinearLayout
                     android:id="@+id/addRecipes_instructions_linear_layout"
-                    android:layout_below="@id/addRecipes_instructionsTitle_tv"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_below="@id/addRecipes_instructionsTitle_tv"
                     android:orientation="vertical" />
 
                 <com.google.android.material.button.MaterialButton
@@ -158,21 +162,24 @@
             </RelativeLayout>
         </com.google.android.material.card.MaterialCardView>
 
-
-        <EditText
-            android:id="@+id/addRecipes_keywords_editText"
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/addRecipes_instructionsLayout_materialCardView"
-            android:hint="Some Keywords here"
-            android:inputType="text" />
+            android:hint="Keywords">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/addRecipes_keywords_editText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="text" />
+        </com.google.android.material.textfield.TextInputLayout>
 
         <ProgressBar
             android:id="@+id/addRecipes_progressbar"
             style="@style/Base.Widget.AppCompat.ProgressBar.Horizontal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/addRecipes_keywords_editText"
             android:padding="4dp" />
 
         <com.google.android.material.button.MaterialButton
@@ -180,12 +187,10 @@
             style="@style/Widget.MaterialComponents.Button.OutlinedButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/addRecipes_progressbar"
-            android:layout_centerHorizontal="true"
-            android:layout_gravity="bottom"
+            android:layout_gravity="bottom|center_horizontal"
             android:layout_marginTop="16dp"
             android:text="Post Recipe"
             app:cornerRadius="18dp" />
 
-    </RelativeLayout>
+    </LinearLayout>
 </ScrollView>

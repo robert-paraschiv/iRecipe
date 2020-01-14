@@ -177,12 +177,19 @@ public class ProfileFragment extends Fragment {
 
             StorageReference oldPicReference = FirebaseStorage.getInstance().getReference();
 
+            Boolean profilePicNotInFireStore = false;
             if (userProfilePicUrl != null && !userProfilePicUrl.equals("")) {
+                if (userProfilePicUrl.contains("googleusercontent.com")) {
+                    profilePicNotInFireStore = true;
+                } else {
+                    oldPicReference = FirebaseStorage.getInstance().getReferenceFromUrl(userProfilePicUrl);
 
-                oldPicReference = FirebaseStorage.getInstance().getReferenceFromUrl(userProfilePicUrl);
+                }
+
             }
-
             final StorageReference finalOldPicReference = oldPicReference;
+
+            final Boolean finalProfilePicNotInFireStore = profilePicNotInFireStore;
             mUploadTask = newFileReference.putFile(mImageUri)
                     .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                         @Override
@@ -191,7 +198,7 @@ public class ProfileFragment extends Fragment {
                                 @Override
                                 public void onSuccess(Uri uri) {
                                     final String imageUrl = uri.toString();
-                                    if (userProfilePicUrl != null && !userProfilePicUrl.equals("")) {
+                                    if (userProfilePicUrl != null && !userProfilePicUrl.equals("") && !finalProfilePicNotInFireStore) {
                                         finalOldPicReference.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
                                             @Override
                                             public void onSuccess(Void aVoid) {

@@ -30,6 +30,7 @@ import android.widget.Toast;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
@@ -87,7 +88,7 @@ public class AddRecipesActivity extends AppCompatActivity {
     private String[] instructionStepImageUrlArray;
     private List<ImageView> instructionStepImageViewList;
 
-    private EditText editTextTitle, editTextDescription, editTextKeywords;
+    private TextInputEditText editTextTitle, editTextDescription, editTextKeywords;
     private Spinner recipeCategorySpinner;
     private ImageView mImageView;
     private ProgressBar mProgressBar;

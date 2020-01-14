@@ -325,7 +325,6 @@ public class FeedFragment extends Fragment implements RecipeAdapter.OnItemClickL
                     if (user.isEmailVerified()) {
 //                        Log.d(TAG, "onAuthStateChanged: signed_in: " + user.getUid());
 //                        Toast.makeText(MainActivity.this, "Authenticated with: " + user.getEmail(), Toast.LENGTH_SHORT).show();
-                        if (user.getEmail().equals("paraschivlongin@gmail.com")) {
                             fab.show();
                             fab.setOnClickListener(new View.OnClickListener() {
                                 @Override
@@ -333,7 +332,7 @@ public class FeedFragment extends Fragment implements RecipeAdapter.OnItemClickL
                                     navigateToAddRecipes();
                                 }
                             });
-                        }
+
                         //If use is authenticated, perform query
                         performQuery();
                     } else {
