@@ -155,31 +155,28 @@ public class homeDinnerFragment extends Fragment implements RecipeAdapter.OnItem
 
 
     private void performQuery() {
-        userDetailsListener = usersReference.whereEqualTo("user_id", Objects.requireNonNull(FirebaseAuth.getInstance()
-                .getCurrentUser()).getUid())
-                .addSnapshotListener(new EventListener<QuerySnapshot>() {
+        userDetailsListener = usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                .addSnapshotListener(new EventListener<DocumentSnapshot>() {
                     @Override
-                    public void onEvent(@javax.annotation.Nullable QuerySnapshot queryDocumentSnapshots,
-                                        @javax.annotation.Nullable FirebaseFirestoreException e) {
+                    public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
                         if (e != null) {
                             Log.w(TAG, "onEvent: ", e);
                             return;
                         }
                         List<Ingredient> userIngredient_list = new ArrayList<>();
+                        User user = documentSnapshot.toObject(User.class);
 
-                        for (DocumentChange documentSnapshot : queryDocumentSnapshots.getDocumentChanges()) {
-                            User user = documentSnapshot.getDocument().toObject(User.class);
-                            mUser = documentSnapshot.getDocument().toObject(User.class);
-                            loggedInUserDocumentId = queryDocumentSnapshots.getDocuments().get(0).getId();
-                            userFavRecipesList = mUser.getFavoriteRecipes();
-                        }
+                        mUser = documentSnapshot.toObject(User.class);
+                        loggedInUserDocumentId = documentSnapshot.getId();
+                        userFavRecipesList = mUser.getFavoriteRecipes();
+
                         Query recipesQuery = null;
                         if (mLastQueriedDocument != null) {
-                            recipesQuery = recipeRef.whereEqualTo("category", "dinner").whereEqualTo("privacy","Everyone")
+                            recipesQuery = recipeRef.whereEqualTo("category", "dinner").whereEqualTo("privacy", "Everyone")
                                     .startAfter(mLastQueriedDocument); // Necessary so we don't have the same results multiple times
 //                                    .limit(3);
                         } else {
-                            recipesQuery = recipeRef.whereEqualTo("category", "dinner").whereEqualTo("privacy","Everyone");
+                            recipesQuery = recipeRef.whereEqualTo("category", "dinner").whereEqualTo("privacy", "Everyone");
 //                                    .limit(3);
                         }
 
@@ -187,10 +184,8 @@ public class homeDinnerFragment extends Fragment implements RecipeAdapter.OnItem
                         pbLoading.setVisibility(View.INVISIBLE);
 
                         initializeRecyclerViewAdapterOnClicks();
-
                     }
                 });
-
 
     }
 

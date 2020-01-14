@@ -151,31 +151,28 @@ public class FeedFragment extends Fragment implements RecipeAdapter.OnItemClickL
 
 
     private void performQuery() {
-        userDetailsListener = usersReference.whereEqualTo("user_id", Objects.requireNonNull(FirebaseAuth.getInstance()
-                .getCurrentUser()).getUid())
-                .addSnapshotListener(new EventListener<QuerySnapshot>() {
+        userDetailsListener = usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                .addSnapshotListener(new EventListener<DocumentSnapshot>() {
                     @Override
-                    public void onEvent(@javax.annotation.Nullable QuerySnapshot queryDocumentSnapshots,
-                                        @javax.annotation.Nullable FirebaseFirestoreException e) {
+                    public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
                         if (e != null) {
                             Log.w(TAG, "onEvent: ", e);
                             return;
                         }
                         List<Ingredient> userIngredient_list = new ArrayList<>();
+                        User user = documentSnapshot.toObject(User.class);
 
-                        for (DocumentChange documentSnapshot : queryDocumentSnapshots.getDocumentChanges()) {
-                            User user = documentSnapshot.getDocument().toObject(User.class);
-                            mUser = documentSnapshot.getDocument().toObject(User.class);
-                            loggedInUserDocumentId = queryDocumentSnapshots.getDocuments().get(0).getId();
-                            userFavRecipesList = mUser.getFavoriteRecipes();
-                        }
+                        mUser = documentSnapshot.toObject(User.class);
+                        loggedInUserDocumentId = documentSnapshot.getId();
+                        userFavRecipesList = mUser.getFavoriteRecipes();
+
                         Query recipesQuery = null;
                         if (mLastQueriedDocument != null) {
-                            recipesQuery = recipeRef.whereEqualTo("privacy","Everyone")
+                            recipesQuery = recipeRef.whereEqualTo("privacy", "Everyone")
                                     .startAfter(mLastQueriedDocument); // Necessary so we don't have the same results multiple times
 //                                    .limit(3);
                         } else {
-                            recipesQuery = recipeRef.whereEqualTo("privacy","Everyone");
+                            recipesQuery = recipeRef.whereEqualTo("privacy", "Everyone");
 //                                    .limit(3);
                         }
 
@@ -183,7 +180,6 @@ public class FeedFragment extends Fragment implements RecipeAdapter.OnItemClickL
                         pbLoading.setVisibility(View.INVISIBLE);
 
                         initializeRecyclerViewAdapterOnClicks();
-
                     }
                 });
 
@@ -226,6 +222,7 @@ public class FeedFragment extends Fragment implements RecipeAdapter.OnItemClickL
             }
         });
     }
+
     private void initializeRecyclerViewAdapterOnClicks() {
         mAdapter.setOnItemClickListener(new RecipeAdapter.OnItemClickListener() {
             @Override
@@ -325,13 +322,13 @@ public class FeedFragment extends Fragment implements RecipeAdapter.OnItemClickL
                     if (user.isEmailVerified()) {
 //                        Log.d(TAG, "onAuthStateChanged: signed_in: " + user.getUid());
 //                        Toast.makeText(MainActivity.this, "Authenticated with: " + user.getEmail(), Toast.LENGTH_SHORT).show();
-                            fab.show();
-                            fab.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    navigateToAddRecipes();
-                                }
-                            });
+                        fab.show();
+                        fab.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                navigateToAddRecipes();
+                            }
+                        });
 
                         //If use is authenticated, perform query
                         performQuery();

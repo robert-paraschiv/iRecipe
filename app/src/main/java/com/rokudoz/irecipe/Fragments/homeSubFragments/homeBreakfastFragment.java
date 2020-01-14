@@ -155,24 +155,21 @@ public class homeBreakfastFragment extends Fragment implements RecipeAdapter.OnI
 
 
     private void performQuery() {
-        userDetailsListener = usersReference.whereEqualTo("user_id", Objects.requireNonNull(FirebaseAuth.getInstance()
-                .getCurrentUser()).getUid())
-                .addSnapshotListener(new EventListener<QuerySnapshot>() {
+        userDetailsListener = usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                .addSnapshotListener(new EventListener<DocumentSnapshot>() {
                     @Override
-                    public void onEvent(@javax.annotation.Nullable QuerySnapshot queryDocumentSnapshots,
-                                        @javax.annotation.Nullable FirebaseFirestoreException e) {
+                    public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
                         if (e != null) {
                             Log.w(TAG, "onEvent: ", e);
                             return;
                         }
                         List<Ingredient> userIngredient_list = new ArrayList<>();
+                        User user = documentSnapshot.toObject(User.class);
 
-                        for (DocumentChange documentSnapshot : queryDocumentSnapshots.getDocumentChanges()) {
-                            User user = documentSnapshot.getDocument().toObject(User.class);
-                            mUser = documentSnapshot.getDocument().toObject(User.class);
-                            loggedInUserDocumentId = queryDocumentSnapshots.getDocuments().get(0).getId();
-                            userFavRecipesList = mUser.getFavoriteRecipes();
-                        }
+                        mUser = documentSnapshot.toObject(User.class);
+                        loggedInUserDocumentId = documentSnapshot.getId();
+                        userFavRecipesList = mUser.getFavoriteRecipes();
+
                         Query recipesQuery = null;
                         if (mLastQueriedDocument != null) {
                             recipesQuery = recipeRef.whereEqualTo("category", "breakfast").whereEqualTo("privacy", "Everyone")
@@ -187,7 +184,6 @@ public class homeBreakfastFragment extends Fragment implements RecipeAdapter.OnI
                         pbLoading.setVisibility(View.INVISIBLE);
 
                         initializeRecyclerViewAdapterOnClicks();
-
                     }
                 });
 
