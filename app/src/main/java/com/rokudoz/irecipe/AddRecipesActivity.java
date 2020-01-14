@@ -401,7 +401,7 @@ public class AddRecipesActivity extends AppCompatActivity {
         }
 
 
-        Recipe recipe = new Recipe(title, creator_docId, category, description, keywords, imageUrls_list, 0f, isFavorite,privacy);
+        Recipe recipe = new Recipe(title, creator_docId, category, description, keywords, imageUrls_list, 0f, isFavorite, privacy);
 
 //        // Sends recipe data to Firestore database
         recipesReference.add(recipe)
@@ -447,24 +447,41 @@ public class AddRecipesActivity extends AppCompatActivity {
         linearLayout.setOrientation(LinearLayout.VERTICAL);
         ingredientsLinearLayout.addView(linearLayout);
 
-        EditText editText = new EditText(this);
+        final EditText editText = new EditText(this);
         editText.setHint("Ingredient ");
         editText.setInputType(InputType.TYPE_TEXT_FLAG_CAP_WORDS);
         setEditTextAttributes(editText);
         linearLayout.addView(editText);
         ingredientNameEtList.add(editText);
 
-        EditText editText2 = new EditText(this);
+        final EditText editText2 = new EditText(this);
         editText2.setHint("Quantity ");
         editText2.setInputType(InputType.TYPE_CLASS_NUMBER);
         setEditTextAttributes(editText2);
         linearLayout.addView(editText2);
         ingredientQuantityEtList.add(editText2);
 
-        Spinner spinner = new Spinner(this);
+        final Spinner spinner = new Spinner(this);
         String[] spinnerItems = {"g", "kg"};
         linearLayout.addView(spinner);
         setUpIngredientQuantitySpinner(spinner, spinnerItems);
+        ingredientQuantityTypeSpinnerList.add(spinner);
+
+        final MaterialButton button = new MaterialButton(this, null, R.attr.materialButtonOutlinedStyle);
+        button.setText("Remove ingredient");
+        button.setCornerRadius(convertDpToPixel(18));
+        setButtonAttributes(button);
+        linearLayout.addView(button);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                linearLayout.removeAllViews();
+                ingredientsLinearLayout.removeView(linearLayout);
+                ingredientNameEtList.remove(editText);
+                ingredientQuantityEtList.remove(editText2);
+                ingredientQuantityTypeSpinnerList.remove(spinner);
+            }
+        });
     }
 
     private void addInstructionLayout() {
@@ -472,7 +489,7 @@ public class AddRecipesActivity extends AppCompatActivity {
         linearLayout.setOrientation(LinearLayout.VERTICAL);
         instructionsLinearLayout.addView(linearLayout);
 
-        Uri uri = Uri.parse("");
+        final Uri uri = Uri.parse("");
         mInstructionStepImageUriList.add(uri);
         Log.d(TAG, "addInstructionLayout: " + uri.toString());
 
@@ -483,6 +500,18 @@ public class AddRecipesActivity extends AppCompatActivity {
         linearLayout.addView(editText);
         instructionTextEtList.add(editText);
 
+        final ImageView imageView = new ImageView(this);
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, convertDpToPixel(100));
+        params.setMargins(convertDpToPixel(16),
+                convertDpToPixel(16),
+                convertDpToPixel(16),
+                0
+        );
+        imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        imageView.setLayoutParams(params);
+        linearLayout.addView(imageView);
+        imageView.setVisibility(View.INVISIBLE);
+
         final MaterialButton button = new MaterialButton(this, null, R.attr.materialButtonOutlinedStyle);
         button.setText("Add photo to this step");
         button.setCornerRadius(convertDpToPixel(18));
@@ -492,29 +521,33 @@ public class AddRecipesActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 openFileChooser(INSTRUCTION_PICTURE + instructionTextEtList.indexOf(editText));
-                button.setVisibility(View.INVISIBLE);
-                addImageView(linearLayout);
+                button.setVisibility(View.GONE);
+                imageView.setVisibility(View.VISIBLE);
+                instructionStepImageViewList.add(imageView);
             }
         });
 
+        final MaterialButton removeStepButton = new MaterialButton(this, null, R.attr.materialButtonOutlinedStyle);
+        removeStepButton.setText("Remove Step");
+        removeStepButton.setCornerRadius(convertDpToPixel(18));
+        setButtonAttributes(removeStepButton);
+        linearLayout.addView(removeStepButton);
+        removeStepButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                linearLayout.removeAllViews();
+                instructionsLinearLayout.removeView(linearLayout);
+                mInstructionStepImageUriList.remove(instructionTextEtList.indexOf(editText));
+                if (instructionStepImageViewList.contains(imageView)){
+                    instructionStepImageViewList.remove(imageView);
+                }
+                instructionTextEtList.remove(editText);
+                instructionsLinearLayout.removeView(linearLayout);
+            }
+        });
 
     }
 
-    private void addImageView(LinearLayout linearLayout) {
-        ImageView imageView = new ImageView(this);
-
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, convertDpToPixel(100));
-
-        params.setMargins(convertDpToPixel(16),
-                convertDpToPixel(16),
-                convertDpToPixel(16),
-                0
-        );
-        imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
-        imageView.setLayoutParams(params);
-        linearLayout.addView(imageView);
-        instructionStepImageViewList.add(imageView);
-    }
 
     private void setUpRecipeCategorySpinner() {
         String[] items = new String[]{"breakfast", "lunch", "dinner"};
@@ -538,7 +571,6 @@ public class AddRecipesActivity extends AppCompatActivity {
         );
         spinner.setLayoutParams(params);
         spinner.setAdapter(adapter);
-        ingredientQuantityTypeSpinnerList.add(spinner);
     }
 
     private void setEditTextAttributes(EditText editText) {

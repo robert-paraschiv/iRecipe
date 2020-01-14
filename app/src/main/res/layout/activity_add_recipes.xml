@@ -117,7 +117,8 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/addRecipes_ingredients_linear_layout"
                     android:layout_centerHorizontal="true"
-                    android:text="Add Ingredient"
+                    android:text="Add New Ingredient"
+                    android:layout_marginTop="8dp"
                     app:cornerRadius="18dp" />
             </RelativeLayout>
         </com.google.android.material.card.MaterialCardView>
@@ -158,6 +159,7 @@
                     android:layout_below="@id/addRecipes_instructions_linear_layout"
                     android:layout_centerHorizontal="true"
                     android:text="Add Step"
+                    android:layout_marginTop="8dp"
                     app:cornerRadius="18dp" />
             </RelativeLayout>
         </com.google.android.material.card.MaterialCardView>
