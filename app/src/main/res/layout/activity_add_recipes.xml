@@ -12,6 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
+        android:animateLayoutChanges="true"
         android:padding="16dp">
 
         <com.google.android.material.card.MaterialCardView
@@ -108,7 +109,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/addRecipes_ingredientsTitle_tv"
-                    android:orientation="vertical" />
+                    android:orientation="vertical"
+                    android:animateLayoutChanges="true"/>
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/addRecipes_addIngredient_btn"
@@ -149,7 +151,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_below="@id/addRecipes_instructionsTitle_tv"
-                    android:orientation="vertical" />
+                    android:orientation="vertical"
+                    android:animateLayoutChanges="true"/>
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/addRecipes_addInstruction_btn"

@@ -1,5 +1,6 @@
 package com.rokudoz.irecipe;
 
+import android.animation.LayoutTransition;
 import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Intent;
@@ -488,7 +489,7 @@ public class AddRecipesActivity extends AppCompatActivity {
         final LinearLayout linearLayout = new LinearLayout(this);
         linearLayout.setOrientation(LinearLayout.VERTICAL);
         instructionsLinearLayout.addView(linearLayout);
-
+        linearLayout.setLayoutTransition(new LayoutTransition());
         final Uri uri = Uri.parse("");
         mInstructionStepImageUriList.add(uri);
         Log.d(TAG, "addInstructionLayout: " + uri.toString());
@@ -538,7 +539,7 @@ public class AddRecipesActivity extends AppCompatActivity {
                 linearLayout.removeAllViews();
                 instructionsLinearLayout.removeView(linearLayout);
                 mInstructionStepImageUriList.remove(instructionTextEtList.indexOf(editText));
-                if (instructionStepImageViewList.contains(imageView)){
+                if (instructionStepImageViewList.contains(imageView)) {
                     instructionStepImageViewList.remove(imageView);
                 }
                 instructionTextEtList.remove(editText);
@@ -610,6 +611,9 @@ public class AddRecipesActivity extends AppCompatActivity {
     }
 
     private void getRecipePhotoUploadCount() {
+        if (mRecipeImageUriArray.length == 0) {
+            Toast.makeText(this, "Make sure to select a photo for the recipe", Toast.LENGTH_SHORT).show();
+        }
         //Getting uploaded to FireStore
         recipeImageUrlArray = new String[mRecipeImageUriArray.length];
         for (int i = 0; i < mRecipeImageUriArray.length; i++) {
