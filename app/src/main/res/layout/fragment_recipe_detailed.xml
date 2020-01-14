@@ -18,33 +18,33 @@
     <androidx.core.widget.NestedScrollView
         android:id="@+id/nestedScrollView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content">
 
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <!--            <ImageView-->
-            <!--                android:id="@+id/recipeDetailed_image"-->
-            <!--                android:layout_width="match_parent"-->
-            <!--                android:layout_height="320dp"-->
-            <!--                android:elevation="4dp"-->
-            <!--                android:transitionName="example_transition"-->
-            <!--                tools:src="@color/grey" />-->
-
-            <androidx.viewpager.widget.ViewPager
-                android:id="@+id/view_pager"
+            <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
-                android:layout_height="320dp"
-                android:elevation="4dp"
-                android:transitionName="example_transition" />
+                android:layout_height="wrap_content"
+                android:id="@+id/recipeDetailed_viewPager_Card"
+                app:cardCornerRadius="18dp"
+                android:layout_margin="4dp"
+                >
+                <androidx.viewpager.widget.ViewPager
+                    android:id="@+id/view_pager"
+                    android:layout_width="match_parent"
+                    android:layout_height="250dp"
+                    android:elevation="4dp"
+                    android:transitionName="example_transition" />
+            </com.google.android.material.card.MaterialCardView>
 
             <TextView
                 android:id="@+id/tvTitle"
-                style="@style/TextAppearance.AppCompat.Large"
+                style="@style/TextAppearance.MaterialComponents.Headline6"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/view_pager"
+                android:layout_below="@+id/recipeDetailed_viewPager_Card"
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="16dp"
                 tools:text="TitleHere" />
@@ -64,7 +64,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/missing_ingredientsNumber"
-                android:layout_marginStart="8dp"
+                android:layout_marginStart="16dp"
                 android:layout_marginTop="8dp"
                 tools:text="Description Here lmao it can have more text                      \n
                  than you think lol wtf" />
@@ -73,19 +73,19 @@
                 android:id="@+id/imageview_favorite_icon"
                 android:layout_width="33dp"
                 android:layout_height="33dp"
-                android:layout_below="@id/view_pager"
+                android:layout_below="@id/recipeDetailed_viewPager_Card"
                 android:layout_alignParentEnd="true"
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="8dp"
                 android:elevation="4dp"
-                android:src="@drawable/ic_star_border_black_24dp" />
+                android:src="@drawable/ic_favorite_border_black_24dp" />
 
             <TextView
                 android:id="@+id/recipeDetailed_numberOfFaved"
                 style="@style/TextAppearance.MaterialComponents.Chip"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/view_pager"
+                android:layout_below="@id/recipeDetailed_viewPager_Card"
                 android:layout_marginTop="14dp"
                 android:layout_marginEnd="4dp"
                 android:layout_toStartOf="@id/imageview_favorite_icon"
@@ -106,26 +106,50 @@
         -Ingredient5\n
         -Ingredient6" />
 
-            <TextView
-                android:id="@+id/tvInstructions"
-                style="@style/TextAppearance.MaterialComponents.Chip"
-                android:layout_width="wrap_content"
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="4dp"
+                android:layout_marginBottom="4dp"
+                android:layout_marginTop="20dp"
+                app:cardCornerRadius="18dp"
+                android:id="@+id/recipeDetailed_instruction_Card"
                 android:layout_below="@id/tvIngredientsList"
-                android:padding="8dp"
-                tools:text="Okay so basically you do stuff here \n
-with the ingredients so ay lmao many lines\n
-but yeah so then we add the stuff together\n
- and then we don't have the stuff anymore\n
-but the stuff turns into some food so basically we do have stuff\n
-but the stuff is now food" />
+                >
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Instructions step by step"
+                        android:textSize="18sp"
+                        android:layout_marginBottom="20dp"
+                        android:layout_marginStart="12dp"
+                        />
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:id="@+id/recipeDetailed_instructions_linearLayout"
+                        android:animateLayoutChanges="true"
+                        >
+
+                    </LinearLayout>
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
 
 
             <EditText
                 android:id="@+id/recipeDetailed_et_commentInput"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/tvInstructions"
+                android:layout_below="@id/recipeDetailed_instruction_Card"
+                android:layout_marginTop="20dp"
                 android:layout_marginStart="8dp"
                 android:layout_toStartOf="@+id/recipeDetailed_addComment_btn"
                 android:hint="Comment here" />
@@ -135,7 +159,7 @@ but the stuff is now food" />
                 style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/tvInstructions"
+                android:layout_below="@id/recipeDetailed_instruction_Card"
                 android:layout_alignParentEnd="true"
                 android:layout_marginStart="16dp"
                 android:layout_marginEnd="16dp"

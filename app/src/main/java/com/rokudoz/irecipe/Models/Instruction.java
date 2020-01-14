@@ -48,4 +48,13 @@ public class Instruction {
                 ", imgUrl='" + imgUrl + '\'' +
                 '}';
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof Instruction))
+            return false;
+        if (obj == this)
+            return true;
+        return this.text.equals(((Instruction) obj).text);
+    }
 }

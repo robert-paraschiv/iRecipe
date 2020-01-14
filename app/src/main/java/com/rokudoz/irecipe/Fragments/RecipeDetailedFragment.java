@@ -1,6 +1,7 @@
 package com.rokudoz.irecipe.Fragments;
 
 import android.content.Intent;
+import android.media.Image;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -17,6 +18,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -39,12 +41,14 @@ import com.google.firebase.firestore.QuerySnapshot;
 import com.rokudoz.irecipe.Account.LoginActivity;
 import com.rokudoz.irecipe.Models.Comment;
 import com.rokudoz.irecipe.Models.Ingredient;
+import com.rokudoz.irecipe.Models.Instruction;
 import com.rokudoz.irecipe.Models.Recipe;
 import com.rokudoz.irecipe.Models.User;
 import com.rokudoz.irecipe.Models.UserWhoFaved;
 import com.rokudoz.irecipe.R;
 import com.rokudoz.irecipe.Utils.ParentCommentAdapter;
 import com.rokudoz.irecipe.Utils.RecipeDetailedViewPagerAdapter;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -64,8 +68,9 @@ public class RecipeDetailedFragment extends Fragment {
     private String title = "";
     private String userFavDocId = "";
     private Boolean isRecipeFavorite = false;
-    public List<String> imageUrls;
+    private List<String> imageUrls;
     private List<Ingredient> userShoppingIngredientList = new ArrayList<>();
+    private List<Ingredient> userIngredientList = new ArrayList<>();
     private List<Ingredient> recipeIngredientsToAddToShoppingList = new ArrayList<>();
 
     private ViewPager viewPager;
@@ -75,15 +80,17 @@ public class RecipeDetailedFragment extends Fragment {
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
 
+    private LinearLayout mInstructionsLinearLayout;
 
-    private TextView tvTitle, tvDescription, tvIngredients, tvInstructions, mFavoriteNumber, tvMissingIngredientsNumber;
+    private TextView tvTitle, tvDescription, tvIngredients, mFavoriteNumber, tvMissingIngredientsNumber;
     private ImageView mImageView, mFavoriteIcon;
     private Button mAddCommentBtn;
-    private ExtendedFloatingActionButton mAddMissingingredientsFAB;
+    private ExtendedFloatingActionButton mAddMissingIngredientsFAB;
     private EditText mCommentEditText;
 
     private ArrayList<Comment> commentList = new ArrayList<>();
     private List<String> userFavRecipesList = new ArrayList<>();
+    private List<Instruction> instructionsAddedToLayout = new ArrayList<>();
     private Integer numberOfFav;
     private ArrayList<String> newItemsToAdd = new ArrayList<>();
     private User mUser;
@@ -107,18 +114,17 @@ public class RecipeDetailedFragment extends Fragment {
         tvTitle = view.findViewById(R.id.tvTitle);
         tvDescription = view.findViewById(R.id.tvDescription);
         tvIngredients = view.findViewById(R.id.tvIngredientsList);
-//        mImageView = view.findViewById(R.id.recipeDetailed_image);
         mAddCommentBtn = view.findViewById(R.id.recipeDetailed_addComment_btn);
         mRecyclerView = view.findViewById(R.id.comment_recycler_view);
         mCommentEditText = view.findViewById(R.id.recipeDetailed_et_commentInput);
-        tvInstructions = view.findViewById(R.id.tvInstructions);
+        mInstructionsLinearLayout = view.findViewById(R.id.recipeDetailed_instructions_linearLayout);
         mFavoriteIcon = view.findViewById(R.id.imageview_favorite_icon);
         mFavoriteNumber = view.findViewById(R.id.recipeDetailed_numberOfFaved);
         tvMissingIngredientsNumber = view.findViewById(R.id.missing_ingredientsNumber);
-        mAddMissingingredientsFAB = view.findViewById(R.id.fab_addMissingIngredients);
+        mAddMissingIngredientsFAB = view.findViewById(R.id.fab_addMissingIngredients);
 
         tvMissingIngredientsNumber.setVisibility(View.INVISIBLE);
-        mAddMissingingredientsFAB.hide();
+        mAddMissingIngredientsFAB.hide();
 
         RecipeDetailedFragmentArgs recipeDetailedFragmentArgs = RecipeDetailedFragmentArgs.fromBundle(getArguments());
         getRecipeArgsPassed(recipeDetailedFragmentArgs);
@@ -289,7 +295,6 @@ public class RecipeDetailedFragment extends Fragment {
 
     private void getRecipeArgsPassed(RecipeDetailedFragmentArgs recipeDetailedFragmentArgs) {
         documentID = recipeDetailedFragmentArgs.getDocumentID();
-        ;
     }
 
     private void setFavoriteIcon(Boolean isFavorite) {
@@ -363,7 +368,6 @@ public class RecipeDetailedFragment extends Fragment {
                                                     }
                                                 }
                                             });
-
                                 }
 
                             }
@@ -382,33 +386,49 @@ public class RecipeDetailedFragment extends Fragment {
 
     private void getCurrentUserDetails(final View view) {
 
-        currentUserDetailsListener = usersRef.whereEqualTo("user_id", FirebaseAuth.getInstance().getCurrentUser().getUid())
-                .addSnapshotListener(new EventListener<QuerySnapshot>() {
+        currentUserDetailsListener = usersRef.document(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                .addSnapshotListener(new EventListener<DocumentSnapshot>() {
                     @Override
-                    public void onEvent(@javax.annotation.Nullable QuerySnapshot queryDocumentSnapshots, @javax.annotation.Nullable FirebaseFirestoreException e) {
+                    public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
                         if (e != null) {
                             Log.w(TAG, "onEvent: ", e);
                             return;
                         }
 
-                        for (DocumentChange documentSnapshot : queryDocumentSnapshots.getDocumentChanges()) {
-                            mUser = documentSnapshot.getDocument().toObject(User.class);
-                            String userDocId = documentSnapshot.getDocument().getId();
-                            currentUserImageUrl = mUser.getUserProfilePicUrl();
-                            currentUserName = mUser.getName();
-                            userFavRecipesList = mUser.getFavoriteRecipes();
-                            loggedInUserDocumentId = documentSnapshot.getDocument().getId();
-                            if (userFavRecipesList != null && !userFavRecipesList.isEmpty())
-                                isRecipeFavorite = userFavRecipesList.contains(documentID);
+                        mUser = documentSnapshot.toObject(User.class);
+                        currentUserImageUrl = mUser.getUserProfilePicUrl();
+                        currentUserName = mUser.getName();
+                        userFavRecipesList = mUser.getFavoriteRecipes();
+                        loggedInUserDocumentId = documentSnapshot.getId();
+                        if (userFavRecipesList != null && !userFavRecipesList.isEmpty())
+                            isRecipeFavorite = userFavRecipesList.contains(documentID);
 
-                            setFavoriteIcon(isRecipeFavorite);
+                        setFavoriteIcon(isRecipeFavorite);
 
-                            getUserShoppingList(userDocId, view);
-                        }
-
+                        getUserIngredientList(mUser.getUser_id(), view);
 
                     }
                 });
+
+    }
+
+    private void getUserIngredientList(String user_id, final View view) {
+        usersRef.document(user_id).collection("Ingredients").addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                if (e != null) {
+                    Log.w(TAG, "onEvent: ", e);
+                    return;
+                }
+                for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                    Ingredient ingredient = documentSnapshot.toObject(Ingredient.class);
+                    if (!userIngredientList.contains(ingredient)) {
+                        userIngredientList.add(ingredient);
+                    }
+                }
+                getUserShoppingList(mUser.getUser_id(), view);
+            }
+        });
     }
 
     private void getUserShoppingList(final String userDocId, final View view) {
@@ -430,7 +450,6 @@ public class RecipeDetailedFragment extends Fragment {
     }
 
     private void getRecipeDocument(final View view) {
-
         recipeRef.document(documentID).addSnapshotListener(new EventListener<DocumentSnapshot>() {
             @Override
             public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
@@ -453,37 +472,69 @@ public class RecipeDetailedFragment extends Fragment {
 
                 tvIngredients.setText(ingredientsToPutInTV.toString());
 
-                int nrOfMissingIngredients = 0;
+                getRecipeIngredients();
 
-//                for (String ingredientName : recipe_ingredients_tag.keySet()) {
-//                    if (mUser.getTags().get(ingredientName) != recipe_ingredients_tag.get(ingredientName)
-//                            && recipe_ingredients_tag.get(ingredientName)) {
-//                        Ingredient ingredient = new Ingredient(ingredientName, "", Objects.requireNonNull(ingredientsWithQuantity).get(ingredientName),
-//                                "g", false);
-//                        if (!recipeIngredientsToAddToShoppingList.contains(ingredient)) {
-//                            if (userShoppingIngredientList.contains(ingredient)) {
-//                                // If user has the ingredient in shopping list and it is checked as true, set it as owned
-//                                if (userShoppingIngredientList.get(userShoppingIngredientList.indexOf(ingredient)).getOwned())
-//                                    ingredient.setOwned(true);
-//
-//                            }
-//                            recipeIngredientsToAddToShoppingList.add(ingredient);
-//                            nrOfMissingIngredients++;
-//
-//                            Log.d(TAG, "onEvent: INGREDIENT NOT IN COMMON " + ingredient.toString());
-//                        } else {
-//                            recipeIngredientsToAddToShoppingList.remove(ingredient);
-//                            nrOfMissingIngredients--;
-//                        }
-//
-//                    }
-//                }
-                if (nrOfMissingIngredients > 0 && !userShoppingIngredientList.containsAll(recipeIngredientsToAddToShoppingList)) {
+
+                setupViewPager(view);
+            }
+        });
+
+
+        getCommentsFromDb();
+    }
+
+    private void getRecipeIngredients() {
+        final int[] nrOfMissingIngredients = {0};
+        final List<Ingredient> recipeIngredientList = new ArrayList<>();
+
+        //Get recipe Ingredients from RecipeIngredients Collection
+        recipeRef.document(documentID).collection("RecipeIngredients").addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                if (e != null) {
+                    Log.w(TAG, "onEvent: ", e);
+                    return;
+                }
+                for (QueryDocumentSnapshot queryDocumentSnapshot : queryDocumentSnapshots) {
+                    Ingredient ingredient = queryDocumentSnapshot.toObject(Ingredient.class);
+                    if (!recipeIngredientList.contains(ingredient)) {
+                        recipeIngredientList.add(ingredient);
+                    }
+
+                }
+
+                for (int i = 0; i < recipeIngredientList.size(); i++) {
+                    Log.d(TAG, "onEvent: " + recipeIngredientList.get(i).toString());
+                }
+                for (Ingredient ing : recipeIngredientList) {
+                    if (userIngredientList.contains(ing)) {
+                        if (!userIngredientList.get(userIngredientList.indexOf(ing)).getOwned()) {
+                            if (!recipeIngredientsToAddToShoppingList.contains(ing)) {
+                                if (userShoppingIngredientList.contains(ing)) {
+                                    // If user has the ingredient in shopping list and it is checked as true, set it as owned
+                                    if (userShoppingIngredientList.get(userShoppingIngredientList.indexOf(ing)).getOwned())
+                                        ing.setOwned(true);
+
+                                }
+                                recipeIngredientsToAddToShoppingList.add(ing);
+                                nrOfMissingIngredients[0]++;
+
+                                Log.d(TAG, "onEvent: INGREDIENT NOT IN COMMON " + ing.toString());
+                            } else {
+                                recipeIngredientsToAddToShoppingList.remove(ing);
+                                nrOfMissingIngredients[0]--;
+                            }
+                        }
+
+                    }
+                }
+
+                if (nrOfMissingIngredients[0] > 0 && !userShoppingIngredientList.containsAll(recipeIngredientsToAddToShoppingList)) {
                     tvMissingIngredientsNumber.setVisibility(View.VISIBLE);
-                    tvMissingIngredientsNumber.setText("Missing " + nrOfMissingIngredients + " ingredients");
-                    mAddMissingingredientsFAB.setText("+" + nrOfMissingIngredients);
-                    mAddMissingingredientsFAB.show();
-                    mAddMissingingredientsFAB.setOnClickListener(new View.OnClickListener() {
+                    tvMissingIngredientsNumber.setText("Missing " + nrOfMissingIngredients[0] + " ingredients");
+                    mAddMissingIngredientsFAB.setText("+" + nrOfMissingIngredients[0]);
+                    mAddMissingIngredientsFAB.show();
+                    mAddMissingIngredientsFAB.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
                             // HERE WE IMPLEMENTS
@@ -499,23 +550,22 @@ public class RecipeDetailedFragment extends Fragment {
                                     });
                                 }
                             }
-                            mAddMissingingredientsFAB.hide();
+                            mAddMissingIngredientsFAB.hide();
                             tvMissingIngredientsNumber.setVisibility(View.INVISIBLE);
-
                         }
                     });
                 }
                 // If the user has the missing ingredients in the shopping list, don't show button, but show message that they are in the list
-                else if (nrOfMissingIngredients > 0 && userShoppingIngredientList.containsAll(recipeIngredientsToAddToShoppingList)) {
+                else if (nrOfMissingIngredients[0] > 0 && userShoppingIngredientList.containsAll(recipeIngredientsToAddToShoppingList)) {
                     for (Ingredient ing : recipeIngredientsToAddToShoppingList) {
                         if (!recipeIngredientsToAddToShoppingList.get(recipeIngredientsToAddToShoppingList.indexOf(ing)).getOwned()) {
                             tvMissingIngredientsNumber.setVisibility(View.VISIBLE);
-                            tvMissingIngredientsNumber.setText(nrOfMissingIngredients + " missing ingredients are in your shopping list");
+                            tvMissingIngredientsNumber.setText(nrOfMissingIngredients[0] + " missing ingredients are in your shopping list");
                         }
                     }
                 }
 
-                if (nrOfMissingIngredients > 0) {
+                if (nrOfMissingIngredients[0] > 0) {
                     Log.d(TAG, "onEvent: usershopping size: " + userShoppingIngredientList.size()
                             + " recipe size : " + recipeIngredientsToAddToShoppingList.size());
                     for (Ingredient testinguser : userShoppingIngredientList)
@@ -523,13 +573,91 @@ public class RecipeDetailedFragment extends Fragment {
                     for (Ingredient testingrecipe : recipeIngredientsToAddToShoppingList)
                         Log.d(TAG, "onEvent: recipeshoppinglist: " + recipeIngredientsToAddToShoppingList.toString());
                 }
-                setupViewPager(view);
+
+                tvIngredients.setText("Ingredients: \n");
+                for (int i = 0; i < recipeIngredientList.size(); i++) {
+                    tvIngredients.append(recipeIngredientList.get(i).getName() + " " + Math.round(recipeIngredientList.get(i).getQuantity())
+                            + " " + recipeIngredientList.get(i).getQuantity_type() + "\n");
+                }
+
+                getRecipeInstructions(documentID);
             }
         });
-
-
-        getCommentsFromDb();
     }
+
+    private void getRecipeInstructions(String documentID) {
+        final List<Instruction> recipeInstructionList = new ArrayList<>();
+
+        recipeRef.document(documentID).collection("RecipeInstructions").orderBy("stepNumber").addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                if (e != null) {
+                    Log.w(TAG, "onEvent: ", e);
+                    return;
+                }
+                for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                    Instruction instruction = documentSnapshot.toObject(Instruction.class);
+                    if (!recipeInstructionList.contains(instruction)) {
+                        recipeInstructionList.add(instruction);
+                    }
+                }
+
+                for (Instruction ins : recipeInstructionList){
+                    if (!instructionsAddedToLayout.contains(ins)){
+                        addInstructionLayout(ins);
+                        instructionsAddedToLayout.add(ins);
+                    }
+                }
+
+            }
+        });
+    }
+
+    private void addInstructionLayout(final Instruction instruction) {
+        if (getActivity() != null) {
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+            );
+            params.setMargins(0, 4, 0, 4);
+            final LinearLayout linearLayout = new LinearLayout(getContext());
+            linearLayout.setOrientation(LinearLayout.VERTICAL);
+            linearLayout.setLayoutParams(params);
+
+            TextView stepNumberTextView = new TextView(getActivity());
+            stepNumberTextView.setText("Step " + instruction.getStepNumber());
+            stepNumberTextView.setTextSize(20);
+            stepNumberTextView.setPadding(22, 25, 0, 0);
+            stepNumberTextView.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+            linearLayout.addView(stepNumberTextView);
+
+            TextView instructionTextView = new TextView(getActivity());
+            instructionTextView.setText(instruction.getText());
+            instructionTextView.setTextSize(16);
+            instructionTextView.setPadding(16,0,0,0);
+            instructionTextView.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+            linearLayout.addView(instructionTextView);
+
+            if (instruction.getImgUrl() != null && !instruction.getImgUrl().equals("")) {
+                final ImageView instructionImageView = new ImageView(getActivity());
+                instructionImageView.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 450));
+                Picasso.get().load(instruction.getImgUrl()).fit().centerCrop().into(instructionImageView);
+                linearLayout.addView(instructionImageView);
+
+                instructionImageView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        // TODO: 14-Jan-20 IMPLEMENT CLICK TO EXPAND IMAGE VIEW
+                        Toast.makeText(getActivity(), "Da", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+
+
+            mInstructionsLinearLayout.addView(linearLayout);
+        }
+    }
+
 
     /*
         ----------------------------- Firebase setup ---------------------------------
