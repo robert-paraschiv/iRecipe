@@ -3,6 +3,7 @@ package com.rokudoz.irecipe.Fragments.profileSubFragments;
 
 import android.content.ContentResolver;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -11,6 +12,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
 
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.InflateException;
 import android.view.LayoutInflater;
@@ -41,6 +43,8 @@ import com.rokudoz.irecipe.Models.User;
 import com.rokudoz.irecipe.R;
 import com.squareup.picasso.Picasso;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -242,7 +246,19 @@ public class profileEditProfile extends Fragment {
             final StorageReference finalOldPicReference = oldPicReference;
             final Boolean finalProfilePicNotInFireStore = profilePicNotInFireStore;
 
-            mUploadTask = newFileReference.putFile(mImageUri)
+            //Compress Image
+            Bitmap bitmap = null;
+            try {
+                bitmap = MediaStore.Images.Media.getBitmap(getContext().getContentResolver(), mImageUri);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 25, baos);
+            byte[] data = baos.toByteArray();
+
+            //Upload image to FireStore Storage
+            mUploadTask = newFileReference.putBytes(data)
                     .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                         @Override
                         public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
@@ -250,7 +266,7 @@ public class profileEditProfile extends Fragment {
                                 @Override
                                 public void onSuccess(Uri uri) {
                                     final String imageUrl = uri.toString();
-                                    if (userProfilePicUrl != null && !userProfilePicUrl.equals("")&& !finalProfilePicNotInFireStore) {
+                                    if (userProfilePicUrl != null && !userProfilePicUrl.equals("") && !finalProfilePicNotInFireStore) {
                                         finalOldPicReference.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
                                             @Override
                                             public void onSuccess(Void aVoid) {

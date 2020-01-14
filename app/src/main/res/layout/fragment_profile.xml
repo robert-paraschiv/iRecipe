@@ -74,17 +74,19 @@
                     style="@style/TextAppearance.MaterialComponents.Headline2"
                     android:textSize="14sp"
                     tools:text="Description" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="40dp"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginTop="8dp"
+                    android:id="@+id/profileFragment_editProfile_materialButton"
+                    android:layout_below="@id/profileFragment_user_description_TextView"
+                    style="@style/Widget.MaterialComponents.Button.TextButton"
+                    android:text="Edit Profile"
+                    />
             </RelativeLayout>
 
-            <com.google.android.material.button.MaterialButton
-                android:layout_width="wrap_content"
-                android:layout_height="40dp"
-                android:layout_centerHorizontal="true"
-                android:id="@+id/profileFragment_editProfile_materialButton"
-                android:layout_below="@id/profileFragment_profileImage"
-                style="@style/Widget.MaterialComponents.Button.TextButton"
-                android:text="Edit Profile"
-                />
 
         </RelativeLayout>
     </com.google.android.material.card.MaterialCardView>

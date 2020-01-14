@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Handler;
 
@@ -12,6 +13,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.text.InputType;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -47,6 +49,8 @@ import com.rokudoz.irecipe.Models.Instruction;
 import com.rokudoz.irecipe.Models.Recipe;
 import com.squareup.picasso.Picasso;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -252,7 +256,18 @@ public class AddRecipesActivity extends AppCompatActivity {
                 final StorageReference fileReference = mStorageRef.child(System.currentTimeMillis()
                         + "." + getFileExtension(mInstructionStepImageUriList.get(position)));
 
-                fileReference.putFile(mInstructionStepImageUriList.get(position)).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                //Compress Image
+                Bitmap bitmap = null;
+                try {
+                    bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), mInstructionStepImageUriList.get(position));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 25, baos);
+                byte[] data = baos.toByteArray();
+
+                fileReference.putBytes(data).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                     @Override
                     public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                         fileReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
@@ -284,7 +299,18 @@ public class AddRecipesActivity extends AppCompatActivity {
             final StorageReference fileReference = mStorageRef.child(System.currentTimeMillis()
                     + "." + getFileExtension(mRecipeImageUriArray[position]));
 
-            mUploadTask = fileReference.putFile(mRecipeImageUriArray[position])
+            //Compress Image
+            Bitmap bitmap = null;
+            try {
+                bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), mRecipeImageUriArray[position]);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 25, baos);
+            byte[] data = baos.toByteArray();
+
+            mUploadTask = fileReference.putBytes(data)
                     .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                         @Override
                         public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
@@ -369,12 +395,12 @@ public class AddRecipesActivity extends AppCompatActivity {
             if (!mInstructionStepImageUriList.get(j).toString().equals("")) {
                 url = instructionStepImageUrlArray[j];
             }
-            Instruction instruction = new Instruction(j+1, instructionTextEtList.get(j).getText().toString(), url);
+            Instruction instruction = new Instruction(j + 1, instructionTextEtList.get(j).getText().toString(), url);
             instructions_list.add(instruction);
         }
 
 
-        Recipe recipe = new Recipe(title, creator_docId, category, description, keywords, imageUrls_list,0f, isFavorite);
+        Recipe recipe = new Recipe(title, creator_docId, category, description, keywords, imageUrls_list, 0f, isFavorite);
 
 //        // Sends recipe data to Firestore database
         recipesReference.add(recipe)
@@ -382,7 +408,7 @@ public class AddRecipesActivity extends AppCompatActivity {
                     @Override
                     public void onSuccess(DocumentReference documentReference) {
                         Toast.makeText(AddRecipesActivity.this, "Succesfully added " + title + " to the recipes list", Toast.LENGTH_SHORT).show();
-                        for (Ingredient ingredient : ingredients_list){
+                        for (Ingredient ingredient : ingredients_list) {
                             recipesReference.document(documentReference.getId()).collection("RecipeIngredients")
                                     .add(ingredient).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                                 @Override
@@ -391,7 +417,7 @@ public class AddRecipesActivity extends AppCompatActivity {
                                 }
                             });
                         }
-                        for (Instruction instruction : instructions_list){
+                        for (Instruction instruction : instructions_list) {
                             recipesReference.document(documentReference.getId()).collection("RecipeInstructions").
                                     add(instruction).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                                 @Override
