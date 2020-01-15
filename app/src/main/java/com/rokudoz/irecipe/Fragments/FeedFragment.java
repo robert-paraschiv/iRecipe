@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
@@ -54,6 +55,7 @@ public class FeedFragment extends Fragment implements RecipeAdapter.OnItemClickL
 
     private ProgressBar pbLoading;
     private FloatingActionButton fab;
+    private int oldScrollYPosition = 0;
 
     //FireBase
     private FirebaseAuth.AuthStateListener mAuthListener;
@@ -97,9 +99,10 @@ public class FeedFragment extends Fragment implements RecipeAdapter.OnItemClickL
         mStorageRef = FirebaseStorage.getInstance();
 
 
-        fab.hide();
+        fab.setVisibility(View.INVISIBLE);
         buildRecyclerView();
         setupFirebaseAuth();
+
 
         return view; // HAS TO BE THE LAST ONE ---------------------------------
     }
@@ -147,6 +150,26 @@ public class FeedFragment extends Fragment implements RecipeAdapter.OnItemClickL
         mRecyclerView.setAdapter(mAdapter);
 
         mAdapter.setOnItemClickListener(FeedFragment.this);
+
+
+        mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+
+                if (dy > 0) {
+                    // Scroll Down
+                    if (fab.isShown()) {
+                        fab.hide();
+                    }
+                } else if (dy < 0) {
+                    // Scroll Up
+                    if (!fab.isShown()) {
+                        fab.show();
+                    }
+                }
+            }
+        });
     }
 
 
@@ -322,7 +345,8 @@ public class FeedFragment extends Fragment implements RecipeAdapter.OnItemClickL
                     if (user.isEmailVerified()) {
 //                        Log.d(TAG, "onAuthStateChanged: signed_in: " + user.getUid());
 //                        Toast.makeText(MainActivity.this, "Authenticated with: " + user.getEmail(), Toast.LENGTH_SHORT).show();
-                        fab.show();
+//                        fab.show();
+                        fab.setVisibility(View.VISIBLE);
                         fab.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {

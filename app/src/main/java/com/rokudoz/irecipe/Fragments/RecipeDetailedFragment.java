@@ -6,6 +6,7 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -15,6 +16,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -81,6 +83,7 @@ public class RecipeDetailedFragment extends Fragment {
     private RecyclerView.LayoutManager mLayoutManager;
 
     private LinearLayout mInstructionsLinearLayout;
+    private NestedScrollView nestedScrollView;
 
     private TextView tvTitle, tvDescription, tvIngredients, mFavoriteNumber, tvMissingIngredientsNumber;
     private ImageView mImageView, mFavoriteIcon;
@@ -95,6 +98,7 @@ public class RecipeDetailedFragment extends Fragment {
     private ArrayList<String> newItemsToAdd = new ArrayList<>();
     private User mUser;
 
+    private int oldScrollYPosition = 0;
     private DocumentSnapshot mLastQueriedDocument;
 
     private FirebaseAuth.AuthStateListener mAuthListener;
@@ -122,7 +126,7 @@ public class RecipeDetailedFragment extends Fragment {
         mFavoriteNumber = view.findViewById(R.id.recipeDetailed_numberOfFaved);
         tvMissingIngredientsNumber = view.findViewById(R.id.missing_ingredientsNumber);
         mAddMissingIngredientsFAB = view.findViewById(R.id.fab_addMissingIngredients);
-
+        nestedScrollView = view.findViewById(R.id.nestedScrollView);
         tvMissingIngredientsNumber.setVisibility(View.INVISIBLE);
         mAddMissingIngredientsFAB.hide();
 
@@ -132,6 +136,20 @@ public class RecipeDetailedFragment extends Fragment {
 
         DocumentReference currentRecipeRef = recipeRef.document(documentID);
         final CollectionReference currentRecipeSubCollection = currentRecipeRef.collection("UsersWhoFaved");
+
+
+//        Hide add missing ingredients FAB on scroll
+        nestedScrollView.setOnScrollChangeListener(new View.OnScrollChangeListener() {
+            @Override
+            public void onScrollChange(View v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
+                if (scrollY > oldScrollY) {
+                    mAddMissingIngredientsFAB.hide();
+                } else {
+                    mAddMissingIngredientsFAB.show();
+                }
+            }
+        });
+
 
         mAddCommentBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -517,8 +535,7 @@ public class RecipeDetailedFragment extends Fragment {
                             }
                         }
 
-                    }
-                    else {
+                    } else {
                         recipeIngredientsToAddToShoppingList.add(ing);
                         nrOfMissingIngredients[0]++;
                     }
@@ -571,7 +588,7 @@ public class RecipeDetailedFragment extends Fragment {
 
                 tvIngredients.setText("Ingredients: \n");
                 for (int i = 0; i < recipeIngredientList.size(); i++) {
-                    tvIngredients.append(" "+recipeIngredientList.get(i).getName() + " " + Math.round(recipeIngredientList.get(i).getQuantity())
+                    tvIngredients.append(" " + recipeIngredientList.get(i).getName() + " " + Math.round(recipeIngredientList.get(i).getQuantity())
                             + " " + recipeIngredientList.get(i).getQuantity_type() + "\n");
                 }
 
@@ -597,8 +614,8 @@ public class RecipeDetailedFragment extends Fragment {
                     }
                 }
 
-                for (Instruction ins : recipeInstructionList){
-                    if (!instructionsAddedToLayout.contains(ins)){
+                for (Instruction ins : recipeInstructionList) {
+                    if (!instructionsAddedToLayout.contains(ins)) {
                         addInstructionLayout(ins);
                         instructionsAddedToLayout.add(ins);
                     }
@@ -629,7 +646,7 @@ public class RecipeDetailedFragment extends Fragment {
             TextView instructionTextView = new TextView(getActivity());
             instructionTextView.setText(instruction.getText());
             instructionTextView.setTextSize(14);
-            instructionTextView.setPadding(16,0,0,12);
+            instructionTextView.setPadding(16, 0, 0, 12);
             instructionTextView.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
             linearLayout.addView(instructionTextView);
 

@@ -44,7 +44,7 @@
         android:layout_alignParentStart="true"
         android:layout_alignParentBottom="true"
         android:layout_margin="16dp"
-        android:src="@drawable/ic_system_update_alt_black_24dp"
+        android:src="@drawable/ic_kitchen_black_24dp"
         app:backgroundTint="@color/colorPrimary"
         app:elevation="4dp"
         app:fabCustomSize="50dp" />
