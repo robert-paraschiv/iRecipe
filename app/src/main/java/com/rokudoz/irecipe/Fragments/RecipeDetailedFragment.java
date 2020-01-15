@@ -519,6 +519,7 @@ public class RecipeDetailedFragment extends Fragment {
 
                     }
                     else {
+                        recipeIngredientsToAddToShoppingList.add(ing);
                         nrOfMissingIngredients[0]++;
                     }
                 }

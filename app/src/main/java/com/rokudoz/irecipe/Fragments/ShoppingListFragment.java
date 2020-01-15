@@ -172,9 +172,16 @@ public class ShoppingListFragment extends Fragment {
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                     shoppingListIngredients.get(shoppingListIngredients.indexOf(ingredient)).setOwned(isChecked);
                     usersReference.document(userDocumentID).collection("ShoppingList").document(ingredient.getDocumentId()).set(ingredient);
-                    if (isChecked && userIngredientList.contains(ingredient) && !userIngredientList.get(userIngredientList.indexOf(ingredient)).getOwned()) {
-                        usersReference.document(userDocumentID).collection("Ingredients")
-                                .document(userIngredientList.get(userIngredientList.indexOf(ingredient)).getDocumentId()).set(ingredient);
+                    if (isChecked) {
+                        if ( userIngredientList.contains(ingredient)){
+                            if (!userIngredientList.get(userIngredientList.indexOf(ingredient)).getOwned()){
+                                usersReference.document(userDocumentID).collection("Ingredients")
+                                        .document(userIngredientList.get(userIngredientList.indexOf(ingredient)).getDocumentId()).set(ingredient);
+                            }
+                        }else {
+                            usersReference.document(userDocumentID).collection("Ingredients")
+                                    .document(ingredient.getDocumentId()).set(ingredient);
+                        }
                     }
                 }
             });
