@@ -19,11 +19,12 @@ import com.rokudoz.irecipe.R;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 
 public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeViewHolder> {
-    private ArrayList<Recipe> mRecipeList;
+    private List<Recipe> mRecipeList;
     private OnItemClickListener mListener;
 
     public interface OnItemClickListener {
@@ -77,7 +78,7 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
 
     }
 
-    public RecipeAdapter(ArrayList<Recipe> recipeList) {
+    public RecipeAdapter(List<Recipe> recipeList) {
         mRecipeList = recipeList;
     }
 

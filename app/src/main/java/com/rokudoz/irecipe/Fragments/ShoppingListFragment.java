@@ -142,6 +142,7 @@ public class ShoppingListFragment extends Fragment {
                                 }
                             });
                         }
+                        ingredientsCheckBoxLinearLayout.removeAllViews();
                         mEmptyBasketBtn.setVisibility(View.INVISIBLE);
                     }
                 });

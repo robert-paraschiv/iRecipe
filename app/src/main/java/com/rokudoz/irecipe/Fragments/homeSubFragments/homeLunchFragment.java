@@ -71,7 +71,8 @@ public class homeLunchFragment extends Fragment implements RecipeAdapter.OnItemC
     private RecyclerView.LayoutManager mLayoutManager;
 
     private ArrayList<String> mDocumentIDs = new ArrayList<>();
-    private ArrayList<Recipe> mRecipeList = new ArrayList<>();
+    private List<Recipe> mRecipeList = new ArrayList<>();
+    private List<Ingredient> userIngredientList = new ArrayList<>();
     private List<String> userFavRecipesList = new ArrayList<>();
     private String loggedInUserDocumentId = "";
     private String userFavDocId = "";
@@ -97,25 +98,36 @@ public class homeLunchFragment extends Fragment implements RecipeAdapter.OnItemC
         pbLoading.setVisibility(View.VISIBLE);
         mStorageRef = FirebaseStorage.getInstance();
         buildRecyclerView();
-        setupFirebaseAuth();
+        getUserIngredients();
 
         return view; // HAS TO BE THE LAST ONE ---------------------------------
     }
-
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        FirebaseAuth.getInstance().addAuthStateListener(mAuthListener);
+    private void getUserIngredients() {
+        usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).collection("Ingredients")
+                .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                    @Override
+                    public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                        if (e != null) {
+                            Log.w(TAG, "onEvent: ", e);
+                            return;
+                        }
+                        for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                            Ingredient ingredient = documentSnapshot.toObject(Ingredient.class);
+                            ingredient.setDocumentId(documentSnapshot.getId());
+                            if (!userIngredientList.contains(ingredient)) {
+                                userIngredientList.add(ingredient);
+                            }
+                        }
+                        performQuery();
+                    }
+                });
     }
+
 
 
     @Override
     public void onStop() {
         super.onStop();
-        if (mAuthListener != null) {
-            FirebaseAuth.getInstance().removeAuthStateListener(mAuthListener);
-        }
         DetatchFirestoreListeners();
         Log.d(TAG, "onStop: ");
     }
@@ -195,8 +207,8 @@ public class homeLunchFragment extends Fragment implements RecipeAdapter.OnItemC
             public void onEvent(@javax.annotation.Nullable QuerySnapshot queryDocumentSnapshots,
                                 @javax.annotation.Nullable FirebaseFirestoreException e) {
                 if (queryDocumentSnapshots != null) {
-                    for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
-                        Recipe recipe = document.toObject(Recipe.class);
+                    for (final QueryDocumentSnapshot document : queryDocumentSnapshots) {
+                        final Recipe recipe = document.toObject(Recipe.class);
                         recipe.setDocumentId(document.getId());
 
                         if (userFavRecipesList != null && userFavRecipesList.contains(document.getId())) {
@@ -207,8 +219,42 @@ public class homeLunchFragment extends Fragment implements RecipeAdapter.OnItemC
                         if (!mDocumentIDs.contains(document.getId())) {
                             mDocumentIDs.add(document.getId());
                             ////////////////////////////////////////////////////////// LOGIC TO GET RECIPES HERE
+                            final List<Ingredient> recipeIngredientList = new ArrayList<>();
 
-                            mRecipeList.add(recipe);
+                            recipeRef.document(recipe.getDocumentId()).collection("RecipeIngredients")
+                                    .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                                        @Override
+                                        public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                                            if (e != null) {
+                                                Log.w(TAG, "onEvent: ", e);
+                                                return;
+                                            }
+                                            for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                                                Ingredient ingredient = documentSnapshot.toObject(Ingredient.class);
+                                                ingredient.setDocumentId(documentSnapshot.getId());
+                                                if (!recipeIngredientList.contains(ingredient)) {
+                                                    recipeIngredientList.add(ingredient);
+                                                }
+                                            }
+                                            int numberOfMissingIngredients = 0;
+                                            for (Ingredient ingredient : recipeIngredientList) {
+                                                if (userIngredientList.contains(ingredient)) {
+                                                    if (!userIngredientList.get(userIngredientList.indexOf(ingredient)).getOwned()) {
+                                                        numberOfMissingIngredients++;
+                                                    }
+
+                                                } else {
+                                                    numberOfMissingIngredients++;
+                                                }
+                                            }
+                                            if (numberOfMissingIngredients < 3) {
+                                                if (!mRecipeList.contains(recipe))
+                                                    mRecipeList.add(recipe);
+                                                mDocumentIDs.add(document.getId());
+                                                mAdapter.notifyDataSetChanged();
+                                            }
+                                        }
+                                    });
                         } else {
                             Log.d(TAG, "onEvent: Already Contains docID");
                         }
@@ -240,8 +286,8 @@ public class homeLunchFragment extends Fragment implements RecipeAdapter.OnItemC
             @Override
             public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
                 if (queryDocumentSnapshots != null) {
-                    for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
-                        Recipe recipe = document.toObject(Recipe.class);
+                    for (final QueryDocumentSnapshot document : queryDocumentSnapshots) {
+                        final Recipe recipe = document.toObject(Recipe.class);
                         recipe.setDocumentId(document.getId());
 
                         if (userFavRecipesList != null && userFavRecipesList.contains(document.getId())) {
@@ -254,7 +300,43 @@ public class homeLunchFragment extends Fragment implements RecipeAdapter.OnItemC
 
                             ////////////////////////////////////////////////////////// LOGIC TO GET RECIPES HERE
 
-                            mRecipeList.add(recipe);
+                            final List<Ingredient> recipeIngredientList = new ArrayList<>();
+
+                            recipeRef.document(recipe.getDocumentId()).collection("RecipeIngredients")
+                                    .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                                        @Override
+                                        public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                                            if (e != null) {
+                                                Log.w(TAG, "onEvent: ", e);
+                                                return;
+                                            }
+                                            for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                                                Ingredient ingredient = documentSnapshot.toObject(Ingredient.class);
+                                                ingredient.setDocumentId(documentSnapshot.getId());
+                                                if (!recipeIngredientList.contains(ingredient)) {
+                                                    recipeIngredientList.add(ingredient);
+                                                }
+                                            }
+                                            int numberOfMissingIngredients = 0;
+                                            for (Ingredient ingredient : recipeIngredientList) {
+                                                if (userIngredientList.contains(ingredient)) {
+                                                    if (!userIngredientList.get(userIngredientList.indexOf(ingredient)).getOwned()) {
+                                                        numberOfMissingIngredients++;
+                                                    }
+
+                                                } else {
+                                                    numberOfMissingIngredients++;
+                                                }
+                                            }
+                                            Log.d(TAG, "onEvent: NR OF MISSING INGREDIENTS " + numberOfMissingIngredients);
+                                            if (numberOfMissingIngredients < 3) {
+                                                if (!mRecipeList.contains(recipe))
+                                                    mRecipeList.add(recipe);
+                                                mDocumentIDs.add(document.getId());
+                                                mAdapter.notifyDataSetChanged();
+                                            }
+                                        }
+                                    });
                         } else {
                             Log.d(TAG, "onEvent: Already Contains docID");
                         }
@@ -357,45 +439,6 @@ public class homeLunchFragment extends Fragment implements RecipeAdapter.OnItemC
         startActivity(intent);
     }
 
-
-    /*
-        ----------------------------- Firebase setup ---------------------------------
-     */
-    private void setupFirebaseAuth() {
-        Log.d(TAG, "setupFirebaseAuth: started");
-
-        mAuthListener = new FirebaseAuth.AuthStateListener() {
-            @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                FirebaseUser user = firebaseAuth.getCurrentUser();
-                if (user != null) {
-
-                    //check if email is verified
-                    if (user.isEmailVerified()) {
-//                        Log.d(TAG, "onAuthStateChanged: signed_in: " + user.getUid());
-//                        Toast.makeText(MainActivity.this, "Authenticated with: " + user.getEmail(), Toast.LENGTH_SHORT).show();
-                        if (user.getEmail().equals("paraschivlongin@gmail.com")) {
-                        }
-                        //If use is authenticated, perform query
-                        performQuery();
-                    } else {
-                        Toast.makeText(getContext(), "Email is not Verified\nCheck your Inbox", Toast.LENGTH_SHORT).show();
-                        FirebaseAuth.getInstance().signOut();
-                    }
-
-                } else {
-                    // User is signed out
-                    Log.d(TAG, "onAuthStateChanged: signed_out");
-                    Toast.makeText(getContext(), "Not logged in", Toast.LENGTH_SHORT).show();
-                    Intent intent = new Intent(getContext(), LoginActivity.class);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                    startActivity(intent);
-                    getActivity().finish();
-                }
-                // ...
-            }
-        };
-    }
 
     @Override
     public void onItemClick(int position) {

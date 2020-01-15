@@ -1,6 +1,5 @@
 package com.rokudoz.irecipe.Fragments.homeSubFragments;
 
-import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -20,9 +19,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
@@ -33,10 +30,8 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
-import com.rokudoz.irecipe.Account.LoginActivity;
 import com.rokudoz.irecipe.Fragments.HomeFragmentDirections;
 import com.rokudoz.irecipe.Models.Ingredient;
-import com.rokudoz.irecipe.Models.Instruction;
 import com.rokudoz.irecipe.Models.Recipe;
 import com.rokudoz.irecipe.Models.User;
 import com.rokudoz.irecipe.Models.UserWhoFaved;
@@ -44,11 +39,7 @@ import com.rokudoz.irecipe.R;
 import com.rokudoz.irecipe.Utils.RecipeAdapter;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 
 public class homeBreakfastFragment extends Fragment implements RecipeAdapter.OnItemClickListener {
     private static final String TAG = "homeBreakfastFragment";
@@ -71,7 +62,8 @@ public class homeBreakfastFragment extends Fragment implements RecipeAdapter.OnI
     private RecyclerView.LayoutManager mLayoutManager;
 
     private ArrayList<String> mDocumentIDs = new ArrayList<>();
-    private ArrayList<Recipe> mRecipeList = new ArrayList<>();
+    private List<Recipe> mRecipeList = new ArrayList<>();
+    private List<Ingredient> userIngredientList = new ArrayList<>();
     private List<String> userFavRecipesList = new ArrayList<>();
     private String loggedInUserDocumentId = "";
     private String userFavDocId = "";
@@ -98,30 +90,41 @@ public class homeBreakfastFragment extends Fragment implements RecipeAdapter.OnI
         mStorageRef = FirebaseStorage.getInstance();
 
         buildRecyclerView();
-        setupFirebaseAuth();
+        getUserIngredients();
 
         return view; // HAS TO BE THE LAST ONE ---------------------------------
     }
 
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        FirebaseAuth.getInstance().addAuthStateListener(mAuthListener);
+    private void getUserIngredients() {
+        usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).collection("Ingredients")
+                .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                    @Override
+                    public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                        if (e != null) {
+                            Log.w(TAG, "onEvent: ", e);
+                            return;
+                        }
+                        for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                            Ingredient ingredient = documentSnapshot.toObject(Ingredient.class);
+                            ingredient.setDocumentId(documentSnapshot.getId());
+                            if (!userIngredientList.contains(ingredient)) {
+                                userIngredientList.add(ingredient);
+                            }
+                        }
+                        performQuery();
+                    }
+                });
     }
 
 
     @Override
     public void onStop() {
         super.onStop();
-        if (mAuthListener != null) {
-            FirebaseAuth.getInstance().removeAuthStateListener(mAuthListener);
-        }
-        DetatchFirestoreListeners();
+        DetachFireStoreListeners();
         Log.d(TAG, "onStop: ");
     }
 
-    private void DetatchFirestoreListeners() {
+    private void DetachFireStoreListeners() {
         if (currentSubCollectionListener != null) {
             currentSubCollectionListener.remove();
             currentSubCollectionListener = null;
@@ -163,8 +166,7 @@ public class homeBreakfastFragment extends Fragment implements RecipeAdapter.OnI
                             Log.w(TAG, "onEvent: ", e);
                             return;
                         }
-                        List<Ingredient> userIngredient_list = new ArrayList<>();
-                        User user = documentSnapshot.toObject(User.class);
+
 
                         mUser = documentSnapshot.toObject(User.class);
                         loggedInUserDocumentId = documentSnapshot.getId();
@@ -180,7 +182,7 @@ public class homeBreakfastFragment extends Fragment implements RecipeAdapter.OnI
 //                                    .limit(3);
                         }
 
-                        PerformMainQuery(recipesQuery, userIngredient_list);
+                        PerformMainQuery(recipesQuery);
                         pbLoading.setVisibility(View.INVISIBLE);
 
                         initializeRecyclerViewAdapterOnClicks();
@@ -189,15 +191,15 @@ public class homeBreakfastFragment extends Fragment implements RecipeAdapter.OnI
 
     }
 
-    private void PerformMainQuery(Query recipesQuery, final List<Ingredient> userIngredient_list) {
+    private void PerformMainQuery(Query recipesQuery) {
 
         recipesListener = recipesQuery.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@javax.annotation.Nullable QuerySnapshot queryDocumentSnapshots,
                                 @javax.annotation.Nullable FirebaseFirestoreException e) {
                 if (queryDocumentSnapshots != null) {
-                    for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
-                        Recipe recipe = document.toObject(Recipe.class);
+                    for (final QueryDocumentSnapshot document : queryDocumentSnapshots) {
+                        final Recipe recipe = document.toObject(Recipe.class);
                         recipe.setDocumentId(document.getId());
 
                         if (userFavRecipesList != null && userFavRecipesList.contains(document.getId())) {
@@ -206,11 +208,45 @@ public class homeBreakfastFragment extends Fragment implements RecipeAdapter.OnI
                             recipe.setFavorite(false);
                         }
                         if (!mDocumentIDs.contains(document.getId())) {
-                            mDocumentIDs.add(document.getId());
 
                             ////////////////////////////////////////////////////////// LOGIC TO GET RECIPES HERE
+                            final List<Ingredient> recipeIngredientList = new ArrayList<>();
 
-                            mRecipeList.add(recipe);
+                            recipeRef.document(recipe.getDocumentId()).collection("RecipeIngredients")
+                                    .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                                        @Override
+                                        public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                                            if (e != null) {
+                                                Log.w(TAG, "onEvent: ", e);
+                                                return;
+                                            }
+                                            for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                                                Ingredient ingredient = documentSnapshot.toObject(Ingredient.class);
+                                                ingredient.setDocumentId(documentSnapshot.getId());
+                                                if (!recipeIngredientList.contains(ingredient)) {
+                                                    recipeIngredientList.add(ingredient);
+                                                }
+                                            }
+                                            int numberOfMissingIngredients = 0;
+                                            for (Ingredient ingredient : recipeIngredientList) {
+                                                if (userIngredientList.contains(ingredient)) {
+                                                    if (!userIngredientList.get(userIngredientList.indexOf(ingredient)).getOwned()) {
+                                                        numberOfMissingIngredients++;
+                                                    }
+
+                                                } else {
+                                                    numberOfMissingIngredients++;
+                                                }
+                                            }
+                                            if (numberOfMissingIngredients < 3) {
+                                                if (!mRecipeList.contains(recipe))
+                                                    mRecipeList.add(recipe);
+                                                mDocumentIDs.add(document.getId());
+                                                mAdapter.notifyDataSetChanged();
+                                            }
+                                        }
+                                    });
+
                         } else {
                             Log.d(TAG, "onEvent: Already Contains docID");
                         }
@@ -244,8 +280,8 @@ public class homeBreakfastFragment extends Fragment implements RecipeAdapter.OnI
             @Override
             public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
                 if (queryDocumentSnapshots != null) {
-                    for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
-                        Recipe recipe = document.toObject(Recipe.class);
+                    for (final QueryDocumentSnapshot document : queryDocumentSnapshots) {
+                        final Recipe recipe = document.toObject(Recipe.class);
                         recipe.setDocumentId(document.getId());
 
                         if (userFavRecipesList != null && userFavRecipesList.contains(document.getId())) {
@@ -254,11 +290,48 @@ public class homeBreakfastFragment extends Fragment implements RecipeAdapter.OnI
                             recipe.setFavorite(false);
                         }
                         if (!mDocumentIDs.contains(document.getId())) {
-                            mDocumentIDs.add(document.getId());
+
 
                             ////////////////////////////////////////////////////////// LOGIC TO GET RECIPES HERE
 
-                            mRecipeList.add(recipe);
+                            final List<Ingredient> recipeIngredientList = new ArrayList<>();
+
+                            recipeRef.document(recipe.getDocumentId()).collection("RecipeIngredients")
+                                    .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                                        @Override
+                                        public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                                            if (e != null) {
+                                                Log.w(TAG, "onEvent: ", e);
+                                                return;
+                                            }
+                                            for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                                                Ingredient ingredient = documentSnapshot.toObject(Ingredient.class);
+                                                ingredient.setDocumentId(documentSnapshot.getId());
+                                                if (!recipeIngredientList.contains(ingredient)) {
+                                                    recipeIngredientList.add(ingredient);
+                                                }
+                                            }
+                                            int numberOfMissingIngredients = 0;
+                                            for (Ingredient ingredient : recipeIngredientList) {
+                                                if (userIngredientList.contains(ingredient)) {
+                                                    if (!userIngredientList.get(userIngredientList.indexOf(ingredient)).getOwned()) {
+                                                        numberOfMissingIngredients++;
+                                                    }
+
+                                                } else {
+                                                    numberOfMissingIngredients++;
+                                                }
+                                            }
+                                            Log.d(TAG, "onEvent: NR OF MISSING INGREDIENTS " + numberOfMissingIngredients);
+                                            if (numberOfMissingIngredients < 3) {
+                                                if (!mRecipeList.contains(recipe))
+                                                    mRecipeList.add(recipe);
+                                                mDocumentIDs.add(document.getId());
+                                                mAdapter.notifyDataSetChanged();
+                                            }
+                                        }
+                                    });
+
                         } else {
                             Log.d(TAG, "onEvent: Already Contains docID");
                         }
@@ -355,46 +428,6 @@ public class homeBreakfastFragment extends Fragment implements RecipeAdapter.OnI
         });
     }
 
-
-    /*
-        ----------------------------- Firebase setup ---------------------------------
-     */
-    private void setupFirebaseAuth() {
-        Log.d(TAG, "setupFirebaseAuth: started");
-
-        mAuthListener = new FirebaseAuth.AuthStateListener() {
-            @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                FirebaseUser user = firebaseAuth.getCurrentUser();
-                if (user != null) {
-
-                    //check if email is verified
-                    if (user.isEmailVerified()) {
-//                        Log.d(TAG, "onAuthStateChanged: signed_in: " + user.getUid());
-//                        Toast.makeText(MainActivity.this, "Authenticated with: " + user.getEmail(), Toast.LENGTH_SHORT).show();
-                        if (user.getEmail().equals("paraschivlongin@gmail.com")) {
-
-                        }
-                        //If use is authenticated, perform query
-                        performQuery();
-                    } else {
-                        Toast.makeText(getContext(), "Email is not Verified\nCheck your Inbox", Toast.LENGTH_SHORT).show();
-                        FirebaseAuth.getInstance().signOut();
-                    }
-
-                } else {
-                    // User is signed out
-                    Log.d(TAG, "onAuthStateChanged: signed_out");
-                    Toast.makeText(getContext(), "Not logged in", Toast.LENGTH_SHORT).show();
-                    Intent intent = new Intent(getContext(), LoginActivity.class);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                    startActivity(intent);
-                    getActivity().finish();
-                }
-                // ...
-            }
-        };
-    }
 
     @Override
     public void onItemClick(int position) {
