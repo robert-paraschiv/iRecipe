@@ -2,12 +2,14 @@ package com.rokudoz.irecipe.Fragments;
 
 
 import android.content.Intent;
+import android.content.res.Resources;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,6 +21,7 @@ import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -38,6 +41,7 @@ import com.rokudoz.irecipe.Models.User;
 import com.rokudoz.irecipe.R;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -52,6 +56,7 @@ public class ShoppingListFragment extends Fragment {
     private String userDocumentID = "";
     private List<Ingredient> shoppingListIngredients = new ArrayList<>();
     private List<Ingredient> userIngredientList = new ArrayList<>();
+    private List<MaterialCheckBox> ingredientCheckBoxList = new ArrayList<>();
     private Button mEmptyBasketBtn;
 
     //Firebase
@@ -121,8 +126,30 @@ public class ShoppingListFragment extends Fragment {
                     }
                     if (!shoppingListIngredients.contains(ingredient)) {
                         shoppingListIngredients.add(ingredient);
-                        addIngredientCheckBox(ingredient);
                     }
+                }
+
+                List<String> checkboxNames = new ArrayList<>();
+                List<String> ingredientCategoryList = new ArrayList<>();
+
+                //setup ingredient names so that they don't duplicate later
+                for (MaterialCheckBox materialCheckBox : ingredientCheckBoxList) {
+                    checkboxNames.add(materialCheckBox.getText().toString());
+                }
+                //Setup categories
+                for (Ingredient ing: shoppingListIngredients) {
+                    if (!ingredientCategoryList.contains(ing.getCategory())) {
+                        ingredientCategoryList.add(ing.getCategory());
+                    }
+                }
+                Collections.sort(ingredientCategoryList);
+                for (String category : ingredientCategoryList) {
+                    List<Ingredient> ingredientsByCategoryList = new ArrayList<>();
+                    for (Ingredient ing: shoppingListIngredients) {
+                        if (ing.getCategory().equals(category) && !checkboxNames.contains(ing.getName()))
+                            ingredientsByCategoryList.add(ing);
+                    }
+                    addCategoryOfIngredientsLayout(ingredientsByCategoryList, category);
                 }
 
                 if (shoppingListIngredients.isEmpty()){
@@ -151,8 +178,9 @@ public class ShoppingListFragment extends Fragment {
     }
 
 
-    private void addIngredientCheckBox(final Ingredient ingredient) {
-        if (getActivity() != null) {
+    private void addCategoryOfIngredientsLayout(List<Ingredient> ingredientList, String categoryName) {
+        if (getActivity() != null && !ingredientList.isEmpty()) {
+            Log.d(TAG, "addCategoryOfIngredientsLayout: ");
             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.MATCH_PARENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT
@@ -162,6 +190,25 @@ public class ShoppingListFragment extends Fragment {
             final LinearLayout linearLayout = new LinearLayout(getActivity());
             linearLayout.setOrientation(LinearLayout.VERTICAL);
             linearLayout.setLayoutParams(params);
+
+            TextView categoryNameTextView = new TextView(getActivity());
+            categoryNameTextView.setText(categoryName);
+            categoryNameTextView.setTextSize(12);
+//            categoryNameTextView.setTypeface(Typeface.DEFAULT_BOLD);
+            categoryNameTextView.setTextAppearance(R.style.TextAppearance_MaterialComponents_Headline6);
+            categoryNameTextView.setPadding(convertDpToPixel(8), 4, 0, 0);
+            linearLayout.addView(categoryNameTextView);
+
+            for (Ingredient ingredient : ingredientList) {
+                addIngredientCheckBox(ingredient, linearLayout);
+            }
+            ingredientsCheckBoxLinearLayout.addView(linearLayout);
+        }
+    }
+
+
+    private void addIngredientCheckBox(final Ingredient ingredient,LinearLayout linearLayout) {
+        if (getActivity() != null) {
 
             MaterialCheckBox materialCheckBox = new MaterialCheckBox(getActivity());
             materialCheckBox.setText(ingredient.getName());
@@ -186,7 +233,13 @@ public class ShoppingListFragment extends Fragment {
                 }
             });
             linearLayout.addView(materialCheckBox);
-            ingredientsCheckBoxLinearLayout.addView(linearLayout);
+            ingredientCheckBoxList.add(materialCheckBox);
         }
+    }
+    //This function to convert DPs to pixels
+    private int convertDpToPixel(float dp) {
+        DisplayMetrics metrics = Resources.getSystem().getDisplayMetrics();
+        float px = dp * (metrics.densityDpi / 160f);
+        return Math.round(px);
     }
 }
