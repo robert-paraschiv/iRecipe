@@ -14,6 +14,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.ViewPager;
@@ -34,6 +35,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -100,6 +102,7 @@ public class RecipeDetailedFragment extends Fragment {
     private LinearLayout mInstructionsLinearLayout;
     private NestedScrollView nestedScrollView;
 
+    private MaterialButton mDeleteRecipeBtn;
     private TextView tvTitle, tvDescription, tvIngredients, mFavoriteNumber, tvMissingIngredientsNumber;
     private ImageView mImageView, mFavoriteIcon;
     private Button mAddCommentBtn;
@@ -144,6 +147,7 @@ public class RecipeDetailedFragment extends Fragment {
         mAddMissingIngredientsFAB = view.findViewById(R.id.fab_addMissingIngredients);
         nestedScrollView = view.findViewById(R.id.nestedScrollView);
         tvMissingIngredientsNumber.setVisibility(View.INVISIBLE);
+        mDeleteRecipeBtn = view.findViewById(R.id.recipeDetailed_deleteRecipe_MaterialBtn);
         mAddMissingIngredientsFAB.hide();
 
 
@@ -621,13 +625,10 @@ public class RecipeDetailedFragment extends Fragment {
     }
 
     private void getRecipeDocument(final View view) {
-        recipeRef.document(documentID).addSnapshotListener(new EventListener<DocumentSnapshot>() {
+
+        recipeRef.document(documentID).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
             @Override
-            public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
-                if (e != null) {
-                    Log.w(TAG, "onEvent: ", e);
-                    return;
-                }
+            public void onSuccess(DocumentSnapshot documentSnapshot) {
                 Recipe recipe = documentSnapshot.toObject(Recipe.class);
                 title = recipe.getTitle();
                 String description = recipe.getDescription();
@@ -643,13 +644,28 @@ public class RecipeDetailedFragment extends Fragment {
 
                 tvIngredients.setText(ingredientsToPutInTV.toString());
 
+                if (recipe.getCreator_docId().equals(mUser.getUser_id())){
+                    mDeleteRecipeBtn.setVisibility(View.VISIBLE);
+                    mDeleteRecipeBtn.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            recipeRef.document(documentID).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                    Toast.makeText(getActivity(), "Successfully deleted", Toast.LENGTH_SHORT).show();
+                                    Navigation.findNavController(view).popBackStack();
+                                }
+                            });
+                        }
+                    });
+                }
+
                 getRecipeIngredients();
 
 
                 setupViewPager(view);
             }
         });
-
 
         getCommentsFromDb();
     }
