@@ -79,6 +79,9 @@
         <argument
             android:name="documentID"
             app:argType="string" />
+        <action
+            android:id="@+id/action_recipeDetailedFragment_to_editRecipeFragment"
+            app:destination="@id/editRecipeFragment" />
 
 
     </fragment>
@@ -96,5 +99,14 @@
             android:id="@+id/action_profileEditProfile_to_profileFragment"
             app:destination="@id/profileFragment"
             app:popUpTo="@+id/profileFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/editRecipeFragment"
+        android:name="com.rokudoz.irecipe.Fragments.EditRecipeFragment"
+        android:label="fragment_edit_recipe"
+        tools:layout="@layout/fragment_edit_recipe" >
+        <argument
+            android:name="documentID"
+            app:argType="string" />
     </fragment>
 </navigation>
