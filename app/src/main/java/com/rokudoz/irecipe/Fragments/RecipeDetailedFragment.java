@@ -14,7 +14,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.Fragment;
-import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.ViewPager;
@@ -103,7 +102,7 @@ public class RecipeDetailedFragment extends Fragment {
 
     private TextView tvTitle, tvDescription, tvIngredients, mFavoriteNumber, tvMissingIngredientsNumber;
     private ImageView mImageView, mFavoriteIcon;
-    private Button mAddCommentBtn,mEditRecipeBtn;
+    private Button mAddCommentBtn;
     private ExtendedFloatingActionButton mAddMissingIngredientsFAB;
     private EditText mCommentEditText;
 
@@ -145,10 +144,9 @@ public class RecipeDetailedFragment extends Fragment {
         mAddMissingIngredientsFAB = view.findViewById(R.id.fab_addMissingIngredients);
         nestedScrollView = view.findViewById(R.id.nestedScrollView);
         tvMissingIngredientsNumber.setVisibility(View.INVISIBLE);
-        mEditRecipeBtn = view.findViewById(R.id.recipeDetailed_editRecipe_MaterialBtn);
         mAddMissingIngredientsFAB.hide();
 
-        loggedInUserDocumentId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
         RecipeDetailedFragmentArgs recipeDetailedFragmentArgs = RecipeDetailedFragmentArgs.fromBundle(getArguments());
         getRecipeArgsPassed(recipeDetailedFragmentArgs);
 
@@ -637,16 +635,6 @@ public class RecipeDetailedFragment extends Fragment {
                 if (recipeDetailedViewPagerAdapter != null)
                     recipeDetailedViewPagerAdapter.notifyDataSetChanged();
 
-                if (recipe.getCreator_docId().equals(loggedInUserDocumentId)){
-                    mEditRecipeBtn.setVisibility(View.VISIBLE);
-                    mEditRecipeBtn.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            //TODO implement go to edit recipe fragment
-                            Navigation.findNavController(view).navigate(RecipeDetailedFragmentDirections.actionRecipeDetailedFragmentToEditRecipeFragment(documentID));
-                        }
-                    });
-                }
                 tvTitle.setText(title);
                 tvDescription.setText(description);
 
