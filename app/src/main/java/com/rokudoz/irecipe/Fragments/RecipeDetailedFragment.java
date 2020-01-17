@@ -79,7 +79,8 @@ public class RecipeDetailedFragment extends Fragment {
     // duration is ideal for subtle animations or animations that occur
     // very frequently.
     private int shortAnimationDuration;
-
+    private int nrOfMissingIngredients = 0;
+    private Boolean showFab = false;
     private String documentID = "";
     private String currentUserImageUrl = "";
     private String currentUserName = "";
@@ -169,7 +170,9 @@ public class RecipeDetailedFragment extends Fragment {
                 if (scrollY > oldScrollY) {
                     mAddMissingIngredientsFAB.hide();
                 } else {
-                    mAddMissingIngredientsFAB.show();
+                    Log.d(TAG, "onScrollChange: " + nrOfMissingIngredients);
+                    if (showFab)
+                        mAddMissingIngredientsFAB.show();
                 }
             }
         });
@@ -644,7 +647,7 @@ public class RecipeDetailedFragment extends Fragment {
 
                 tvIngredients.setText(ingredientsToPutInTV.toString());
 
-                if (recipe.getCreator_docId().equals(mUser.getUser_id())){
+                if (recipe.getCreator_docId().equals(mUser.getUser_id())) {
                     mDeleteRecipeBtn.setVisibility(View.VISIBLE);
                     mDeleteRecipeBtn.setOnClickListener(new View.OnClickListener() {
                         @Override
@@ -671,7 +674,6 @@ public class RecipeDetailedFragment extends Fragment {
     }
 
     private void getRecipeIngredients() {
-        final int[] nrOfMissingIngredients = {0};
         final List<Ingredient> recipeIngredientList = new ArrayList<>();
 
         //Get recipe Ingredients from RecipeIngredients Collection
@@ -704,25 +706,26 @@ public class RecipeDetailedFragment extends Fragment {
 
                                 }
                                 recipeIngredientsToAddToShoppingList.add(ing);
-                                nrOfMissingIngredients[0]++;
+                                nrOfMissingIngredients++;
 
                                 Log.d(TAG, "onEvent: INGREDIENT NOT IN COMMON " + ing.toString());
                             } else {
                                 recipeIngredientsToAddToShoppingList.remove(ing);
-                                nrOfMissingIngredients[0]--;
+                                nrOfMissingIngredients--;
                             }
                         }
 
                     } else {
                         recipeIngredientsToAddToShoppingList.add(ing);
-                        nrOfMissingIngredients[0]++;
+                        nrOfMissingIngredients++;
                     }
                 }
 
-                if (nrOfMissingIngredients[0] > 0 && !userShoppingIngredientList.containsAll(recipeIngredientsToAddToShoppingList)) {
+                if (nrOfMissingIngredients > 0 && !userShoppingIngredientList.containsAll(recipeIngredientsToAddToShoppingList)) {
                     tvMissingIngredientsNumber.setVisibility(View.VISIBLE);
-                    tvMissingIngredientsNumber.setText("Missing " + nrOfMissingIngredients[0] + " ingredients");
-                    mAddMissingIngredientsFAB.setText("+" + nrOfMissingIngredients[0]);
+                    tvMissingIngredientsNumber.setText("Missing " + nrOfMissingIngredients + " ingredients");
+                    mAddMissingIngredientsFAB.setText("+" + nrOfMissingIngredients);
+                    showFab = true;
                     mAddMissingIngredientsFAB.show();
                     mAddMissingIngredientsFAB.setOnClickListener(new View.OnClickListener() {
                         @Override
@@ -741,21 +744,22 @@ public class RecipeDetailedFragment extends Fragment {
                                 }
                             }
                             mAddMissingIngredientsFAB.hide();
+                            showFab = false;
                             tvMissingIngredientsNumber.setVisibility(View.INVISIBLE);
                         }
                     });
                 }
                 // If the user has the missing ingredients in the shopping list, don't show button, but show message that they are in the list
-                else if (nrOfMissingIngredients[0] > 0 && userShoppingIngredientList.containsAll(recipeIngredientsToAddToShoppingList)) {
+                else if (nrOfMissingIngredients > 0 && userShoppingIngredientList.containsAll(recipeIngredientsToAddToShoppingList)) {
                     for (Ingredient ing : recipeIngredientsToAddToShoppingList) {
                         if (!recipeIngredientsToAddToShoppingList.get(recipeIngredientsToAddToShoppingList.indexOf(ing)).getOwned()) {
                             tvMissingIngredientsNumber.setVisibility(View.VISIBLE);
-                            tvMissingIngredientsNumber.setText(nrOfMissingIngredients[0] + " missing ingredients are in your shopping list");
+                            tvMissingIngredientsNumber.setText(nrOfMissingIngredients + " missing ingredients are in your shopping list");
                         }
                     }
                 }
 
-                if (nrOfMissingIngredients[0] > 0) {
+                if (nrOfMissingIngredients > 0) {
                     Log.d(TAG, "onEvent: usershopping size: " + userShoppingIngredientList.size()
                             + " recipe size : " + recipeIngredientsToAddToShoppingList.size());
                     for (Ingredient testinguser : userShoppingIngredientList)
