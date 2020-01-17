@@ -3,6 +3,7 @@ package com.rokudoz.irecipe.Fragments;
 
 import android.content.Intent;
 import android.content.res.Resources;
+import android.graphics.Paint;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -137,7 +138,7 @@ public class ShoppingListFragment extends Fragment {
                     checkboxNames.add(materialCheckBox.getText().toString());
                 }
                 //Setup categories
-                for (Ingredient ing: shoppingListIngredients) {
+                for (Ingredient ing : shoppingListIngredients) {
                     if (!ingredientCategoryList.contains(ing.getCategory())) {
                         ingredientCategoryList.add(ing.getCategory());
                     }
@@ -145,14 +146,14 @@ public class ShoppingListFragment extends Fragment {
                 Collections.sort(ingredientCategoryList);
                 for (String category : ingredientCategoryList) {
                     List<Ingredient> ingredientsByCategoryList = new ArrayList<>();
-                    for (Ingredient ing: shoppingListIngredients) {
+                    for (Ingredient ing : shoppingListIngredients) {
                         if (ing.getCategory().equals(category) && !checkboxNames.contains(ing.getName()))
                             ingredientsByCategoryList.add(ing);
                     }
                     addCategoryOfIngredientsLayout(ingredientsByCategoryList, category);
                 }
 
-                if (shoppingListIngredients.isEmpty()){
+                if (shoppingListIngredients.isEmpty()) {
                     mEmptyBasketBtn.setVisibility(View.INVISIBLE);
                 }
                 // EMPTY basket on click
@@ -207,12 +208,15 @@ public class ShoppingListFragment extends Fragment {
     }
 
 
-    private void addIngredientCheckBox(final Ingredient ingredient,LinearLayout linearLayout) {
+    private void addIngredientCheckBox(final Ingredient ingredient, LinearLayout linearLayout) {
         if (getActivity() != null) {
 
-            MaterialCheckBox materialCheckBox = new MaterialCheckBox(getActivity());
+            final MaterialCheckBox materialCheckBox = new MaterialCheckBox(getActivity());
             materialCheckBox.setText(ingredient.getName());
             materialCheckBox.setChecked(ingredient.getOwned());
+            if (ingredient.getOwned()) {
+                materialCheckBox.setPaintFlags(materialCheckBox.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+            }
 
             materialCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
@@ -220,15 +224,19 @@ public class ShoppingListFragment extends Fragment {
                     shoppingListIngredients.get(shoppingListIngredients.indexOf(ingredient)).setOwned(isChecked);
                     usersReference.document(userDocumentID).collection("ShoppingList").document(ingredient.getDocumentId()).set(ingredient);
                     if (isChecked) {
-                        if ( userIngredientList.contains(ingredient)){
-                            if (!userIngredientList.get(userIngredientList.indexOf(ingredient)).getOwned()){
+                        if (userIngredientList.contains(ingredient)) {
+                            if (!userIngredientList.get(userIngredientList.indexOf(ingredient)).getOwned()) {
                                 usersReference.document(userDocumentID).collection("Ingredients")
                                         .document(userIngredientList.get(userIngredientList.indexOf(ingredient)).getDocumentId()).set(ingredient);
+                                materialCheckBox.setPaintFlags(materialCheckBox.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
                             }
-                        }else {
+                        } else {
                             usersReference.document(userDocumentID).collection("Ingredients")
                                     .document(ingredient.getDocumentId()).set(ingredient);
+
                         }
+                    }else {
+                        materialCheckBox.setPaintFlags(materialCheckBox.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
                     }
                 }
             });
@@ -236,6 +244,7 @@ public class ShoppingListFragment extends Fragment {
             ingredientCheckBoxList.add(materialCheckBox);
         }
     }
+
     //This function to convert DPs to pixels
     private int convertDpToPixel(float dp) {
         DisplayMetrics metrics = Resources.getSystem().getDisplayMetrics();
