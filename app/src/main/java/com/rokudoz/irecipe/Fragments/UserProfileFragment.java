@@ -1,10 +1,10 @@
-package com.rokudoz.irecipe.Fragments.profileSubFragments;
+package com.rokudoz.irecipe.Fragments;
 
 
-import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 
-import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -15,68 +15,63 @@ import android.view.InflateException;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
-import com.rokudoz.irecipe.Account.LoginActivity;
-import com.rokudoz.irecipe.Fragments.HomeFragmentDirections;
-import com.rokudoz.irecipe.Fragments.ProfileFragment;
-import com.rokudoz.irecipe.Fragments.ProfileFragmentDirections;
-import com.rokudoz.irecipe.Fragments.homeSubFragments.homeBreakfastFragment;
-import com.rokudoz.irecipe.Models.Ingredient;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.StorageTask;
+import com.rokudoz.irecipe.Fragments.profileSubFragments.profileMyRecipesFragment;
 import com.rokudoz.irecipe.Models.Recipe;
 import com.rokudoz.irecipe.Models.User;
 import com.rokudoz.irecipe.Models.UserWhoFaved;
 import com.rokudoz.irecipe.R;
 import com.rokudoz.irecipe.Utils.RecipeAdapter;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
-public class profileMyRecipesFragment extends Fragment implements RecipeAdapter.OnItemClickListener {
-    private static final String TAG = "profileMyRecipesFragmen";
+import de.hdodenhof.circleimageview.CircleImageView;
 
-    private View view;
-    private ProgressBar pbLoading;
+public class UserProfileFragment extends Fragment implements RecipeAdapter.OnItemClickListener {
+    private static final String TAG = "UserProfileFragment";
 
-    private RecyclerView mRecyclerView;
-    private RecipeAdapter mAdapter;
-    private RecyclerView.LayoutManager mLayoutManager;
-
-    //FireBase
-    private FirebaseAuth.AuthStateListener mAuthListener;
+    private String documentID;
+    private String userProfilePicUrl = "";
     private User mUser;
-    private FirebaseFirestore db = FirebaseFirestore.getInstance();
-    private CollectionReference recipeRef = db.collection("Recipes");
-    private CollectionReference usersReference = db.collection("Users");
-    private ListenerRegistration currentSubCollectionListener, userDetailsListener, recipesListener;
-    private FirebaseStorage mStorageRef;
-
+    private TextView UserNameTv;
+    private TextView UserUsernameTv;
+    private TextView UserDescriptionTv;
+    private CircleImageView mProfileImage;
+    private View view;
     private ArrayList<String> mDocumentIDs = new ArrayList<>();
     private ArrayList<Recipe> mRecipeList = new ArrayList<>();
     private List<String> userFavRecipesList = new ArrayList<>();
     private String userFavDocId = "";
 
     private DocumentSnapshot mLastQueriedDocument;
+    private RecyclerView mRecyclerView;
+    private RecipeAdapter mAdapter;
+    private RecyclerView.LayoutManager mLayoutManager;
 
+    //Firebase
+    private FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private CollectionReference usersReference = db.collection("Users");
+    private CollectionReference recipeRef = db.collection("Recipes");
 
-    public profileMyRecipesFragment() {
+    public UserProfileFragment() {
         // Required empty public constructor
     }
 
@@ -91,18 +86,23 @@ public class profileMyRecipesFragment extends Fragment implements RecipeAdapter.
             }
         }
         try {
-            view = inflater.inflate(R.layout.fragment_profile_my_recipes, container, false);
+            view = inflater.inflate(R.layout.fragment_user_profile, container, false);
         } catch (InflateException e) {
             Log.e(TAG, "onCreateView: ", e);
         }
 
+
+        UserNameTv = view.findViewById(R.id.userprofileFragment_user_name_TextView);
+        UserUsernameTv = view.findViewById(R.id.userprofileFragment_userName_TextView);
+        UserDescriptionTv = view.findViewById(R.id.userprofileFragment_user_description_TextView);
+        mProfileImage = view.findViewById(R.id.userprofileFragment_profileImage);
+        mRecyclerView = view.findViewById(R.id.userprofile_recycler_view);
+
+
+        UserProfileFragmentArgs userProfileFragmentArgs = UserProfileFragmentArgs.fromBundle(getArguments());
+        getRecipeArgsPassed(userProfileFragmentArgs);
+
         mUser = new User();
-        pbLoading = view.findViewById(R.id.profileMyRecipesFragment_pbLoading);
-        mRecyclerView = view.findViewById(R.id.profileMyRecipesFragment_recycler_view);
-
-        pbLoading.setVisibility(View.VISIBLE);
-        mStorageRef = FirebaseStorage.getInstance();
-
 
         mUser.setUser_id(FirebaseAuth.getInstance().getCurrentUser().getUid());
 
@@ -110,6 +110,46 @@ public class profileMyRecipesFragment extends Fragment implements RecipeAdapter.
         performQuery();
 
         return view;
+    }
+
+    private void getRecipeArgsPassed(UserProfileFragmentArgs userProfileFragmentArgs) {
+        documentID = userProfileFragmentArgs.getDocumentID();
+
+        getCreatorInfo();
+    }
+
+    private void getCreatorInfo() {
+        usersReference.document(documentID).addSnapshotListener(new EventListener<DocumentSnapshot>() {
+            @Override
+            public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
+                if (e == null) {
+                    User user = documentSnapshot.toObject(User.class);
+                    userProfilePicUrl = user.getUserProfilePicUrl();
+
+                    UserNameTv.setText(user.getName());
+                    UserUsernameTv.setText(user.getUsername());
+                    UserDescriptionTv.setText(user.getDescription());
+
+                    if (userProfilePicUrl != null && !userProfilePicUrl.equals("")) {
+                        Picasso.get()
+                                .load(userProfilePicUrl)
+                                .error(R.drawable.ic_account_circle_black_24dp)
+                                .fit()
+                                .centerCrop()
+                                .into(mProfileImage);
+
+                    } else {
+                        Picasso.get()
+                                .load(R.drawable.ic_account_circle_black_24dp)
+                                .placeholder(R.drawable.ic_account_circle_black_24dp)
+                                .into(mProfileImage);
+
+
+                        Toast.makeText(getContext(), "empty", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            }
+        });
     }
 
     private void buildRecyclerView() {
@@ -122,28 +162,26 @@ public class profileMyRecipesFragment extends Fragment implements RecipeAdapter.
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setAdapter(mAdapter);
 
-        mAdapter.setOnItemClickListener(profileMyRecipesFragment.this);
+        mAdapter.setOnItemClickListener(UserProfileFragment.this);
     }
-
 
     private void performQuery() {
         Query recipesQuery = null;
         if (mLastQueriedDocument != null) {
-            recipesQuery = recipeRef.whereEqualTo("creator_docId", mUser.getUser_id())
+            recipesQuery = recipeRef.whereEqualTo("creator_docId", documentID).whereEqualTo("privacy","Everyone")
                     .startAfter(mLastQueriedDocument); // Necessary so we don't have the same results multiple times
 //                                    .limit(3);
         } else {
-            recipesQuery = recipeRef.whereEqualTo("creator_docId", mUser.getUser_id());
+            recipesQuery = recipeRef.whereEqualTo("creator_docId", documentID).whereEqualTo("privacy","Everyone");
 //                                    .limit(3);
         }
         PerformMainQuery(recipesQuery);
-        pbLoading.setVisibility(View.INVISIBLE);
         initializeRecyclerViewAdapterOnClicks();
     }
 
     private void PerformMainQuery(Query notesQuery) {
 
-        recipesListener = notesQuery.addSnapshotListener(new EventListener<QuerySnapshot>() {
+        notesQuery.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@javax.annotation.Nullable QuerySnapshot queryDocumentSnapshots,
                                 @javax.annotation.Nullable FirebaseFirestoreException e) {
@@ -190,7 +228,7 @@ public class profileMyRecipesFragment extends Fragment implements RecipeAdapter.
                 String title = mRecipeList.get(position).getTitle();
                 Log.d(TAG, "onItemClick: CLICKED " + title + " id " + id);
 
-                Navigation.findNavController(view).navigate(ProfileFragmentDirections.actionProfileFragmentToRecipeDetailedFragment(id));
+                Navigation.findNavController(view).navigate(UserProfileFragmentDirections.actionUserProfileFragment2ToRecipeDetailedFragment(id));
 
             }
 
@@ -213,7 +251,7 @@ public class profileMyRecipesFragment extends Fragment implements RecipeAdapter.
                     userFavRecipesList.remove(id);
                     mRecipeList.get(position).setFavorite(false);
 
-                    currentSubCollectionListener = currentRecipeSubCollection.whereEqualTo("userID", mUser.getUser_id())
+                    currentRecipeSubCollection.whereEqualTo("userID", mUser.getUser_id())
                             .addSnapshotListener(new EventListener<QuerySnapshot>() {
                                 @Override
                                 public void onEvent(@javax.annotation.Nullable QuerySnapshot queryDocumentSnapshots, @javax.annotation.Nullable FirebaseFirestoreException e) {

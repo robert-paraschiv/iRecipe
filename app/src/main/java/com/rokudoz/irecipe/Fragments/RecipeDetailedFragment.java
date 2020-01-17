@@ -14,6 +14,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -104,8 +105,8 @@ public class RecipeDetailedFragment extends Fragment {
     private NestedScrollView nestedScrollView;
 
     private MaterialButton mDeleteRecipeBtn;
-    private TextView tvTitle, tvDescription, tvIngredients, mFavoriteNumber, tvMissingIngredientsNumber;
-    private ImageView mImageView, mFavoriteIcon;
+    private TextView tvTitle, tvDescription, tvIngredients, mFavoriteNumber, tvMissingIngredientsNumber, tvCreatorName;
+    private ImageView mImageView, mFavoriteIcon, mCreatorImage;
     private Button mAddCommentBtn;
     private ExtendedFloatingActionButton mAddMissingIngredientsFAB;
     private EditText mCommentEditText;
@@ -149,6 +150,8 @@ public class RecipeDetailedFragment extends Fragment {
         nestedScrollView = view.findViewById(R.id.nestedScrollView);
         tvMissingIngredientsNumber.setVisibility(View.INVISIBLE);
         mDeleteRecipeBtn = view.findViewById(R.id.recipeDetailed_deleteRecipe_MaterialBtn);
+        tvCreatorName = view.findViewById(R.id.recipeDetailed_creatorName_TextView);
+        mCreatorImage = view.findViewById(R.id.recipeDetailed_creatorImage_ImageView);
         mAddMissingIngredientsFAB.hide();
 
 
@@ -663,6 +666,7 @@ public class RecipeDetailedFragment extends Fragment {
                     });
                 }
 
+                getRecipeCreatorDetails(recipe.getCreator_docId());
                 getRecipeIngredients();
 
 
@@ -671,6 +675,30 @@ public class RecipeDetailedFragment extends Fragment {
         });
 
         getCommentsFromDb();
+    }
+
+    private void getRecipeCreatorDetails(final String creator_docId) {
+        usersRef.document(creator_docId).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+            @Override
+            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                User user = documentSnapshot.toObject(User.class);
+                tvCreatorName.setText(user.getName());
+                Picasso.get().load(user.getUserProfilePicUrl()).centerCrop().fit().into(mCreatorImage);
+
+                tvCreatorName.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Navigation.findNavController(view).navigate(RecipeDetailedFragmentDirections.actionRecipeDetailedFragmentToUserProfileFragment2(creator_docId));
+                    }
+                });
+                mCreatorImage.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Navigation.findNavController(view).navigate(RecipeDetailedFragmentDirections.actionRecipeDetailedFragmentToUserProfileFragment2(creator_docId));
+                    }
+                });
+            }
+        });
     }
 
     private void getRecipeIngredients() {

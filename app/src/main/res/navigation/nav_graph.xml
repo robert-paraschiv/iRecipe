@@ -79,6 +79,10 @@
         <argument
             android:name="documentID"
             app:argType="string" />
+        <action
+            android:id="@+id/action_recipeDetailedFragment_to_userProfileFragment2"
+            app:destination="@id/userProfileFragment2"
+            app:popUpTo="@+id/recipeDetailedFragment" />
 
 
     </fragment>
@@ -96,5 +100,17 @@
             android:id="@+id/action_profileEditProfile_to_profileFragment"
             app:destination="@id/profileFragment"
             app:popUpTo="@+id/profileFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/userProfileFragment2"
+        android:name="com.rokudoz.irecipe.Fragments.UserProfileFragment"
+        android:label="fragment_user_profile"
+        tools:layout="@layout/fragment_user_profile" >
+        <argument
+            android:name="documentID"
+            app:argType="string" />
+        <action
+            android:id="@+id/action_userProfileFragment2_to_recipeDetailedFragment"
+            app:destination="@id/recipeDetailedFragment" />
     </fragment>
 </navigation>

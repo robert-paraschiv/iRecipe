@@ -2,9 +2,9 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/container"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:id="@+id/container">
+    android:layout_height="match_parent">
 
     <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
         android:id="@+id/fab_addMissingIngredients"
@@ -13,8 +13,8 @@
         android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"
         android:layout_margin="8dp"
-        app:icon="@drawable/ic_shopping_basket_black_24dp"
-        android:text="+"/>
+        android:text="+"
+        app:icon="@drawable/ic_shopping_basket_black_24dp" />
 
     <androidx.core.widget.NestedScrollView
         android:id="@+id/nestedScrollView"
@@ -26,12 +26,12 @@
             android:layout_height="wrap_content">
 
             <com.google.android.material.card.MaterialCardView
+                android:id="@+id/recipeDetailed_viewPager_Card"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/recipeDetailed_viewPager_Card"
-                app:cardCornerRadius="18dp"
                 android:layout_margin="4dp"
-                >
+                app:cardCornerRadius="18dp">
+
                 <androidx.viewpager.widget.ViewPager
                     android:id="@+id/view_pager"
                     android:layout_width="match_parent"
@@ -40,16 +40,42 @@
                     android:transitionName="example_transition" />
             </com.google.android.material.card.MaterialCardView>
 
+
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/recipeDetailed_creatorImage_cardView"
+                android:layout_width="33dp"
+                android:layout_height="33dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:layout_below="@id/recipeDetailed_viewPager_Card"
+                app:cardCornerRadius="35dp">
+
+                <ImageView
+                    android:id="@+id/recipeDetailed_creatorImage_ImageView"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    tools:src="@color/colorPrimary"/>
+            </com.google.android.material.card.MaterialCardView>
+            <TextView
+                android:id="@+id/recipeDetailed_creatorName_TextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/recipeDetailed_viewPager_Card"
+                android:layout_toEndOf="@id/recipeDetailed_creatorImage_cardView"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="14dp"
+                tools:text="Creator name" />
+
             <TextView
                 android:id="@+id/tvTitle"
                 style="@style/TextAppearance.MaterialComponents.Headline6"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/recipeDetailed_viewPager_Card"
+                android:layout_below="@+id/recipeDetailed_creatorImage_cardView"
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="16dp"
                 tools:text="TitleHere" />
-
             <TextView
                 android:id="@+id/missing_ingredientsNumber"
                 android:layout_width="wrap_content"
@@ -93,36 +119,35 @@
                 tools:text="88" />
 
             <com.google.android.material.button.MaterialButton
+                android:id="@+id/recipeDetailed_deleteRecipe_MaterialBtn"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
                 android:layout_width="33dp"
                 android:layout_height="33dp"
-                android:id="@+id/recipeDetailed_deleteRecipe_MaterialBtn"
                 android:layout_below="@id/imageview_favorite_icon"
-                app:icon="@drawable/ic_delete_black_24dp"
                 android:layout_alignParentEnd="true"
-                android:layout_marginEnd="8dp"
                 android:layout_marginTop="8dp"
-                style="@style/Widget.MaterialComponents.Button.TextButton"
-                app:cornerRadius="18dp"
+                android:layout_marginEnd="8dp"
                 android:visibility="invisible"
-                />
+                app:cornerRadius="18dp"
+                app:icon="@drawable/ic_delete_black_24dp" />
 
             <com.google.android.material.card.MaterialCardView
+                android:id="@+id/recipeDetailed_ingredients_Card"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:cardCornerRadius="18dp"
+                android:layout_below="@id/tvDescription"
                 android:layout_marginStart="4dp"
-                android:layout_marginEnd="4dp"
                 android:layout_marginTop="20dp"
-                android:id="@+id/recipeDetailed_ingredients_Card"
-                android:layout_below="@id/tvDescription">
+                android:layout_marginEnd="4dp"
+                app:cardCornerRadius="18dp">
 
                 <TextView
                     android:id="@+id/tvIngredientsList"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="16sp"
                     android:layout_marginStart="8dp"
                     android:layout_marginTop="8dp"
+                    android:textSize="16sp"
                     tools:text="Ingredients list\n
         -Ingredient1\n
         -Ingredient2\n
@@ -134,35 +159,35 @@
 
 
             <com.google.android.material.card.MaterialCardView
+                android:id="@+id/recipeDetailed_instruction_Card"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_below="@id/recipeDetailed_ingredients_Card"
                 android:layout_marginStart="4dp"
+                android:layout_marginTop="20dp"
                 android:layout_marginEnd="4dp"
                 android:layout_marginBottom="4dp"
-                android:layout_marginTop="20dp"
-                app:cardCornerRadius="18dp"
-                android:id="@+id/recipeDetailed_instruction_Card"
-                android:layout_below="@id/recipeDetailed_ingredients_Card"
-                >
+                app:cardCornerRadius="18dp">
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:orientation="vertical">
+
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Instructions step by step"
-                        android:textSize="18sp"
-                        android:layout_marginBottom="10dp"
                         android:layout_marginStart="12dp"
-                        />
+                        android:layout_marginBottom="10dp"
+                        android:text="Instructions step by step"
+                        android:textSize="18sp" />
+
                     <LinearLayout
+                        android:id="@+id/recipeDetailed_instructions_linearLayout"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:id="@+id/recipeDetailed_instructions_linearLayout"
                         android:animateLayoutChanges="true"
-                        >
+                        android:orientation="vertical">
 
                     </LinearLayout>
                 </LinearLayout>
@@ -170,14 +195,13 @@
             </com.google.android.material.card.MaterialCardView>
 
 
-
             <EditText
                 android:id="@+id/recipeDetailed_et_commentInput"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/recipeDetailed_instruction_Card"
-                android:layout_marginTop="20dp"
                 android:layout_marginStart="8dp"
+                android:layout_marginTop="20dp"
                 android:layout_toStartOf="@+id/recipeDetailed_addComment_btn"
                 android:hint="Comment here" />
 
@@ -205,10 +229,10 @@
     </androidx.core.widget.NestedScrollView>
 
     <ImageView
+        android:id="@+id/expanded_image"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/expanded_image"
-        android:visibility="invisible"
-        android:contentDescription="Expanded image"/>
+        android:contentDescription="Expanded image"
+        android:visibility="invisible" />
 
 </RelativeLayout>
