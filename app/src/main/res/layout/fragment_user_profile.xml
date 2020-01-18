@@ -6,10 +6,17 @@
     android:layout_height="match_parent"
     tools:context=".Fragments.UserProfileFragment">
 
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        app:title="User Profile" />
+
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/userprofileFragment_userDetails_MaterialCard"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_below="@id/toolbar"
         android:layout_centerHorizontal="true"
         android:layout_margin="8dp"
         app:cardCornerRadius="18dp">

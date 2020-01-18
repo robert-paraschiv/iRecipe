@@ -6,12 +6,19 @@
     android:layout_height="match_parent"
     tools:context=".AddIngredientActivity">
 
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        app:title="Add Ingredient"
+        />
 
     <com.google.android.material.textfield.TextInputEditText
         android:id="@+id/textinput_ingredientName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="50dp"
+        android:layout_below="@id/toolbar"
         android:inputType="textCapWords"
         android:hint="Ingredient Name" />
 

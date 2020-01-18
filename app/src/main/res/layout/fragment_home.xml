@@ -4,26 +4,40 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-
-    <com.google.android.material.appbar.AppBarLayout
-        android:id="@+id/app_bar"
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="35dp"
-        android:elevation="4dp">
+        android:layout_height="40dp"
+        app:title="My Fridge" />
 
-        <com.google.android.material.tabs.TabLayout
-            android:id="@+id/tabLayout"
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/homeFragment_TabLayout_MaterialCard"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/toolbar"
+        android:layout_margin="4dp"
+        app:cardCornerRadius="18dp">
+        <com.google.android.material.appbar.AppBarLayout
+            android:id="@+id/app_bar"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="35dp"
+            android:elevation="4dp">
 
-    </com.google.android.material.appbar.AppBarLayout>
+            <com.google.android.material.tabs.TabLayout
+                android:id="@+id/tabLayout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+        </com.google.android.material.appbar.AppBarLayout>
+    </com.google.android.material.card.MaterialCardView>
+
 
 
     <androidx.viewpager.widget.ViewPager
         android:id="@+id/container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/app_bar"/>
+        android:layout_below="@id/homeFragment_TabLayout_MaterialCard"/>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab_add_recipe"

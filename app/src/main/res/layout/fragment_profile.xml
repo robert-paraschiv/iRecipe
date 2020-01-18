@@ -6,8 +6,15 @@
     android:layout_height="match_parent"
     android:padding="4dp">
 
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        app:title="My Profile" />
+
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/profileFragment_userDetails_MaterialCard"
+        android:layout_below="@id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
@@ -94,7 +101,7 @@
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/profileFragment_TabLayout_MaterialCard"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_below="@id/profileFragment_userDetails_MaterialCard"
         android:layout_margin="4dp"
         app:cardCornerRadius="18dp">
