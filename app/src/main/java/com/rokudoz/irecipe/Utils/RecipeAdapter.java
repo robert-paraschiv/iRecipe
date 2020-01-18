@@ -100,9 +100,24 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
                 .centerCrop()
                 .into(holder.mImageView);
 
-        holder.tvAvgRating.setText(currentItem.getAvg_rating().toString());
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        CollectionReference currentRecipeSubCollection = db.collection("Recipes").document(currentItem.getDocumentId())
+                .collection("UsersWhoFaved");
 
-        if (mRecipeList.get(position).getPrivacy().equals("Everyone")){
+        currentRecipeSubCollection.addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@javax.annotation.Nullable QuerySnapshot queryDocumentSnapshots, @javax.annotation.Nullable FirebaseFirestoreException e) {
+                if (e != null) {
+                    return;
+                }
+                currentItem.setAvg_rating((float) queryDocumentSnapshots.size());
+                if (currentItem.getAvg_rating() != null) {
+                    holder.tvAvgRating.setText("" + queryDocumentSnapshots.size());
+                }
+            }
+        });
+
+        if (mRecipeList.get(position).getPrivacy().equals("Everyone")) {
             holder.imgPrivacy.setVisibility(View.GONE);
         }
 
@@ -110,6 +125,7 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
         if (currentItem.getFavorite() != null && currentItem.getFavorite()) {
             holder.imgFavorited.setImageResource(R.drawable.ic_favorite_red_24dp);
         }
+
 
     }
 

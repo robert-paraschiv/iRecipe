@@ -1,7 +1,6 @@
 package com.rokudoz.irecipe.Fragments;
 
 
-import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.Nullable;
@@ -26,13 +25,10 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.StorageTask;
-import com.rokudoz.irecipe.Fragments.profileSubFragments.profileMyRecipesFragment;
 import com.rokudoz.irecipe.Models.Recipe;
 import com.rokudoz.irecipe.Models.User;
 import com.rokudoz.irecipe.Models.UserWhoFaved;
@@ -70,6 +66,7 @@ public class UserProfileFragment extends Fragment implements RecipeAdapter.OnIte
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private CollectionReference usersReference = db.collection("Users");
     private CollectionReference recipeRef = db.collection("Recipes");
+    private ListenerRegistration creatorDetailsListener, currentSubCollectionListener, recipesListener;
 
     public UserProfileFragment() {
         // Required empty public constructor
@@ -104,12 +101,41 @@ public class UserProfileFragment extends Fragment implements RecipeAdapter.OnIte
 
         mUser = new User();
 
-        mUser.setUser_id(FirebaseAuth.getInstance().getCurrentUser().getUid());
-
         buildRecyclerView();
-        performQuery();
+        getCurrentUserDetails();
 
         return view;
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        DetachFirestoneListeners();
+    }
+
+    private void DetachFirestoneListeners() {
+        if (currentSubCollectionListener != null) {
+            currentSubCollectionListener.remove();
+            currentSubCollectionListener = null;
+        }
+        if (creatorDetailsListener != null) {
+            creatorDetailsListener.remove();
+            creatorDetailsListener = null;
+        }
+        if (recipesListener != null) {
+            recipesListener.remove();
+            recipesListener = null;
+        }
+    }
+
+    private void getCurrentUserDetails() {
+        usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+            @Override
+            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                mUser = documentSnapshot.toObject(User.class);
+                performQuery();
+            }
+        });
     }
 
     private void getRecipeArgsPassed(UserProfileFragmentArgs userProfileFragmentArgs) {
@@ -119,34 +145,32 @@ public class UserProfileFragment extends Fragment implements RecipeAdapter.OnIte
     }
 
     private void getCreatorInfo() {
-        usersReference.document(documentID).addSnapshotListener(new EventListener<DocumentSnapshot>() {
+        usersReference.document(documentID).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
             @Override
-            public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
-                if (e == null) {
-                    User user = documentSnapshot.toObject(User.class);
-                    userProfilePicUrl = user.getUserProfilePicUrl();
+            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                User user = documentSnapshot.toObject(User.class);
+                userProfilePicUrl = user.getUserProfilePicUrl();
 
-                    UserNameTv.setText(user.getName());
-                    UserUsernameTv.setText(user.getUsername());
-                    UserDescriptionTv.setText(user.getDescription());
+                UserNameTv.setText(user.getName());
+                UserUsernameTv.setText(user.getUsername());
+                UserDescriptionTv.setText(user.getDescription());
 
-                    if (userProfilePicUrl != null && !userProfilePicUrl.equals("")) {
-                        Picasso.get()
-                                .load(userProfilePicUrl)
-                                .error(R.drawable.ic_account_circle_black_24dp)
-                                .fit()
-                                .centerCrop()
-                                .into(mProfileImage);
+                if (userProfilePicUrl != null && !userProfilePicUrl.equals("")) {
+                    Picasso.get()
+                            .load(userProfilePicUrl)
+                            .error(R.drawable.ic_account_circle_black_24dp)
+                            .fit()
+                            .centerCrop()
+                            .into(mProfileImage);
 
-                    } else {
-                        Picasso.get()
-                                .load(R.drawable.ic_account_circle_black_24dp)
-                                .placeholder(R.drawable.ic_account_circle_black_24dp)
-                                .into(mProfileImage);
+                } else {
+                    Picasso.get()
+                            .load(R.drawable.ic_account_circle_black_24dp)
+                            .placeholder(R.drawable.ic_account_circle_black_24dp)
+                            .into(mProfileImage);
 
 
-                        Toast.makeText(getContext(), "empty", Toast.LENGTH_SHORT).show();
-                    }
+                    Toast.makeText(getContext(), "empty", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -168,11 +192,11 @@ public class UserProfileFragment extends Fragment implements RecipeAdapter.OnIte
     private void performQuery() {
         Query recipesQuery = null;
         if (mLastQueriedDocument != null) {
-            recipesQuery = recipeRef.whereEqualTo("creator_docId", documentID).whereEqualTo("privacy","Everyone")
+            recipesQuery = recipeRef.whereEqualTo("creator_docId", documentID).whereEqualTo("privacy", "Everyone")
                     .startAfter(mLastQueriedDocument); // Necessary so we don't have the same results multiple times
 //                                    .limit(3);
         } else {
-            recipesQuery = recipeRef.whereEqualTo("creator_docId", documentID).whereEqualTo("privacy","Everyone");
+            recipesQuery = recipeRef.whereEqualTo("creator_docId", documentID).whereEqualTo("privacy", "Everyone");
 //                                    .limit(3);
         }
         PerformMainQuery(recipesQuery);
@@ -181,10 +205,9 @@ public class UserProfileFragment extends Fragment implements RecipeAdapter.OnIte
 
     private void PerformMainQuery(Query notesQuery) {
 
-        notesQuery.addSnapshotListener(new EventListener<QuerySnapshot>() {
+        notesQuery.get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
             @Override
-            public void onEvent(@javax.annotation.Nullable QuerySnapshot queryDocumentSnapshots,
-                                @javax.annotation.Nullable FirebaseFirestoreException e) {
+            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                 if (queryDocumentSnapshots != null) {
                     for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
                         Recipe recipe = document.toObject(Recipe.class);
@@ -215,7 +238,6 @@ public class UserProfileFragment extends Fragment implements RecipeAdapter.OnIte
                     Log.d(TAG, "onEvent: Querry result is null");
                 }
                 mAdapter.notifyDataSetChanged();
-
             }
         });
     }
@@ -252,32 +274,28 @@ public class UserProfileFragment extends Fragment implements RecipeAdapter.OnIte
                     mRecipeList.get(position).setFavorite(false);
 
                     currentRecipeSubCollection.whereEqualTo("userID", mUser.getUser_id())
-                            .addSnapshotListener(new EventListener<QuerySnapshot>() {
-                                @Override
-                                public void onEvent(@javax.annotation.Nullable QuerySnapshot queryDocumentSnapshots, @javax.annotation.Nullable FirebaseFirestoreException e) {
-                                    if (e != null) {
-                                        Log.w(TAG, "onEvent: ", e);
-                                        return;
-                                    }
-                                    if (queryDocumentSnapshots != null && queryDocumentSnapshots.size() != 0) {
-                                        userFavDocId = queryDocumentSnapshots.getDocuments().get(0).getId();
-                                        Log.d(TAG, "onEvent: docID " + userFavDocId);
+                            .get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                        @Override
+                        public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                            if (queryDocumentSnapshots != null && queryDocumentSnapshots.size() != 0) {
+                                userFavDocId = queryDocumentSnapshots.getDocuments().get(0).getId();
+                                Log.d(TAG, "onEvent: docID " + userFavDocId);
 
-                                        if (!userFavDocId.equals("") && !mRecipeList.get(position).getFavorite()) {
-                                            currentRecipeSubCollection.document(userFavDocId).delete()
-                                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                        @Override
-                                                        public void onSuccess(Void aVoid) {
-                                                            if (getContext() != null)
-                                                                Toast.makeText(getContext(), "Removed from favorites", Toast.LENGTH_SHORT).show();
-                                                        }
-                                                    });
-                                        } else {
-                                            Log.d(TAG, "onFavoriteClick: empty docID");
-                                        }
-                                    }
+                                if (!userFavDocId.equals("") && !mRecipeList.get(position).getFavorite()) {
+                                    currentRecipeSubCollection.document(userFavDocId).delete()
+                                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                @Override
+                                                public void onSuccess(Void aVoid) {
+                                                    if (getContext() != null)
+                                                        Toast.makeText(getContext(), "Removed from favorites", Toast.LENGTH_SHORT).show();
+                                                }
+                                            });
+                                } else {
+                                    Log.d(TAG, "onFavoriteClick: empty docID");
                                 }
-                            });
+                            }
+                        }
+                    });
                 } else {
                     userFavRecipesList.add(id);
                     mRecipeList.get(position).setFavorite(true);
