@@ -166,7 +166,7 @@ public class RecipeDetailedFragment extends Fragment {
         shortAnimationDuration = getResources().getInteger(
                 android.R.integer.config_shortAnimTime);
 
-//        Hide add missing ingredients FAB on scroll
+        //        Hide add missing ingredients FAB on scroll
         nestedScrollView.setOnScrollChangeListener(new View.OnScrollChangeListener() {
             @Override
             public void onScrollChange(View v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
@@ -561,41 +561,30 @@ public class RecipeDetailedFragment extends Fragment {
     }
 
     private void getCurrentUserDetails(final View view) {
+        usersRef.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+            @Override
+            public void onSuccess(DocumentSnapshot documentSnapshot) {
 
-        currentUserDetailsListener = usersRef.document(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                .addSnapshotListener(new EventListener<DocumentSnapshot>() {
-                    @Override
-                    public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
-                        if (e != null) {
-                            Log.w(TAG, "onEvent: ", e);
-                            return;
-                        }
+                mUser = documentSnapshot.toObject(User.class);
+                currentUserImageUrl = mUser.getUserProfilePicUrl();
+                currentUserName = mUser.getName();
+                userFavRecipesList = mUser.getFavoriteRecipes();
+                loggedInUserDocumentId = documentSnapshot.getId();
+                if (userFavRecipesList != null && !userFavRecipesList.isEmpty())
+                    isRecipeFavorite = userFavRecipesList.contains(documentID);
 
-                        mUser = documentSnapshot.toObject(User.class);
-                        currentUserImageUrl = mUser.getUserProfilePicUrl();
-                        currentUserName = mUser.getName();
-                        userFavRecipesList = mUser.getFavoriteRecipes();
-                        loggedInUserDocumentId = documentSnapshot.getId();
-                        if (userFavRecipesList != null && !userFavRecipesList.isEmpty())
-                            isRecipeFavorite = userFavRecipesList.contains(documentID);
+                setFavoriteIcon(isRecipeFavorite);
 
-                        setFavoriteIcon(isRecipeFavorite);
+                getUserIngredientList(mUser.getUser_id(), view);
 
-                        getUserIngredientList(mUser.getUser_id(), view);
-
-                    }
-                });
-
+            }
+        });
     }
 
     private void getUserIngredientList(String user_id, final View view) {
-        usersRef.document(user_id).collection("Ingredients").addSnapshotListener(new EventListener<QuerySnapshot>() {
+        usersRef.document(user_id).collection("Ingredients").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
             @Override
-            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
-                if (e != null) {
-                    Log.w(TAG, "onEvent: ", e);
-                    return;
-                }
+            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                 for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
                     Ingredient ingredient = documentSnapshot.toObject(Ingredient.class);
                     if (!userIngredientList.contains(ingredient)) {
@@ -609,12 +598,9 @@ public class RecipeDetailedFragment extends Fragment {
 
     private void getUserShoppingList(final String userDocId, final View view) {
 
-        userShoppingListListener = usersRef.document(userDocId).collection("ShoppingList").addSnapshotListener(new EventListener<QuerySnapshot>() {
+        usersRef.document(userDocId).collection("ShoppingList").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
             @Override
-            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
-                if (e != null) {
-                    Log.w(TAG, "onEvent: ", e);
-                }
+            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                 for (DocumentChange documentSnapshot : queryDocumentSnapshots.getDocumentChanges()) {
                     Ingredient ingredient = documentSnapshot.getDocument().toObject(Ingredient.class);
                     userShoppingIngredientList.add(ingredient);
@@ -792,7 +778,8 @@ public class RecipeDetailedFragment extends Fragment {
     private void getRecipeInstructions(String documentID) {
         final List<Instruction> recipeInstructionList = new ArrayList<>();
 
-        recipeRef.document(documentID).collection("RecipeInstructions").orderBy("stepNumber").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+        recipeRef.document(documentID).collection("RecipeInstructions").orderBy("stepNumber").get()
+                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
             @Override
             public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                 for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {

@@ -10,6 +10,7 @@ import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.rokudoz.irecipe.Fragments.RecipeDetailedFragmentDirections;
 import com.rokudoz.irecipe.Models.Comment;
 import com.rokudoz.irecipe.Models.User;
 import com.rokudoz.irecipe.R;
@@ -23,7 +24,9 @@ import java.util.Locale;
 import java.util.Objects;
 
 import androidx.annotation.NonNull;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.RecyclerView;
+
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class ChildCommentAdapter extends RecyclerView.Adapter<ChildCommentAdapter.CommentViewHolder> {
@@ -60,7 +63,7 @@ public class ChildCommentAdapter extends RecyclerView.Adapter<ChildCommentAdapte
 
     @Override
     public void onBindViewHolder(@NonNull final CommentViewHolder holder, int position) {
-        Comment currentItem = mCommentList.get(position);
+        final Comment currentItem = mCommentList.get(position);
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.collection("Users").whereEqualTo("user_id", currentItem.getmUserId()).addSnapshotListener(new EventListener<QuerySnapshot>() {
@@ -92,7 +95,18 @@ public class ChildCommentAdapter extends RecyclerView.Adapter<ChildCommentAdapte
                 holder.mCommentTimeStamp.setText(creationDate);
             }
         }
-
+        holder.mName.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Navigation.findNavController(v).navigate(RecipeDetailedFragmentDirections.actionRecipeDetailedFragmentToUserProfileFragment2(currentItem.getmUserId()));
+            }
+        });
+        holder.mImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Navigation.findNavController(v).navigate(RecipeDetailedFragmentDirections.actionRecipeDetailedFragmentToUserProfileFragment2(currentItem.getmUserId()));
+            }
+        });
 
     }
 

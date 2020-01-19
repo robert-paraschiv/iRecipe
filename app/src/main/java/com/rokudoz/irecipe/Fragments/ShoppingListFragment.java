@@ -82,6 +82,7 @@ public class ShoppingListFragment extends Fragment {
         mEmptyBasketBtn = view.findViewById(R.id.empty_basket_btn);
         ingredientsCheckBoxLinearLayout = view.findViewById(R.id.ingredients_checkBox_linearLayout);
 
+        getUserIngredients();
         return view;
     }
 
@@ -234,7 +235,7 @@ public class ShoppingListFragment extends Fragment {
                                     .document(ingredient.getDocumentId()).set(ingredient);
 
                         }
-                    }else {
+                    } else {
                         materialCheckBox.setPaintFlags(materialCheckBox.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
                     }
                 }

@@ -23,6 +23,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.rokudoz.irecipe.Fragments.RecipeDetailedFragmentDirections;
 import com.rokudoz.irecipe.Models.Comment;
 import com.rokudoz.irecipe.Models.User;
 import com.rokudoz.irecipe.R;
@@ -38,6 +39,7 @@ import java.util.Objects;
 import javax.annotation.Nullable;
 
 import androidx.annotation.NonNull;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -114,14 +116,10 @@ public class ParentCommentAdapter
         final Comment currentItem = mCommentList.get(position);
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-        db.collection("Users").whereEqualTo("user_id", currentItem.getmUserId()).addSnapshotListener(new EventListener<QuerySnapshot>() {
+        db.collection("Users").document(currentItem.getmUserId()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
             @Override
-            public void onEvent(@androidx.annotation.Nullable QuerySnapshot queryDocumentSnapshots, @androidx.annotation.Nullable FirebaseFirestoreException e) {
-                if (e != null) {
-                    Log.w(TAG, "onEvent: ", e);
-                    return;
-                }
-                User user = Objects.requireNonNull(queryDocumentSnapshots).getDocuments().get(0).toObject(User.class);
+            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                User user = documentSnapshot.toObject(User.class);
                 if (user.getUserProfilePicUrl() != null) {
                     Picasso.get()
                             .load(user.getUserProfilePicUrl())
@@ -130,7 +128,6 @@ public class ParentCommentAdapter
                             .into(holder.mImageView);
                     holder.mName.setText(user.getName());
                 }
-
             }
         });
 
@@ -172,6 +169,19 @@ public class ParentCommentAdapter
                             });
                 }
 
+            }
+        });
+
+        holder.mName.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Navigation.findNavController(v).navigate(RecipeDetailedFragmentDirections.actionRecipeDetailedFragmentToUserProfileFragment2(currentItem.getmUserId()));
+            }
+        });
+        holder.mImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Navigation.findNavController(v).navigate(RecipeDetailedFragmentDirections.actionRecipeDetailedFragmentToUserProfileFragment2(currentItem.getmUserId()));
             }
         });
 
