@@ -71,6 +71,19 @@
                     android:layout_marginTop="8dp"
                     android:textSize="14sp"
                     tools:text="Description" />
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/userprofile_addFriend_MaterialButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Add friend"
+                    android:layout_below="@id/userprofileFragment_user_description_TextView"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_alignParentStart="true"
+                    android:layout_marginStart="30dp"
+                    android:layout_marginTop="8dp"
+                    android:textSize="14sp"
+                    android:visibility="invisible"
+                    />
             </RelativeLayout>
 
 

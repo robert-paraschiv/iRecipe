@@ -18,7 +18,6 @@ import com.rokudoz.irecipe.Models.Recipe;
 import com.rokudoz.irecipe.R;
 import com.squareup.picasso.Picasso;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -38,7 +37,7 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
     }
 
     public class RecipeViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        TextView tvTitle, tvDescription, tvAvgRating;
+        TextView tvTitle, tvDescription, tvNrOfFaves;
         ImageView mImageView, imgFavorited, imgPrivacy;
         Map<String, Boolean> ingredientTags;
 
@@ -48,7 +47,7 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
             tvDescription = itemView.findViewById(R.id.text_view_description);
             mImageView = itemView.findViewById(R.id.recipeItem_image);
             imgFavorited = itemView.findViewById(R.id.recyclerview_favorite);
-            tvAvgRating = itemView.findViewById(R.id.recyclerview_avgRating_textView);
+            tvNrOfFaves = itemView.findViewById(R.id.recyclerview_nrOfFaves_textView);
             imgPrivacy = itemView.findViewById(R.id.recycler_view_privacy);
 
             itemView.setOnClickListener(this);
@@ -112,7 +111,7 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
                 }
                 currentItem.setAvg_rating((float) queryDocumentSnapshots.size());
                 if (currentItem.getAvg_rating() != null) {
-                    holder.tvAvgRating.setText("" + queryDocumentSnapshots.size());
+                    holder.tvNrOfFaves.setText("" + queryDocumentSnapshots.size());
                 }
             }
         });

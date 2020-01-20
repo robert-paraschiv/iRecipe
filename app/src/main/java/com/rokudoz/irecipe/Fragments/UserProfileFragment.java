@@ -3,6 +3,7 @@ package com.rokudoz.irecipe.Fragments;
 
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
@@ -17,7 +18,9 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.button.MaterialButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
@@ -29,6 +32,7 @@ import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.rokudoz.irecipe.Models.Friend;
 import com.rokudoz.irecipe.Models.Recipe;
 import com.rokudoz.irecipe.Models.User;
 import com.rokudoz.irecipe.Models.UserWhoFaved;
@@ -47,9 +51,8 @@ public class UserProfileFragment extends Fragment implements RecipeAdapter.OnIte
     private String documentID;
     private String userProfilePicUrl = "";
     private User mUser;
-    private TextView UserNameTv;
-    private TextView UserUsernameTv;
-    private TextView UserDescriptionTv;
+    private TextView UserNameTv, UserUsernameTv, UserDescriptionTv;
+    private MaterialButton mAddFriendButton;
     private CircleImageView mProfileImage;
     private View view;
     private ArrayList<String> mDocumentIDs = new ArrayList<>();
@@ -94,15 +97,15 @@ public class UserProfileFragment extends Fragment implements RecipeAdapter.OnIte
         UserDescriptionTv = view.findViewById(R.id.userprofileFragment_user_description_TextView);
         mProfileImage = view.findViewById(R.id.userprofileFragment_profileImage);
         mRecyclerView = view.findViewById(R.id.userprofile_recycler_view);
+        mAddFriendButton = view.findViewById(R.id.userprofile_addFriend_MaterialButton);
 
+        mUser = new User();
 
         UserProfileFragmentArgs userProfileFragmentArgs = UserProfileFragmentArgs.fromBundle(getArguments());
         getRecipeArgsPassed(userProfileFragmentArgs);
 
-        mUser = new User();
 
         buildRecyclerView();
-        getCurrentUserDetails();
 
         return view;
     }
@@ -136,11 +139,129 @@ public class UserProfileFragment extends Fragment implements RecipeAdapter.OnIte
                 performQuery();
             }
         });
+
+        // ADD TO FRIEND LIST
+        if (!documentID.equals(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
+            usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).collection("FriendList").document(documentID).addSnapshotListener(new EventListener<DocumentSnapshot>() {
+                @Override
+                public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
+                    if (e != null){
+                        Log.w(TAG, "onEvent: ", e);
+                        return;
+                    }
+                    final Friend friend = documentSnapshot.toObject(Friend.class);
+                    if (friend != null) {
+                        if (friend.getFriend_status().equals("friends")) {
+                            Log.d(TAG, "onSuccess: WE FRIENDS ALREADY");
+                            mAddFriendButton.setText("Unfriend");
+                            mAddFriendButton.setVisibility(View.VISIBLE);
+                            mAddFriendButton.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).collection("FriendList").document(documentID)
+                                            .delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void aVoid) {
+                                            usersReference.document(documentID).collection("FriendList")
+                                                    .document(FirebaseAuth.getInstance().getCurrentUser().getUid()).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                @Override
+                                                public void onSuccess(Void aVoid) {
+                                                    Toast.makeText(getActivity(), "Removed from friend list", Toast.LENGTH_SHORT).show();
+                                                    mAddFriendButton.setText("Add Friend");
+                                                    mAddFriendButton.setEnabled(true);
+                                                }
+                                            });
+                                        }
+                                    });
+                                }
+                            });
+                        } else if (friend.getFriend_status().equals("friend_request_sent")) {
+                            mAddFriendButton.setText("Cancel Friend request");
+                            mAddFriendButton.setVisibility(View.VISIBLE);
+                            mAddFriendButton.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).collection("FriendList").document(documentID)
+                                            .delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void aVoid) {
+                                            usersReference.document(documentID).collection("FriendList")
+                                                    .document(FirebaseAuth.getInstance().getCurrentUser().getUid()).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                @Override
+                                                public void onSuccess(Void aVoid) {
+                                                    Toast.makeText(getActivity(), "Cancelled friend request", Toast.LENGTH_SHORT).show();
+                                                    mAddFriendButton.setText("Add Friend");
+                                                    mAddFriendButton.setEnabled(true);
+                                                }
+                                            });
+                                        }
+                                    });
+                                }
+                            });
+                        } else if (friend.getFriend_status().equals("friend_request_received")) {
+                            mAddFriendButton.setText("Accept Friend request");
+                            mAddFriendButton.setVisibility(View.VISIBLE);
+                            mAddFriendButton.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    Friend friendForCurrentUser = new Friend(documentID, "friends", null);
+                                    usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).collection("FriendList").document(documentID)
+                                            .set(friendForCurrentUser).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void aVoid) {
+                                            Friend friendForOtherUser = new Friend(FirebaseAuth.getInstance().getCurrentUser().getUid(), "friends", null);
+                                            usersReference.document(documentID).collection("FriendList")
+                                                    .document(FirebaseAuth.getInstance().getCurrentUser().getUid()).set(friendForOtherUser).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                @Override
+                                                public void onSuccess(Void aVoid) {
+                                                    Toast.makeText(getActivity(), "Accepted friend request", Toast.LENGTH_SHORT).show();
+                                                }
+                                            });
+                                        }
+                                    });
+                                }
+                            });
+                        }
+                        Log.d(TAG, "onSuccess: FOUND IN FRIEND LIST " + friend.toString());
+                    } else {
+                        mAddFriendButton.setText("Add friend");
+                        mAddFriendButton.setVisibility(View.VISIBLE);
+                        mAddFriendButton.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                Friend friendForCurrentUser = new Friend(documentID, "friend_request_sent", null);
+                                usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).collection("FriendList").document(documentID)
+                                        .set(friendForCurrentUser).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+                                        Friend friendForOtherUser = new Friend(FirebaseAuth.getInstance().getCurrentUser().getUid(), "friend_request_received", null);
+                                        usersReference.document(documentID).collection("FriendList")
+                                                .document(FirebaseAuth.getInstance().getCurrentUser().getUid()).set(friendForOtherUser).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                            @Override
+                                            public void onSuccess(Void aVoid) {
+                                                Toast.makeText(getActivity(), "Sent friend request", Toast.LENGTH_SHORT).show();
+                                                mAddFriendButton.setText("Cancel Friend request");
+                                            }
+                                        });
+                                    }
+                                });
+                            }
+                        });
+
+                    }
+
+                }
+            });
+
+        } else {
+            mAddFriendButton.setVisibility(View.GONE);
+        }
+
     }
 
     private void getRecipeArgsPassed(UserProfileFragmentArgs userProfileFragmentArgs) {
         documentID = userProfileFragmentArgs.getDocumentID();
-
+        getCurrentUserDetails();
         getCreatorInfo();
     }
 
