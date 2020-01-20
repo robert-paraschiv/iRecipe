@@ -28,6 +28,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.rokudoz.irecipe.Account.LoginActivity;
 import com.rokudoz.irecipe.AddRecipesActivity;
+import com.rokudoz.irecipe.Models.Friend;
 import com.rokudoz.irecipe.Models.Ingredient;
 import com.rokudoz.irecipe.Models.Recipe;
 import com.rokudoz.irecipe.Models.User;
@@ -73,6 +74,8 @@ public class FeedFragment extends Fragment implements RecipeAdapter.OnItemClickL
     private ArrayList<String> mDocumentIDs = new ArrayList<>();
     private ArrayList<Recipe> mRecipeList = new ArrayList<>();
     private List<String> userFavRecipesList = new ArrayList<>();
+    private List<String> friends_userID_list = new ArrayList<>();
+    private List<Friend> friendList = new ArrayList<>();
     private String loggedInUserDocumentId = "";
     private String userFavDocId = "";
 
@@ -172,43 +175,60 @@ public class FeedFragment extends Fragment implements RecipeAdapter.OnItemClickL
         });
     }
 
+    private void getCurrentUserDetails() {
+        usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+            @Override
+            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                List<Ingredient> userIngredient_list = new ArrayList<>();
+                User user = documentSnapshot.toObject(User.class);
 
-    private void performQuery() {
-        userDetailsListener = usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                .addSnapshotListener(new EventListener<DocumentSnapshot>() {
+                mUser = documentSnapshot.toObject(User.class);
+                loggedInUserDocumentId = documentSnapshot.getId();
+                userFavRecipesList = mUser.getFavoriteRecipes();
+                if (!friends_userID_list.contains(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
+                    friends_userID_list.add(FirebaseAuth.getInstance().getCurrentUser().getUid());
+                }
+
+                usersReference.document(user.getUser_id()).collection("FriendList").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                     @Override
-                    public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
-                        if (e != null) {
-                            Log.w(TAG, "onEvent: ", e);
-                            return;
+                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                        for (QueryDocumentSnapshot queryDocumentSnapshot : queryDocumentSnapshots) {
+                            Friend friend = queryDocumentSnapshot.toObject(Friend.class);
+                            if (!friendList.contains(friend)) {
+                                friendList.add(friend);
+                            }
                         }
-                        List<Ingredient> userIngredient_list = new ArrayList<>();
-                        User user = documentSnapshot.toObject(User.class);
-
-                        mUser = documentSnapshot.toObject(User.class);
-                        loggedInUserDocumentId = documentSnapshot.getId();
-                        userFavRecipesList = mUser.getFavoriteRecipes();
-
-                        Query recipesQuery = null;
-                        if (mLastQueriedDocument != null) {
-                            recipesQuery = recipeRef.whereEqualTo("privacy", "Everyone")
-                                    .startAfter(mLastQueriedDocument); // Necessary so we don't have the same results multiple times
-//                                    .limit(3);
-                        } else {
-                            recipesQuery = recipeRef.whereEqualTo("privacy", "Everyone");
-//                                    .limit(3);
+                        for (Friend friend : friendList) {
+                            if (!friends_userID_list.contains(friend.getFriend_user_id()))
+                                friends_userID_list.add(friend.getFriend_user_id());
                         }
+                        performQuery();
 
-                        PerformMainQuery(recipesQuery, userIngredient_list);
-                        pbLoading.setVisibility(View.INVISIBLE);
-
-                        initializeRecyclerViewAdapterOnClicks();
                     }
                 });
+            }
+        });
+    }
+
+    private void performQuery() {
+        Query recipesQuery = null;
+        if (mLastQueriedDocument != null) {
+            recipesQuery = recipeRef.whereIn("creator_docId", friends_userID_list)
+                    .startAfter(mLastQueriedDocument); // Necessary so we don't have the same results multiple times
+//                                    .limit(3);
+        } else {
+            recipesQuery = recipeRef.whereIn("creator_docId", friends_userID_list);
+//                                    .limit(3);
+        }
+        PerformMainQuery(recipesQuery);
+        pbLoading.setVisibility(View.INVISIBLE);
+
+        initializeRecyclerViewAdapterOnClicks();
+
 
     }
 
-    private void PerformMainQuery(Query notesQuery, final List<Ingredient> userIngredient_list) {
+    private void PerformMainQuery(Query notesQuery) {
 
         recipesListener = notesQuery.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
@@ -355,7 +375,7 @@ public class FeedFragment extends Fragment implements RecipeAdapter.OnItemClickL
                         });
 
                         //If use is authenticated, perform query
-                        performQuery();
+                        getCurrentUserDetails();
                     } else {
                         Toast.makeText(getContext(), "Email is not Verified\nCheck your Inbox", Toast.LENGTH_SHORT).show();
                         FirebaseAuth.getInstance().signOut();

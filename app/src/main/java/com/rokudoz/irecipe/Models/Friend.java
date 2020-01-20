@@ -51,4 +51,13 @@ public class Friend {
                 ", friendTimeStamp=" + friendTimeStamp +
                 '}';
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof Friend))
+            return false;
+        if (obj == this)
+            return true;
+        return this.friend_user_id.equals(((Friend) obj).friend_user_id);
+    }
 }
