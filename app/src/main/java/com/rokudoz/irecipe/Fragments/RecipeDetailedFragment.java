@@ -38,6 +38,7 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
@@ -92,7 +93,7 @@ public class RecipeDetailedFragment extends Fragment {
     private List<String> imageUrls;
     private List<Ingredient> userShoppingIngredientList = new ArrayList<>();
     private List<Ingredient> userIngredientList = new ArrayList<>();
-    private List<Ingredient> recipeIngredientsToAddToShoppingList = new ArrayList<>();
+
 
     private ViewPager viewPager;
     private RecipeDetailedViewPagerAdapter recipeDetailedViewPagerAdapter;
@@ -513,37 +514,17 @@ public class RecipeDetailedFragment extends Fragment {
                         //get comments from commentRef
                         if (queryDocumentSnapshots != null) {
                             for (final QueryDocumentSnapshot document : queryDocumentSnapshots) {
-                                final QueryDocumentSnapshot.ServerTimestampBehavior behavior = ESTIMATE;
                                 final Comment comment = document.toObject(Comment.class);
-//                                commentList.add(new Comment(documentID, comment.getmUserId(), comment.getmImageUrl(), comment.getmName(), comment.getmCommentText()));
                                 if (!newItemsToAdd.contains(document.getId())) {
 
                                     Log.d(TAG, "onEvent: doc id" + document.getId());
 
-                                    final String currentCommentID = document.getId();
-                                    usersRefListener = usersRef.whereEqualTo("user_id", comment.getmUserId())
-                                            .addSnapshotListener(new EventListener<QuerySnapshot>() {
-                                                @Override
-                                                public void onEvent(@javax.annotation.Nullable QuerySnapshot queryDocumentSnapshots, @javax.annotation.Nullable FirebaseFirestoreException e) {
-                                                    User user = null;
-                                                    if (queryDocumentSnapshots != null) {
-                                                        user = queryDocumentSnapshots.getDocuments().get(0).toObject(User.class);
+                                    comment.setDocumentId(document.getId());
+                                    commentList.add(0, comment);
+                                    Log.d(TAG, "onEvent: currrent commentID " + document.getId());
+                                    newItemsToAdd.add(document.getId());
+                                    mAdapter.notifyDataSetChanged();
 
-                                                        //Date date = document.getDate("mCommentTimeStamp", behavior);
-                                                        Date date = comment.getmCommentTimeStamp();
-
-                                                        if (!newItemsToAdd.contains(currentCommentID)) {
-                                                            Comment commentx = new Comment(documentID, comment.getmUserId(), user.getUserProfilePicUrl()
-                                                                    , comment.getmName(), comment.getmCommentText(), date);
-                                                            commentx.setDocumentId(document.getId());
-                                                            commentList.add(0, commentx);
-                                                            Log.d(TAG, "onEvent: currrent commentID " + document.getId());
-                                                            newItemsToAdd.add(document.getId());
-                                                            mAdapter.notifyDataSetChanged();
-                                                        }
-                                                    }
-                                                }
-                                            });
                                 }
 
                             }
@@ -603,8 +584,10 @@ public class RecipeDetailedFragment extends Fragment {
             public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                 for (DocumentChange documentSnapshot : queryDocumentSnapshots.getDocumentChanges()) {
                     Ingredient ingredient = documentSnapshot.getDocument().toObject(Ingredient.class);
-                    userShoppingIngredientList.add(ingredient);
-                    Log.d(TAG, "onEvent: ADDED TO USER SHOPPING LIST " + ingredient.toString());
+                    if (!userShoppingIngredientList.contains(ingredient)) {
+                        userShoppingIngredientList.add(ingredient);
+                    }
+                    Log.d(TAG, "onEvent: Got USER SHOPPING LIST ingredient" + ingredient.toString());
                 }
                 getRecipeDocument(view);
             }
@@ -669,13 +652,15 @@ public class RecipeDetailedFragment extends Fragment {
                 tvCreatorName.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Navigation.findNavController(view).navigate(RecipeDetailedFragmentDirections.actionRecipeDetailedFragmentToUserProfileFragment2(creator_docId));
+                        Navigation.findNavController(view).navigate(RecipeDetailedFragmentDirections
+                                .actionRecipeDetailedFragmentToUserProfileFragment2(creator_docId));
                     }
                 });
                 mCreatorImage.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Navigation.findNavController(view).navigate(RecipeDetailedFragmentDirections.actionRecipeDetailedFragmentToUserProfileFragment2(creator_docId));
+                        Navigation.findNavController(view).navigate(RecipeDetailedFragmentDirections
+                                .actionRecipeDetailedFragmentToUserProfileFragment2(creator_docId));
                     }
                 });
             }
@@ -684,7 +669,7 @@ public class RecipeDetailedFragment extends Fragment {
 
     private void getRecipeIngredients() {
         final List<Ingredient> recipeIngredientList = new ArrayList<>();
-
+        final List<Ingredient> recipeIngredientsToAddToShoppingList = new ArrayList<>();
         //Get recipe Ingredients from RecipeIngredients Collection
         recipeRef.document(documentID).collection("RecipeIngredients").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
             @Override
@@ -714,9 +699,6 @@ public class RecipeDetailedFragment extends Fragment {
                                 nrOfMissingIngredients++;
 
                                 Log.d(TAG, "onEvent: INGREDIENT NOT IN COMMON " + ing.toString());
-                            } else {
-                                recipeIngredientsToAddToShoppingList.remove(ing);
-                                nrOfMissingIngredients--;
                             }
                         }
 
@@ -728,7 +710,11 @@ public class RecipeDetailedFragment extends Fragment {
 
                 if (nrOfMissingIngredients > 0 && !userShoppingIngredientList.containsAll(recipeIngredientsToAddToShoppingList)) {
                     tvMissingIngredientsNumber.setVisibility(View.VISIBLE);
-                    tvMissingIngredientsNumber.setText("Missing " + nrOfMissingIngredients + " ingredients");
+                    if (nrOfMissingIngredients == 1) {
+                        tvMissingIngredientsNumber.setText("Missing " + nrOfMissingIngredients + " ingredient");
+                    } else {
+                        tvMissingIngredientsNumber.setText("Missing " + nrOfMissingIngredients + " ingredients");
+                    }
                     mAddMissingIngredientsFAB.setText("+" + nrOfMissingIngredients);
                     showFab = true;
                     mAddMissingIngredientsFAB.show();
@@ -749,6 +735,7 @@ public class RecipeDetailedFragment extends Fragment {
                                 }
                             }
                             mAddMissingIngredientsFAB.hide();
+                            Toast.makeText(getActivity(), "Added " + nrOfMissingIngredients + " missing ingredients to your shopping list", Toast.LENGTH_SHORT).show();
                             showFab = false;
                             tvMissingIngredientsNumber.setVisibility(View.INVISIBLE);
                         }
@@ -759,7 +746,11 @@ public class RecipeDetailedFragment extends Fragment {
                     for (Ingredient ing : recipeIngredientsToAddToShoppingList) {
                         if (!recipeIngredientsToAddToShoppingList.get(recipeIngredientsToAddToShoppingList.indexOf(ing)).getOwned()) {
                             tvMissingIngredientsNumber.setVisibility(View.VISIBLE);
-                            tvMissingIngredientsNumber.setText(nrOfMissingIngredients + " missing ingredients are in your shopping list");
+                            if (nrOfMissingIngredients == 1) {
+                                tvMissingIngredientsNumber.setText(nrOfMissingIngredients + " missing ingredient is in your shopping list");
+                            } else {
+                                tvMissingIngredientsNumber.setText(nrOfMissingIngredients + " missing ingredients are in your shopping list");
+                            }
                         }
                     }
                 }
@@ -780,23 +771,23 @@ public class RecipeDetailedFragment extends Fragment {
 
         recipeRef.document(documentID).collection("RecipeInstructions").orderBy("stepNumber").get()
                 .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-            @Override
-            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
-                    Instruction instruction = documentSnapshot.toObject(Instruction.class);
-                    if (!recipeInstructionList.contains(instruction)) {
-                        recipeInstructionList.add(instruction);
-                    }
-                }
+                    @Override
+                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                        for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                            Instruction instruction = documentSnapshot.toObject(Instruction.class);
+                            if (!recipeInstructionList.contains(instruction)) {
+                                recipeInstructionList.add(instruction);
+                            }
+                        }
 
-                for (Instruction ins : recipeInstructionList) {
-                    if (!instructionsAddedToLayout.contains(ins)) {
-                        addInstructionLayout(ins);
-                        instructionsAddedToLayout.add(ins);
+                        for (Instruction ins : recipeInstructionList) {
+                            if (!instructionsAddedToLayout.contains(ins)) {
+                                addInstructionLayout(ins);
+                                instructionsAddedToLayout.add(ins);
+                            }
+                        }
                     }
-                }
-            }
-        });
+                });
     }
 
     private void addInstructionLayout(final Instruction instruction) {

@@ -6,8 +6,8 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginStart="4dp"
-    android:layout_marginTop="4dp"
-    android:layout_marginEnd="4dp"
+    android:layout_marginTop="8dp"
+    android:layout_marginEnd="8dp"
     app:cardCornerRadius="18dp"
     android:elevation="4dp">
 
@@ -38,7 +38,7 @@
             <ImageView
                 android:id="@+id/recipeItem_image"
                 android:layout_width="match_parent"
-                android:layout_height="200dp"
+                android:layout_height="340dp"
                 tools:src="@color/colorPrimary"/>
         </com.google.android.material.card.MaterialCardView>
 
