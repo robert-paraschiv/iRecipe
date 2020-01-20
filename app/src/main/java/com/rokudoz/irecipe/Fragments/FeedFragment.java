@@ -194,7 +194,7 @@ public class FeedFragment extends Fragment implements RecipeAdapter.OnItemClickL
                     public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                         for (QueryDocumentSnapshot queryDocumentSnapshot : queryDocumentSnapshots) {
                             Friend friend = queryDocumentSnapshot.toObject(Friend.class);
-                            if (!friendList.contains(friend)) {
+                            if (!friendList.contains(friend) && friend.getFriend_status().equals("friends")) {
                                 friendList.add(friend);
                             }
                         }

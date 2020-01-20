@@ -24,17 +24,20 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.GetTokenResult;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.iid.FirebaseInstanceId;
 import com.rokudoz.irecipe.MainActivity;
 import com.rokudoz.irecipe.Models.Ingredient;
 import com.rokudoz.irecipe.Models.User;
@@ -127,20 +130,27 @@ public class LoginActivity extends AppCompatActivity implements
 
                     FirebaseAuth.getInstance().signInWithEmailAndPassword(mEmail.getText().toString(),
                             mPassword.getText().toString())
-                            .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                            .addOnSuccessListener(new OnSuccessListener<AuthResult>() {
                                 @Override
-                                public void onComplete(@NonNull Task<AuthResult> task) {
-
+                                public void onSuccess(final AuthResult authResult) {
                                     hideProgressBar();
+                                    String token_id = FirebaseInstanceId.getInstance().getToken();
+                                    userRef.document(authResult.getUser().getUid()).update("user_tokenID",token_id).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void aVoid) {
+                                            Log.d(TAG, "onSuccess: Updated Token ID");
+                                        }
+                                    });
 
                                 }
-                            }).addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            Toast.makeText(LoginActivity.this, "Authentication Failed", Toast.LENGTH_SHORT).show();
-                            hideProgressBar();
-                        }
-                    });
+                            })
+                            .addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    Toast.makeText(LoginActivity.this, "Authentication Failed" + e, Toast.LENGTH_SHORT).show();
+                                    hideProgressBar();
+                                }
+                            });
                 } else {
                     Toast.makeText(LoginActivity.this, "You didn't fill in all the fields.", Toast.LENGTH_SHORT).show();
                 }
@@ -297,15 +307,22 @@ public class LoginActivity extends AppCompatActivity implements
                             Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                             boolean newuser = task.getResult().getAdditionalUserInfo().isNewUser();
-                            if (newuser){
+                            if (newuser) {
                                 Log.d(TAG, "onComplete: NEW USER");
                                 addNewUser();
 
-                            }else {
+                            } else {
                                 Log.d(TAG, "onComplete: NOT a new USER");
                                 startActivity(intent);
                                 finish();
                             }
+                            String token_id = FirebaseInstanceId.getInstance().getToken();
+                            userRef.document(mAuth.getCurrentUser().getUid()).update("user_tokenID",token_id).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                    Log.d(TAG, "onSuccess: Updated Token ID");
+                                }
+                            });
 
                         } else {
                             // If sign in fails, display a message to the user.

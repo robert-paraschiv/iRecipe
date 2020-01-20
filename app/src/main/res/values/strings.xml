@@ -4,6 +4,7 @@
     <string name="select_myingredients_string">Select the ingredients you got around</string>
 
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="default_notification_channel_id">Foodify_friend_request</string>
     <string-array name="Gender">
         <item>Male</item>
         <item>Female</item>
