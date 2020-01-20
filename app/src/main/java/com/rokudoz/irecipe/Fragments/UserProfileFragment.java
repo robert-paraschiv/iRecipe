@@ -1,6 +1,8 @@
 package com.rokudoz.irecipe.Fragments;
 
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -158,21 +160,62 @@ public class UserProfileFragment extends Fragment implements RecipeAdapter.OnIte
                             mAddFriendButton.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
-                                    usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).collection("FriendList").document(documentID)
+
+                                    AlertDialog.Builder builder1 = new AlertDialog.Builder(getActivity());
+                                    builder1.setMessage("Are you sure you want to remove this user from your friend list?");
+                                    builder1.setCancelable(true);
+
+                                    builder1.setPositiveButton(
+                                            "Yes",
+                                            new DialogInterface.OnClickListener() {
+                                                public void onClick(DialogInterface dialog, int id) {
+                                                    usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).collection("FriendList").document(documentID)
                                             .delete().addOnSuccessListener(new OnSuccessListener<Void>() {
-                                        @Override
-                                        public void onSuccess(Void aVoid) {
-                                            usersReference.document(documentID).collection("FriendList")
-                                                    .document(FirebaseAuth.getInstance().getCurrentUser().getUid()).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                @Override
-                                                public void onSuccess(Void aVoid) {
-                                                    Toast.makeText(getActivity(), "Removed from friend list", Toast.LENGTH_SHORT).show();
-                                                    mAddFriendButton.setText("Add Friend");
-                                                    mAddFriendButton.setEnabled(true);
+                                                        @Override
+                                                        public void onSuccess(Void aVoid) {
+                                                            usersReference.document(documentID).collection("FriendList")
+                                                                    .document(FirebaseAuth.getInstance().getCurrentUser().getUid()).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                                @Override
+                                                                public void onSuccess(Void aVoid) {
+                                                                    Toast.makeText(getActivity(), "Removed from friend list", Toast.LENGTH_SHORT).show();
+                                                                    mAddFriendButton.setText("Add Friend");
+                                                                    mAddFriendButton.setEnabled(true);
+                                                                }
+                                                            });
+                                                        }
+                                                    });
+                                                    dialog.cancel();
                                                 }
                                             });
-                                        }
-                                    });
+
+                                    builder1.setNegativeButton(
+                                            "No",
+                                            new DialogInterface.OnClickListener() {
+                                                public void onClick(DialogInterface dialog, int id) {
+                                                    dialog.cancel();
+                                                }
+                                            });
+
+                                    AlertDialog alert11 = builder1.create();
+                                    alert11.show();
+
+
+                                    //
+//                                    usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).collection("FriendList").document(documentID)
+//                                            .delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+//                                        @Override
+//                                        public void onSuccess(Void aVoid) {
+//                                            usersReference.document(documentID).collection("FriendList")
+//                                                    .document(FirebaseAuth.getInstance().getCurrentUser().getUid()).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+//                                                @Override
+//                                                public void onSuccess(Void aVoid) {
+//                                                    Toast.makeText(getActivity(), "Removed from friend list", Toast.LENGTH_SHORT).show();
+//                                                    mAddFriendButton.setText("Add Friend");
+//                                                    mAddFriendButton.setEnabled(true);
+//                                                }
+//                                            });
+//                                        }
+//                                    });
                                 }
                             });
                         } else if (friend.getFriend_status().equals("friend_request_sent")) {

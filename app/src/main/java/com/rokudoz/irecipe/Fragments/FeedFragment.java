@@ -213,11 +213,11 @@ public class FeedFragment extends Fragment implements RecipeAdapter.OnItemClickL
     private void performQuery() {
         Query recipesQuery = null;
         if (mLastQueriedDocument != null) {
-            recipesQuery = recipeRef.whereIn("creator_docId", friends_userID_list)
+            recipesQuery = recipeRef.whereIn("creator_docId", friends_userID_list).whereEqualTo("privacy","Everyone")
                     .startAfter(mLastQueriedDocument); // Necessary so we don't have the same results multiple times
 //                                    .limit(3);
         } else {
-            recipesQuery = recipeRef.whereIn("creator_docId", friends_userID_list);
+            recipesQuery = recipeRef.whereIn("creator_docId", friends_userID_list).whereEqualTo("privacy","Everyone");
 //                                    .limit(3);
         }
         PerformMainQuery(recipesQuery);
