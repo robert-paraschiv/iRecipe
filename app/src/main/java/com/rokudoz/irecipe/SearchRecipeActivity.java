@@ -6,6 +6,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -72,6 +73,9 @@ public class SearchRecipeActivity extends AppCompatActivity implements SearchRec
     private String loggedInUserDocumentId = "";
     private String userFavDocId = "";
 
+
+    private String postText="";
+
     private DocumentSnapshot mLastQueriedDocument;
 
 
@@ -82,6 +86,12 @@ public class SearchRecipeActivity extends AppCompatActivity implements SearchRec
 
         MaterialToolbar myToolbar = (MaterialToolbar) findViewById(R.id.my_toolbar);
         setSupportActionBar(myToolbar);
+
+        if (getIntent() != null) {
+            if (getIntent().getStringExtra("post_text") != null) {
+                postText = getIntent().getStringExtra("post_text");
+            }
+        }
 
 
 
@@ -185,14 +195,18 @@ public class SearchRecipeActivity extends AppCompatActivity implements SearchRec
 
     private void performQuery() {
         Query recipesQuery = null;
+
+        //NORMAL
         if (mLastQueriedDocument != null) {
-            recipesQuery = recipeRef.whereIn("creator_docId", friends_userID_list).whereEqualTo("privacy", "Everyone")
+            recipesQuery = recipeRef.whereEqualTo("privacy", "Everyone")
                     .startAfter(mLastQueriedDocument); // Necessary so we don't have the same results multiple times
 //                                    .limit(3);
         } else {
-            recipesQuery = recipeRef.whereIn("creator_docId", friends_userID_list).whereEqualTo("privacy", "Everyone");
+            recipesQuery = recipeRef.whereEqualTo("privacy", "Everyone");
 //                                    .limit(3);
         }
+
+
         PerformMainQuery(recipesQuery);
     }
 
@@ -240,7 +254,11 @@ public class SearchRecipeActivity extends AppCompatActivity implements SearchRec
             @Override
             public void onItemClick(int position) {
                 String id = mRecipeList.get(position).getDocumentId();
-                Toast.makeText(SearchRecipeActivity.this, "" + id, Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(SearchRecipeActivity.this, AddPostActivity.class);
+                intent.putExtra("post_text", postText);
+                intent.putExtra("recipe_doc_id", id);
+                startActivity(intent);
+                finish();
             }
 
             @Override
