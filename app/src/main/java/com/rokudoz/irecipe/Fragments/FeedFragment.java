@@ -194,8 +194,9 @@ public class FeedFragment extends Fragment implements RecipeAdapter.OnItemClickL
                     public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                         for (QueryDocumentSnapshot queryDocumentSnapshot : queryDocumentSnapshots) {
                             Friend friend = queryDocumentSnapshot.toObject(Friend.class);
-                            if (!friendList.contains(friend) && friend.getFriend_status().equals("friends")) {
-                                friendList.add(friend);
+                            if (!friendList.contains(friend)) {
+                                if (friend.getFriend_status().equals("friends") || friend.getFriend_status().equals("friend_request_accepted"))
+                                    friendList.add(friend);
                             }
                         }
                         for (Friend friend : friendList) {
@@ -213,11 +214,11 @@ public class FeedFragment extends Fragment implements RecipeAdapter.OnItemClickL
     private void performQuery() {
         Query recipesQuery = null;
         if (mLastQueriedDocument != null) {
-            recipesQuery = recipeRef.whereIn("creator_docId", friends_userID_list).whereEqualTo("privacy","Everyone")
+            recipesQuery = recipeRef.whereIn("creator_docId", friends_userID_list).whereEqualTo("privacy", "Everyone")
                     .startAfter(mLastQueriedDocument); // Necessary so we don't have the same results multiple times
 //                                    .limit(3);
         } else {
-            recipesQuery = recipeRef.whereIn("creator_docId", friends_userID_list).whereEqualTo("privacy","Everyone");
+            recipesQuery = recipeRef.whereIn("creator_docId", friends_userID_list).whereEqualTo("privacy", "Everyone");
 //                                    .limit(3);
         }
         PerformMainQuery(recipesQuery);

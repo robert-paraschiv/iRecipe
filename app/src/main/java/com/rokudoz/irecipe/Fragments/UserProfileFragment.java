@@ -154,7 +154,7 @@ public class UserProfileFragment extends Fragment implements RecipeAdapter.OnIte
                     }
                     final Friend friend = documentSnapshot.toObject(Friend.class);
                     if (friend != null) {
-                        if (friend.getFriend_status().equals("friends")) {
+                        if (friend.getFriend_status().equals("friends") || friend.getFriend_status().equals("friend_request_accepted")) {
                             Log.d(TAG, "onSuccess: WE FRIENDS ALREADY");
                             mAddFriendButton.setText("Unfriend");
                             mAddFriendButton.setVisibility(View.VISIBLE);
@@ -162,10 +162,10 @@ public class UserProfileFragment extends Fragment implements RecipeAdapter.OnIte
                                 @Override
                                 public void onClick(View v) {
 
-                                    MaterialAlertDialogBuilder builder1 = new MaterialAlertDialogBuilder(getActivity());
-                                    builder1.setMessage("Are you sure you want to remove this user from your friend list?");
-                                    builder1.setCancelable(true);
-                                    builder1.setPositiveButton(
+                                    MaterialAlertDialogBuilder materialAlertDialogBuilder = new MaterialAlertDialogBuilder(getActivity(), R.style.ThemeOverlay_MaterialComponents_MaterialAlertDialog_Centered);
+                                    materialAlertDialogBuilder.setMessage("Are you sure you want to remove this user from your friend list?");
+                                    materialAlertDialogBuilder.setCancelable(true);
+                                    materialAlertDialogBuilder.setPositiveButton(
                                             "Yes",
                                             new DialogInterface.OnClickListener() {
                                                 public void onClick(DialogInterface dialog, int id) {
@@ -188,7 +188,7 @@ public class UserProfileFragment extends Fragment implements RecipeAdapter.OnIte
                                                 }
                                             });
 
-                                    builder1.setNegativeButton(
+                                    materialAlertDialogBuilder.setNegativeButton(
                                             "No",
                                             new DialogInterface.OnClickListener() {
                                                 public void onClick(DialogInterface dialog, int id) {
@@ -196,7 +196,7 @@ public class UserProfileFragment extends Fragment implements RecipeAdapter.OnIte
                                                 }
                                             });
 
-                                    builder1.show();
+                                    materialAlertDialogBuilder.show();
 
 
                                     //
@@ -251,7 +251,7 @@ public class UserProfileFragment extends Fragment implements RecipeAdapter.OnIte
                                             .set(friendForCurrentUser).addOnSuccessListener(new OnSuccessListener<Void>() {
                                         @Override
                                         public void onSuccess(Void aVoid) {
-                                            Friend friendForOtherUser = new Friend(FirebaseAuth.getInstance().getCurrentUser().getUid(), "friends", null);
+                                            Friend friendForOtherUser = new Friend(FirebaseAuth.getInstance().getCurrentUser().getUid(), "friend_request_accepted", null);
                                             usersReference.document(documentID).collection("FriendList")
                                                     .document(FirebaseAuth.getInstance().getCurrentUser().getUid()).set(friendForOtherUser).addOnSuccessListener(new OnSuccessListener<Void>() {
                                                 @Override

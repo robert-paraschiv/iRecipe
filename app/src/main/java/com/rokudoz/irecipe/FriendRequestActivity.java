@@ -105,13 +105,13 @@ public class FriendRequestActivity extends AppCompatActivity implements RecipeAd
             usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).collection("FriendList").document(documentID).addSnapshotListener(new EventListener<DocumentSnapshot>() {
                 @Override
                 public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
-                    if (e != null){
+                    if (e != null) {
                         Log.w(TAG, "onEvent: ", e);
                         return;
                     }
                     final Friend friend = documentSnapshot.toObject(Friend.class);
                     if (friend != null) {
-                        if (friend.getFriend_status().equals("friends")) {
+                        if (friend.getFriend_status().equals("friends") || friend.getFriend_status().equals("friend_request_accepted")) {
                             Log.d(TAG, "onSuccess: WE FRIENDS ALREADY");
                             mAddFriendButton.setText("Unfriend");
                             mAddFriendButton.setVisibility(View.VISIBLE);
@@ -119,11 +119,11 @@ public class FriendRequestActivity extends AppCompatActivity implements RecipeAd
                                 @Override
                                 public void onClick(View v) {
 
-                                    MaterialAlertDialogBuilder builder1 = new MaterialAlertDialogBuilder(FriendRequestActivity.this);
-                                    builder1.setMessage("Are you sure you want to remove this user from your friend list?");
-                                    builder1.setCancelable(true);
+                                    MaterialAlertDialogBuilder materialAlertDialogBuilder = new MaterialAlertDialogBuilder(FriendRequestActivity.this, R.style.ThemeOverlay_MaterialComponents_MaterialAlertDialog_Centered);
+                                    materialAlertDialogBuilder.setMessage("Are you sure you want to remove this user from your friend list?");
+                                    materialAlertDialogBuilder.setCancelable(true);
 
-                                    builder1.setPositiveButton(
+                                    materialAlertDialogBuilder.setPositiveButton(
                                             "Yes",
                                             new DialogInterface.OnClickListener() {
                                                 public void onClick(DialogInterface dialog, int id) {
@@ -146,7 +146,7 @@ public class FriendRequestActivity extends AppCompatActivity implements RecipeAd
                                                 }
                                             });
 
-                                    builder1.setNegativeButton(
+                                    materialAlertDialogBuilder.setNegativeButton(
                                             "No",
                                             new DialogInterface.OnClickListener() {
                                                 public void onClick(DialogInterface dialog, int id) {
@@ -154,9 +154,7 @@ public class FriendRequestActivity extends AppCompatActivity implements RecipeAd
                                                 }
                                             });
 
-                                    builder1.show();
-
-
+                                    materialAlertDialogBuilder.show();
 
 
 //                                    usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).collection("FriendList").document(documentID)
@@ -210,7 +208,7 @@ public class FriendRequestActivity extends AppCompatActivity implements RecipeAd
                                             .set(friendForCurrentUser).addOnSuccessListener(new OnSuccessListener<Void>() {
                                         @Override
                                         public void onSuccess(Void aVoid) {
-                                            Friend friendForOtherUser = new Friend(FirebaseAuth.getInstance().getCurrentUser().getUid(), "friends", null);
+                                            Friend friendForOtherUser = new Friend(FirebaseAuth.getInstance().getCurrentUser().getUid(), "friend_request_accepted", null);
                                             usersReference.document(documentID).collection("FriendList")
                                                     .document(FirebaseAuth.getInstance().getCurrentUser().getUid()).set(friendForOtherUser).addOnSuccessListener(new OnSuccessListener<Void>() {
                                                 @Override

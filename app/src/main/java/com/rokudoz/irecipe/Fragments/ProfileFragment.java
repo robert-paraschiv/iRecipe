@@ -45,6 +45,7 @@ import com.rokudoz.irecipe.Account.LoginActivity;
 import com.rokudoz.irecipe.Fragments.homeSubFragments.homeBreakfastFragment;
 import com.rokudoz.irecipe.Fragments.homeSubFragments.homeDinnerFragment;
 import com.rokudoz.irecipe.Fragments.homeSubFragments.homeLunchFragment;
+import com.rokudoz.irecipe.Fragments.profileSubFragments.profileMyFriendList;
 import com.rokudoz.irecipe.Fragments.profileSubFragments.profileMyIngredientsFragment;
 import com.rokudoz.irecipe.Fragments.profileSubFragments.profileMyRecipesFragment;
 import com.rokudoz.irecipe.Models.Ingredient;
@@ -151,8 +152,9 @@ public class ProfileFragment extends Fragment {
 
     private void setupViewPager(ViewPager viewPager) {
         SectionsPagerAdapter adapter = new SectionsPagerAdapter(getChildFragmentManager(), FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
-        adapter.addFragment(new profileMyIngredientsFragment(), "My ingredients");
+        adapter.addFragment(new profileMyIngredientsFragment(), "Fridge");
         adapter.addFragment(new profileMyRecipesFragment(), "My recipes");
+        adapter.addFragment(new profileMyFriendList(), "Friend List");
         viewPager.setAdapter(adapter);
     }
 

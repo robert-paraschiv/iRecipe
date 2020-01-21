@@ -70,6 +70,9 @@
         <action
             android:id="@+id/action_profileFragment_to_profileEditProfile"
             app:destination="@id/profileEditProfile" />
+        <action
+            android:id="@+id/action_profileFragment_to_userProfileFragment2"
+            app:destination="@id/userProfileFragment2" />
     </fragment>
     <fragment
         android:id="@+id/recipeDetailedFragment"
