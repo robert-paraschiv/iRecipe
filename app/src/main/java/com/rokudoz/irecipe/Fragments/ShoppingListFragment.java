@@ -1,6 +1,7 @@
 package com.rokudoz.irecipe.Fragments;
 
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Paint;
@@ -11,6 +12,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
+import android.text.InputType;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -20,6 +22,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
@@ -29,9 +32,12 @@ import android.widget.Toast;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.checkbox.MaterialCheckBox;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -53,7 +59,7 @@ import java.util.Objects;
 public class ShoppingListFragment extends Fragment {
 
     private static final String TAG = "ShoppingListFragment";
-    private ProgressBar pbLoading;
+    private FloatingActionButton addIngredientToListFab;
     private LinearLayout ingredientsCheckBoxLinearLayout;
 
     private String userDocumentID = "";
@@ -81,7 +87,7 @@ public class ShoppingListFragment extends Fragment {
 //        textViewData = view.findViewById(R.id.tv_data);
         mEmptyBasketBtn = view.findViewById(R.id.empty_basket_btn);
         ingredientsCheckBoxLinearLayout = view.findViewById(R.id.ingredients_checkBox_linearLayout);
-
+        addIngredientToListFab = view.findViewById(R.id.fab_add_ingredient_toShoppingList);
         getUserIngredients();
         return view;
     }
@@ -172,6 +178,49 @@ public class ShoppingListFragment extends Fragment {
                         }
                         ingredientsCheckBoxLinearLayout.removeAllViews();
                         mEmptyBasketBtn.setVisibility(View.INVISIBLE);
+                    }
+                });
+                addIngredientToListFab.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+                        final EditText input = new EditText(getActivity());
+                        input.setInputType(InputType.TYPE_TEXT_FLAG_CAP_WORDS);
+                        MaterialAlertDialogBuilder materialAlertDialogBuilder = new MaterialAlertDialogBuilder(getActivity(), R.style.ThemeOverlay_MaterialComponents_MaterialAlertDialog_Centered);
+                        materialAlertDialogBuilder.setView(input);
+                        materialAlertDialogBuilder.setMessage("Add ingredient to shopping list");
+                        materialAlertDialogBuilder.setCancelable(true);
+                        materialAlertDialogBuilder.setPositiveButton(
+                                "Confirm",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+                                        //
+                                        Ingredient ingredient = new Ingredient(input.getText().toString(), "Self Added", 0f, "g", false);
+                                        if (shoppingListIngredients.contains(ingredient)) {
+                                            Toast.makeText(getActivity(), "" + input.getText().toString() + " is already in your shopping list", Toast.LENGTH_SHORT).show();
+                                        } else {
+                                            usersReference.document(userDocumentID).collection("ShoppingList").add(ingredient).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                                                @Override
+                                                public void onSuccess(DocumentReference documentReference) {
+                                                    Log.d(TAG, "onSuccess: added to db");
+                                                }
+                                            });
+
+                                        }
+                                        dialog.cancel();
+                                    }
+                                });
+
+                        materialAlertDialogBuilder.setNegativeButton(
+                                "Cancel",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+                                        dialog.cancel();
+                                    }
+                                });
+
+                        materialAlertDialogBuilder.show();
+
                     }
                 });
             }

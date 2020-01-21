@@ -39,13 +39,15 @@
         android:layout_centerHorizontal="true"
         android:text="Empty basket" />
 
-        <!--        <LinearLayout-->
-        <!--            android:id="@+id/linear_layout"-->
-        <!--            android:layout_below="@id/checkable_list"-->
-        <!--            android:layout_width="match_parent"-->
-        <!--            android:layout_height="wrap_content"-->
-        <!--            android:orientation="vertical">-->
-
-        <!--        </LinearLayout>-->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab_add_ingredient_toShoppingList"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_margin="16dp"
+        android:src="@drawable/ic_add"
+        app:fabCustomSize="50dp"
+        app:elevation="4dp"/>
 
 </RelativeLayout>
