@@ -23,6 +23,7 @@ import android.widget.Toast;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
@@ -147,7 +148,7 @@ public class UserProfileFragment extends Fragment implements RecipeAdapter.OnIte
             usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).collection("FriendList").document(documentID).addSnapshotListener(new EventListener<DocumentSnapshot>() {
                 @Override
                 public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
-                    if (e != null){
+                    if (e != null) {
                         Log.w(TAG, "onEvent: ", e);
                         return;
                     }
@@ -161,16 +162,15 @@ public class UserProfileFragment extends Fragment implements RecipeAdapter.OnIte
                                 @Override
                                 public void onClick(View v) {
 
-                                    AlertDialog.Builder builder1 = new AlertDialog.Builder(getActivity());
+                                    MaterialAlertDialogBuilder builder1 = new MaterialAlertDialogBuilder(getActivity());
                                     builder1.setMessage("Are you sure you want to remove this user from your friend list?");
                                     builder1.setCancelable(true);
-
                                     builder1.setPositiveButton(
                                             "Yes",
                                             new DialogInterface.OnClickListener() {
                                                 public void onClick(DialogInterface dialog, int id) {
                                                     usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).collection("FriendList").document(documentID)
-                                            .delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                            .delete().addOnSuccessListener(new OnSuccessListener<Void>() {
                                                         @Override
                                                         public void onSuccess(Void aVoid) {
                                                             usersReference.document(documentID).collection("FriendList")
@@ -196,8 +196,7 @@ public class UserProfileFragment extends Fragment implements RecipeAdapter.OnIte
                                                 }
                                             });
 
-                                    AlertDialog alert11 = builder1.create();
-                                    alert11.show();
+                                    builder1.show();
 
 
                                     //

@@ -6,6 +6,8 @@ import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -14,6 +16,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
@@ -115,21 +118,62 @@ public class FriendRequestActivity extends AppCompatActivity implements RecipeAd
                             mAddFriendButton.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
-                                    usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).collection("FriendList").document(documentID)
-                                            .delete().addOnSuccessListener(new OnSuccessListener<Void>() {
-                                        @Override
-                                        public void onSuccess(Void aVoid) {
-                                            usersReference.document(documentID).collection("FriendList")
-                                                    .document(FirebaseAuth.getInstance().getCurrentUser().getUid()).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                @Override
-                                                public void onSuccess(Void aVoid) {
-                                                    Toast.makeText(FriendRequestActivity.this, "Removed from friend list", Toast.LENGTH_SHORT).show();
-                                                    mAddFriendButton.setText("Add Friend");
-                                                    mAddFriendButton.setEnabled(true);
+
+                                    MaterialAlertDialogBuilder builder1 = new MaterialAlertDialogBuilder(FriendRequestActivity.this);
+                                    builder1.setMessage("Are you sure you want to remove this user from your friend list?");
+                                    builder1.setCancelable(true);
+
+                                    builder1.setPositiveButton(
+                                            "Yes",
+                                            new DialogInterface.OnClickListener() {
+                                                public void onClick(DialogInterface dialog, int id) {
+                                                    usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).collection("FriendList").document(documentID)
+                                                            .delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                        @Override
+                                                        public void onSuccess(Void aVoid) {
+                                                            usersReference.document(documentID).collection("FriendList")
+                                                                    .document(FirebaseAuth.getInstance().getCurrentUser().getUid()).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                                @Override
+                                                                public void onSuccess(Void aVoid) {
+                                                                    Toast.makeText(FriendRequestActivity.this, "Removed from friend list", Toast.LENGTH_SHORT).show();
+                                                                    mAddFriendButton.setText("Add Friend");
+                                                                    mAddFriendButton.setEnabled(true);
+                                                                }
+                                                            });
+                                                        }
+                                                    });
+                                                    dialog.cancel();
                                                 }
                                             });
-                                        }
-                                    });
+
+                                    builder1.setNegativeButton(
+                                            "No",
+                                            new DialogInterface.OnClickListener() {
+                                                public void onClick(DialogInterface dialog, int id) {
+                                                    dialog.cancel();
+                                                }
+                                            });
+
+                                    builder1.show();
+
+
+
+
+//                                    usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).collection("FriendList").document(documentID)
+//                                            .delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+//                                        @Override
+//                                        public void onSuccess(Void aVoid) {
+//                                            usersReference.document(documentID).collection("FriendList")
+//                                                    .document(FirebaseAuth.getInstance().getCurrentUser().getUid()).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+//                                                @Override
+//                                                public void onSuccess(Void aVoid) {
+//                                                    Toast.makeText(FriendRequestActivity.this, "Removed from friend list", Toast.LENGTH_SHORT).show();
+//                                                    mAddFriendButton.setText("Add Friend");
+//                                                    mAddFriendButton.setEnabled(true);
+//                                                }
+//                                            });
+//                                        }
+//                                    });
                                 }
                             });
                         } else if (friend.getFriend_status().equals("friend_request_sent")) {
