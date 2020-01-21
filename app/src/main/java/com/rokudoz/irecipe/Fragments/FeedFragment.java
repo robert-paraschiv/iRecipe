@@ -6,7 +6,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
@@ -15,7 +14,6 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
@@ -27,6 +25,7 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.rokudoz.irecipe.Account.LoginActivity;
+import com.rokudoz.irecipe.AddPostActivity;
 import com.rokudoz.irecipe.AddRecipesActivity;
 import com.rokudoz.irecipe.Models.Friend;
 import com.rokudoz.irecipe.Models.Ingredient;
@@ -37,10 +36,7 @@ import com.rokudoz.irecipe.R;
 import com.rokudoz.irecipe.Utils.RecipeAdapter;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -345,8 +341,8 @@ public class FeedFragment extends Fragment implements RecipeAdapter.OnItemClickL
     }
 
 
-    public void navigateToAddRecipes() {
-        Intent intent = new Intent(getContext(), AddRecipesActivity.class);
+    public void navigateToAddPost() {
+        Intent intent = new Intent(getContext(), AddPostActivity.class);
         startActivity(intent);
     }
 
@@ -371,7 +367,7 @@ public class FeedFragment extends Fragment implements RecipeAdapter.OnItemClickL
                         fab.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                navigateToAddRecipes();
+                                navigateToAddPost();
                             }
                         });
 

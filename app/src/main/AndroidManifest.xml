@@ -12,9 +12,12 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity android:name=".SearchRecipeActivity"></activity>
+        <activity android:name=".AddPostActivity" />
         <activity android:name=".FriendRequestActivity">
             <intent-filter>
                 <action android:name="com.rokudoz.foodify.FriendRequestNotification" />
+
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>

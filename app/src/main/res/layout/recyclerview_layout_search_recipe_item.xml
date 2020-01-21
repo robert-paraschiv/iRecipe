@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="4dp"
+    android:layout_marginTop="8dp"
+    android:layout_marginEnd="8dp"
+    app:cardCornerRadius="18dp"
+    android:elevation="4dp">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="4dp">
+
+
+        <TextView
+            android:id="@+id/text_view_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:maxLines="1"
+            android:text="Title"
+            android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6" />
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:layout_below="@id/text_view_title"
+            android:layout_centerHorizontal="true"
+            app:cardCornerRadius="18dp"
+            android:id="@+id/recycler_view_recipeItem_Image_CardView"
+            >
+            <ImageView
+                android:id="@+id/recipeItem_image"
+                android:layout_width="match_parent"
+                android:layout_height="100dp"
+                tools:src="@color/colorPrimary"/>
+        </com.google.android.material.card.MaterialCardView>
+
+
+        <TextView
+            android:id="@+id/text_view_description"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/recycler_view_recipeItem_Image_CardView"
+            android:layout_alignParentStart="true"
+            android:layout_toStartOf="@id/recyclerview_nrOfFaves_textView"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="12dp"
+            android:text="Description" />
+
+        <TextView
+            android:id="@+id/recyclerview_nrOfFaves_textView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="88"
+            android:layout_toStartOf="@id/recyclerview_favorite"
+            android:layout_below="@id/recycler_view_recipeItem_Image_CardView"
+            android:layout_marginTop="14dp"
+            android:layout_marginEnd="4dp"
+            style="@style/TextAppearance.MaterialComponents.Chip"/>
+        <ImageView
+            android:id="@+id/recyclerview_favorite"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:elevation="4dp"
+            android:layout_below="@id/recycler_view_recipeItem_Image_CardView"
+            android:layout_marginEnd="8dp"
+            android:layout_marginTop="12dp"
+            android:layout_alignParentEnd="true"
+            android:src="@drawable/ic_favorite_red_24dp"
+            android:contentDescription="Recipe Image" />
+
+    </RelativeLayout>
+</com.google.android.material.card.MaterialCardView>
