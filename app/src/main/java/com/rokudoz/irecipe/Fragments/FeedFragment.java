@@ -209,7 +209,7 @@ public class FeedFragment extends Fragment implements PostAdapter.OnItemClickLis
                                                 if (queryDocumentSnapshots != null) {
                                                     for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
                                                         String favPostID = documentSnapshot.getId();
-                                                        if (userFavPostList.contains(favPostID))
+                                                        if (!userFavPostList.contains(favPostID))
                                                             userFavPostList.add(favPostID);
                                                     }
 
@@ -357,8 +357,6 @@ public class FeedFragment extends Fragment implements PostAdapter.OnItemClickLis
                     currentUserRef.collection("FavoritePosts").document(id).set(favoritePost);
                     Toast.makeText(getContext(), "Added " + " to favorites", Toast.LENGTH_SHORT).show();
                 }
-
-                mUser.setFavoriteRecipes(userFavPostList);
 
 
                 mAdapter.notifyDataSetChanged();

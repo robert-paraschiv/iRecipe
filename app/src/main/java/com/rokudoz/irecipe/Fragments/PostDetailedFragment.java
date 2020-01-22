@@ -36,9 +36,11 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.rokudoz.irecipe.Models.Comment;
+import com.rokudoz.irecipe.Models.FavoritePost;
 import com.rokudoz.irecipe.Models.Post;
 import com.rokudoz.irecipe.Models.Recipe;
 import com.rokudoz.irecipe.Models.User;
+import com.rokudoz.irecipe.Models.UserWhoFaved;
 import com.rokudoz.irecipe.R;
 import com.rokudoz.irecipe.Utils.PostParentCommentAdapter;
 import com.rokudoz.irecipe.Utils.RecipeParentCommentAdapter;
@@ -48,6 +50,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 public class PostDetailedFragment extends Fragment {
@@ -67,6 +70,7 @@ public class PostDetailedFragment extends Fragment {
     private MaterialCardView recipeCardView;
 
     private String documentID = "";
+    private List<String> userFavPostList = new ArrayList<>();
     private View view;
 
     private RecyclerView.Adapter mAdapter;
@@ -76,7 +80,7 @@ public class PostDetailedFragment extends Fragment {
 
     private FirebaseAuth.AuthStateListener mAuthListener;
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
-    private ListenerRegistration currentSubCollectionListener, userRefListener,numberofFavListener,commentListener;
+    private ListenerRegistration currentSubCollectionListener, userRefListener, numberofFavListener, commentListener;
     private DocumentSnapshot mLastQueriedDocument;
 
     private CollectionReference recipeRef = db.collection("Recipes");
@@ -131,9 +135,9 @@ public class PostDetailedFragment extends Fragment {
         addCommentBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (commentEditText.getText().toString().trim().equals("")){
+                if (commentEditText.getText().toString().trim().equals("")) {
                     Toast.makeText(getActivity(), "Comment cannot be empty", Toast.LENGTH_SHORT).show();
-                }else {
+                } else {
                     addComment();
                 }
             }
@@ -237,6 +241,7 @@ public class PostDetailedFragment extends Fragment {
             @Override
             public void onSuccess(DocumentSnapshot documentSnapshot) {
                 final Post post = documentSnapshot.toObject(Post.class);
+                post.setDocumentId(documentSnapshot.getId());
 
                 Date date = post.getCreation_date();
                 if (date != null) {
@@ -261,13 +266,89 @@ public class PostDetailedFragment extends Fragment {
                 usersRef.document(post.getCreatorId()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                     @Override
                     public void onSuccess(DocumentSnapshot documentSnapshot) {
-                        User user = documentSnapshot.toObject(User.class);
+                        final User user = documentSnapshot.toObject(User.class);
                         creatorName.setText(user.getName());
                         Picasso.get()
                                 .load(user.getUserProfilePicUrl())
                                 .fit()
                                 .centerCrop()
                                 .into(creatorImage);
+                        creatorImage.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                Navigation.findNavController(view).navigate(PostDetailedFragmentDirections.actionPostDetailedToUserProfileFragment2(user.getUser_id()));
+                            }
+                        });
+                        final String loggedInUserDocId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+                        usersRef.document(loggedInUserDocId).collection("FavoritePosts").get()
+                                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                                    @Override
+                                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                                        if (queryDocumentSnapshots != null) {
+                                            for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                                                String favPostID = documentSnapshot.getId();
+                                                if (!userFavPostList.contains(favPostID))
+                                                    userFavPostList.add(favPostID);
+                                            }
+                                            if (userFavPostList.contains(post.getDocumentId())) {
+                                                post.setFavorite(true);
+                                                postFavoriteIcon.setImageResource(R.drawable.ic_favorite_red_24dp);
+                                            } else {
+                                                Log.d(TAG, "onSuccess: NOT COINAIN");
+                                                post.setFavorite(false);
+                                                postFavoriteIcon.setImageResource(R.drawable.ic_favorite_border_black_24dp);
+                                            }
+                                            Log.d(TAG, "onSuccess: userfav : " + userFavPostList + " PSOT ID : " + post.getDocumentId());
+
+                                            postFavoriteIcon.setOnClickListener(new View.OnClickListener() {
+                                                @Override
+                                                public void onClick(View v) {
+                                                    ////////////////////////////////////////////////
+
+                                                    String id = documentID;
+                                                    DocumentReference currentRecipeRef = postsRef.document(id);
+                                                    final CollectionReference currentRecipeSubCollection = currentRecipeRef.collection("UsersWhoFaved");
+
+                                                    DocumentReference currentUserRef = usersRef.document(loggedInUserDocId);
+
+
+                                                    if (userFavPostList == null) {
+                                                        userFavPostList = new ArrayList<>();
+                                                    }
+                                                    if (userFavPostList.contains(id)) {
+                                                        currentUserRef.collection("FavoritePosts").document(id).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                            @Override
+                                                            public void onSuccess(Void aVoid) {
+                                                                Log.d(TAG, "onSuccess: Deleted from user FAV posts");
+                                                            }
+                                                        });
+                                                        userFavPostList.remove(id);
+                                                        post.setFavorite(false);
+                                                        postFavoriteIcon.setImageResource(R.drawable.ic_favorite_border_black_24dp);
+
+                                                        currentRecipeSubCollection.document(loggedInUserDocId).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                            @Override
+                                                            public void onSuccess(Void aVoid) {
+                                                                Log.d(TAG, "onSuccess: deleted user from post users who faved");
+                                                            }
+                                                        });
+
+                                                    } else {
+                                                        userFavPostList.add(id);
+                                                        post.setFavorite(true);
+                                                        postFavoriteIcon.setImageResource(R.drawable.ic_favorite_red_24dp);
+                                                        UserWhoFaved userWhoFaved = new UserWhoFaved(loggedInUserDocId, null);
+                                                        currentRecipeSubCollection.document(loggedInUserDocId).set(userWhoFaved);
+
+                                                        FavoritePost favoritePost = new FavoritePost(null);
+                                                        currentUserRef.collection("FavoritePosts").document(id).set(favoritePost);
+                                                        Toast.makeText(getContext(), "Added " + " to favorites", Toast.LENGTH_SHORT).show();
+                                                    }
+                                                }
+                                            });
+                                        }
+                                    }
+                                });
                     }
                 });
                 recipeRef.document(post.getReferenced_recipe_docId()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
@@ -290,7 +371,7 @@ public class PostDetailedFragment extends Fragment {
                     }
                 });
 
-                if (FirebaseAuth.getInstance().getCurrentUser().getUid().equals(post.getCreatorId())){
+                if (FirebaseAuth.getInstance().getCurrentUser().getUid().equals(post.getCreatorId())) {
                     deletePost.setVisibility(View.VISIBLE);
                     deletePost.setOnClickListener(new View.OnClickListener() {
                         @Override
@@ -324,7 +405,7 @@ public class PostDetailedFragment extends Fragment {
                             materialAlertDialogBuilder.show();
                         }
                     });
-                }else {
+                } else {
                     deletePost.setVisibility(View.GONE);
                 }
 

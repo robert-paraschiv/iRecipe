@@ -4,6 +4,7 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
+import android.content.DialogInterface;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.os.Bundle;
@@ -33,6 +34,7 @@ import android.widget.Toast;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
@@ -608,13 +610,35 @@ public class RecipeDetailedFragment extends Fragment {
                     mDeleteRecipeBtn.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            recipeRef.document(documentID).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
-                                @Override
-                                public void onSuccess(Void aVoid) {
-                                    Toast.makeText(getActivity(), "Successfully deleted", Toast.LENGTH_SHORT).show();
-                                    Navigation.findNavController(view).popBackStack();
-                                }
-                            });
+                            MaterialAlertDialogBuilder materialAlertDialogBuilder = new MaterialAlertDialogBuilder(getActivity(), R.style.ThemeOverlay_MaterialComponents_MaterialAlertDialog_Centered);
+                            materialAlertDialogBuilder.setMessage("Are you sure you want to delete your recipe?");
+                            materialAlertDialogBuilder.setCancelable(true);
+                            materialAlertDialogBuilder.setPositiveButton(
+                                    "Yes",
+                                    new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int id) {
+                                            recipeRef.document(documentID).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                @Override
+                                                public void onSuccess(Void aVoid) {
+                                                    Toast.makeText(getActivity(), "Successfully deleted", Toast.LENGTH_SHORT).show();
+                                                    Navigation.findNavController(view).popBackStack();
+                                                }
+                                            });
+                                            dialog.cancel();
+                                        }
+                                    });
+
+                            materialAlertDialogBuilder.setNegativeButton(
+                                    "No",
+                                    new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int id) {
+                                            dialog.cancel();
+                                        }
+                                    });
+
+                            materialAlertDialogBuilder.show();
+
+
                         }
                     });
                 }
