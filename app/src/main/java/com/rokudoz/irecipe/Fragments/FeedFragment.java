@@ -172,9 +172,65 @@ public class FeedFragment extends Fragment implements PostAdapter.OnItemClickLis
     }
 
     private void getCurrentUserDetails() {
-        usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+//        usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+//            @Override
+//            public void onSuccess(final DocumentSnapshot documentSnapshot) {
+//                List<Ingredient> userIngredient_list = new ArrayList<>();
+//                final User user = documentSnapshot.toObject(User.class);
+//
+//                mUser = documentSnapshot.toObject(User.class);
+//                loggedInUserDocumentId = documentSnapshot.getId();
+//                userFavPostList = new ArrayList<>();
+//
+//                if (!friends_userID_list.contains(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
+//                    friends_userID_list.add(FirebaseAuth.getInstance().getCurrentUser().getUid());
+//                }
+//
+//                usersReference.document(user.getUser_id()).collection("FriendList").get()
+//                        .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+//                            @Override
+//                            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+//                                for (QueryDocumentSnapshot queryDocumentSnapshot : queryDocumentSnapshots) {
+//                                    Friend friend = queryDocumentSnapshot.toObject(Friend.class);
+//                                    if (!friendList.contains(friend)) {
+//                                        if (friend.getFriend_status().equals("friends") || friend.getFriend_status().equals("friend_request_accepted"))
+//                                            friendList.add(friend);
+//                                    }
+//                                }
+//                                for (Friend friend : friendList) {
+//                                    if (!friends_userID_list.contains(friend.getFriend_user_id()))
+//                                        friends_userID_list.add(friend.getFriend_user_id());
+//                                }
+//
+//                                usersReference.document(user.getUser_id()).collection("FavoritePosts").get()
+//                                        .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+//                                            @Override
+//                                            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+//                                                if (queryDocumentSnapshots != null) {
+//                                                    for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+//                                                        String favPostID = documentSnapshot.getId();
+//                                                        if (!userFavPostList.contains(favPostID))
+//                                                            userFavPostList.add(favPostID);
+//                                                    }
+//
+//                                                    performQuery();
+//                                                }
+//                                            }
+//                                        });
+//
+//
+//                            }
+//                        });
+//            }
+//        });
+
+        usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).addSnapshotListener(new EventListener<DocumentSnapshot>() {
             @Override
-            public void onSuccess(final DocumentSnapshot documentSnapshot) {
+            public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
+                if (e != null) {
+                    Log.w(TAG, "onEvent: ", e);
+                    return;
+                }
                 List<Ingredient> userIngredient_list = new ArrayList<>();
                 final User user = documentSnapshot.toObject(User.class);
 
@@ -186,41 +242,48 @@ public class FeedFragment extends Fragment implements PostAdapter.OnItemClickLis
                     friends_userID_list.add(FirebaseAuth.getInstance().getCurrentUser().getUid());
                 }
 
-                usersReference.document(user.getUser_id()).collection("FriendList").get()
-                        .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                usersReference.document(user.getUser_id()).collection("FriendList").addSnapshotListener(new EventListener<QuerySnapshot>() {
+                    @Override
+                    public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                        if (e != null) {
+                            Log.w(TAG, "onEvent: ", e);
+                            return;
+                        }
+                        for (QueryDocumentSnapshot queryDocumentSnapshot : queryDocumentSnapshots) {
+                            Friend friend = queryDocumentSnapshot.toObject(Friend.class);
+                            if (!friendList.contains(friend)) {
+                                if (friend.getFriend_status().equals("friends") || friend.getFriend_status().equals("friend_request_accepted"))
+                                    friendList.add(friend);
+                            }
+                        }
+                        for (Friend friend : friendList) {
+                            if (!friends_userID_list.contains(friend.getFriend_user_id()))
+                                friends_userID_list.add(friend.getFriend_user_id());
+                        }
+                        usersReference.document(user.getUser_id()).collection("FavoritePosts").addSnapshotListener(new EventListener<QuerySnapshot>() {
                             @Override
-                            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                                for (QueryDocumentSnapshot queryDocumentSnapshot : queryDocumentSnapshots) {
-                                    Friend friend = queryDocumentSnapshot.toObject(Friend.class);
-                                    if (!friendList.contains(friend)) {
-                                        if (friend.getFriend_status().equals("friends") || friend.getFriend_status().equals("friend_request_accepted"))
-                                            friendList.add(friend);
+                            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                                if (e != null) {
+                                    Log.w(TAG, "onEvent: ", e);
+                                    return;
+                                }
+                                if (queryDocumentSnapshots != null) {
+                                    for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                                        String favPostID = documentSnapshot.getId();
+                                        if (!userFavPostList.contains(favPostID))
+                                            userFavPostList.add(favPostID);
                                     }
+
+                                    performQuery();
                                 }
-                                for (Friend friend : friendList) {
-                                    if (!friends_userID_list.contains(friend.getFriend_user_id()))
-                                        friends_userID_list.add(friend.getFriend_user_id());
-                                }
-
-                                usersReference.document(user.getUser_id()).collection("FavoritePosts").get()
-                                        .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-                                            @Override
-                                            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                                                if (queryDocumentSnapshots != null) {
-                                                    for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
-                                                        String favPostID = documentSnapshot.getId();
-                                                        if (!userFavPostList.contains(favPostID))
-                                                            userFavPostList.add(favPostID);
-                                                    }
-
-                                                    performQuery();
-                                                }
-                                            }
-                                        });
-
 
                             }
                         });
+
+                    }
+                });
+
+
             }
         });
     }
@@ -317,35 +380,12 @@ public class FeedFragment extends Fragment implements PostAdapter.OnItemClickLis
                     userFavPostList.remove(id);
                     mPostList.get(position).setFavorite(false);
 
-                    currentSubCollectionListener = currentRecipeSubCollection.whereEqualTo("userID", mUser.getUser_id())
-                            .addSnapshotListener(new EventListener<QuerySnapshot>() {
-                                @Override
-                                public void onEvent(@javax.annotation.Nullable QuerySnapshot queryDocumentSnapshots, @javax.annotation.Nullable FirebaseFirestoreException e) {
-                                    if (e != null) {
-                                        Log.w(TAG, "onEvent: ", e);
-                                        return;
-                                    }
-                                    if (queryDocumentSnapshots != null && queryDocumentSnapshots.size() != 0) {
-                                        userFavDocId = queryDocumentSnapshots.getDocuments().get(0).getId();
-                                        Log.d(TAG, "onEvent: docID" + userFavDocId);
-                                    }
-                                    if (!mPostList.get(position).getFavorite())
-                                        if (!userFavDocId.equals("")) {
-                                            currentRecipeSubCollection.document(userFavDocId).delete()
-                                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                        @Override
-                                                        public void onSuccess(Void aVoid) {
-                                                            Toast.makeText(getContext(), "Removed from favorites", Toast.LENGTH_SHORT).show();
-                                                        }
-                                                    });
-
-
-                                        } else {
-                                            Log.d(TAG, "onFavoriteClick: empty docID");
-                                        }
-
-                                }
-                            });
+                    currentRecipeSubCollection.document(mUser.getUser_id()).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            Log.d(TAG, "onSuccess: Deleted userwhoFaved");
+                        }
+                    });
 
                 } else {
                     userFavPostList.add(id);
@@ -355,7 +395,7 @@ public class FeedFragment extends Fragment implements PostAdapter.OnItemClickLis
 
                     FavoritePost favoritePost = new FavoritePost(null);
                     currentUserRef.collection("FavoritePosts").document(id).set(favoritePost);
-                    Toast.makeText(getContext(), "Added " + " to favorites", Toast.LENGTH_SHORT).show();
+                    Log.d(TAG, "onFavoriteClick: Added to favorites");
                 }
 
 

@@ -11,11 +11,13 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.rokudoz.irecipe.Models.Post;
 import com.rokudoz.irecipe.Models.User;
@@ -51,7 +53,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
     }
 
     public class PostViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        TextView tvDescription, tvNrOfFaves, creatorName,creationDate;
+        TextView tvDescription, tvNrOfFaves, creatorName, creationDate;
         ImageView mImageView, imgFavorited, creatorImage;
 
         public PostViewHolder(View itemView) {
@@ -112,7 +114,6 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
                 .into(holder.mImageView);
 
 
-
         Date date = currentItem.getCreation_date();
         if (date != null) {
             DateFormat dateFormat = new SimpleDateFormat("HH:mm, d MMM", Locale.getDefault());
@@ -142,15 +143,26 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
                 if (e != null) {
                     return;
                 }
+                boolean fav = false;
+                for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                    if (documentSnapshot.getId().equals(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
+                        fav = true;
+                    }
+                }
+                if (fav)
+                    holder.imgFavorited.setImageResource(R.drawable.ic_favorite_red_24dp);
+                else
+                    holder.imgFavorited.setImageResource(R.drawable.ic_favorite_border_black_24dp);
+
                 holder.tvNrOfFaves.setText("" + queryDocumentSnapshots.size());
 
             }
         });
 
-        holder.imgFavorited.setImageResource(R.drawable.ic_favorite_border_black_24dp);
-        if (currentItem.getFavorite() != null && currentItem.getFavorite()) {
-            holder.imgFavorited.setImageResource(R.drawable.ic_favorite_red_24dp);
-        }
+//        holder.imgFavorited.setImageResource(R.drawable.ic_favorite_border_black_24dp);
+//        if (currentItem.getFavorite() != null && currentItem.getFavorite()) {
+//            holder.imgFavorited.setImageResource(R.drawable.ic_favorite_red_24dp);
+//        }
 
 
     }

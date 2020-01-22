@@ -342,7 +342,7 @@ public class PostDetailedFragment extends Fragment {
 
                                                         FavoritePost favoritePost = new FavoritePost(null);
                                                         currentUserRef.collection("FavoritePosts").document(id).set(favoritePost);
-                                                        Toast.makeText(getContext(), "Added " + " to favorites", Toast.LENGTH_SHORT).show();
+                                                        Log.d(TAG, "onClick: added to favorites");
                                                     }
                                                 }
                                             });
