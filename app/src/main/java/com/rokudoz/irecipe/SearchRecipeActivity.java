@@ -85,6 +85,7 @@ public class SearchRecipeActivity extends AppCompatActivity implements SearchRec
         setContentView(R.layout.activity_search_recipe);
 
         MaterialToolbar myToolbar = (MaterialToolbar) findViewById(R.id.my_toolbar);
+        myToolbar.setTitle("Search Recipe");
         setSupportActionBar(myToolbar);
 
         if (getIntent() != null) {

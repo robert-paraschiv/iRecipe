@@ -92,14 +92,6 @@
                 android:entries="@array/Privacy"
                 android:spinnerMode="dropdown" />
 
-            <ProgressBar
-                android:id="@+id/addPost_progressbar"
-                style="@style/Base.Widget.AppCompat.ProgressBar.Horizontal"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:padding="4dp" />
-
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/addPost_post_btn"
                 style="@style/Widget.MaterialComponents.Button.OutlinedButton"

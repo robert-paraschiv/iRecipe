@@ -12,16 +12,18 @@ public class Post {
     private String creatorId;
     private String text;
     private String imageUrl;
+    private Boolean isFavorite;
     private String privacy;
 
     private @ServerTimestamp
     Date creation_date;
 
-    public Post(String referenced_recipe_docId, String creatorId, String text, String imageUrl, String privacy, Date creation_date) {
+    public Post(String referenced_recipe_docId, String creatorId, String text, String imageUrl, Boolean isFavorite, String privacy, Date creation_date) {
         this.referenced_recipe_docId = referenced_recipe_docId;
         this.creatorId = creatorId;
         this.text = text;
         this.imageUrl = imageUrl;
+        this.isFavorite = isFavorite;
         this.privacy = privacy;
         this.creation_date = creation_date;
     }
@@ -78,6 +80,14 @@ public class Post {
         this.creation_date = creation_date;
     }
 
+    public Boolean getFavorite() {
+        return isFavorite;
+    }
+
+    public void setFavorite(Boolean favorite) {
+        isFavorite = favorite;
+    }
+
     public String getPrivacy() {
         return privacy;
     }
@@ -95,6 +105,7 @@ public class Post {
                 ", creatorId='" + creatorId + '\'' +
                 ", text='" + text + '\'' +
                 ", imageUrl='" + imageUrl + '\'' +
+                ", isFavorite=" + isFavorite +
                 ", privacy='" + privacy + '\'' +
                 ", creation_date=" + creation_date +
                 '}';
