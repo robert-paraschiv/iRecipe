@@ -63,9 +63,10 @@
             android:id="@+id/postItem_description_text_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
+            android:layout_alignParentStart="true"
             android:layout_below="@id/recycler_view_postItem_Image_CardView"
-            android:layout_marginStart="55dp"
+            android:layout_toStartOf="@id/recycler_view_postItem_nrOfFaves_textView"
+            android:layout_marginStart="8dp"
             android:layout_marginEnd="8dp"
             android:layout_marginTop="12dp"
             tools:text="Description" />
@@ -84,7 +85,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             tools:text="88"
-            android:layout_toEndOf="@id/recycler_view_postItem_favorite"
+            android:layout_toStartOf="@id/recycler_view_postItem_favorite"
             android:layout_below="@id/recycler_view_postItem_Image_CardView"
             android:layout_marginTop="14dp"
             android:layout_marginEnd="4dp"
@@ -97,7 +98,7 @@
             android:layout_below="@id/recycler_view_postItem_Image_CardView"
             android:layout_marginEnd="8dp"
             android:layout_marginTop="12dp"
-            android:layout_alignParentStart="true"
+            android:layout_alignParentEnd="true"
             android:src="@drawable/ic_favorite_border_black_24dp"
             android:contentDescription="Post Image" />
 

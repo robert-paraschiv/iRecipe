@@ -210,11 +210,11 @@ public class FeedFragment extends Fragment implements PostAdapter.OnItemClickLis
     private void performQuery() {
         Query postsQuery = null;
         if (mLastQueriedDocument != null) {
-            postsQuery = postsRef.whereIn("creatorId", friends_userID_list).whereEqualTo("privacy", "Everyone").orderBy("creation_date")
+            postsQuery = postsRef.orderBy("creation_date", Query.Direction.DESCENDING).whereIn("creatorId", friends_userID_list).whereEqualTo("privacy", "Everyone")
                     .startAfter(mLastQueriedDocument); // Necessary so we don't have the same results multiple times
 //                                    .limit(3);
         } else {
-            postsQuery = postsRef.whereIn("creatorId", friends_userID_list).whereEqualTo("privacy", "Everyone").orderBy("creation_date");
+            postsQuery = postsRef.orderBy("creation_date", Query.Direction.DESCENDING).whereIn("creatorId", friends_userID_list).whereEqualTo("privacy", "Everyone");
 //                                    .limit(3);
         }
         PerformMainQuery(postsQuery);

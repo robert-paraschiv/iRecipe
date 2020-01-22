@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        app:title="Post Detailed" />
+
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/nestedScrollView"
+        android:layout_below="@id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/postDetailed_viewPager_Card"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="4dp"
+                app:cardCornerRadius="18dp">
+
+                <androidx.viewpager.widget.ViewPager
+                    android:id="@+id/postDetailed_view_pager"
+                    android:layout_width="match_parent"
+                    android:layout_height="400dp"
+                    android:elevation="4dp"
+                    android:transitionName="example_transition" />
+            </com.google.android.material.card.MaterialCardView>
+
+
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/postDetailed_creatorImage_cardView"
+                android:layout_width="33dp"
+                android:layout_height="33dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:layout_below="@id/postDetailed_viewPager_Card"
+                app:cardCornerRadius="35dp">
+
+                <ImageView
+                    android:id="@+id/postDetailed_creatorImage_ImageView"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    tools:src="@color/colorPrimary"/>
+            </com.google.android.material.card.MaterialCardView>
+            <TextView
+                android:id="@+id/postDetailed_creatorName_TextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/postDetailed_viewPager_Card"
+                android:layout_toEndOf="@id/postDetailed_creatorImage_cardView"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="14dp"
+                tools:text="Creator name" />
+
+            <TextView
+                android:id="@+id/postDetailed_tvDescription"
+                style="@style/TextAppearance.AppCompat"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/postDetailed_creatorImage_cardView"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
+                tools:text="Description Here lmao it can have more text    k                 k k k k kkkkk \n
+                 than you think lol wtf kkkkkkkkkkkkkkkkkkkkk"/>
+
+            <ImageView
+                android:id="@+id/postDetailed_imageView_favorite_icon"
+                android:layout_width="33dp"
+                android:layout_height="33dp"
+                android:layout_below="@id/postDetailed_viewPager_Card"
+                android:layout_alignParentEnd="true"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
+                android:elevation="4dp"
+                android:src="@drawable/ic_favorite_border_black_24dp" />
+
+            <TextView
+                android:id="@+id/postDetailed_numberOfFaved"
+                style="@style/TextAppearance.MaterialComponents.Chip"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/postDetailed_viewPager_Card"
+                android:layout_marginTop="14dp"
+                android:layout_marginEnd="4dp"
+                android:layout_toStartOf="@id/postDetailed_imageView_favorite_icon"
+                tools:text="88" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/postDetailed_deleteRecipe_MaterialBtn"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:layout_width="33dp"
+                android:layout_height="33dp"
+                android:layout_below="@id/postDetailed_viewPager_Card"
+                android:layout_toStartOf="@id/postDetailed_numberOfFaved"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
+                android:visibility="visible"
+                app:cornerRadius="18dp"
+                app:icon="@drawable/ic_delete_black_24dp" />
+
+
+            <EditText
+                android:id="@+id/postDetailed_et_commentInput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/postDetailed_tvDescription"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="20dp"
+                android:layout_toStartOf="@+id/postDetailed_addComment_btn"
+                android:hint="Comment here" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/postDetailed_addComment_btn"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/postDetailed_tvDescription"
+                android:layout_alignParentEnd="true"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginEnd="16dp"
+                android:text="Post"
+                app:cornerRadius="18dp" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/postDetailed_comment_recycler_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_below="@id/postDetailed_et_commentInput"
+                android:layout_marginTop="10dp"
+                android:transitionName="example_transition" />
+        </RelativeLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+
+</RelativeLayout>
