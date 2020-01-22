@@ -5,7 +5,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -15,7 +14,6 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
@@ -23,7 +21,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
-import com.rokudoz.irecipe.Fragments.RecipeDetailedFragmentDirections;
+import com.rokudoz.irecipe.Fragments.PostDetailedFragmentDirections;
 import com.rokudoz.irecipe.Models.Comment;
 import com.rokudoz.irecipe.Models.User;
 import com.rokudoz.irecipe.R;
@@ -34,7 +32,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
-import java.util.Objects;
 
 import javax.annotation.Nullable;
 
@@ -45,8 +42,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class ParentCommentAdapter
-        extends RecyclerView.Adapter<ParentCommentAdapter.CommentViewHolder>
+public class PostParentCommentAdapter
+        extends RecyclerView.Adapter<PostParentCommentAdapter.CommentViewHolder>
         implements View.OnClickListener {
 
     private static final int SECOND_MILLIS = 1000;
@@ -55,10 +52,10 @@ public class ParentCommentAdapter
     private static final int DAY_MILLIS = 24 * HOUR_MILLIS;
 
 
-    private static final String TAG = "ParentCommentAdapter";
+    private static final String TAG = "RecipeParentCommentAdapter";
     private Integer expandedPosition = -1;
     private ArrayList<Comment> mCommentList;
-    private ChildCommentAdapter childAdapter;
+    private PostChildCommentAdapter childAdapter;
     private User mUser;
     Context ctx;
 
@@ -85,7 +82,7 @@ public class ParentCommentAdapter
         }
     }
 
-    public ParentCommentAdapter(Context ctx, ArrayList<Comment> commentArrayList) {
+    public PostParentCommentAdapter(Context ctx, ArrayList<Comment> commentArrayList) {
         this.ctx = ctx;
         mCommentList = commentArrayList;
     }
@@ -97,7 +94,7 @@ public class ParentCommentAdapter
         CommentViewHolder cvh = new CommentViewHolder(v);
         mUser = new User();
         getCurrentUserDetails();
-        cvh.itemView.setOnClickListener(ParentCommentAdapter.this);
+        cvh.itemView.setOnClickListener(PostParentCommentAdapter.this);
         cvh.itemView.setTag(cvh);
         return cvh;
     }
@@ -159,7 +156,7 @@ public class ParentCommentAdapter
                 if (!replyText.trim().equals("")) {
                     Comment comment = new Comment(currentItem.getmRecipeDocumentId(), mUser.getUser_id(), mUser.getUserProfilePicUrl()
                             , mUser.getName(), replyText, null);
-                    db.collection("Recipes").document(currentItem.getmRecipeDocumentId()).collection("Comments")
+                    db.collection("Posts").document(currentItem.getmRecipeDocumentId()).collection("Comments")
                             .document(currentItem.getDocumentId()).collection("ChildComments").add(comment)
                             .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                                 @Override
@@ -182,13 +179,13 @@ public class ParentCommentAdapter
         holder.mName.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Navigation.findNavController(v).navigate(RecipeDetailedFragmentDirections.actionRecipeDetailedFragmentToUserProfileFragment2(currentItem.getmUserId()));
+                Navigation.findNavController(v).navigate(PostDetailedFragmentDirections.actionPostDetailedToUserProfileFragment2(currentItem.getmUserId()));
             }
         });
         holder.mImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Navigation.findNavController(v).navigate(RecipeDetailedFragmentDirections.actionRecipeDetailedFragmentToUserProfileFragment2(currentItem.getmUserId()));
+                Navigation.findNavController(v).navigate(PostDetailedFragmentDirections.actionPostDetailedToUserProfileFragment2(currentItem.getmUserId()));
             }
         });
 
@@ -198,26 +195,20 @@ public class ParentCommentAdapter
 
     private void getCurrentUserDetails() {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-        db.collection("Users").whereEqualTo("user_id", FirebaseAuth.getInstance().getCurrentUser().getUid())
-                .addSnapshotListener(new EventListener<QuerySnapshot>() {
-                    @Override
-                    public void onEvent(@javax.annotation.Nullable QuerySnapshot queryDocumentSnapshots, @javax.annotation.Nullable FirebaseFirestoreException e) {
-                        if (e != null) {
-                            Log.w(TAG, "onEvent: ", e);
-                            return;
-                        }
-                        for (DocumentChange documentSnapshot : queryDocumentSnapshots.getDocumentChanges()) {
-                            mUser = documentSnapshot.getDocument().toObject(User.class);
-                        }
-                    }
-                });
+        db.collection("Users").document(FirebaseAuth.getInstance().getCurrentUser().getUid()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+            @Override
+            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                mUser = documentSnapshot.toObject(User.class);
+            }
+        });
+
     }
 
     private ArrayList<Comment> getChildComments(Comment comment) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         final ArrayList<Comment> childComments = new ArrayList<>();
         final ArrayList<String> childcommentID = new ArrayList<>();
-        db.collection("Recipes").document(comment.getmRecipeDocumentId()).collection("Comments")
+        db.collection("Posts").document(comment.getmRecipeDocumentId()).collection("Comments")
                 .document(comment.getDocumentId()).collection("ChildComments").orderBy("mCommentTimeStamp", Query.Direction.ASCENDING)
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
@@ -245,7 +236,7 @@ public class ParentCommentAdapter
 
     private void initchildLayout(RecyclerView rv_child, ArrayList<Comment> childData) {
         rv_child.setLayoutManager(new LinearLayoutManager(ctx));
-        childAdapter = new ChildCommentAdapter(childData);
+        childAdapter = new PostChildCommentAdapter(childData);
         rv_child.setAdapter(childAdapter);
         rv_child.setHasFixedSize(true);
     }

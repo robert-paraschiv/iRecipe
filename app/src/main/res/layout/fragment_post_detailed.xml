@@ -9,82 +9,90 @@
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="40dp"
-        app:title="Post Detailed" />
+        android:layout_height="40dp">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/postDetailed_creatorImage_cardView"
+                android:layout_width="33dp"
+                android:layout_height="33dp"
+                android:layout_marginStart="4dp"
+                android:layout_marginTop="8dp"
+                app:cardCornerRadius="35dp">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <ImageView
+                        android:id="@+id/postDetailed_creatorImage_ImageView"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_centerVertical="true"
+                        tools:src="@color/colorPrimary" />
+                </RelativeLayout>
+
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <TextView
+                android:id="@+id/postDetailed_creatorName_TextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="8dp"
+                android:layout_toEndOf="@id/postDetailed_creatorImage_cardView"
+                tools:text="Creator name" />
+
+            <TextView
+                android:id="@+id/postDetailed_creationDate_text_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:layout_marginEnd="8dp"
+                android:textSize="12sp"
+                tools:text="20:40, Jan 21" />
+        </RelativeLayout>
+
+    </com.google.android.material.appbar.MaterialToolbar>
 
     <androidx.core.widget.NestedScrollView
         android:id="@+id/nestedScrollView"
-        android:layout_below="@id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_below="@id/toolbar">
 
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
             <com.google.android.material.card.MaterialCardView
-                android:id="@+id/postDetailed_viewPager_Card"
+                android:id="@+id/postDetailed_ImageView_Card"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="4dp"
                 app:cardCornerRadius="18dp">
 
-                <androidx.viewpager.widget.ViewPager
-                    android:id="@+id/postDetailed_view_pager"
+                <ImageView
+                    android:id="@+id/postDetailed_ImageView"
                     android:layout_width="match_parent"
                     android:layout_height="400dp"
-                    android:elevation="4dp"
-                    android:transitionName="example_transition" />
+                    tools:src="@color/colorPrimaryDark" />
             </com.google.android.material.card.MaterialCardView>
 
-
-
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/postDetailed_creatorImage_cardView"
-                android:layout_width="33dp"
-                android:layout_height="33dp"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="8dp"
-                android:layout_below="@id/postDetailed_viewPager_Card"
-                app:cardCornerRadius="35dp">
-
-                <ImageView
-                    android:id="@+id/postDetailed_creatorImage_ImageView"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    tools:src="@color/colorPrimary"/>
-            </com.google.android.material.card.MaterialCardView>
-            <TextView
-                android:id="@+id/postDetailed_creatorName_TextView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/postDetailed_viewPager_Card"
-                android:layout_toEndOf="@id/postDetailed_creatorImage_cardView"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="14dp"
-                tools:text="Creator name" />
-
-            <TextView
-                android:id="@+id/postDetailed_tvDescription"
-                style="@style/TextAppearance.AppCompat"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/postDetailed_creatorImage_cardView"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="8dp"
-                android:layout_marginEnd="8dp"
-                tools:text="Description Here lmao it can have more text    k                 k k k k kkkkk \n
-                 than you think lol wtf kkkkkkkkkkkkkkkkkkkkk"/>
 
             <ImageView
                 android:id="@+id/postDetailed_imageView_favorite_icon"
                 android:layout_width="33dp"
                 android:layout_height="33dp"
-                android:layout_below="@id/postDetailed_viewPager_Card"
-                android:layout_alignParentEnd="true"
+                android:layout_below="@id/postDetailed_ImageView_Card"
+                android:layout_alignParentStart="true"
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="8dp"
-                android:elevation="4dp"
                 android:src="@drawable/ic_favorite_border_black_24dp" />
 
             <TextView
@@ -92,24 +100,77 @@
                 style="@style/TextAppearance.MaterialComponents.Chip"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/postDetailed_viewPager_Card"
+                android:layout_below="@id/postDetailed_ImageView_Card"
                 android:layout_marginTop="14dp"
                 android:layout_marginEnd="4dp"
-                android:layout_toStartOf="@id/postDetailed_imageView_favorite_icon"
+                android:layout_toEndOf="@id/postDetailed_imageView_favorite_icon"
                 tools:text="88" />
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/postDetailed_recipe_cardView"
+                android:layout_width="200dp"
+                android:layout_height="35dp"
+                android:layout_marginTop="4dp"
+                android:layout_below="@id/postDetailed_ImageView_Card"
+                android:layout_centerHorizontal="true"
+                app:cardCornerRadius="8dp">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/postDetailed_recipeImage_CardView"
+                        android:layout_width="50dp"
+                        android:layout_height="35dp"
+                        android:layout_marginStart="8dp"
+                        app:cardCornerRadius="8dp">
+
+                        <ImageView
+                            android:id="@+id/postDetailed_recipeImage"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            tools:src="@color/colorPrimaryDark" />
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <TextView
+                        android:id="@+id/postDetailed_recipe_name_TextView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_marginStart="8dp"
+                        android:layout_marginEnd="8dp"
+                        android:layout_toEndOf="@id/postDetailed_recipeImage_CardView"
+                        tools:text="Recipe name" />
+                </RelativeLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <TextView
+                android:id="@+id/postDetailed_tvDescription"
+                style="@style/TextAppearance.AppCompat"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/postDetailed_recipe_cardView"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
+                tools:text="Description Here lmao it can have more text    k                 k k k k kkkkk \n
+                 than you think lol wtf kkkkkkkkkkkkkkkkkkkkk" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/postDetailed_deleteRecipe_MaterialBtn"
                 style="@style/Widget.MaterialComponents.Button.TextButton"
                 android:layout_width="33dp"
                 android:layout_height="33dp"
-                android:layout_below="@id/postDetailed_viewPager_Card"
-                android:layout_toStartOf="@id/postDetailed_numberOfFaved"
+                android:layout_below="@id/postDetailed_ImageView_Card"
+                android:layout_alignParentEnd="true"
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="8dp"
-                android:visibility="visible"
+                android:visibility="invisible"
                 app:cornerRadius="18dp"
-                app:icon="@drawable/ic_delete_black_24dp" />
+                app:icon="@drawable/ic_delete_black_24dp"
+                tools:visibility="visible" />
 
 
             <EditText

@@ -26,6 +26,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.rokudoz.irecipe.Account.LoginActivity;
 import com.rokudoz.irecipe.AddPostActivity;
+import com.rokudoz.irecipe.Models.FavoritePost;
 import com.rokudoz.irecipe.Models.Friend;
 import com.rokudoz.irecipe.Models.Ingredient;
 import com.rokudoz.irecipe.Models.Post;
@@ -33,7 +34,6 @@ import com.rokudoz.irecipe.Models.User;
 import com.rokudoz.irecipe.Models.UserWhoFaved;
 import com.rokudoz.irecipe.R;
 import com.rokudoz.irecipe.Utils.Adapters.PostAdapter;
-import com.rokudoz.irecipe.Utils.RecipeAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -69,7 +69,7 @@ public class FeedFragment extends Fragment implements PostAdapter.OnItemClickLis
 
     private ArrayList<String> mDocumentIDs = new ArrayList<>();
     private ArrayList<Post> mPostList = new ArrayList<>();
-    private List<String> userFavRecipesList = new ArrayList<>();
+    private List<String> userFavPostList = new ArrayList<>();
     private List<String> friends_userID_list = new ArrayList<>();
     private List<Friend> friendList = new ArrayList<>();
     private String loggedInUserDocumentId = "";
@@ -174,35 +174,53 @@ public class FeedFragment extends Fragment implements PostAdapter.OnItemClickLis
     private void getCurrentUserDetails() {
         usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
             @Override
-            public void onSuccess(DocumentSnapshot documentSnapshot) {
+            public void onSuccess(final DocumentSnapshot documentSnapshot) {
                 List<Ingredient> userIngredient_list = new ArrayList<>();
-                User user = documentSnapshot.toObject(User.class);
+                final User user = documentSnapshot.toObject(User.class);
 
                 mUser = documentSnapshot.toObject(User.class);
                 loggedInUserDocumentId = documentSnapshot.getId();
-                userFavRecipesList = mUser.getFavoriteRecipes();
+                userFavPostList = new ArrayList<>();
+
                 if (!friends_userID_list.contains(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
                     friends_userID_list.add(FirebaseAuth.getInstance().getCurrentUser().getUid());
                 }
 
-                usersReference.document(user.getUser_id()).collection("FriendList").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-                    @Override
-                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                        for (QueryDocumentSnapshot queryDocumentSnapshot : queryDocumentSnapshots) {
-                            Friend friend = queryDocumentSnapshot.toObject(Friend.class);
-                            if (!friendList.contains(friend)) {
-                                if (friend.getFriend_status().equals("friends") || friend.getFriend_status().equals("friend_request_accepted"))
-                                    friendList.add(friend);
-                            }
-                        }
-                        for (Friend friend : friendList) {
-                            if (!friends_userID_list.contains(friend.getFriend_user_id()))
-                                friends_userID_list.add(friend.getFriend_user_id());
-                        }
-                        performQuery();
+                usersReference.document(user.getUser_id()).collection("FriendList").get()
+                        .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                            @Override
+                            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                                for (QueryDocumentSnapshot queryDocumentSnapshot : queryDocumentSnapshots) {
+                                    Friend friend = queryDocumentSnapshot.toObject(Friend.class);
+                                    if (!friendList.contains(friend)) {
+                                        if (friend.getFriend_status().equals("friends") || friend.getFriend_status().equals("friend_request_accepted"))
+                                            friendList.add(friend);
+                                    }
+                                }
+                                for (Friend friend : friendList) {
+                                    if (!friends_userID_list.contains(friend.getFriend_user_id()))
+                                        friends_userID_list.add(friend.getFriend_user_id());
+                                }
 
-                    }
-                });
+                                usersReference.document(user.getUser_id()).collection("FavoritePosts").get()
+                                        .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                                            @Override
+                                            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                                                if (queryDocumentSnapshots != null) {
+                                                    for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                                                        String favPostID = documentSnapshot.getId();
+                                                        if (userFavPostList.contains(favPostID))
+                                                            userFavPostList.add(favPostID);
+                                                    }
+
+                                                    performQuery();
+                                                }
+                                            }
+                                        });
+
+
+                            }
+                        });
             }
         });
     }
@@ -236,7 +254,7 @@ public class FeedFragment extends Fragment implements PostAdapter.OnItemClickLis
                         Post post = document.toObject(Post.class);
                         post.setDocumentId(document.getId());
 
-                        if (userFavRecipesList != null && userFavRecipesList.contains(document.getId())) {
+                        if (userFavPostList != null && userFavPostList.contains(document.getId())) {
                             post.setFavorite(true);
                         } else {
                             post.setFavorite(false);
@@ -268,8 +286,7 @@ public class FeedFragment extends Fragment implements PostAdapter.OnItemClickLis
             @Override
             public void onItemClick(int position) {
                 String id = mDocumentIDs.get(position);
-//                Navigation.findNavController(view).navigate(FeedFragmentDirections.actionSearchFragmentToRecipeDetailedFragment(id));
-                Toast.makeText(getActivity(), "" + id, Toast.LENGTH_SHORT).show();
+                Navigation.findNavController(view).navigate(FeedFragmentDirections.actionFeedFragmentToPostDetailed(id));
             }
 
             @Override
@@ -277,69 +294,76 @@ public class FeedFragment extends Fragment implements PostAdapter.OnItemClickLis
 
                 ////////////////////////////////////////////////
 
-//                String id = mDocumentIDs.get(position);
-//                DocumentReference currentRecipeRef = postsRef.document(id);
-//                final CollectionReference currentRecipeSubCollection = currentRecipeRef.collection("UsersWhoFaved");
-//
-//                mUser.setFavoriteRecipes(userFavRecipesList);
-//                DocumentReference favRecipesRef = usersReference.document(loggedInUserDocumentId);
-//
-//
-//                Log.d(TAG, "onFavoriteClick: " + mPostList.get(position).getDocumentId());
-//
-//                if (userFavRecipesList == null) {
-//                    userFavRecipesList = new ArrayList<>();
-//                }
-//                if (userFavRecipesList.contains(id)) {
-//                    userFavRecipesList.remove(id);
-//                    mPostList.get(position).setFavorite(false);
-//
-//                    currentSubCollectionListener = currentRecipeSubCollection.whereEqualTo("userID", mUser.getUser_id())
-//                            .addSnapshotListener(new EventListener<QuerySnapshot>() {
-//                                @Override
-//                                public void onEvent(@javax.annotation.Nullable QuerySnapshot queryDocumentSnapshots, @javax.annotation.Nullable FirebaseFirestoreException e) {
-//                                    if (e != null) {
-//                                        Log.w(TAG, "onEvent: ", e);
-//                                        return;
-//                                    }
-//                                    if (queryDocumentSnapshots != null && queryDocumentSnapshots.size() != 0) {
-//                                        userFavDocId = queryDocumentSnapshots.getDocuments().get(0).getId();
-//                                        Log.d(TAG, "onEvent: docID" + userFavDocId);
-//                                    }
-//                                    if (!mPostList.get(position).getFavorite())
-//                                        if (!userFavDocId.equals("")) {
-//                                            currentRecipeSubCollection.document(userFavDocId).delete()
-//                                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
-//                                                        @Override
-//                                                        public void onSuccess(Void aVoid) {
-//                                                            Toast.makeText(getContext(), "Removed from favorites", Toast.LENGTH_SHORT).show();
-//                                                        }
-//                                                    });
-//
-//
-//                                        } else {
-//                                            Log.d(TAG, "onFavoriteClick: empty docID");
-//                                        }
-//
-//                                }
-//                            });
-//
-//                } else {
-//                    userFavRecipesList.add(id);
-//                    mPostList.get(position).setFavorite(true);
-//                    UserWhoFaved userWhoFaved = new UserWhoFaved(mUser.getUser_id(), null);
-//                    currentRecipeSubCollection.add(userWhoFaved);
-//                    Toast.makeText(getContext(), "Added " + " to favorites", Toast.LENGTH_SHORT).show();
-//                }
-//
-//                mUser.setFavoriteRecipes(userFavRecipesList);
-//                favRecipesRef.update("favoriteRecipes", userFavRecipesList);
-//
-//
-//                mAdapter.notifyDataSetChanged();
-//
-//
-//
+                String id = mDocumentIDs.get(position);
+                DocumentReference currentRecipeRef = postsRef.document(id);
+                final CollectionReference currentRecipeSubCollection = currentRecipeRef.collection("UsersWhoFaved");
+
+                mUser.setFavoriteRecipes(userFavPostList);
+                DocumentReference currentUserRef = usersReference.document(loggedInUserDocumentId);
+
+
+                Log.d(TAG, "onFavoriteClick: " + mPostList.get(position).getDocumentId());
+
+                if (userFavPostList == null) {
+                    userFavPostList = new ArrayList<>();
+                }
+                if (userFavPostList.contains(id)) {
+                    currentUserRef.collection("FavoritePosts").document(id).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            Log.d(TAG, "onSuccess: Deleted from user FAV posts");
+                        }
+                    });
+                    userFavPostList.remove(id);
+                    mPostList.get(position).setFavorite(false);
+
+                    currentSubCollectionListener = currentRecipeSubCollection.whereEqualTo("userID", mUser.getUser_id())
+                            .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                                @Override
+                                public void onEvent(@javax.annotation.Nullable QuerySnapshot queryDocumentSnapshots, @javax.annotation.Nullable FirebaseFirestoreException e) {
+                                    if (e != null) {
+                                        Log.w(TAG, "onEvent: ", e);
+                                        return;
+                                    }
+                                    if (queryDocumentSnapshots != null && queryDocumentSnapshots.size() != 0) {
+                                        userFavDocId = queryDocumentSnapshots.getDocuments().get(0).getId();
+                                        Log.d(TAG, "onEvent: docID" + userFavDocId);
+                                    }
+                                    if (!mPostList.get(position).getFavorite())
+                                        if (!userFavDocId.equals("")) {
+                                            currentRecipeSubCollection.document(userFavDocId).delete()
+                                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                        @Override
+                                                        public void onSuccess(Void aVoid) {
+                                                            Toast.makeText(getContext(), "Removed from favorites", Toast.LENGTH_SHORT).show();
+                                                        }
+                                                    });
+
+
+                                        } else {
+                                            Log.d(TAG, "onFavoriteClick: empty docID");
+                                        }
+
+                                }
+                            });
+
+                } else {
+                    userFavPostList.add(id);
+                    mPostList.get(position).setFavorite(true);
+                    UserWhoFaved userWhoFaved = new UserWhoFaved(mUser.getUser_id(), null);
+                    currentRecipeSubCollection.document(mUser.getUser_id()).set(userWhoFaved);
+
+                    FavoritePost favoritePost = new FavoritePost(null);
+                    currentUserRef.collection("FavoritePosts").document(id).set(favoritePost);
+                    Toast.makeText(getContext(), "Added " + " to favorites", Toast.LENGTH_SHORT).show();
+                }
+
+                mUser.setFavoriteRecipes(userFavPostList);
+
+
+                mAdapter.notifyDataSetChanged();
+
+
                 /////////////////////////////////////
             }
 

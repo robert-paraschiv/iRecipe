@@ -29,14 +29,14 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class ChildCommentAdapter extends RecyclerView.Adapter<ChildCommentAdapter.CommentViewHolder> {
+public class RecipeChildCommentAdapter extends RecyclerView.Adapter<RecipeChildCommentAdapter.CommentViewHolder> {
     private static final int SECOND_MILLIS = 1000;
     private static final int MINUTE_MILLIS = 60 * SECOND_MILLIS;
     private static final int HOUR_MILLIS = 60 * MINUTE_MILLIS;
     private static final int DAY_MILLIS = 24 * HOUR_MILLIS;
 
     private ArrayList<Comment> mCommentList;
-    private static final String TAG = "ChildCommentAdapter";
+    private static final String TAG = "RecipeChildCommentAdapter";
 
     public class CommentViewHolder extends RecyclerView.ViewHolder {
         public CircleImageView mImageView;
@@ -53,7 +53,7 @@ public class ChildCommentAdapter extends RecyclerView.Adapter<ChildCommentAdapte
         }
     }
 
-    public ChildCommentAdapter(ArrayList<Comment> commentArrayList) {
+    public RecipeChildCommentAdapter(ArrayList<Comment> commentArrayList) {
         mCommentList = commentArrayList;
     }
 
@@ -115,7 +115,7 @@ public class ChildCommentAdapter extends RecyclerView.Adapter<ChildCommentAdapte
 
     }
 
-    public static String getTimeAgo(long time) {
+    private static String getTimeAgo(long time) {
         if (time < 1000000000000L) {
             // if timestamp given in seconds, convert to millis
             time *= 1000;
