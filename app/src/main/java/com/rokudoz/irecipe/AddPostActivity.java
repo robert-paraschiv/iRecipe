@@ -32,6 +32,7 @@ import com.google.firebase.storage.UploadTask;
 import com.rokudoz.irecipe.Models.Ingredient;
 import com.rokudoz.irecipe.Models.Post;
 import com.rokudoz.irecipe.Models.Recipe;
+import com.rokudoz.irecipe.Utils.RotateBitmap;
 import com.squareup.picasso.Picasso;
 
 import java.io.ByteArrayOutputStream;
@@ -45,7 +46,7 @@ public class AddPostActivity extends AppCompatActivity {
     private static final int PICK_IMAGE_REQUEST = 1;
     private Uri mImageUri;
     private String postPicUrl = "";
-
+    Bitmap imageBitmap;
     //FireBase refs
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private CollectionReference recipesReference = db.collection("Recipes");
@@ -133,7 +134,14 @@ public class AddPostActivity extends AppCompatActivity {
         if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK
                 && data != null && data.getData() != null) {
             mImageUri = data.getData();
-            Picasso.get().load(mImageUri).into(imageView);
+            try {
+                RotateBitmap rotateBitmap = new RotateBitmap();
+                imageBitmap = rotateBitmap.HandleSamplingAndRotationBitmap(this, mImageUri);
+                imageView.setImageBitmap(imageBitmap);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+//            Picasso.get().load(mImageUri).into(imageView);
         }
     }
 
@@ -149,12 +157,7 @@ public class AddPostActivity extends AppCompatActivity {
                     + "." + getFileExtension(mImageUri));
 
             //Compress image
-            Bitmap bitmap = null;
-            try {
-                bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), mImageUri);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            Bitmap bitmap = imageBitmap;
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             bitmap.compress(Bitmap.CompressFormat.JPEG, 25, baos);
             byte[] data = baos.toByteArray();
@@ -194,7 +197,7 @@ public class AddPostActivity extends AppCompatActivity {
         String text = descriptionInputText.getText().toString();
         String privacy = privacySpinner.getSelectedItem().toString();
 
-        Post post = new Post(referencedRecipeDocID, creatorId, text, postPicUrl,false, privacy, null);
+        Post post = new Post(referencedRecipeDocID, creatorId, text, postPicUrl, false, privacy, null);
         if (postPicUrl.equals("")) {
             Toast.makeText(this, "Please select a photo for your post", Toast.LENGTH_SHORT).show();
         } else {
