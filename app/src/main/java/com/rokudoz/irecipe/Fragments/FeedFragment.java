@@ -169,60 +169,21 @@ public class FeedFragment extends Fragment implements PostAdapter.OnItemClickLis
                 }
             }
         });
+        mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+
+                if (!recyclerView.canScrollVertically(1)) {
+                    performQuery();
+                    Log.d(TAG, "onScrollStateChanged: ");
+
+                }
+            }
+        });
     }
 
     private void getCurrentUserDetails() {
-//        usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-//            @Override
-//            public void onSuccess(final DocumentSnapshot documentSnapshot) {
-//                List<Ingredient> userIngredient_list = new ArrayList<>();
-//                final User user = documentSnapshot.toObject(User.class);
-//
-//                mUser = documentSnapshot.toObject(User.class);
-//                loggedInUserDocumentId = documentSnapshot.getId();
-//                userFavPostList = new ArrayList<>();
-//
-//                if (!friends_userID_list.contains(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
-//                    friends_userID_list.add(FirebaseAuth.getInstance().getCurrentUser().getUid());
-//                }
-//
-//                usersReference.document(user.getUser_id()).collection("FriendList").get()
-//                        .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-//                            @Override
-//                            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-//                                for (QueryDocumentSnapshot queryDocumentSnapshot : queryDocumentSnapshots) {
-//                                    Friend friend = queryDocumentSnapshot.toObject(Friend.class);
-//                                    if (!friendList.contains(friend)) {
-//                                        if (friend.getFriend_status().equals("friends") || friend.getFriend_status().equals("friend_request_accepted"))
-//                                            friendList.add(friend);
-//                                    }
-//                                }
-//                                for (Friend friend : friendList) {
-//                                    if (!friends_userID_list.contains(friend.getFriend_user_id()))
-//                                        friends_userID_list.add(friend.getFriend_user_id());
-//                                }
-//
-//                                usersReference.document(user.getUser_id()).collection("FavoritePosts").get()
-//                                        .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-//                                            @Override
-//                                            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-//                                                if (queryDocumentSnapshots != null) {
-//                                                    for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
-//                                                        String favPostID = documentSnapshot.getId();
-//                                                        if (!userFavPostList.contains(favPostID))
-//                                                            userFavPostList.add(favPostID);
-//                                                    }
-//
-//                                                    performQuery();
-//                                                }
-//                                            }
-//                                        });
-//
-//
-//                            }
-//                        });
-//            }
-//        });
 
         usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).addSnapshotListener(new EventListener<DocumentSnapshot>() {
             @Override
@@ -291,18 +252,19 @@ public class FeedFragment extends Fragment implements PostAdapter.OnItemClickLis
     private void performQuery() {
         Query postsQuery = null;
         if (mLastQueriedDocument != null) {
-            postsQuery = postsRef.orderBy("creation_date", Query.Direction.DESCENDING).whereIn("creatorId", friends_userID_list).whereEqualTo("privacy", "Everyone")
-                    .startAfter(mLastQueriedDocument); // Necessary so we don't have the same results multiple times
-//                                    .limit(3);
+            postsQuery = postsRef.orderBy("creation_date", Query.Direction.DESCENDING).whereIn("creatorId", friends_userID_list)
+                    .whereEqualTo("privacy", "Everyone")
+                    .startAfter(mLastQueriedDocument) // Necessary so we don't have the same results multiple times
+                    .limit(20);
         } else {
-            postsQuery = postsRef.orderBy("creation_date", Query.Direction.DESCENDING).whereIn("creatorId", friends_userID_list).whereEqualTo("privacy", "Everyone");
-//                                    .limit(3);
+            postsQuery = postsRef.orderBy("creation_date", Query.Direction.DESCENDING).whereIn("creatorId", friends_userID_list)
+                    .whereEqualTo("privacy", "Everyone")
+                    .limit(20);
         }
         PerformMainQuery(postsQuery);
         pbLoading.setVisibility(View.INVISIBLE);
 
         initializeRecyclerViewAdapterOnClicks();
-
 
     }
 

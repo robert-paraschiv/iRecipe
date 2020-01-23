@@ -1,5 +1,7 @@
 package com.rokudoz.irecipe.Models;
 
+import com.google.firebase.firestore.Exclude;
+
 import java.util.Calendar;
 import java.util.List;
 
@@ -13,13 +15,14 @@ public class User {
     private String nationality;
     private String userProfilePicUrl;
     private List<String> favoriteRecipes;
+    private String user_tokenID;
 
     public User() {
         //Empty constructor
     }
 
     public User(String user_id, String name, String username, String email, String description, String gender
-            , String nationality, String userProfilePicUrl,List<String> favoriteRecipes) {
+            , String nationality, String userProfilePicUrl, List<String> favoriteRecipes) {
         this.user_id = user_id;
         this.name = name;
         this.username = username;
@@ -102,6 +105,14 @@ public class User {
 
     public void setFavoriteRecipes(List<String> favoriteRecipes) {
         this.favoriteRecipes = favoriteRecipes;
+    }
+
+    public String getUser_tokenID() {
+        return user_tokenID;
+    }
+
+    public void setUser_tokenID(String user_tokenID) {
+        this.user_tokenID = user_tokenID;
     }
 
     @Override
