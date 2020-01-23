@@ -1,4 +1,4 @@
-package com.rokudoz.irecipe.Utils;
+package com.rokudoz.irecipe.Utils.Adapters;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;

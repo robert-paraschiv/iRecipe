@@ -25,9 +25,7 @@ import android.view.ViewGroup;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -55,8 +53,10 @@ import com.rokudoz.irecipe.Models.Recipe;
 import com.rokudoz.irecipe.Models.User;
 import com.rokudoz.irecipe.Models.UserWhoFaved;
 import com.rokudoz.irecipe.R;
-import com.rokudoz.irecipe.Utils.RecipeParentCommentAdapter;
-import com.rokudoz.irecipe.Utils.RecipeDetailedViewPagerAdapter;
+import com.rokudoz.irecipe.Utils.Adapters.RecipeIngredientsAdapter;
+import com.rokudoz.irecipe.Utils.Adapters.RecipeInstructionsAdapter;
+import com.rokudoz.irecipe.Utils.Adapters.RecipeParentCommentAdapter;
+import com.rokudoz.irecipe.Utils.Adapters.RecipeDetailedViewPagerAdapter;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -91,24 +91,31 @@ public class RecipeDetailedFragment extends Fragment {
     private ViewPager viewPager;
     private RecipeDetailedViewPagerAdapter recipeDetailedViewPagerAdapter;
 
-    private RecyclerView mRecyclerView;
-    private RecyclerView.Adapter mAdapter;
-    private RecyclerView.LayoutManager mLayoutManager;
+    private RecyclerView commentRecyclerView;
+    private RecyclerView.Adapter commentAdapter;
+    private RecyclerView.LayoutManager commentLayoutManager;
 
-    private LinearLayout mInstructionsLinearLayout;
+    private RecyclerView instructionsRecyclewView;
+    private RecyclerView.Adapter instructionsAdapter;
+    private RecyclerView.LayoutManager instructionsLayoutManager;
+
+    private RecyclerView ingredientsRecyclewView;
+    private RecyclerView.Adapter ingredientsAdapter;
+    private RecyclerView.LayoutManager ingredientsLayoutManager;
+
     private NestedScrollView nestedScrollView;
 
     private MaterialButton mDeleteRecipeBtn;
     private TextView tvTitle, tvDescription, tvIngredients, mFavoriteNumber, tvMissingIngredientsNumber, tvCreatorName;
-    private ImageView mImageView, mFavoriteIcon;
+    private ImageView mFavoriteIcon;
     private CircleImageView mCreatorImage;
     private Button mAddCommentBtn;
     private ExtendedFloatingActionButton mAddMissingIngredientsFAB;
     private EditText mCommentEditText;
-
+    private List<Ingredient> recipeIngredientList = new ArrayList<>();
+    private List<Instruction> recipeInstructionList = new ArrayList<>();
     private ArrayList<Comment> commentList = new ArrayList<>();
     private List<String> userFavRecipesList = new ArrayList<>();
-    private List<Instruction> instructionsAddedToLayout = new ArrayList<>();
     private Integer numberOfFav;
     private ArrayList<String> newItemsToAdd = new ArrayList<>();
     private User mUser;
@@ -133,11 +140,11 @@ public class RecipeDetailedFragment extends Fragment {
         imageUrls = new ArrayList<>();
         tvTitle = view.findViewById(R.id.tvTitle);
         tvDescription = view.findViewById(R.id.tvDescription);
-        tvIngredients = view.findViewById(R.id.tvIngredientsList);
         mAddCommentBtn = view.findViewById(R.id.recipeDetailed_addComment_btn);
-        mRecyclerView = view.findViewById(R.id.comment_recycler_view);
+        commentRecyclerView = view.findViewById(R.id.comment_recycler_view);
+        instructionsRecyclewView = view.findViewById(R.id.recipeDetailed_instructions_recycler_view);
+        ingredientsRecyclewView = view.findViewById(R.id.recipeDetailed_ingredients_recycler_view);
         mCommentEditText = view.findViewById(R.id.recipeDetailed_et_commentInput);
-        mInstructionsLinearLayout = view.findViewById(R.id.recipeDetailed_instructions_linearLayout);
         mFavoriteIcon = view.findViewById(R.id.imageview_favorite_icon);
         mFavoriteNumber = view.findViewById(R.id.recipeDetailed_numberOfFaved);
         tvMissingIngredientsNumber = view.findViewById(R.id.missing_ingredientsNumber);
@@ -254,148 +261,6 @@ public class RecipeDetailedFragment extends Fragment {
         return view; // HAS TO BE THE LAST ONE ---------------------------------
     }
 
-
-    private void zoomImageFromThumb(final View imageButton, String imageUrl) {
-        // If there's an animation in progress, cancel it
-        // immediately and proceed with this one.
-        if (currentAnimator != null) {
-            currentAnimator.cancel();
-        }
-
-        // Load the high-resolution "zoomed-in" image.
-        final ImageView expandedImageView = (ImageView) view.findViewById(
-                R.id.expanded_image);
-
-        Picasso.get().load(imageUrl).into(expandedImageView);
-//        expandedImageView.setImageResource(imageResId);
-
-        // Calculate the starting and ending bounds for the zoomed-in image.
-        // This step involves lots of math. Yay, math.
-        final Rect startBounds = new Rect();
-        final Rect finalBounds = new Rect();
-        final Point globalOffset = new Point();
-
-        // The start bounds are the global visible rectangle of the thumbnail,
-        // and the final bounds are the global visible rectangle of the container
-        // view. Also set the container view's offset as the origin for the
-        // bounds, since that's the origin for the positioning animation
-        // properties (X, Y).
-        imageButton.getGlobalVisibleRect(startBounds);
-        view.findViewById(R.id.container)
-                .getGlobalVisibleRect(finalBounds, globalOffset);
-        startBounds.offset(-globalOffset.x, -globalOffset.y);
-        finalBounds.offset(-globalOffset.x, -globalOffset.y);
-
-        // Adjust the start bounds to be the same aspect ratio as the final
-        // bounds using the "center crop" technique. This prevents undesirable
-        // stretching during the animation. Also calculate the start scaling
-        // factor (the end scaling factor is always 1.0).
-        float startScale;
-        if ((float) finalBounds.width() / finalBounds.height()
-                > (float) startBounds.width() / startBounds.height()) {
-            // Extend start bounds horizontally
-            startScale = (float) startBounds.height() / finalBounds.height();
-            float startWidth = startScale * finalBounds.width();
-            float deltaWidth = (startWidth - startBounds.width()) / 2;
-            startBounds.left -= deltaWidth;
-            startBounds.right += deltaWidth;
-        } else {
-            // Extend start bounds vertically
-            startScale = (float) startBounds.width() / finalBounds.width();
-            float startHeight = startScale * finalBounds.height();
-            float deltaHeight = (startHeight - startBounds.height()) / 2;
-            startBounds.top -= deltaHeight;
-            startBounds.bottom += deltaHeight;
-        }
-
-        // Hide the thumbnail and show the zoomed-in view. When the animation
-        // begins, it will position the zoomed-in view in the place of the
-        // thumbnail.
-        imageButton.setAlpha(0f);
-        expandedImageView.setVisibility(View.VISIBLE);
-
-        // Set the pivot point for SCALE_X and SCALE_Y transformations
-        // to the top-left corner of the zoomed-in view (the default
-        // is the center of the view).
-        expandedImageView.setPivotX(0f);
-        expandedImageView.setPivotY(0f);
-
-        // Construct and run the parallel animation of the four translation and
-        // scale properties (X, Y, SCALE_X, and SCALE_Y).
-        AnimatorSet set = new AnimatorSet();
-        set
-                .play(ObjectAnimator.ofFloat(expandedImageView, View.X,
-                        startBounds.left, finalBounds.left))
-                .with(ObjectAnimator.ofFloat(expandedImageView, View.Y,
-                        startBounds.top, finalBounds.top))
-                .with(ObjectAnimator.ofFloat(expandedImageView, View.SCALE_X,
-                        startScale, 1f))
-                .with(ObjectAnimator.ofFloat(expandedImageView,
-                        View.SCALE_Y, startScale, 1f));
-        set.setDuration(shortAnimationDuration);
-        set.setInterpolator(new DecelerateInterpolator());
-        set.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                currentAnimator = null;
-            }
-
-            @Override
-            public void onAnimationCancel(Animator animation) {
-                currentAnimator = null;
-            }
-        });
-        set.start();
-        currentAnimator = set;
-
-        // Upon clicking the zoomed-in image, it should zoom back down
-        // to the original bounds and show the thumbnail instead of
-        // the expanded image.
-        final float startScaleFinal = startScale;
-        expandedImageView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (currentAnimator != null) {
-                    currentAnimator.cancel();
-                }
-
-                // Animate the four positioning/sizing properties in parallel,
-                // back to their original values.
-                AnimatorSet set = new AnimatorSet();
-                set.play(ObjectAnimator
-                        .ofFloat(expandedImageView, View.X, startBounds.left))
-                        .with(ObjectAnimator
-                                .ofFloat(expandedImageView,
-                                        View.Y, startBounds.top))
-                        .with(ObjectAnimator
-                                .ofFloat(expandedImageView,
-                                        View.SCALE_X, startScaleFinal))
-                        .with(ObjectAnimator
-                                .ofFloat(expandedImageView,
-                                        View.SCALE_Y, startScaleFinal));
-                set.setDuration(shortAnimationDuration);
-                set.setInterpolator(new DecelerateInterpolator());
-                set.addListener(new AnimatorListenerAdapter() {
-                    @Override
-                    public void onAnimationEnd(Animator animation) {
-                        imageButton.setAlpha(1f);
-                        expandedImageView.setVisibility(View.GONE);
-                        currentAnimator = null;
-                    }
-
-                    @Override
-                    public void onAnimationCancel(Animator animation) {
-                        imageButton.setAlpha(1f);
-                        expandedImageView.setVisibility(View.GONE);
-                        currentAnimator = null;
-                    }
-                });
-                set.start();
-                currentAnimator = set;
-            }
-        });
-    }
-
     private void setupViewPager(View view) {
 
         viewPager = view.findViewById(R.id.view_pager);
@@ -477,11 +342,24 @@ public class RecipeDetailedFragment extends Fragment {
     }
 
     private void buildRecyclerView() {
-        mRecyclerView.setHasFixedSize(true);
-        mLayoutManager = new LinearLayoutManager(getContext());
-        mAdapter = new RecipeParentCommentAdapter(getContext(), commentList);
-        mRecyclerView.setLayoutManager(mLayoutManager);
-        mRecyclerView.setAdapter(mAdapter);
+        commentRecyclerView.setHasFixedSize(true);
+        commentLayoutManager = new LinearLayoutManager(getContext());
+        commentAdapter = new RecipeParentCommentAdapter(getContext(), commentList);
+        commentRecyclerView.setLayoutManager(commentLayoutManager);
+        commentRecyclerView.setAdapter(commentAdapter);
+
+
+        instructionsRecyclewView.setHasFixedSize(true);
+        instructionsLayoutManager = new LinearLayoutManager(getContext());
+        instructionsAdapter = new RecipeInstructionsAdapter(recipeInstructionList);
+        instructionsRecyclewView.setLayoutManager(instructionsLayoutManager);
+        instructionsRecyclewView.setAdapter(instructionsAdapter);
+
+        ingredientsRecyclewView.setHasFixedSize(true);
+        ingredientsLayoutManager = new LinearLayoutManager(getContext());
+        ingredientsAdapter = new RecipeIngredientsAdapter(recipeIngredientList);
+        ingredientsRecyclewView.setLayoutManager(ingredientsLayoutManager);
+        ingredientsRecyclewView.setAdapter(ingredientsAdapter);
     }
 
     private void getCommentsFromDb() {
@@ -517,7 +395,7 @@ public class RecipeDetailedFragment extends Fragment {
                                     commentList.add(0, comment);
                                     Log.d(TAG, "onEvent: currrent commentID " + document.getId());
                                     newItemsToAdd.add(document.getId());
-                                    mAdapter.notifyDataSetChanged();
+                                    commentAdapter.notifyDataSetChanged();
 
                                 }
 
@@ -527,7 +405,7 @@ public class RecipeDetailedFragment extends Fragment {
                                         .get(queryDocumentSnapshots.getDocuments().size() - 1);
                             }
                         }
-                        mAdapter.notifyDataSetChanged();
+                        commentAdapter.notifyDataSetChanged();
                         Log.d(TAG, "onEvent: querrysize " + queryDocumentSnapshots.size() + " ListSize: " + commentList.size());
                     }
                 });
@@ -602,11 +480,8 @@ public class RecipeDetailedFragment extends Fragment {
 
                 tvTitle.setText(title);
                 tvDescription.setText(description);
-
-                StringBuilder ingredientsToPutInTV = new StringBuilder();
                 ////////////////////////////////////////////////////////// LOGIC TO GET RECIPES INGREDIENTS AND INSTRUCTIONS HERE
 
-                tvIngredients.setText(ingredientsToPutInTV.toString());
 
                 if (recipe.getCreator_docId().equals(mUser.getUser_id())) {
                     mDeleteRecipeBtn.setVisibility(View.VISIBLE);
@@ -649,7 +524,6 @@ public class RecipeDetailedFragment extends Fragment {
                 getRecipeCreatorDetails(recipe.getCreator_docId());
                 getRecipeIngredients();
 
-
                 setupViewPager(view);
             }
         });
@@ -684,7 +558,7 @@ public class RecipeDetailedFragment extends Fragment {
     }
 
     private void getRecipeIngredients() {
-        final List<Ingredient> recipeIngredientList = new ArrayList<>();
+
         final List<Ingredient> recipeIngredientsToAddToShoppingList = new ArrayList<>();
         //Get recipe Ingredients from RecipeIngredients Collection
         recipeRef.document(documentID).collection("RecipeIngredients").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
@@ -694,13 +568,12 @@ public class RecipeDetailedFragment extends Fragment {
                     Ingredient ingredient = queryDocumentSnapshot.toObject(Ingredient.class);
                     if (!recipeIngredientList.contains(ingredient)) {
                         recipeIngredientList.add(ingredient);
+                        //
+                        ingredientsAdapter.notifyDataSetChanged();
                     }
 
                 }
 
-                for (int i = 0; i < recipeIngredientList.size(); i++) {
-                    Log.d(TAG, "onEvent: " + recipeIngredientList.get(i).toString());
-                }
                 for (Ingredient ing : recipeIngredientList) {
                     if (userIngredientList.contains(ing)) {
                         if (!userIngredientList.get(userIngredientList.indexOf(ing)).getOwned()) {
@@ -771,19 +644,12 @@ public class RecipeDetailedFragment extends Fragment {
                     }
                 }
 
-                tvIngredients.setText("Ingredients: \n");
-                for (int i = 0; i < recipeIngredientList.size(); i++) {
-                    tvIngredients.append(" " + recipeIngredientList.get(i).getName() + " " + Math.round(recipeIngredientList.get(i).getQuantity())
-                            + " " + recipeIngredientList.get(i).getQuantity_type() + "\n");
-                }
-
                 getRecipeInstructions(documentID);
             }
         });
     }
 
     private void getRecipeInstructions(String documentID) {
-        final List<Instruction> recipeInstructionList = new ArrayList<>();
 
         recipeRef.document(documentID).collection("RecipeInstructions").orderBy("stepNumber").get()
                 .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
@@ -793,62 +659,11 @@ public class RecipeDetailedFragment extends Fragment {
                             Instruction instruction = documentSnapshot.toObject(Instruction.class);
                             if (!recipeInstructionList.contains(instruction)) {
                                 recipeInstructionList.add(instruction);
-                            }
-                        }
-
-                        for (Instruction ins : recipeInstructionList) {
-                            if (!instructionsAddedToLayout.contains(ins)) {
-                                addInstructionLayout(ins);
-                                instructionsAddedToLayout.add(ins);
+                                instructionsAdapter.notifyDataSetChanged();
                             }
                         }
                     }
                 });
-    }
-
-    private void addInstructionLayout(final Instruction instruction) {
-        if (getActivity() != null) {
-            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT
-            );
-            params.setMargins(4, 4, 4, 4);
-            final LinearLayout linearLayout = new LinearLayout(getContext());
-            linearLayout.setOrientation(LinearLayout.VERTICAL);
-            linearLayout.setLayoutParams(params);
-
-            TextView stepNumberTextView = new TextView(getActivity());
-            stepNumberTextView.setText("Step " + instruction.getStepNumber());
-            stepNumberTextView.setTextSize(18);
-            stepNumberTextView.setPadding(22, 25, 0, 8);
-            stepNumberTextView.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-            linearLayout.addView(stepNumberTextView);
-
-            TextView instructionTextView = new TextView(getActivity());
-            instructionTextView.setText(instruction.getText());
-            instructionTextView.setTextSize(14);
-            instructionTextView.setPadding(16, 0, 0, 12);
-            instructionTextView.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-            linearLayout.addView(instructionTextView);
-
-            if (instruction.getImgUrl() != null && !instruction.getImgUrl().equals("")) {
-                final ImageButton instructionImageView = new ImageButton(getActivity());
-                instructionImageView.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 450));
-                Picasso.get().load(instruction.getImgUrl()).fit().centerCrop().into(instructionImageView);
-                linearLayout.addView(instructionImageView);
-
-                instructionImageView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        //ZOOM
-                        zoomImageFromThumb(instructionImageView, instruction.getImgUrl());
-                    }
-                });
-            }
-
-
-            mInstructionsLinearLayout.addView(linearLayout);
-        }
     }
 
 

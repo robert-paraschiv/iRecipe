@@ -1,4 +1,4 @@
-package com.rokudoz.irecipe.Utils;
+package com.rokudoz.irecipe.Utils.Adapters;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -6,6 +6,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -18,12 +20,14 @@ import com.rokudoz.irecipe.Models.Recipe;
 import com.rokudoz.irecipe.R;
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 
-public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeViewHolder> {
+public class SearchRecipeAdapter extends RecyclerView.Adapter<SearchRecipeAdapter.SearchRecipeViewHolder> implements Filterable {
+    private static final String TAG = "SearchRecipeAdapter";
     private List<Recipe> mRecipeList;
+    private List<Recipe> mRecipeListFull;
     private OnItemClickListener mListener;
 
     public interface OnItemClickListener {
@@ -36,33 +40,19 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
         mListener = listener;
     }
 
-    public class RecipeViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public class SearchRecipeViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         TextView tvTitle, tvDescription, tvNrOfFaves;
-        ImageView mImageView, imgFavorited, imgPrivacy;
-        Map<String, Boolean> ingredientTags;
+        ImageView mImageView, imgFavorited;
 
-        public RecipeViewHolder(View itemView) {
+        public SearchRecipeViewHolder(View itemView) {
             super(itemView);
             tvTitle = itemView.findViewById(R.id.text_view_title);
             tvDescription = itemView.findViewById(R.id.text_view_description);
             mImageView = itemView.findViewById(R.id.recipeItem_image);
             imgFavorited = itemView.findViewById(R.id.recyclerview_favorite);
             tvNrOfFaves = itemView.findViewById(R.id.recyclerview_nrOfFaves_textView);
-            imgPrivacy = itemView.findViewById(R.id.recycler_view_privacy);
 
             itemView.setOnClickListener(this);
-
-            imgFavorited.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (mListener != null) {
-                        int position = getAdapterPosition();
-                        if (position != RecyclerView.NO_POSITION) {
-                            mListener.onFavoriteClick(position);
-                        }
-                    }
-                }
-            });
         }
 
         @Override
@@ -77,18 +67,19 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
 
     }
 
-    public RecipeAdapter(List<Recipe> recipeList) {
-        mRecipeList = recipeList;
+    public SearchRecipeAdapter(List<Recipe> recipeList) {
+        this.mRecipeList = recipeList;
+        mRecipeListFull = new ArrayList<>(recipeList);
     }
 
     @Override
-    public RecipeViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.recyclerview_layout_recipe_item, parent, false);
-        return new RecipeViewHolder(v);
+    public SearchRecipeViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.recyclerview_layout_search_recipe_item, parent, false);
+        return new SearchRecipeViewHolder(v);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull final RecipeViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull final SearchRecipeViewHolder holder, int position) {
         final Recipe currentItem = mRecipeList.get(position);
 
         holder.tvTitle.setText(currentItem.getTitle());
@@ -116,16 +107,6 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
             }
         });
 
-        if (mRecipeList.get(position).getPrivacy().equals("Everyone")) {
-            holder.imgPrivacy.setVisibility(View.GONE);
-        }
-
-        holder.imgFavorited.setImageResource(R.drawable.ic_favorite_border_black_24dp);
-        if (currentItem.getFavorite() != null && currentItem.getFavorite()) {
-            holder.imgFavorited.setImageResource(R.drawable.ic_favorite_red_24dp);
-        }
-
-
     }
 
 
@@ -133,4 +114,39 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
     public int getItemCount() {
         return mRecipeList.size();
     }
+
+    @Override
+    public Filter getFilter() {
+        return recipeFilter;
+    }
+
+    private Filter recipeFilter = new Filter() {
+        @Override
+        protected FilterResults performFiltering(CharSequence constraint) {
+            List<Recipe> filteredList = new ArrayList<>();
+            if (constraint == null || constraint.length() == 0) {
+                filteredList.addAll(mRecipeListFull);
+            } else {
+                String filterPattern = constraint.toString().toLowerCase().trim();
+
+                for (Recipe recipe : mRecipeListFull) {
+                    if (recipe.getTitle().toLowerCase().contains(filterPattern)) {
+                        filteredList.add(recipe);
+                    }
+                }
+            }
+
+            FilterResults results = new FilterResults();
+            results.values = filteredList;
+
+            return results;
+        }
+
+        @Override
+        protected void publishResults(CharSequence constraint, FilterResults results) {
+            mRecipeList.clear();
+            mRecipeList.addAll((List) results.values);
+            notifyDataSetChanged();
+        }
+    };
 }

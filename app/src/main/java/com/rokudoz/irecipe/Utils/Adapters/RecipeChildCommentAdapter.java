@@ -1,4 +1,4 @@
-package com.rokudoz.irecipe.Utils;
+package com.rokudoz.irecipe.Utils.Adapters;
 
 import android.util.Log;
 import android.view.LayoutInflater;

@@ -1,7 +1,6 @@
 package com.rokudoz.irecipe;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -15,17 +14,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.ProgressBar;
 import android.widget.SearchView;
-import android.widget.Toast;
-import android.widget.Toolbar;
 
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.appbar.MaterialToolbar;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -35,16 +29,11 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
-import com.rokudoz.irecipe.Fragments.FeedFragment;
-import com.rokudoz.irecipe.Fragments.FeedFragmentDirections;
 import com.rokudoz.irecipe.Models.Friend;
 import com.rokudoz.irecipe.Models.Ingredient;
 import com.rokudoz.irecipe.Models.Recipe;
 import com.rokudoz.irecipe.Models.User;
-import com.rokudoz.irecipe.Models.UserWhoFaved;
-import com.rokudoz.irecipe.Utils.RecipeAdapter;
-import com.rokudoz.irecipe.Utils.SearchRecipeAdapter;
-import com.squareup.picasso.Picasso;
+import com.rokudoz.irecipe.Utils.Adapters.SearchRecipeAdapter;
 
 import java.util.ArrayList;
 import java.util.List;

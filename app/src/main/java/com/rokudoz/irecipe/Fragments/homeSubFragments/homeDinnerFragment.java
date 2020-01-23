@@ -20,9 +20,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
@@ -33,7 +31,6 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
-import com.rokudoz.irecipe.Account.LoginActivity;
 import com.rokudoz.irecipe.AddRecipesActivity;
 import com.rokudoz.irecipe.Fragments.HomeFragmentDirections;
 import com.rokudoz.irecipe.Models.Ingredient;
@@ -41,14 +38,10 @@ import com.rokudoz.irecipe.Models.Recipe;
 import com.rokudoz.irecipe.Models.User;
 import com.rokudoz.irecipe.Models.UserWhoFaved;
 import com.rokudoz.irecipe.R;
-import com.rokudoz.irecipe.Utils.RecipeAdapter;
+import com.rokudoz.irecipe.Utils.Adapters.RecipeAdapter;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 
 public class homeDinnerFragment extends Fragment implements RecipeAdapter.OnItemClickListener {
     private static final String TAG = "homeDinnerFragment";

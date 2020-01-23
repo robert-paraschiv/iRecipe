@@ -6,7 +6,6 @@ import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.util.Log;
@@ -28,14 +27,12 @@ import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
-import com.rokudoz.irecipe.Fragments.UserProfileFragment;
-import com.rokudoz.irecipe.Fragments.UserProfileFragmentArgs;
 import com.rokudoz.irecipe.Fragments.UserProfileFragmentDirections;
 import com.rokudoz.irecipe.Models.Friend;
 import com.rokudoz.irecipe.Models.Recipe;
 import com.rokudoz.irecipe.Models.User;
 import com.rokudoz.irecipe.Models.UserWhoFaved;
-import com.rokudoz.irecipe.Utils.RecipeAdapter;
+import com.rokudoz.irecipe.Utils.Adapters.RecipeAdapter;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;

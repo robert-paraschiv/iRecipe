@@ -14,15 +14,13 @@ import androidx.viewpager.widget.ViewPager;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.rokudoz.irecipe.AddIngredientActivity;
 import com.rokudoz.irecipe.AddRecipesActivity;
 import com.rokudoz.irecipe.Fragments.homeSubFragments.homeBreakfastFragment;
 import com.rokudoz.irecipe.Fragments.homeSubFragments.homeDinnerFragment;
 import com.rokudoz.irecipe.Fragments.homeSubFragments.homeLunchFragment;
 import com.rokudoz.irecipe.R;
-import com.rokudoz.irecipe.Utils.SectionsPagerAdapter;
+import com.rokudoz.irecipe.Utils.Adapters.SectionsPagerAdapter;
 
 public class HomeFragment extends Fragment {
     private static final String TAG = "HomeFragment";

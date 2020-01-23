@@ -24,9 +24,9 @@
 
     <androidx.core.widget.NestedScrollView
         android:id="@+id/nestedScrollView"
-        android:layout_below="@id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_below="@id/toolbar">
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -48,26 +48,23 @@
             </com.google.android.material.card.MaterialCardView>
 
 
-
-
             <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/recipeDetailed_creatorImage_ImageView"
                 android:layout_width="33dp"
                 android:layout_height="33dp"
-                tools:src="@color/colorPrimaryDark"
-                android:id="@+id/recipeDetailed_creatorImage_ImageView"
+                android:layout_below="@id/recipeDetailed_viewPager_Card"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="8dp"
-                android:layout_below="@id/recipeDetailed_viewPager_Card"
-                />
+                tools:src="@color/colorPrimaryDark" />
 
             <TextView
                 android:id="@+id/recipeDetailed_creatorName_TextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/recipeDetailed_viewPager_Card"
-                android:layout_toEndOf="@id/recipeDetailed_creatorImage_ImageView"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="14dp"
+                android:layout_toEndOf="@id/recipeDetailed_creatorImage_ImageView"
                 tools:text="Creator name" />
 
             <TextView
@@ -79,6 +76,7 @@
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="16dp"
                 tools:text="TitleHere" />
+
             <TextView
                 android:id="@+id/missing_ingredientsNumber"
                 android:layout_width="wrap_content"
@@ -144,20 +142,27 @@
                 android:layout_marginEnd="4dp"
                 app:cardCornerRadius="18dp">
 
-                <TextView
-                    android:id="@+id/tvIngredientsList"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginTop="8dp"
-                    android:textSize="16sp"
-                    tools:text="Ingredients list\n
-        -Ingredient1\n
-        -Ingredient2\n
-        -Ingredient3\n
-        -Ingredient4\n
-        -Ingredient5\n
-        -Ingredient6" />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/tvIngredientsList"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:layout_marginTop="8dp"
+                        android:textSize="18sp"
+                        android:text="Ingredients" />
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/recipeDetailed_ingredients_recycler_view"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginTop="8dp"
+                        android:transitionName="example_transition" />
+                </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
 
@@ -178,21 +183,20 @@
                     android:orientation="vertical">
 
                     <TextView
+                        android:id="@+id/recipeDetailed_instructions_TextView"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="12dp"
-                        android:layout_marginBottom="10dp"
+                        android:layout_marginBottom="8dp"
                         android:text="Instructions step by step"
                         android:textSize="18sp" />
 
-                    <LinearLayout
-                        android:id="@+id/recipeDetailed_instructions_linearLayout"
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/recipeDetailed_instructions_recycler_view"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:animateLayoutChanges="true"
-                        android:orientation="vertical">
-
-                    </LinearLayout>
+                        android:layout_height="match_parent"
+                        android:layout_marginTop="8dp"
+                        android:transitionName="example_transition" />
                 </LinearLayout>
 
             </com.google.android.material.card.MaterialCardView>
@@ -215,8 +219,8 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/recipeDetailed_instruction_Card"
                 android:layout_alignParentEnd="true"
-                android:layout_marginTop="20dp"
                 android:layout_marginStart="16dp"
+                android:layout_marginTop="20dp"
                 android:layout_marginEnd="16dp"
                 android:text="Post"
                 app:cornerRadius="18dp" />

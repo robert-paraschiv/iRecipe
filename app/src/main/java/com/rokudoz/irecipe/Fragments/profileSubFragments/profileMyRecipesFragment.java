@@ -1,10 +1,8 @@
 package com.rokudoz.irecipe.Fragments.profileSubFragments;
 
 
-import android.content.Intent;
 import android.os.Bundle;
 
-import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -20,34 +18,24 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
-import com.rokudoz.irecipe.Account.LoginActivity;
-import com.rokudoz.irecipe.Fragments.HomeFragmentDirections;
-import com.rokudoz.irecipe.Fragments.ProfileFragment;
 import com.rokudoz.irecipe.Fragments.ProfileFragmentDirections;
-import com.rokudoz.irecipe.Fragments.homeSubFragments.homeBreakfastFragment;
-import com.rokudoz.irecipe.Models.Ingredient;
 import com.rokudoz.irecipe.Models.Recipe;
 import com.rokudoz.irecipe.Models.User;
 import com.rokudoz.irecipe.Models.UserWhoFaved;
 import com.rokudoz.irecipe.R;
-import com.rokudoz.irecipe.Utils.RecipeAdapter;
+import com.rokudoz.irecipe.Utils.Adapters.RecipeAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 public class profileMyRecipesFragment extends Fragment implements RecipeAdapter.OnItemClickListener {
     private static final String TAG = "profileMyRecipesFragmen";

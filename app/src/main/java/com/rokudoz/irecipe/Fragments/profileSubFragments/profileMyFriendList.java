@@ -14,27 +14,21 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
-import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
-import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.rokudoz.irecipe.Fragments.ProfileFragmentDirections;
 import com.rokudoz.irecipe.Models.Friend;
-import com.rokudoz.irecipe.Models.Recipe;
 import com.rokudoz.irecipe.Models.User;
-import com.rokudoz.irecipe.Models.UserWhoFaved;
 import com.rokudoz.irecipe.R;
-import com.rokudoz.irecipe.Utils.FriendAdapter;
-import com.rokudoz.irecipe.Utils.RecipeAdapter;
+import com.rokudoz.irecipe.Utils.Adapters.FriendAdapter;
 
 import java.util.ArrayList;
 import java.util.List;

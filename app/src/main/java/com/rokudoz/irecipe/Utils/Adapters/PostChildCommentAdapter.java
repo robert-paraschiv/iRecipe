@@ -1,4 +1,4 @@
-package com.rokudoz.irecipe.Utils;
+package com.rokudoz.irecipe.Utils.Adapters;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -11,7 +11,6 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.rokudoz.irecipe.Fragments.PostDetailedFragmentDirections;
-import com.rokudoz.irecipe.Fragments.RecipeDetailedFragmentDirections;
 import com.rokudoz.irecipe.Models.Comment;
 import com.rokudoz.irecipe.Models.User;
 import com.rokudoz.irecipe.R;

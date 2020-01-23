@@ -19,8 +19,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.MimeTypeMap;
-import android.widget.Button;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -29,36 +27,26 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.StorageTask;
 import com.google.firebase.storage.UploadTask;
 import com.rokudoz.irecipe.Account.LoginActivity;
-import com.rokudoz.irecipe.Fragments.homeSubFragments.homeBreakfastFragment;
-import com.rokudoz.irecipe.Fragments.homeSubFragments.homeDinnerFragment;
-import com.rokudoz.irecipe.Fragments.homeSubFragments.homeLunchFragment;
 import com.rokudoz.irecipe.Fragments.profileSubFragments.profileMyFriendList;
 import com.rokudoz.irecipe.Fragments.profileSubFragments.profileMyIngredientsFragment;
 import com.rokudoz.irecipe.Fragments.profileSubFragments.profileMyRecipesFragment;
-import com.rokudoz.irecipe.Models.Ingredient;
 import com.rokudoz.irecipe.Models.User;
 import com.rokudoz.irecipe.R;
-import com.rokudoz.irecipe.Utils.SectionsPagerAdapter;
+import com.rokudoz.irecipe.Utils.Adapters.SectionsPagerAdapter;
 import com.squareup.picasso.Picasso;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -299,7 +287,7 @@ public class ProfileFragment extends Fragment {
                                 .into(mProfileImage);
 
 
-                        Toast.makeText(getContext(), "empty", Toast.LENGTH_SHORT).show();
+                        Log.d(TAG, "onEvent: Empty profile pic");
                     }
                 }
             }
