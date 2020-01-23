@@ -48,6 +48,9 @@
         <action
             android:id="@+id/action_feedFragment_to_postDetailed"
             app:destination="@id/postDetailed" />
+        <action
+            android:id="@+id/action_feedFragment_to_allMessagesFragment"
+            app:destination="@id/allMessagesFragment" />
     </fragment>
     <fragment
         android:id="@+id/favoritesFragment"
@@ -136,5 +139,35 @@
         <action
             android:id="@+id/action_postDetailed_to_userProfileFragment2"
             app:destination="@id/userProfileFragment2" />
+    </fragment>
+    <fragment
+        android:id="@+id/allMessagesFragment"
+        android:name="com.rokudoz.irecipe.Fragments.Messages.AllMessagesFragment"
+        android:label="fragment_all_messages"
+        tools:layout="@layout/fragment_all_messages" >
+        <action
+            android:id="@+id/action_allMessagesFragment_to_messageFragment"
+            app:destination="@id/messageFragment" />
+        <action
+            android:id="@+id/action_allMessagesFragment_to_selectFriendToOpenConverstationFragment"
+            app:destination="@id/selectFriendToOpenConverstationFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/selectFriendToOpenConverstationFragment"
+        android:name="com.rokudoz.irecipe.Fragments.Messages.SelectFriendToOpenConverstationFragment"
+        android:label="fragment_select_friend_to_open_converstation"
+        tools:layout="@layout/fragment_select_friend_to_open_converstation" >
+        <action
+            android:id="@+id/action_selectFriendToOpenConverstationFragment_to_messageFragment"
+            app:destination="@id/messageFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/messageFragment"
+        android:name="com.rokudoz.irecipe.Fragments.Messages.MessageFragment"
+        android:label="fragment_message"
+        tools:layout="@layout/fragment_message" >
+        <argument
+            android:name="user_id"
+            app:argType="string" />
     </fragment>
 </navigation>

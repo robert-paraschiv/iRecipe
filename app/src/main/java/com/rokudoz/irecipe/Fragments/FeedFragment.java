@@ -10,6 +10,8 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -89,13 +91,24 @@ public class FeedFragment extends Fragment implements PostAdapter.OnItemClickLis
         if (view == null) {
             view = inflater.inflate(R.layout.fragment_feed, container, false);
         }
+        BottomNavigationView navBar = getActivity().findViewById(R.id.bottom_navigation);
+        navBar.setVisibility(View.VISIBLE);
+
         mUser = new User();
         pbLoading = view.findViewById(R.id.homeFragment_pbLoading);
         fab = view.findViewById(R.id.fab_add_recipe);
         mRecyclerView = view.findViewById(R.id.recycler_view);
+        MaterialButton messagesBtn = view.findViewById(R.id.feedFragment_messages_MaterialBtn);
 
         pbLoading.setVisibility(View.VISIBLE);
         mStorageRef = FirebaseStorage.getInstance();
+
+        messagesBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Navigation.findNavController(view).navigate(FeedFragmentDirections.actionFeedFragmentToAllMessagesFragment());
+            }
+        });
 
 
         fab.setVisibility(View.INVISIBLE);
