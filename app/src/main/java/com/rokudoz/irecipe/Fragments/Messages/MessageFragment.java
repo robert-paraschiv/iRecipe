@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.rokudoz.irecipe.R;
@@ -18,6 +19,7 @@ import com.rokudoz.irecipe.R;
 public class MessageFragment extends Fragment {
 
     private View view;
+    private String otherUserId = "";
 
     public MessageFragment() {
         // Required empty public constructor
@@ -30,6 +32,9 @@ public class MessageFragment extends Fragment {
         view = inflater.inflate(R.layout.fragment_message, container, false);
 
 
+        MessageFragmentArgs messageFragmentArgs = MessageFragmentArgs.fromBundle(getArguments());
+        otherUserId = messageFragmentArgs.getUserId();
+        Toast.makeText(getActivity(), "" + otherUserId, Toast.LENGTH_SHORT).show();
 
         return view;
     }
