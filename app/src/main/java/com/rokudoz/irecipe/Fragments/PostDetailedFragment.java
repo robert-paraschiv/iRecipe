@@ -2,6 +2,7 @@ package com.rokudoz.irecipe.Fragments;
 
 
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -35,6 +36,8 @@ import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.rokudoz.irecipe.AddPostActivity;
+import com.rokudoz.irecipe.EditPostActivity;
 import com.rokudoz.irecipe.Models.Comment;
 import com.rokudoz.irecipe.Models.FavoritePost;
 import com.rokudoz.irecipe.Models.Post;
@@ -42,8 +45,8 @@ import com.rokudoz.irecipe.Models.Recipe;
 import com.rokudoz.irecipe.Models.User;
 import com.rokudoz.irecipe.Models.UserWhoFaved;
 import com.rokudoz.irecipe.R;
+import com.rokudoz.irecipe.SearchRecipeActivity;
 import com.rokudoz.irecipe.Utils.PostParentCommentAdapter;
-import com.rokudoz.irecipe.Utils.RecipeParentCommentAdapter;
 import com.squareup.picasso.Picasso;
 
 import java.text.DateFormat;
@@ -64,7 +67,7 @@ public class PostDetailedFragment extends Fragment {
 
     private ImageView creatorImage, postImage, recipeImage, postFavoriteIcon;
     private TextView creatorName, postDescription, postCreationDate, recipeTitle, postFavoriteNumber;
-    private MaterialButton deletePost, addCommentBtn;
+    private MaterialButton editPostBtn, addCommentBtn;
     private EditText commentEditText;
     private RecyclerView commentRecyclerView;
     private MaterialCardView recipeCardView;
@@ -107,7 +110,7 @@ public class PostDetailedFragment extends Fragment {
         recipeTitle = view.findViewById(R.id.postDetailed_recipe_name_TextView);
         postFavoriteIcon = view.findViewById(R.id.postDetailed_imageView_favorite_icon);
         postFavoriteNumber = view.findViewById(R.id.postDetailed_numberOfFaved);
-        deletePost = view.findViewById(R.id.postDetailed_deleteRecipe_MaterialBtn);
+        editPostBtn = view.findViewById(R.id.postDetailed_editPost_MaterialBtn);
         addCommentBtn = view.findViewById(R.id.postDetailed_addComment_btn);
         commentEditText = view.findViewById(R.id.postDetailed_et_commentInput);
         commentRecyclerView = view.findViewById(R.id.postDetailed_comment_recycler_view);
@@ -372,41 +375,21 @@ public class PostDetailedFragment extends Fragment {
                 });
 
                 if (FirebaseAuth.getInstance().getCurrentUser().getUid().equals(post.getCreatorId())) {
-                    deletePost.setVisibility(View.VISIBLE);
-                    deletePost.setOnClickListener(new View.OnClickListener() {
+                    editPostBtn.setVisibility(View.VISIBLE);
+                    editPostBtn.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            MaterialAlertDialogBuilder materialAlertDialogBuilder = new MaterialAlertDialogBuilder(getActivity(), R.style.ThemeOverlay_MaterialComponents_MaterialAlertDialog_Centered);
-                            materialAlertDialogBuilder.setMessage("Are you sure you want to delete your post?");
-                            materialAlertDialogBuilder.setCancelable(true);
-                            materialAlertDialogBuilder.setPositiveButton(
-                                    "Yes",
-                                    new DialogInterface.OnClickListener() {
-                                        public void onClick(DialogInterface dialog, int id) {
-
-                                            postsRef.document(documentID).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                @Override
-                                                public void onSuccess(Void aVoid) {
-                                                    Navigation.findNavController(view).navigate(PostDetailedFragmentDirections.actionPostDetailedToFeedFragment());
-                                                }
-                                            });
-                                            dialog.cancel();
-                                        }
-                                    });
-
-                            materialAlertDialogBuilder.setNegativeButton(
-                                    "No",
-                                    new DialogInterface.OnClickListener() {
-                                        public void onClick(DialogInterface dialog, int id) {
-                                            dialog.cancel();
-                                        }
-                                    });
-
-                            materialAlertDialogBuilder.show();
+                            Intent intent = new Intent(getActivity(), EditPostActivity.class);
+                            intent.putExtra("post_id", documentID);
+                            intent.putExtra("post_imageUrl", post.getImageUrl());
+                            intent.putExtra("post_text", post.getText());
+                            intent.putExtra("post_privacy", post.getPrivacy());
+                            intent.putExtra("post_referencedRecipe", post.getReferenced_recipe_docId());
+                            startActivity(intent);
                         }
                     });
                 } else {
-                    deletePost.setVisibility(View.GONE);
+                    editPostBtn.setVisibility(View.GONE);
                 }
 
 

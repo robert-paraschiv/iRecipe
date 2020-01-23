@@ -44,6 +44,7 @@ import com.rokudoz.irecipe.Models.User;
 import com.rokudoz.irecipe.Models.UserWhoFaved;
 import com.rokudoz.irecipe.Utils.RecipeAdapter;
 import com.rokudoz.irecipe.Utils.SearchRecipeAdapter;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -74,7 +75,14 @@ public class SearchRecipeActivity extends AppCompatActivity implements SearchRec
     private String userFavDocId = "";
 
 
-    private String postText="";
+    private String postText = "";
+    String postID = "";
+    String post_imageUrl = "";
+    String post_text = "";
+    String post_privacy = "";
+    String post_referencedRecipe = "";
+
+    String coming_from = "";
 
     private DocumentSnapshot mLastQueriedDocument;
 
@@ -89,11 +97,33 @@ public class SearchRecipeActivity extends AppCompatActivity implements SearchRec
         setSupportActionBar(myToolbar);
 
         if (getIntent() != null) {
-            if (getIntent().getStringExtra("post_text") != null) {
-                postText = getIntent().getStringExtra("post_text");
-            }
-        }
+            coming_from = getIntent().getStringExtra("coming_from");
 
+            if (getIntent().getStringExtra("coming_from").equals("AddPostActivity")) {
+                if (getIntent().getStringExtra("post_text") != null) {
+                    postText = getIntent().getStringExtra("post_text");
+                }
+            }
+            if (getIntent().getStringExtra("coming_from").equals("EditPostActivity")) {
+                if (getIntent().getStringExtra("post_id") != null) {
+                    postID = getIntent().getStringExtra("post_id");
+                }
+                if (getIntent().getStringExtra("post_imageUrl") != null) {
+                    post_imageUrl = getIntent().getStringExtra("post_imageUrl");
+                }
+                if (getIntent().getStringExtra("post_text") != null) {
+                    post_text = getIntent().getStringExtra("post_text");
+                }
+                if (getIntent().getStringExtra("post_privacy") != null) {
+                    post_privacy = getIntent().getStringExtra("post_privacy");
+                }
+                if (getIntent().getStringExtra("post_referencedRecipe") != null) {
+                    post_referencedRecipe = getIntent().getStringExtra("post_referencedRecipe");
+                }
+            }
+
+
+        }
 
 
         mStorageRef = FirebaseStorage.getInstance();
@@ -142,7 +172,7 @@ public class SearchRecipeActivity extends AppCompatActivity implements SearchRec
         searchView.setOnQueryTextFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
-                if (hasFocus){
+                if (hasFocus) {
                     showInputMethod(v.findFocus());
                 }
             }
@@ -254,12 +284,26 @@ public class SearchRecipeActivity extends AppCompatActivity implements SearchRec
         mAdapter.setOnItemClickListener(new SearchRecipeAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(int position) {
-                String id = mRecipeList.get(position).getDocumentId();
-                Intent intent = new Intent(SearchRecipeActivity.this, AddPostActivity.class);
-                intent.putExtra("post_text", postText);
-                intent.putExtra("recipe_doc_id", id);
-                startActivity(intent);
-                finish();
+
+                if (coming_from.equals("AddPostActivity")){
+                    String id = mRecipeList.get(position).getDocumentId();
+                    Intent intent = new Intent(SearchRecipeActivity.this, AddPostActivity.class);
+                    intent.putExtra("post_text", postText);
+                    intent.putExtra("recipe_doc_id", id);
+                    startActivity(intent);
+                    finish();
+                }else if (coming_from.equals("EditPostActivity")){
+                    String id = mRecipeList.get(position).getDocumentId();
+                    Intent intent = new Intent(SearchRecipeActivity.this, EditPostActivity.class);
+                    intent.putExtra("post_id", postID);
+                    intent.putExtra("post_imageUrl", post_imageUrl);
+                    intent.putExtra("post_text", post_text);
+                    intent.putExtra("post_privacy", post_privacy);
+                    intent.putExtra("post_referencedRecipe", id);
+                    startActivity(intent);
+                    finish();
+                }
+
             }
 
             @Override

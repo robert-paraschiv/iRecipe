@@ -49,9 +49,6 @@ public class AddPostActivity extends AppCompatActivity {
     Bitmap imageBitmap;
     //FireBase refs
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
-    private CollectionReference recipesReference = db.collection("Recipes");
-    private CollectionReference usersReference = db.collection("Users");
-    private CollectionReference ingredientsReference = db.collection("Ingredients");
     private StorageReference mStorageRef = FirebaseStorage.getInstance().getReference("PostPhotos");
     private StorageTask mUploadTask;
 
@@ -90,6 +87,7 @@ public class AddPostActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(AddPostActivity.this, SearchRecipeActivity.class);
+                intent.putExtra("coming_from","AddPostActivity");
                 intent.putExtra("post_text", descriptionInputText.getText().toString());
                 startActivity(intent);
             }
