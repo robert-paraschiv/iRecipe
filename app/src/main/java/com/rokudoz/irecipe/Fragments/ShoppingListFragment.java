@@ -26,6 +26,7 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -184,10 +185,22 @@ public class ShoppingListFragment extends Fragment {
                     @Override
                     public void onClick(View v) {
 
+                        final LinearLayout linearLayout = new LinearLayout(getActivity());
+                        linearLayout.setOrientation(LinearLayout.VERTICAL);
                         final EditText input = new EditText(getActivity());
+                        final Spinner spinner = new Spinner(getActivity());
+                        String[] items = new String[]{"Vegetables", "Fruits", "Meats", "Dairy", "Seafood", "Condiments"
+                                , "Oils", "Flour/Grains/Cereals", "Batter/Breading/Pastas"};
+                        //create an adapter to describe how the items are displayed, adapters are used in several places in android.
+                        //There are multiple variations of this, but this is the basic variant.
+                        ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_dropdown_item, items);
+                        //set the spinners adapter to the previously created one.
+                        spinner.setAdapter(adapter);
                         input.setInputType(InputType.TYPE_TEXT_FLAG_CAP_WORDS);
                         MaterialAlertDialogBuilder materialAlertDialogBuilder = new MaterialAlertDialogBuilder(getActivity(), R.style.ThemeOverlay_MaterialComponents_MaterialAlertDialog_Centered);
-                        materialAlertDialogBuilder.setView(input);
+                        linearLayout.addView(input);
+                        linearLayout.addView(spinner);
+                        materialAlertDialogBuilder.setView(linearLayout);
                         materialAlertDialogBuilder.setMessage("Add ingredient to shopping list");
                         materialAlertDialogBuilder.setCancelable(true);
                         materialAlertDialogBuilder.setPositiveButton(
@@ -195,7 +208,7 @@ public class ShoppingListFragment extends Fragment {
                                 new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int id) {
                                         //
-                                        Ingredient ingredient = new Ingredient(input.getText().toString(), "Self Added", 0f, "g", false);
+                                        Ingredient ingredient = new Ingredient(input.getText().toString(), spinner.getSelectedItem().toString(), 0f, "g", false);
                                         if (shoppingListIngredients.contains(ingredient)) {
                                             Toast.makeText(getActivity(), "" + input.getText().toString() + " is already in your shopping list", Toast.LENGTH_SHORT).show();
                                         } else {
