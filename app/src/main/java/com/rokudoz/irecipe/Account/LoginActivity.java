@@ -147,7 +147,7 @@ public class LoginActivity extends AppCompatActivity implements
                             .addOnFailureListener(new OnFailureListener() {
                                 @Override
                                 public void onFailure(@NonNull Exception e) {
-                                    Toast.makeText(LoginActivity.this, "Authentication Failed" + e, Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(LoginActivity.this, "Authentication Failed" + e.getMessage(), Toast.LENGTH_SHORT).show();
                                     hideProgressBar();
                                 }
                             });

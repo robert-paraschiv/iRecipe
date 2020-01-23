@@ -209,18 +209,24 @@ public class ShoppingListFragment extends Fragment {
                                     public void onClick(DialogInterface dialog, int id) {
                                         //
                                         Ingredient ingredient = new Ingredient(input.getText().toString(), spinner.getSelectedItem().toString(), 0f, "g", false);
-                                        if (shoppingListIngredients.contains(ingredient)) {
-                                            Toast.makeText(getActivity(), "" + input.getText().toString() + " is already in your shopping list", Toast.LENGTH_SHORT).show();
-                                        } else {
-                                            usersReference.document(userDocumentID).collection("ShoppingList").add(ingredient).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                                                @Override
-                                                public void onSuccess(DocumentReference documentReference) {
-                                                    Log.d(TAG, "onSuccess: added to db");
-                                                }
-                                            });
 
+                                        if (input.getText().toString().trim().equals("")) {
+                                            Toast.makeText(getActivity(), "You need to write the name of what you want to add to the shopping list", Toast.LENGTH_SHORT).show();
+                                        } else {
+                                            if (shoppingListIngredients.contains(ingredient)) {
+                                                Toast.makeText(getActivity(), "" + input.getText().toString() + " is already in your shopping list", Toast.LENGTH_SHORT).show();
+                                            } else {
+                                                usersReference.document(userDocumentID).collection("ShoppingList").add(ingredient).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                                                    @Override
+                                                    public void onSuccess(DocumentReference documentReference) {
+                                                        Log.d(TAG, "onSuccess: added to db");
+                                                    }
+                                                });
+
+                                            }
+                                            dialog.cancel();
                                         }
-                                        dialog.cancel();
+
                                     }
                                 });
 

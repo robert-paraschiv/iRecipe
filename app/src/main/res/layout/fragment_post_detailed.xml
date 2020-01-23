@@ -16,28 +16,17 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/postDetailed_creatorImage_cardView"
+            <de.hdodenhof.circleimageview.CircleImageView
                 android:layout_width="33dp"
                 android:layout_height="33dp"
+                tools:src="@color/colorPrimaryDark"
+                android:id="@+id/postDetailed_creatorImage_ImageView"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
                 android:layout_marginStart="4dp"
                 android:layout_marginTop="8dp"
-                app:cardCornerRadius="35dp">
+                />
 
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent">
-
-                    <ImageView
-                        android:id="@+id/postDetailed_creatorImage_ImageView"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_centerVertical="true"
-                        tools:src="@color/colorPrimary" />
-                </RelativeLayout>
-
-
-            </com.google.android.material.card.MaterialCardView>
 
             <TextView
                 android:id="@+id/postDetailed_creatorName_TextView"
@@ -45,7 +34,7 @@
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
                 android:layout_marginStart="8dp"
-                android:layout_toEndOf="@id/postDetailed_creatorImage_cardView"
+                android:layout_toEndOf="@id/postDetailed_creatorImage_ImageView"
                 tools:text="Creator name" />
 
             <TextView

@@ -13,36 +13,30 @@
         android:layout_height="match_parent"
         android:padding="4dp">
 
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/recycler_view_postItem_creator_Image_CardView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            tools:src="@color/colorPrimaryDark"
+            android:id="@+id/postItem_creator_image"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
-            app:cardCornerRadius="25dp">
-
-            <ImageView
-                android:id="@+id/postItem_creator_image"
-                android:layout_width="25dp"
-                android:layout_height="25dp"
-                tools:src="@color/colorPrimary" />
-        </com.google.android.material.card.MaterialCardView>
+            />
 
         <TextView
             android:id="@+id/postItem_creator_name_textView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerVertical="@id/recycler_view_postItem_creator_Image_CardView"
+            android:layout_centerVertical="@id/postItem_creator_image"
             android:layout_marginStart="4dp"
             android:layout_marginTop="10dp"
-            android:layout_toEndOf="@id/recycler_view_postItem_creator_Image_CardView"
+            android:layout_toEndOf="@id/postItem_creator_image"
             tools:text="Creator Name" />
 
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/recycler_view_postItem_Image_CardView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/recycler_view_postItem_creator_Image_CardView"
+            android:layout_below="@id/postItem_creator_image"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="4dp"
             app:cardCornerRadius="18dp">

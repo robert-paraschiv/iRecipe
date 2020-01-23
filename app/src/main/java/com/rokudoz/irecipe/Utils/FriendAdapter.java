@@ -24,11 +24,14 @@ import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
+import de.hdodenhof.circleimageview.CircleImageView;
+
 
 public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.FriendViewHolder> {
     private List<Friend> mFriendList;
     private OnItemClickListener mListener;
     TextView friendReqReceivedTv;
+
     public interface OnItemClickListener {
         void onItemClick(int position);
     }
@@ -39,7 +42,7 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.FriendView
 
     public class FriendViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         TextView tvName;
-        ImageView mImage;
+        CircleImageView mImage;
 
 
         public FriendViewHolder(View itemView) {
@@ -85,17 +88,18 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.FriendView
                     User user = documentSnapshot.toObject(User.class);
                     holder.tvName.setText(user.getName());
 
-                    Picasso.get()
-                            .load(user.getUserProfilePicUrl())
-                            .fit()
-                            .centerCrop()
-                            .into(holder.mImage);
+                    if (user.getUserProfilePicUrl() != null && !user.getUserProfilePicUrl().equals(""))
+                        Picasso.get()
+                                .load(user.getUserProfilePicUrl())
+                                .fit()
+                                .centerCrop()
+                                .into(holder.mImage);
                 }
             }
         });
-        if (currentItem.getFriend_status().equals("friend_request_received")){
+        if (currentItem.getFriend_status().equals("friend_request_received")) {
             friendReqReceivedTv.setVisibility(View.VISIBLE);
-        }else if (currentItem.getFriend_status().equals("friends")|| currentItem.getFriend_status().equals("friend_request_accepted")){
+        } else if (currentItem.getFriend_status().equals("friends") || currentItem.getFriend_status().equals("friend_request_accepted")) {
             friendReqReceivedTv.setVisibility(View.GONE);
         }
     }

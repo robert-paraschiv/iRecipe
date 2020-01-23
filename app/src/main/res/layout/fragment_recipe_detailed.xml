@@ -49,27 +49,23 @@
 
 
 
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/recipeDetailed_creatorImage_cardView"
+
+            <de.hdodenhof.circleimageview.CircleImageView
                 android:layout_width="33dp"
                 android:layout_height="33dp"
+                tools:src="@color/colorPrimaryDark"
+                android:id="@+id/recipeDetailed_creatorImage_ImageView"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="8dp"
                 android:layout_below="@id/recipeDetailed_viewPager_Card"
-                app:cardCornerRadius="35dp">
+                />
 
-                <ImageView
-                    android:id="@+id/recipeDetailed_creatorImage_ImageView"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    tools:src="@color/colorPrimary"/>
-            </com.google.android.material.card.MaterialCardView>
             <TextView
                 android:id="@+id/recipeDetailed_creatorName_TextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/recipeDetailed_viewPager_Card"
-                android:layout_toEndOf="@id/recipeDetailed_creatorImage_cardView"
+                android:layout_toEndOf="@id/recipeDetailed_creatorImage_ImageView"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="14dp"
                 tools:text="Creator name" />
@@ -79,7 +75,7 @@
                 style="@style/TextAppearance.MaterialComponents.Headline6"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/recipeDetailed_creatorImage_cardView"
+                android:layout_below="@+id/recipeDetailed_creatorImage_ImageView"
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="16dp"
                 tools:text="TitleHere" />

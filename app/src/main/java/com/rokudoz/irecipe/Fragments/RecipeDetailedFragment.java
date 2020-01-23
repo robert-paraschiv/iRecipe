@@ -62,6 +62,8 @@ import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.hdodenhof.circleimageview.CircleImageView;
+
 public class RecipeDetailedFragment extends Fragment {
     private static final String TAG = "RecipeDetailedFragment";
     // Hold a reference to the current animator,
@@ -98,7 +100,8 @@ public class RecipeDetailedFragment extends Fragment {
 
     private MaterialButton mDeleteRecipeBtn;
     private TextView tvTitle, tvDescription, tvIngredients, mFavoriteNumber, tvMissingIngredientsNumber, tvCreatorName;
-    private ImageView mImageView, mFavoriteIcon, mCreatorImage;
+    private ImageView mImageView, mFavoriteIcon;
+    private CircleImageView mCreatorImage;
     private Button mAddCommentBtn;
     private ExtendedFloatingActionButton mAddMissingIngredientsFAB;
     private EditText mCommentEditText;

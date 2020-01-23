@@ -31,6 +31,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import de.hdodenhof.circleimageview.CircleImageView;
+
 
 public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder> {
     private List<Post> post_List;
@@ -54,7 +56,8 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
 
     public class PostViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         TextView tvDescription, tvNrOfFaves, creatorName, creationDate;
-        ImageView mImageView, imgFavorited, creatorImage;
+        ImageView mImageView, imgFavorited;
+        CircleImageView creatorImage;
 
         public PostViewHolder(View itemView) {
             super(itemView);

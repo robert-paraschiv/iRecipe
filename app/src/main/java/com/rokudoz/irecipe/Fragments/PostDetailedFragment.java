@@ -56,6 +56,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+import de.hdodenhof.circleimageview.CircleImageView;
+
 public class PostDetailedFragment extends Fragment {
     private static final String TAG = "PostDetailedFragment";
 
@@ -65,7 +67,8 @@ public class PostDetailedFragment extends Fragment {
     private static final int DAY_MILLIS = 24 * HOUR_MILLIS;
 
 
-    private ImageView creatorImage, postImage, recipeImage, postFavoriteIcon;
+    private ImageView postImage, recipeImage, postFavoriteIcon;
+    private CircleImageView creatorImage;
     private TextView creatorName, postDescription, postCreationDate, recipeTitle, postFavoriteNumber;
     private MaterialButton editPostBtn, addCommentBtn;
     private EditText commentEditText;
