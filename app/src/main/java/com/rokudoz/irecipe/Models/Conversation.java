@@ -64,4 +64,13 @@ public class Conversation {
                 ", date=" + date +
                 '}';
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof Conversation))
+            return false;
+        if (obj == this)
+            return true;
+        return this.userId.equals(((Conversation) obj).userId);
+    }
 }
