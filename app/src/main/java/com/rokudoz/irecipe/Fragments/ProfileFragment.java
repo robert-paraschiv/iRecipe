@@ -43,6 +43,7 @@ import com.rokudoz.irecipe.Fragments.profileSubFragments.profileMyRecipesFragmen
 import com.rokudoz.irecipe.Models.User;
 import com.rokudoz.irecipe.R;
 import com.rokudoz.irecipe.Utils.Adapters.SectionsPagerAdapter;
+import com.rokudoz.irecipe.Utils.RotateBitmap;
 import com.squareup.picasso.Picasso;
 
 import java.io.ByteArrayOutputStream;
@@ -57,6 +58,7 @@ public class ProfileFragment extends Fragment {
 
     private static final int PICK_IMAGE_REQUEST = 1;
     private Uri mImageUri;
+    private Bitmap imageBitmap;
     private TextView UserNameTv;
     private TextView UserUsernameTv;
     private TextView UserDescriptionTv;
@@ -105,7 +107,7 @@ public class ProfileFragment extends Fragment {
             @Override
             public void onClick(View v) {
 
-                usersReference.document(userDocumentID).update("user_tokenID","").addOnSuccessListener(new OnSuccessListener<Void>() {
+                usersReference.document(userDocumentID).update("user_tokenID", "").addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
                         FirebaseAuth.getInstance().signOut();
@@ -160,7 +162,12 @@ public class ProfileFragment extends Fragment {
         if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK
                 && data != null && data.getData() != null) {
             mImageUri = data.getData();
-
+            try {
+                RotateBitmap rotateBitmap = new RotateBitmap();
+                imageBitmap = rotateBitmap.HandleSamplingAndRotationBitmap(getActivity(), mImageUri);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             uploadUserProfilePic();
         }
     }
@@ -192,12 +199,7 @@ public class ProfileFragment extends Fragment {
             final Boolean finalProfilePicNotInFireStore = profilePicNotInFireStore;
 
             //Compress image
-            Bitmap bitmap = null;
-            try {
-                bitmap = MediaStore.Images.Media.getBitmap(getContext().getContentResolver(),mImageUri);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            Bitmap bitmap = imageBitmap;
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             bitmap.compress(Bitmap.CompressFormat.JPEG, 25, baos);
             byte[] data = baos.toByteArray();

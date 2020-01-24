@@ -22,7 +22,7 @@
         android:text="+"
         app:icon="@drawable/ic_shopping_basket_black_24dp" />
 
-    <androidx.core.widget.NestedScrollView
+    <ScrollView
         android:id="@+id/nestedScrollView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -234,7 +234,7 @@
                 android:transitionName="example_transition" />
         </RelativeLayout>
 
-    </androidx.core.widget.NestedScrollView>
+    </ScrollView>
 
     <ImageView
         android:id="@+id/expanded_image"

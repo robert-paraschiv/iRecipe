@@ -280,7 +280,7 @@ public class LoginActivity extends AppCompatActivity implements
                 // Google Sign In failed, update UI appropriately
                 Log.w(TAG, "Google sign in failed", e);
                 // [START_EXCLUDE]
-                Toast.makeText(this, "Failed To log in", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
                 // [END_EXCLUDE]
             }
         }

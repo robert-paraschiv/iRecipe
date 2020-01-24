@@ -7,18 +7,21 @@ import java.util.Date;
 
 public class Message {
     private String documentId;
-    private String sender_id;
-    private String receiver_id;
     private String text;
+    private String sender_id;
+    private String type;
 
     private @ServerTimestamp
     Date timestamp;
 
-    public Message(String sender_id, String receiver_id, String text, Date timestamp) {
+    public Message(String sender_id, String text, String type, Date timestamp) {
         this.sender_id = sender_id;
-        this.receiver_id = receiver_id;
         this.text = text;
+        this.type = type;
         this.timestamp = timestamp;
+    }
+
+    public Message() {
     }
 
     @Exclude
@@ -38,13 +41,6 @@ public class Message {
         this.sender_id = sender_id;
     }
 
-    public String getReceiver_id() {
-        return receiver_id;
-    }
-
-    public void setReceiver_id(String receiver_id) {
-        this.receiver_id = receiver_id;
-    }
 
     public String getText() {
         return text;
@@ -62,13 +58,21 @@ public class Message {
         this.timestamp = timestamp;
     }
 
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
     @Override
     public String toString() {
         return "Message{" +
                 "documentId='" + documentId + '\'' +
-                ", sender_id='" + sender_id + '\'' +
-                ", receiver_id='" + receiver_id + '\'' +
                 ", text='" + text + '\'' +
+                ", sender_id='" + sender_id + '\'' +
+                ", type='" + type + '\'' +
                 ", timestamp=" + timestamp +
                 '}';
     }

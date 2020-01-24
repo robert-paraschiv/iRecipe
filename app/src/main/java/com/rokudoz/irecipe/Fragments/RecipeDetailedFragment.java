@@ -26,6 +26,7 @@ import android.view.animation.DecelerateInterpolator;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -103,7 +104,7 @@ public class RecipeDetailedFragment extends Fragment {
     private RecyclerView.Adapter ingredientsAdapter;
     private RecyclerView.LayoutManager ingredientsLayoutManager;
 
-    private NestedScrollView nestedScrollView;
+    private ScrollView nestedScrollView;
 
     private MaterialButton mDeleteRecipeBtn;
     private TextView tvTitle, tvDescription, tvIngredients, mFavoriteNumber, tvMissingIngredientsNumber, tvCreatorName;
