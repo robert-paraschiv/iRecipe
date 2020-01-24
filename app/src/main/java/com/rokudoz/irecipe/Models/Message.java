@@ -76,4 +76,13 @@ public class Message {
                 ", timestamp=" + timestamp +
                 '}';
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof Message))
+            return false;
+        if (obj == this)
+            return true;
+        return this.documentId.equals(((Message) obj).documentId);
+    }
 }

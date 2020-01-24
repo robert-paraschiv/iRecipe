@@ -20,7 +20,11 @@ import com.rokudoz.irecipe.Models.User;
 import com.rokudoz.irecipe.R;
 import com.squareup.picasso.Picasso;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -38,7 +42,7 @@ public class ConversationAdapter extends RecyclerView.Adapter<ConversationAdapte
     }
 
     public class ConversationViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        TextView tvName,tvMessage,tvTimeStamp;
+        TextView tvName, tvMessage, tvTimeStamp;
         CircleImageView mImage;
 
 
@@ -96,9 +100,15 @@ public class ConversationAdapter extends RecyclerView.Adapter<ConversationAdapte
             }
         });
 
+        if (currentItem.getDate() != null) {
+            Date date = currentItem.getDate();
+            DateFormat dateFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
+            String creationDate = dateFormat.format(date);
 
-        holder.tvMessage.setText(currentItem.getText());
-        holder.tvTimeStamp.setText(currentItem.getDate().toString());
+            holder.tvMessage.setText(currentItem.getText());
+            holder.tvTimeStamp.setText(creationDate);
+        }
+
 
     }
 

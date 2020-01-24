@@ -5,6 +5,8 @@ import android.os.Bundle;
 
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -24,11 +26,19 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.rokudoz.irecipe.Models.Conversation;
 import com.rokudoz.irecipe.Models.Message;
 import com.rokudoz.irecipe.Models.User;
 import com.rokudoz.irecipe.R;
+import com.rokudoz.irecipe.Utils.Adapters.ConversationAdapter;
+import com.rokudoz.irecipe.Utils.Adapters.MessageAdapter;
 import com.squareup.picasso.Picasso;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -43,6 +53,12 @@ public class MessageFragment extends Fragment {
     private View view;
     private String friendUserId = "";
     private String currentUserId = "";
+
+    private List<Message> messageList = new ArrayList<>();
+
+    private RecyclerView mRecyclerView;
+    private MessageAdapter mAdapter;
+    private RecyclerView.LayoutManager mLayoutManager;
 
     private User userFriend = new User();
 
@@ -64,12 +80,13 @@ public class MessageFragment extends Fragment {
         friendName = view.findViewById(R.id.message_friendName_TextView);
         textInputEditText = view.findViewById(R.id.message_input_TextInput);
         sendButton = view.findViewById(R.id.message_send_MaterialBtn);
-
+        mRecyclerView = view.findViewById(R.id.message_recycler_view);
         MessageFragmentArgs messageFragmentArgs = MessageFragmentArgs.fromBundle(getArguments());
         friendUserId = messageFragmentArgs.getUserId();
         currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
         Log.d(TAG, "onCreateView: friend id " + friendUserId);
 
+        buildRecyclerView();
         getFriendDetails();
 
         sendButton.setOnClickListener(new View.OnClickListener() {
@@ -82,6 +99,45 @@ public class MessageFragment extends Fragment {
         return view;
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+        getMessages();
+    }
+
+    private void buildRecyclerView() {
+        Log.d(TAG, "buildRecyclerView: ");
+        mRecyclerView.setHasFixedSize(true);
+        mLayoutManager = new LinearLayoutManager(getContext());
+
+        mAdapter = new MessageAdapter(messageList);
+
+        mRecyclerView.setLayoutManager(mLayoutManager);
+        mRecyclerView.setAdapter(mAdapter);
+    }
+
+
+    private void getMessages() {
+        usersReference.document(currentUserId).collection("Conversations").document(friendUserId)
+                .collection(friendUserId).orderBy("timestamp", Query.Direction.ASCENDING).addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                if (e != null) {
+                    Log.w(TAG, "onEvent: ", e);
+                    return;
+                }
+                for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                    Message message = documentSnapshot.toObject(Message.class);
+                    message.setDocumentId(documentSnapshot.getId());
+                    if (!messageList.contains(message)) {
+                        messageList.add(message);
+                    }
+                    mAdapter.notifyDataSetChanged();
+                }
+            }
+        });
+    }
+
     private void sendMessage() {
         if (textInputEditText.getText().toString().trim().equals("")) {
             Toast.makeText(getActivity(), "Can't send empty message", Toast.LENGTH_SHORT).show();
@@ -90,8 +146,8 @@ public class MessageFragment extends Fragment {
             final Message messageForCurrentUser = new Message(currentUserId, text, "message_sent", null);
             final Message messageForFriendUser = new Message(currentUserId, text, "message_received", null);
 
-            final Conversation conversationForCurrentUser = new Conversation(friendUserId,text, "message_sent",null);
-            final Conversation conversationForFriendUser = new Conversation(currentUserId,text, "message_received",null);
+            final Conversation conversationForCurrentUser = new Conversation(friendUserId, text, "message_sent", null);
+            final Conversation conversationForFriendUser = new Conversation(currentUserId, text, "message_received", null);
 
             textInputEditText.setText("");
 
@@ -102,25 +158,25 @@ public class MessageFragment extends Fragment {
 
                             usersReference.document(friendUserId).collection("Conversations").document(currentUserId).set(conversationForFriendUser)
                                     .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                @Override
-                                public void onSuccess(Void aVoid) {
-                                    usersReference.document(currentUserId).collection("Conversations").document(friendUserId)
-                                            .collection(friendUserId).add(messageForCurrentUser).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                                         @Override
-                                        public void onSuccess(DocumentReference documentReference) {
-                                            Log.d(TAG, "onSuccess: Added message in current user db");
-
-                                            usersReference.document(friendUserId).collection("Conversations").document(currentUserId)
-                                                    .collection(currentUserId).add(messageForFriendUser).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                                        public void onSuccess(Void aVoid) {
+                                            usersReference.document(currentUserId).collection("Conversations").document(friendUserId)
+                                                    .collection(friendUserId).add(messageForCurrentUser).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                                                 @Override
                                                 public void onSuccess(DocumentReference documentReference) {
-                                                    Log.d(TAG, "onSuccess: Added message in friend user db");
+                                                    Log.d(TAG, "onSuccess: Added message in current user db");
+
+                                                    usersReference.document(friendUserId).collection("Conversations").document(currentUserId)
+                                                            .collection(currentUserId).add(messageForFriendUser).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                                                        @Override
+                                                        public void onSuccess(DocumentReference documentReference) {
+                                                            Log.d(TAG, "onSuccess: Added message in friend user db");
+                                                        }
+                                                    });
                                                 }
                                             });
                                         }
                                     });
-                                }
-                            });
                         }
                     });
         }
