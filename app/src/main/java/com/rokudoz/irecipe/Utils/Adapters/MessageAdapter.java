@@ -3,6 +3,7 @@ package com.rokudoz.irecipe.Utils.Adapters;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,6 +30,7 @@ import java.util.Map;
 
 public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageViewHolder> {
     private List<Message> messageList = new ArrayList<>();
+    private static final String TAG = "MessageAdapter";
 
     public class MessageViewHolder extends RecyclerView.ViewHolder {
         TextView tvMessageText, tvMessageTimeStamp;
@@ -59,17 +61,26 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
 
         String currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
-        if (currentItem.getSender_id().equals(currentUserId)) {
-            RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) holder.materialCardView.getLayoutParams();
+        if (currentItem.getType().equals("message_sent")) {
+
+            //Set params for message sent
+            RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
             params.addRule(RelativeLayout.ALIGN_PARENT_END);
             holder.materialCardView.setLayoutParams(params);
-            holder.materialCardView.setBackgroundResource(R.color.colorPrimary);
-        } else {
+            holder.materialCardView.setCardBackgroundColor(holder.materialCardView.getResources().getColor(R.color.colorPrimary));
+        } else if (currentItem.getType().equals("message_received")){
 
+            //Reset params
+            RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            params.addRule(RelativeLayout.ALIGN_PARENT_START);
+            holder.materialCardView.setLayoutParams(params);
+            MaterialCardView materialCardView = new MaterialCardView(holder.materialCardView.getContext());
+            holder.materialCardView.setCardBackgroundColor(materialCardView.getCardBackgroundColor());
         }
 
         holder.tvMessageText.setText(currentItem.getText());
 
+        Log.d(TAG, "onBindViewHolder: " + currentItem.getText() + " " + currentItem.getType());
         if (currentItem.getTimestamp() != null) {
             Date date = currentItem.getTimestamp();
             DateFormat dateFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());

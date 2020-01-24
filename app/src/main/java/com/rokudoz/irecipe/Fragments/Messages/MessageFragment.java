@@ -109,11 +109,14 @@ public class MessageFragment extends Fragment {
         Log.d(TAG, "buildRecyclerView: ");
         mRecyclerView.setHasFixedSize(true);
         mLayoutManager = new LinearLayoutManager(getContext());
+        final LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
+        linearLayoutManager.setStackFromEnd(true);
 
         mAdapter = new MessageAdapter(messageList);
 
-        mRecyclerView.setLayoutManager(mLayoutManager);
+        mRecyclerView.setLayoutManager(linearLayoutManager);
         mRecyclerView.setAdapter(mAdapter);
+
     }
 
 
@@ -133,6 +136,7 @@ public class MessageFragment extends Fragment {
                         messageList.add(message);
                     }
                     mAdapter.notifyDataSetChanged();
+                    mRecyclerView.scrollToPosition(messageList.size()-1);
                 }
             }
         });
