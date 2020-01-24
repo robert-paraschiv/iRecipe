@@ -5,6 +5,7 @@ import android.os.Bundle;
 
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -81,10 +82,19 @@ public class MessageFragment extends Fragment {
         textInputEditText = view.findViewById(R.id.message_input_TextInput);
         sendButton = view.findViewById(R.id.message_send_MaterialBtn);
         mRecyclerView = view.findViewById(R.id.message_recycler_view);
+
         MessageFragmentArgs messageFragmentArgs = MessageFragmentArgs.fromBundle(getArguments());
         friendUserId = messageFragmentArgs.getUserId();
         currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
         Log.d(TAG, "onCreateView: friend id " + friendUserId);
+
+        friendImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Navigation.findNavController(view).navigate(MessageFragmentDirections.actionMessageFragmentToUserProfileFragment2(friendUserId));
+            }
+        });
+
 
         buildRecyclerView();
         getFriendDetails();

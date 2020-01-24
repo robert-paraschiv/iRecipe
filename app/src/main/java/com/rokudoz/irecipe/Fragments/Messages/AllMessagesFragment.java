@@ -97,6 +97,8 @@ public class AllMessagesFragment extends Fragment implements ConversationAdapter
             }
         });
 
+        conversationList = new ArrayList<>();
+
         buildRecyclerView();
         getCurrentUserDetails();
 
@@ -142,9 +144,9 @@ public class AllMessagesFragment extends Fragment implements ConversationAdapter
                     Conversation conversation = documentSnapshot.toObject(Conversation.class);
                     if (!conversationList.contains(conversation)) {
                         conversationList.add(conversation);
-                        mAdapter.notifyDataSetChanged();
                     }
                 }
+                mAdapter.notifyDataSetChanged();
             }
         });
 

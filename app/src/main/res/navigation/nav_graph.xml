@@ -121,6 +121,10 @@
         <action
             android:id="@+id/action_userProfileFragment2_to_recipeDetailedFragment"
             app:destination="@id/recipeDetailedFragment" />
+        <action
+            android:id="@+id/action_userProfileFragment2_to_messageFragment"
+            app:destination="@id/messageFragment"
+            app:popUpTo="@+id/allMessagesFragment" />
     </fragment>
     <fragment
         android:id="@+id/postDetailed"
@@ -159,7 +163,8 @@
         tools:layout="@layout/fragment_select_friend_to_open_converstation" >
         <action
             android:id="@+id/action_selectFriendToOpenConverstationFragment_to_messageFragment"
-            app:destination="@id/messageFragment" />
+            app:destination="@id/messageFragment"
+            app:popUpTo="@+id/allMessagesFragment" />
     </fragment>
     <fragment
         android:id="@+id/messageFragment"
@@ -169,5 +174,8 @@
         <argument
             android:name="user_id"
             app:argType="string" />
+        <action
+            android:id="@+id/action_messageFragment_to_userProfileFragment2"
+            app:destination="@id/userProfileFragment2" />
     </fragment>
 </navigation>

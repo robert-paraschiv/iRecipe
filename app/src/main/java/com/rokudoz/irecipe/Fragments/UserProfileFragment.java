@@ -98,11 +98,24 @@ public class UserProfileFragment extends Fragment implements RecipeAdapter.OnIte
         mProfileImage = view.findViewById(R.id.userprofileFragment_profileImage);
         mRecyclerView = view.findViewById(R.id.userprofile_recycler_view);
         mAddFriendButton = view.findViewById(R.id.userprofile_addFriend_MaterialButton);
+        MaterialButton messageUser = view.findViewById(R.id.userprofile_messageUser_MaterialButton);
 
         mUser = new User();
 
         UserProfileFragmentArgs userProfileFragmentArgs = UserProfileFragmentArgs.fromBundle(getArguments());
         getRecipeArgsPassed(userProfileFragmentArgs);
+
+        if (documentID.equals(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
+            messageUser.setVisibility(View.GONE);
+        } else {
+            messageUser.setVisibility(View.VISIBLE);
+            messageUser.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Navigation.findNavController(view).navigate(UserProfileFragmentDirections.actionUserProfileFragment2ToMessageFragment(documentID));
+                }
+            });
+        }
 
 
         buildRecyclerView();
