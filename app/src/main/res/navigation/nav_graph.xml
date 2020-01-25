@@ -51,6 +51,9 @@
         <action
             android:id="@+id/action_feedFragment_to_allMessagesFragment"
             app:destination="@id/allMessagesFragment" />
+        <action
+            android:id="@+id/action_feedFragment_to_messageFragment"
+            app:destination="@id/messageFragment" />
     </fragment>
     <fragment
         android:id="@+id/favoritesFragment"

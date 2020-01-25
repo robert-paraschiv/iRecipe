@@ -108,6 +108,12 @@ public class ConversationAdapter extends RecyclerView.Adapter<ConversationAdapte
             holder.tvMessage.setText(currentItem.getText());
             holder.tvTimeStamp.setText(creationDate);
         }
+        if (currentItem.getType().equals("message_received")){
+            holder.tvMessage.setTextColor(holder.tvMessage.getResources().getColor(R.color.colorPrimary));
+        }else {
+            TextView textView = new TextView(holder.tvMessage.getContext());
+            holder.tvMessage.setTextColor(textView.getCurrentTextColor());
+        }
 
 
     }

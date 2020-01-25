@@ -45,6 +45,7 @@
             android:id="@+id/message_recycler_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_margin="4dp"
             android:layout_below="@id/message_toolbar"
             android:layout_above="@id/message_text_layout"
             />

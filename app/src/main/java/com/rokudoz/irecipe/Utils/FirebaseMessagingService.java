@@ -30,7 +30,7 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
         String friend_status = remoteMessage.getData().get("friend_status");
 
 
-        Log.d(TAG, "onMessageReceived: " + messageTitle + " " + messageBody);
+        Log.d(TAG, "onMessageReceived: " + messageTitle + " " + messageBody + click_action);
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext(), getString(R.string.default_notification_channel_id))
                 .setSmallIcon(R.mipmap.ic_launcher)
@@ -50,7 +50,8 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
         int mNotificationId = (int) System.currentTimeMillis();
 
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(getApplicationContext());
-        notificationManager.notify(mNotificationId, builder.build());
+        if (click_action.equals("com.rokudoz.foodify.FriendRequestNotification"))
+            notificationManager.notify(mNotificationId, builder.build());
 
     }
 

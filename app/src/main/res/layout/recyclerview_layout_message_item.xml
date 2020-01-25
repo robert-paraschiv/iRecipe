@@ -37,8 +37,9 @@
                 android:layout_toEndOf="@id/recycler_view_messageItem_Text"
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="4dp"
+                android:layout_marginStart="-8dp"
                 android:textSize="10sp"
-                tools:text="20 hours ago" />
+                tools:text="20:40" />
 
         </RelativeLayout>
     </com.google.android.material.card.MaterialCardView>

@@ -1,9 +1,11 @@
 package com.rokudoz.irecipe;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.rokudoz.irecipe.Fragments.FeedFragmentDirections;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.NavigationUI;
 
@@ -20,6 +22,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+
         setUpNavigation();
 
     }
@@ -29,6 +32,13 @@ public class MainActivity extends AppCompatActivity {
         NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
         NavController navController = navHostFragment.getNavController();
         NavigationUI.setupWithNavController(bottomNavigationView, navController);
+
+        if (getIntent() != null && getIntent().getStringExtra("friend_id") != null) {
+            String friend_id = getIntent().getStringExtra("friend_id");
+            Bundle args = new Bundle();
+            args.putString("user_id", friend_id);
+            navController.navigate(R.id.messageFragment,args );
+        }
     }
 
 
