@@ -8,6 +8,7 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.navigation.Navigation;
@@ -100,6 +101,7 @@ public class ProfileFragment extends Fragment {
         setupViewPager(viewPager);
         TabLayout tabLayout = view.findViewById(R.id.profileFragment_tabLayout);
         tabLayout.setupWithViewPager(viewPager);
+
 
         getUserInfo();
 
