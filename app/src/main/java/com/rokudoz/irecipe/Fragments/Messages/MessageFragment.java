@@ -33,6 +33,7 @@ import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.WriteBatch;
 import com.rokudoz.irecipe.Models.Conversation;
 import com.rokudoz.irecipe.Models.Message;
 import com.rokudoz.irecipe.Models.User;
@@ -149,9 +150,11 @@ public class MessageFragment extends Fragment {
                     message.setDocumentId(documentSnapshot.getId());
                     if (!messageList.contains(message)) {
                         messageList.add(message);
+                    } else {
+                        messageList.set(messageList.indexOf(message), message);
                     }
                     mAdapter.notifyDataSetChanged();
-                    mRecyclerView.scrollToPosition(messageList.size()-1);
+                    mRecyclerView.scrollToPosition(messageList.size() - 1);
                 }
             }
         });
@@ -162,42 +165,34 @@ public class MessageFragment extends Fragment {
             Toast.makeText(getActivity(), "Can't send empty message", Toast.LENGTH_SHORT).show();
         } else {
             String text = textInputEditText.getText().toString();
-            final Message messageForCurrentUser = new Message(currentUserId, text, "message_sent", null);
-            final Message messageForFriendUser = new Message(currentUserId, text, "message_received", null);
+            final Message messageForCurrentUser = new Message(currentUserId, friendUserId, text, "message_sent", null, false);
+            final Message messageForFriendUser = new Message(currentUserId, friendUserId, text, "message_received", null, false);
 
-            final Conversation conversationForCurrentUser = new Conversation(friendUserId, text, "message_sent", null);
-            final Conversation conversationForFriendUser = new Conversation(currentUserId, text, "message_received", null);
+            final Conversation conversationForCurrentUser = new Conversation(friendUserId, text, "message_sent", null,false);
+            final Conversation conversationForFriendUser = new Conversation(currentUserId, text, "message_received", null,false);
 
             textInputEditText.setText("");
 
-            usersReference.document(currentUserId).collection("Conversations").document(friendUserId).set(conversationForCurrentUser)
-                    .addOnSuccessListener(new OnSuccessListener<Void>() {
-                        @Override
-                        public void onSuccess(Void aVoid) {
 
-                            usersReference.document(friendUserId).collection("Conversations").document(currentUserId).set(conversationForFriendUser)
-                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                        @Override
-                                        public void onSuccess(Void aVoid) {
-                                            usersReference.document(currentUserId).collection("Conversations").document(friendUserId)
-                                                    .collection(friendUserId).add(messageForCurrentUser).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                                                @Override
-                                                public void onSuccess(DocumentReference documentReference) {
-                                                    Log.d(TAG, "onSuccess: Added message in current user db");
+            //Send message to db in batch
+            WriteBatch batch = db.batch();
+            String messageID = usersReference.document(currentUserId).collection("Conversations").document(friendUserId).collection(friendUserId).document().getId();
+            Log.d(TAG, "sendMessage: " + messageID);
+            batch.set(usersReference.document(currentUserId).collection("Conversations").document(friendUserId), conversationForCurrentUser);
+            batch.set(usersReference.document(friendUserId).collection("Conversations").document(currentUserId), conversationForFriendUser);
+            batch.set(usersReference.document(currentUserId).collection("Conversations").document(friendUserId).collection(friendUserId).document(messageID)
+                    , messageForCurrentUser);
+            batch.set(usersReference.document(friendUserId).collection("Conversations").document(currentUserId).collection(currentUserId).document(messageID)
+                    , messageForFriendUser);
 
-                                                    usersReference.document(friendUserId).collection("Conversations").document(currentUserId)
-                                                            .collection(currentUserId).add(messageForFriendUser).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                                                        @Override
-                                                        public void onSuccess(DocumentReference documentReference) {
-                                                            Log.d(TAG, "onSuccess: Added message in friend user db");
-                                                        }
-                                                    });
-                                                }
-                                            });
-                                        }
-                                    });
-                        }
-                    });
+            batch.commit().addOnSuccessListener(new OnSuccessListener<Void>() {
+                @Override
+                public void onSuccess(Void aVoid) {
+                    Log.d(TAG, "onSuccess: added message");
+                }
+            });
+
+
         }
     }
 

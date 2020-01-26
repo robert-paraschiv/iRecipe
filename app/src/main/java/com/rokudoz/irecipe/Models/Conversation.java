@@ -8,16 +8,18 @@ public class Conversation {
     private String userId;
     private String text;
     private String type;
+    private Boolean read;
 
     @ServerTimestamp
     private
     Date date;
 
-    public Conversation(String userId,String text, String type,Date date) {
+    public Conversation(String userId, String text, String type, Date date, Boolean read) {
         this.userId = userId;
         this.text = text;
         this.type = type;
         this.date = date;
+        this.read = read;
     }
 
     public Conversation() {
@@ -55,12 +57,21 @@ public class Conversation {
         this.type = type;
     }
 
+    public Boolean getRead() {
+        return read;
+    }
+
+    public void setRead(Boolean read) {
+        this.read = read;
+    }
+
     @Override
     public String toString() {
         return "Conversation{" +
                 "userId='" + userId + '\'' +
                 ", text='" + text + '\'' +
                 ", type='" + type + '\'' +
+                ", read=" + read +
                 ", date=" + date +
                 '}';
     }

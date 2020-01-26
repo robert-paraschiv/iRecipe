@@ -250,7 +250,8 @@ public class UserProfileFragment extends Fragment implements PostAdapter.OnItemC
                                                                     .document(FirebaseAuth.getInstance().getCurrentUser().getUid()).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
                                                                 @Override
                                                                 public void onSuccess(Void aVoid) {
-                                                                    Toast.makeText(getActivity(), "Removed from friend list", Toast.LENGTH_SHORT).show();
+                                                                    if (getActivity() != null)
+                                                                        Toast.makeText(getActivity(), "Removed from friend list", Toast.LENGTH_SHORT).show();
                                                                     mAddFriendButton.setText("Add Friend");
                                                                     mAddFriendButton.setEnabled(true);
                                                                 }

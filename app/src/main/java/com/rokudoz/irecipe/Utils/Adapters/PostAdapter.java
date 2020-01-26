@@ -110,57 +110,61 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
         final Post currentItem = post_List.get(position);
 
         holder.tvDescription.setText(currentItem.getText());
-        Picasso.get()
-                .load(currentItem.getImageUrl())
-                .fit()
-                .centerCrop()
-                .into(holder.mImageView);
+        if (!currentItem.getImageUrl().equals(""))
+            Picasso.get()
+                    .load(currentItem.getImageUrl())
+                    .fit()
+                    .centerCrop()
+                    .into(holder.mImageView);
 
-
-        Date date = currentItem.getCreation_date();
-        if (date != null) {
-            DateFormat dateFormat = new SimpleDateFormat("HH:mm, d MMM", Locale.getDefault());
-            String creationDate = dateFormat.format(date);
-            long time = date.getTime();
-            if (currentItem.getCreation_date() != null && !currentItem.getCreation_date().equals("")) {
-                holder.creationDate.setText(getTimeAgo(time));
+        if (currentItem.getCreation_date() != null) {
+            Date date = currentItem.getCreation_date();
+            if (date != null) {
+                DateFormat dateFormat = new SimpleDateFormat("HH:mm, d MMM", Locale.getDefault());
+                String creationDate = dateFormat.format(date);
+                long time = date.getTime();
+                if (currentItem.getCreation_date() != null && !currentItem.getCreation_date().equals("")) {
+                    holder.creationDate.setText(getTimeAgo(time));
+                }
             }
         }
 
+        if (currentItem.getDocumentId() != null && !currentItem.getDocumentId().equals("")) {
+            FirebaseFirestore db = FirebaseFirestore.getInstance();
+            CollectionReference currentRecipeSubCollection = db.collection("Posts").document(currentItem.getDocumentId())
+                    .collection("UsersWhoFaved");
 
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        CollectionReference currentRecipeSubCollection = db.collection("Posts").document(currentItem.getDocumentId())
-                .collection("UsersWhoFaved");
-
-        db.collection("Users").document(currentItem.getCreatorId()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-            @Override
-            public void onSuccess(DocumentSnapshot documentSnapshot) {
-                User user = documentSnapshot.toObject(User.class);
-                holder.creatorName.setText(user.getName());
-                Picasso.get().load(user.getUserProfilePicUrl()).fit().centerCrop().into(holder.creatorImage);
-            }
-        });
-        currentRecipeSubCollection.addSnapshotListener(new EventListener<QuerySnapshot>() {
-            @Override
-            public void onEvent(@javax.annotation.Nullable QuerySnapshot queryDocumentSnapshots, @javax.annotation.Nullable FirebaseFirestoreException e) {
-                if (e != null) {
-                    return;
+            db.collection("Users").document(currentItem.getCreatorId()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                @Override
+                public void onSuccess(DocumentSnapshot documentSnapshot) {
+                    User user = documentSnapshot.toObject(User.class);
+                    holder.creatorName.setText(user.getName());
+                    Picasso.get().load(user.getUserProfilePicUrl()).fit().centerCrop().into(holder.creatorImage);
                 }
-                boolean fav = false;
-                for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
-                    if (documentSnapshot.getId().equals(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
-                        fav = true;
+            });
+            currentRecipeSubCollection.addSnapshotListener(new EventListener<QuerySnapshot>() {
+                @Override
+                public void onEvent(@javax.annotation.Nullable QuerySnapshot queryDocumentSnapshots, @javax.annotation.Nullable FirebaseFirestoreException e) {
+                    if (e != null) {
+                        return;
                     }
+                    boolean fav = false;
+                    for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                        if (documentSnapshot.getId().equals(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
+                            fav = true;
+                        }
+                    }
+                    if (fav)
+                        holder.imgFavorited.setImageResource(R.drawable.ic_favorite_red_24dp);
+                    else
+                        holder.imgFavorited.setImageResource(R.drawable.ic_favorite_border_black_24dp);
+
+                    holder.tvNrOfFaves.setText("" + queryDocumentSnapshots.size());
+
                 }
-                if (fav)
-                    holder.imgFavorited.setImageResource(R.drawable.ic_favorite_red_24dp);
-                else
-                    holder.imgFavorited.setImageResource(R.drawable.ic_favorite_border_black_24dp);
+            });
+        }
 
-                holder.tvNrOfFaves.setText("" + queryDocumentSnapshots.size());
-
-            }
-        });
 
 //        holder.imgFavorited.setImageResource(R.drawable.ic_favorite_border_black_24dp);
 //        if (currentItem.getFavorite() != null && currentItem.getFavorite()) {

@@ -35,11 +35,22 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/recycler_view_messageItem_Text"
                 android:layout_toEndOf="@id/recycler_view_messageItem_Text"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="12dp"
                 android:layout_marginEnd="4dp"
                 android:layout_marginStart="-8dp"
                 android:textSize="10sp"
                 tools:text="20:40" />
+            <androidx.appcompat.widget.AppCompatImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_marginTop="8dp"
+                android:id="@+id/recycler_view_messageItem_ReadStatus"
+                android:layout_below="@id/recycler_view_messageItem_Text"
+                android:layout_toEndOf="@id/recycler_view_messageItem_MessageTimeStamp"
+                android:src="@drawable/ic_check_black_24dp"
+                android:visibility="invisible"
+                tools:visibility="visible"
+                />
 
         </RelativeLayout>
     </com.google.android.material.card.MaterialCardView>

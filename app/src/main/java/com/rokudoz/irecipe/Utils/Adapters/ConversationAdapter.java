@@ -82,23 +82,26 @@ public class ConversationAdapter extends RecyclerView.Adapter<ConversationAdapte
     public void onBindViewHolder(@NonNull final ConversationViewHolder holder, int position) {
         final Conversation currentItem = conversationList.get(position);
 
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        db.collection("Users").document(currentItem.getUserId()).addSnapshotListener(new EventListener<DocumentSnapshot>() {
-            @Override
-            public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
-                if (documentSnapshot != null) {
-                    User user = documentSnapshot.toObject(User.class);
-                    holder.tvName.setText(user.getName());
+        if (currentItem.getUserId() != null) {
+            FirebaseFirestore db = FirebaseFirestore.getInstance();
+            db.collection("Users").document(currentItem.getUserId()).addSnapshotListener(new EventListener<DocumentSnapshot>() {
+                @Override
+                public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
+                    if (documentSnapshot != null) {
+                        User user = documentSnapshot.toObject(User.class);
+                        holder.tvName.setText(user.getName());
 
-                    if (user.getUserProfilePicUrl() != null && !user.getUserProfilePicUrl().equals(""))
-                        Picasso.get()
-                                .load(user.getUserProfilePicUrl())
-                                .fit()
-                                .centerCrop()
-                                .into(holder.mImage);
+                        if (user.getUserProfilePicUrl() != null && !user.getUserProfilePicUrl().equals(""))
+                            Picasso.get()
+                                    .load(user.getUserProfilePicUrl())
+                                    .fit()
+                                    .centerCrop()
+                                    .into(holder.mImage);
+                    }
                 }
-            }
-        });
+            });
+        }
+
 
         if (currentItem.getDate() != null) {
             Date date = currentItem.getDate();
@@ -108,11 +111,13 @@ public class ConversationAdapter extends RecyclerView.Adapter<ConversationAdapte
             holder.tvMessage.setText(currentItem.getText());
             holder.tvTimeStamp.setText(creationDate);
         }
-        if (currentItem.getType().equals("message_received")){
-            holder.tvMessage.setTextColor(holder.tvMessage.getResources().getColor(R.color.colorPrimary));
-        }else {
-            TextView textView = new TextView(holder.tvMessage.getContext());
-            holder.tvMessage.setTextColor(textView.getCurrentTextColor());
+        if (currentItem.getRead() != null && currentItem.getType() != null) {
+            if (currentItem.getType().equals("message_received") && !currentItem.getRead()) {
+                holder.tvMessage.setTextColor(holder.tvMessage.getResources().getColor(R.color.colorPrimary));
+            } else {
+                TextView textView = new TextView(holder.tvMessage.getContext());
+                holder.tvMessage.setTextColor(textView.getCurrentTextColor());
+            }
         }
 
 

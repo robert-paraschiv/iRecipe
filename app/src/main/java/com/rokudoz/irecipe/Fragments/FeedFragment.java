@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -51,6 +52,7 @@ public class FeedFragment extends Fragment implements PostAdapter.OnItemClickLis
     private static final String TAG = "FeedFragment";
 
     public View view;
+    private TextView unreadMessagesTv;
 
     private ProgressBar pbLoading;
     private FloatingActionButton fab;
@@ -99,6 +101,7 @@ public class FeedFragment extends Fragment implements PostAdapter.OnItemClickLis
         fab = view.findViewById(R.id.fab_add_recipe);
         mRecyclerView = view.findViewById(R.id.recycler_view);
         MaterialButton messagesBtn = view.findViewById(R.id.feedFragment_messages_MaterialBtn);
+        unreadMessagesTv = view.findViewById(R.id.feedFragment_messages_UnreadText);
 
         pbLoading.setVisibility(View.VISIBLE);
         mStorageRef = FirebaseStorage.getInstance();
@@ -124,6 +127,7 @@ public class FeedFragment extends Fragment implements PostAdapter.OnItemClickLis
     public void onStart() {
         super.onStart();
         FirebaseAuth.getInstance().addAuthStateListener(mAuthListener);
+        getUnreadConversationNr();
     }
 
 
@@ -260,6 +264,29 @@ public class FeedFragment extends Fragment implements PostAdapter.OnItemClickLis
 
             }
         });
+
+    }
+
+    private void getUnreadConversationNr() {
+        usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).collection("Conversations")
+                .whereEqualTo("read", false).addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                if (e != null) {
+                    Log.w(TAG, "onEvent: ", e);
+                    return;
+                }
+                if (queryDocumentSnapshots != null && queryDocumentSnapshots.size() > 0) {
+                    String number = "";
+                    number = "" + queryDocumentSnapshots.size();
+                    unreadMessagesTv.setText(number);
+
+                }
+                if (queryDocumentSnapshots != null && queryDocumentSnapshots.size() == 0) {
+                    unreadMessagesTv.setText("");
+                }
+            }
+        });
     }
 
     private void performQuery() {
@@ -312,6 +339,11 @@ public class FeedFragment extends Fragment implements PostAdapter.OnItemClickLis
                     }
                 } else {
                     Log.d(TAG, "onEvent: Querry result is null");
+                }
+                if (mPostList.isEmpty()) {
+                    mPostList.add(new Post("", "", "Add friends to see posts just like this one", ""
+                            , false, "Everyone", null));
+                    Log.d(TAG, "EMPTY: ");
                 }
                 mAdapter.notifyDataSetChanged();
 

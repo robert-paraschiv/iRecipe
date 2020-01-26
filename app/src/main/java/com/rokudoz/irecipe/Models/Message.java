@@ -9,16 +9,20 @@ public class Message {
     private String documentId;
     private String text;
     private String sender_id;
+    private String receiver_id;
     private String type;
+    private Boolean read;
 
     private @ServerTimestamp
     Date timestamp;
 
-    public Message(String sender_id, String text, String type, Date timestamp) {
+    public Message(String sender_id, String receiver_id,String text, String type, Date timestamp,Boolean read) {
         this.sender_id = sender_id;
+        this.receiver_id = receiver_id;
         this.text = text;
         this.type = type;
         this.timestamp = timestamp;
+        this.read = read;
     }
 
     public Message() {
@@ -41,6 +45,21 @@ public class Message {
         this.sender_id = sender_id;
     }
 
+    public Boolean getRead() {
+        return read;
+    }
+
+    public String getReceiver_id() {
+        return receiver_id;
+    }
+
+    public void setReceiver_id(String receiver_id) {
+        this.receiver_id = receiver_id;
+    }
+
+    public void setRead(Boolean read) {
+        this.read = read;
+    }
 
     public String getText() {
         return text;
@@ -72,7 +91,9 @@ public class Message {
                 "documentId='" + documentId + '\'' +
                 ", text='" + text + '\'' +
                 ", sender_id='" + sender_id + '\'' +
+                ", receiver_id='" + receiver_id + '\'' +
                 ", type='" + type + '\'' +
+                ", read=" + read +
                 ", timestamp=" + timestamp +
                 '}';
     }
