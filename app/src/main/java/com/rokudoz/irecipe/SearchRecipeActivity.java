@@ -92,6 +92,9 @@ public class SearchRecipeActivity extends AppCompatActivity implements SearchRec
                 if (getIntent().getStringExtra("post_text") != null) {
                     postText = getIntent().getStringExtra("post_text");
                 }
+                if (getIntent().getStringExtra("post_imageUrl") != null) {
+                    post_imageUrl = getIntent().getStringExtra("post_imageUrl");
+                }
             }
             if (getIntent().getStringExtra("coming_from").equals("EditPostActivity")) {
                 if (getIntent().getStringExtra("post_id") != null) {
@@ -279,6 +282,7 @@ public class SearchRecipeActivity extends AppCompatActivity implements SearchRec
                     Intent intent = new Intent(SearchRecipeActivity.this, AddPostActivity.class);
                     intent.putExtra("post_text", postText);
                     intent.putExtra("recipe_doc_id", id);
+                    intent.putExtra("post_imageUrl", post_imageUrl);
                     startActivity(intent);
                     finish();
                 }else if (coming_from.equals("EditPostActivity")){

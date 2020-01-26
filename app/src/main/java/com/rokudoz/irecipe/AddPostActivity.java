@@ -82,13 +82,21 @@ public class AddPostActivity extends AppCompatActivity {
                 referencedRecipeDocID = getIntent().getStringExtra("recipe_doc_id");
                 searchRecipeBtn.setText("Change recipe");
             }
+            if (getIntent().getStringExtra("post_imageUrl") != null){
+                postPicUrl = getIntent().getStringExtra("post_imageUrl");
+                if (!postPicUrl.equals("")){
+                    choosePhotoBtn.setText("Change photo");
+                    Picasso.get().load(postPicUrl).fit().centerCrop().into(imageView);
+                }
+            }
         }
         searchRecipeBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(AddPostActivity.this, SearchRecipeActivity.class);
-                intent.putExtra("coming_from","AddPostActivity");
+                intent.putExtra("coming_from", "AddPostActivity");
                 intent.putExtra("post_text", descriptionInputText.getText().toString());
+                intent.putExtra("post_imageUrl", postPicUrl);
                 startActivity(intent);
             }
         });
@@ -111,8 +119,10 @@ public class AddPostActivity extends AppCompatActivity {
                     Toast.makeText(AddPostActivity.this, "You need to select a recipe you've followed", Toast.LENGTH_SHORT).show();
                 } else if (descriptionInputText.getText().toString().equals("")) {
                     Toast.makeText(AddPostActivity.this, "Description can't be empty", Toast.LENGTH_SHORT).show();
+                } else if (postPicUrl.equals("")) {
+                    Toast.makeText(AddPostActivity.this, "No post picture selected selected", Toast.LENGTH_SHORT).show();
                 } else
-                    uploadUserProfilePic();
+                    addPost();
             }
         });
     }
@@ -136,6 +146,7 @@ public class AddPostActivity extends AppCompatActivity {
                 RotateBitmap rotateBitmap = new RotateBitmap();
                 imageBitmap = rotateBitmap.HandleSamplingAndRotationBitmap(this, mImageUri);
                 imageView.setImageBitmap(imageBitmap);
+                uploadPostPic();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -149,7 +160,7 @@ public class AddPostActivity extends AppCompatActivity {
         return mime.getExtensionFromMimeType(cR.getType(uri));
     }
 
-    private void uploadUserProfilePic() {
+    private void uploadPostPic() {
         if (mImageUri != null) {
             final StorageReference newFileReference = mStorageRef.child(System.currentTimeMillis()
                     + "." + getFileExtension(mImageUri));
@@ -171,7 +182,7 @@ public class AddPostActivity extends AppCompatActivity {
                                     final String imageUrl = uri.toString();
                                     postPicUrl = imageUrl;
                                     //
-                                    addPost();
+
 
                                 }
                             });
