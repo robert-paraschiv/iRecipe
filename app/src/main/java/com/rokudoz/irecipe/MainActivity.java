@@ -10,6 +10,7 @@ import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.NavigationUI;
 
 import android.os.Bundle;
+import android.widget.Toast;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -44,6 +45,12 @@ public class MainActivity extends AppCompatActivity {
             Bundle args = new Bundle();
             args.putString("documentID", recipe_id);
             navController.navigate(R.id.recipeDetailedFragment,args );
+        }
+        if (getIntent() != null && getIntent().getStringExtra("post_id") != null) {
+            String post_id = getIntent().getStringExtra("post_id");
+            Bundle args = new Bundle();
+            args.putString("documentID", post_id);
+            navController.navigate(R.id.postDetailed,args );
         }
     }
 

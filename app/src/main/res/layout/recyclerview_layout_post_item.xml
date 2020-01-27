@@ -50,18 +50,6 @@
 
 
         <TextView
-            android:id="@+id/postItem_description_text_view"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/recycler_view_postItem_Image_CardView"
-            android:layout_alignParentStart="true"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="12dp"
-            android:layout_marginEnd="8dp"
-            android:layout_toStartOf="@id/recycler_view_postItem_nrOfFaves_textView"
-            tools:text="Description" />
-
-        <TextView
             android:id="@+id/postItem_creationDate_text_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -79,7 +67,7 @@
             android:layout_below="@id/recycler_view_postItem_Image_CardView"
             android:layout_marginTop="14dp"
             android:layout_marginEnd="4dp"
-            android:layout_toStartOf="@id/recycler_view_postItem_favorite"
+            android:layout_toEndOf="@id/recycler_view_postItem_favorite"
             tools:text="88" />
 
         <ImageView
@@ -87,12 +75,22 @@
             android:layout_width="25dp"
             android:layout_height="25dp"
             android:layout_below="@id/recycler_view_postItem_Image_CardView"
-            android:layout_alignParentEnd="true"
+            android:layout_alignParentStart="true"
             android:layout_marginTop="12dp"
             android:layout_marginEnd="8dp"
             android:contentDescription="Post Image"
             android:elevation="4dp"
             android:src="@drawable/ic_favorite_border_black_24dp" />
+
+        <TextView
+            android:id="@+id/postItem_description_text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/recycler_view_postItem_favorite"
+            android:layout_alignParentStart="true"
+            android:layout_marginStart="12dp"
+            android:layout_marginEnd="8dp"
+            tools:text="Description" />
 
 
     </RelativeLayout>

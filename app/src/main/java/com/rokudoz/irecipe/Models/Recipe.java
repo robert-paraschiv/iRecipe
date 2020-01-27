@@ -15,7 +15,8 @@ public class Recipe implements Comparable<Recipe>{
     private Float avg_rating;
     private Boolean isFavorite;
     private String privacy;
-    private Integer missingIngredients;
+    private Integer nrOfMissingIngredients;
+    private List<String> missingIngredients;
 
 
     public Recipe() {
@@ -49,11 +50,20 @@ public class Recipe implements Comparable<Recipe>{
     }
 
     @Exclude
-    public Integer getMissingIngredients() {
+    public Integer getNrOfMissingIngredients() {
+        return nrOfMissingIngredients;
+    }
+
+    public void setNrOfMissingIngredients(Integer nrOfMissingIngredients) {
+        this.nrOfMissingIngredients = nrOfMissingIngredients;
+    }
+
+    @Exclude
+    public List<String> getMissingIngredients() {
         return missingIngredients;
     }
 
-    public void setMissingIngredients(Integer missingIngredients) {
+    public void setMissingIngredients(List<String> missingIngredients) {
         this.missingIngredients = missingIngredients;
     }
 
@@ -156,6 +166,6 @@ public class Recipe implements Comparable<Recipe>{
 
     @Override
     public int compareTo(Recipe o) {
-        return this.getMissingIngredients().compareTo(o.getMissingIngredients());
+        return this.getNrOfMissingIngredients().compareTo(o.getNrOfMissingIngredients());
     }
 }

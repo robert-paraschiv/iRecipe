@@ -28,6 +28,8 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
         String click_action = remoteMessage.getNotification().getClickAction();
         String friend_id = remoteMessage.getData().get("friend_id");
         String friend_status = remoteMessage.getData().get("friend_status");
+        String post_id = remoteMessage.getData().get("post_id");
+        String recipe_id = remoteMessage.getData().get("recipe_id");
 
 
         Log.d(TAG, "onMessageReceived: " + messageTitle + " " + messageBody + click_action);
@@ -43,6 +45,8 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
         Intent resultIntent = new Intent(click_action);
         resultIntent.putExtra("friend_id", friend_id);
         resultIntent.putExtra("friend_status", friend_status);
+        resultIntent.putExtra("post_id", post_id);
+        resultIntent.putExtra("recipe_id", recipe_id);
         PendingIntent resultPendingIntent = PendingIntent.getActivity(this, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         builder.setContentIntent(resultPendingIntent);
 
@@ -50,7 +54,7 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
         int mNotificationId = (int) System.currentTimeMillis();
 
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(getApplicationContext());
-        if (click_action.equals("com.rokudoz.foodify.FriendRequestNotification"))
+        if (!click_action.equals("com.rokudoz.foodify.MessageNotification"))
             notificationManager.notify(mNotificationId, builder.build());
 
     }

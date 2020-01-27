@@ -40,23 +40,14 @@
         </com.google.android.material.card.MaterialCardView>
 
 
-        <TextView
-            android:id="@+id/text_view_description"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/recycler_view_recipeItem_Image_CardView"
-            android:layout_alignParentStart="true"
-            android:layout_toStartOf="@id/recyclerview_nrOfFaves_textView"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="12dp"
-            android:text="Description" />
+
 
         <TextView
             android:id="@+id/recyclerview_nrOfFaves_textView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             tools:text="88"
-            android:layout_toStartOf="@id/recyclerview_favorite"
+            android:layout_toEndOf="@id/recyclerview_favorite"
             android:layout_below="@id/recycler_view_recipeItem_Image_CardView"
             android:layout_marginTop="14dp"
             android:layout_marginEnd="4dp"
@@ -69,9 +60,19 @@
             android:layout_below="@id/recycler_view_recipeItem_Image_CardView"
             android:layout_marginEnd="8dp"
             android:layout_marginTop="12dp"
-            android:layout_alignParentEnd="true"
+            android:layout_alignParentStart="true"
             android:src="@drawable/ic_favorite_border_black_24dp"
             android:contentDescription="Recipe Image" />
+
+        <TextView
+            android:id="@+id/text_view_description"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/recyclerview_favorite"
+            android:layout_alignParentStart="true"
+            android:layout_marginStart="12dp"
+            android:layout_marginEnd="8dp"
+            android:text="Description" />
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -81,6 +82,7 @@
             android:layout_centerHorizontal="true"
             android:id="@+id/recycler_view_recipeItem_missingIngredients"
             style="@style/TextAppearance.MaterialComponents.Caption"
+            android:textStyle="bold"
             />
         <ImageView
             android:layout_width="wrap_content"

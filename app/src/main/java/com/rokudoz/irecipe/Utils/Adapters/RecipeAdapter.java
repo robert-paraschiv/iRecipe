@@ -120,13 +120,20 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
             }
         });
         if (currentItem.getMissingIngredients() != null) {
-            if (currentItem.getMissingIngredients() == 0) {
+            if (currentItem.getNrOfMissingIngredients() == 0) {
                 holder.tvNumMissingIngredients.setVisibility(View.GONE);
             } else {
+                StringBuilder missingIngredients = new StringBuilder("Missing ingredients: ");
+                for (int i = 0; i < currentItem.getMissingIngredients().size(); i++) {
+                    if (i == currentItem.getMissingIngredients().size() - 1) {
+                        missingIngredients.append(currentItem.getMissingIngredients().get(i));
+                    } else
+                        missingIngredients.append(currentItem.getMissingIngredients().get(i)).append(", ");
+                }
                 holder.tvNumMissingIngredients.setVisibility(View.VISIBLE);
-                holder.tvNumMissingIngredients.setText("Missing " + currentItem.getMissingIngredients() + " ingredients");
+                holder.tvNumMissingIngredients.setText(missingIngredients.toString());
             }
-        }else
+        } else
             holder.tvNumMissingIngredients.setVisibility(View.GONE);
 
         if (mRecipeList.get(position).getPrivacy().equals("Everyone")) {

@@ -211,6 +211,7 @@ public class homeBreakfastFragment extends Fragment implements RecipeAdapter.OnI
 
                             ////////////////////////////////////////////////////////// LOGIC TO GET RECIPES HERE
                             final List<Ingredient> recipeIngredientList = new ArrayList<>();
+                            final List<String> missingIngredients = new ArrayList<>();
 
                             recipeRef.document(recipe.getDocumentId()).collection("RecipeIngredients")
                                     .addSnapshotListener(new EventListener<QuerySnapshot>() {
@@ -232,19 +233,23 @@ public class homeBreakfastFragment extends Fragment implements RecipeAdapter.OnI
                                                 if (userIngredientList.contains(ingredient)) {
                                                     if (!userIngredientList.get(userIngredientList.indexOf(ingredient)).getOwned()) {
                                                         numberOfMissingIngredients++;
+                                                        missingIngredients.add(ingredient.getName());
                                                     }
 
                                                 } else {
+                                                    missingIngredients.add(ingredient.getName());
                                                     numberOfMissingIngredients++;
                                                 }
                                             }
                                             Log.d(TAG, "onEvent: " + recipe.getTitle() + " NR OF MISSING INGREDIENTS " + numberOfMissingIngredients);
                                             if (numberOfMissingIngredients < 3) {
                                                 if (!mRecipeList.contains(recipe)) {
-                                                    recipe.setMissingIngredients(numberOfMissingIngredients);
+                                                    recipe.setNrOfMissingIngredients(numberOfMissingIngredients);
+                                                    recipe.setMissingIngredients(missingIngredients);
                                                     mRecipeList.add(recipe);
                                                 } else {
-                                                    recipe.setMissingIngredients(numberOfMissingIngredients);
+                                                    recipe.setNrOfMissingIngredients(numberOfMissingIngredients);
+                                                    recipe.setMissingIngredients(missingIngredients);
                                                     mRecipeList.set(mRecipeList.indexOf(recipe), recipe);
                                                 }
                                                 Collections.sort(mRecipeList);
@@ -301,6 +306,7 @@ public class homeBreakfastFragment extends Fragment implements RecipeAdapter.OnI
                             ////////////////////////////////////////////////////////// LOGIC TO GET RECIPES HERE
 
                             final List<Ingredient> recipeIngredientList = new ArrayList<>();
+                            final List<String> missingIngredients = new ArrayList<>();
 
                             recipeRef.document(recipe.getDocumentId()).collection("RecipeIngredients")
                                     .addSnapshotListener(new EventListener<QuerySnapshot>() {
@@ -322,19 +328,23 @@ public class homeBreakfastFragment extends Fragment implements RecipeAdapter.OnI
                                                 if (userIngredientList.contains(ingredient)) {
                                                     if (!userIngredientList.get(userIngredientList.indexOf(ingredient)).getOwned()) {
                                                         numberOfMissingIngredients++;
+                                                        missingIngredients.add(ingredient.getName());
                                                     }
 
                                                 } else {
+                                                    missingIngredients.add(ingredient.getName());
                                                     numberOfMissingIngredients++;
                                                 }
                                             }
                                             Log.d(TAG, "onEvent: " + recipe.getTitle() + " NR OF MISSING INGREDIENTS " + numberOfMissingIngredients);
                                             if (numberOfMissingIngredients < 3) {
                                                 if (!mRecipeList.contains(recipe)) {
-                                                    recipe.setMissingIngredients(numberOfMissingIngredients);
+                                                    recipe.setNrOfMissingIngredients(numberOfMissingIngredients);
+                                                    recipe.setMissingIngredients(missingIngredients);
                                                     mRecipeList.add(recipe);
                                                 } else {
-                                                    recipe.setMissingIngredients(numberOfMissingIngredients);
+                                                    recipe.setNrOfMissingIngredients(numberOfMissingIngredients);
+                                                    recipe.setMissingIngredients(missingIngredients);
                                                     mRecipeList.set(mRecipeList.indexOf(recipe), recipe);
                                                 }
                                                 Collections.sort(mRecipeList);
@@ -394,38 +404,18 @@ public class homeBreakfastFragment extends Fragment implements RecipeAdapter.OnI
                     userFavRecipesList.remove(id);
                     mRecipeList.get(position).setFavorite(false);
 
-                    currentSubCollectionListener = currentRecipeSubCollection.whereEqualTo("userID", mUser.getUser_id())
-                            .addSnapshotListener(new EventListener<QuerySnapshot>() {
-                                @Override
-                                public void onEvent(@javax.annotation.Nullable QuerySnapshot queryDocumentSnapshots, @javax.annotation.Nullable FirebaseFirestoreException e) {
-                                    if (e != null) {
-                                        Log.w(TAG, "onEvent: ", e);
-                                        return;
-                                    }
-                                    if (queryDocumentSnapshots != null && queryDocumentSnapshots.size() != 0) {
-                                        userFavDocId = queryDocumentSnapshots.getDocuments().get(0).getId();
-                                        Log.d(TAG, "onEvent: docID " + userFavDocId);
+                    currentRecipeSubCollection.document(mUser.getUser_id()).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            Toast.makeText(getContext(), "Removed from favorites", Toast.LENGTH_SHORT).show();
+                        }
+                    });
 
-                                        if (!userFavDocId.equals("") && !mRecipeList.get(position).getFavorite()) {
-                                            currentRecipeSubCollection.document(userFavDocId).delete()
-                                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                        @Override
-                                                        public void onSuccess(Void aVoid) {
-                                                            if (getContext() != null)
-                                                                Toast.makeText(getContext(), "Removed from favorites", Toast.LENGTH_SHORT).show();
-                                                        }
-                                                    });
-                                        } else {
-                                            Log.d(TAG, "onFavoriteClick: empty docID");
-                                        }
-                                    }
-                                }
-                            });
                 } else {
                     userFavRecipesList.add(id);
                     mRecipeList.get(position).setFavorite(true);
                     UserWhoFaved userWhoFaved = new UserWhoFaved(mUser.getUser_id(), null);
-                    currentRecipeSubCollection.add(userWhoFaved);
+                    currentRecipeSubCollection.document(mUser.getUser_id()).set(userWhoFaved);
                     Toast.makeText(getContext(), "Added " + title + " to favorites", Toast.LENGTH_SHORT).show();
                 }
 

@@ -36,7 +36,14 @@
             </intent-filter>
             <intent-filter>
                 <action android:name="com.rokudoz.foodify.MessageNotification" />
-
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="com.rokudoz.foodify.RecipeLikeNotification" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="com.rokudoz.foodify.PostLikeNotification" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>

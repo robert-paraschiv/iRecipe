@@ -225,34 +225,18 @@ public class profileMyRecipesFragment extends Fragment implements RecipeAdapter.
                     userFavRecipesList.remove(id);
                     mRecipeList.get(position).setFavorite(false);
 
-                    currentRecipeSubCollection.whereEqualTo("userID", mUser.getUser_id())
-                            .get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                    currentRecipeSubCollection.document(mUser.getUser_id()).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
-                        public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                            if (queryDocumentSnapshots != null && queryDocumentSnapshots.size() != 0) {
-                                userFavDocId = queryDocumentSnapshots.getDocuments().get(0).getId();
-                                Log.d(TAG, "onEvent: docID " + userFavDocId);
-
-                                if (!userFavDocId.equals("") && !mRecipeList.get(position).getFavorite()) {
-                                    currentRecipeSubCollection.document(userFavDocId).delete()
-                                            .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                @Override
-                                                public void onSuccess(Void aVoid) {
-                                                    if (getContext() != null)
-                                                        Toast.makeText(getContext(), "Removed from favorites", Toast.LENGTH_SHORT).show();
-                                                }
-                                            });
-                                } else {
-                                    Log.d(TAG, "onFavoriteClick: empty docID");
-                                }
-                            }
+                        public void onSuccess(Void aVoid) {
+                            Toast.makeText(getContext(), "Removed from favorites", Toast.LENGTH_SHORT).show();
                         }
                     });
+
                 } else {
                     userFavRecipesList.add(id);
                     mRecipeList.get(position).setFavorite(true);
                     UserWhoFaved userWhoFaved = new UserWhoFaved(mUser.getUser_id(), null);
-                    currentRecipeSubCollection.add(userWhoFaved);
+                    currentRecipeSubCollection.document(mUser.getUser_id()).set(userWhoFaved);
                     Toast.makeText(getContext(), "Added " + title + " to favorites", Toast.LENGTH_SHORT).show();
                 }
 
