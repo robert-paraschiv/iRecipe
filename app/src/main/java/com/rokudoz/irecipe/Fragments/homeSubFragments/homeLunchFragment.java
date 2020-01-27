@@ -41,6 +41,7 @@ import com.rokudoz.irecipe.R;
 import com.rokudoz.irecipe.Utils.Adapters.RecipeAdapter;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class homeLunchFragment extends Fragment implements RecipeAdapter.OnItemClickListener {
@@ -94,6 +95,7 @@ public class homeLunchFragment extends Fragment implements RecipeAdapter.OnItemC
 
         return view; // HAS TO BE THE LAST ONE ---------------------------------
     }
+
     private void getUserIngredients() {
         usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).collection("Ingredients")
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
@@ -114,7 +116,6 @@ public class homeLunchFragment extends Fragment implements RecipeAdapter.OnItemC
                     }
                 });
     }
-
 
 
     @Override
@@ -238,9 +239,16 @@ public class homeLunchFragment extends Fragment implements RecipeAdapter.OnItemC
                                                     numberOfMissingIngredients++;
                                                 }
                                             }
-                                            if (numberOfMissingIngredients < 3) {
-                                                if (!mRecipeList.contains(recipe))
+                                            Log.d(TAG, "onEvent: " + recipe.getTitle() + " NR OF MISSING INGREDIENTS " + numberOfMissingIngredients);
+                                            if (numberOfMissingIngredients <= 4) {
+                                                if (!mRecipeList.contains(recipe)) {
+                                                    recipe.setMissingIngredients(numberOfMissingIngredients);
                                                     mRecipeList.add(recipe);
+                                                } else {
+                                                    recipe.setMissingIngredients(numberOfMissingIngredients);
+                                                    mRecipeList.set(mRecipeList.indexOf(recipe), recipe);
+                                                }
+                                                Collections.sort(mRecipeList);
                                                 mAdapter.notifyDataSetChanged();
                                             }
                                         }
@@ -317,10 +325,16 @@ public class homeLunchFragment extends Fragment implements RecipeAdapter.OnItemC
                                                     numberOfMissingIngredients++;
                                                 }
                                             }
-                                            Log.d(TAG, "onEvent: NR OF MISSING INGREDIENTS " + numberOfMissingIngredients);
+                                            Log.d(TAG, "onEvent: " + recipe.getTitle() + " NR OF MISSING INGREDIENTS " + numberOfMissingIngredients);
                                             if (numberOfMissingIngredients < 3) {
-                                                if (!mRecipeList.contains(recipe))
+                                                if (!mRecipeList.contains(recipe)) {
+                                                    recipe.setMissingIngredients(numberOfMissingIngredients);
                                                     mRecipeList.add(recipe);
+                                                } else {
+                                                    recipe.setMissingIngredients(numberOfMissingIngredients);
+                                                    mRecipeList.set(mRecipeList.indexOf(recipe), recipe);
+                                                }
+                                                Collections.sort(mRecipeList);
                                                 mAdapter.notifyDataSetChanged();
                                             }
                                         }

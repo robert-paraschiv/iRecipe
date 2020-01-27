@@ -14,7 +14,6 @@
         android:layout_height="match_parent"
         android:padding="4dp">
 
-
         <TextView
             android:id="@+id/text_view_title"
             android:layout_width="wrap_content"
@@ -73,12 +72,22 @@
             android:layout_alignParentEnd="true"
             android:src="@drawable/ic_favorite_border_black_24dp"
             android:contentDescription="Recipe Image" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="Missing 2 ingredients"
+            android:layout_marginTop="4dp"
+            android:layout_below="@id/text_view_description"
+            android:layout_centerHorizontal="true"
+            android:id="@+id/recycler_view_recipeItem_missingIngredients"
+            style="@style/TextAppearance.MaterialComponents.Caption"
+            />
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
             android:id="@+id/recycler_view_privacy"
-            android:layout_below="@id/text_view_description"
+            android:layout_below="@id/recycler_view_recipeItem_missingIngredients"
             android:src="@drawable/ic_lock_black_24dp"
             android:layout_centerHorizontal="true"
             android:contentDescription="Privacy" />

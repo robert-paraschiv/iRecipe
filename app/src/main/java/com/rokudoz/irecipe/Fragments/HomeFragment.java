@@ -63,15 +63,16 @@ public class HomeFragment extends Fragment {
             }
         });
 
-        if (FirebaseAuth.getInstance().getCurrentUser().getEmail().equals("paraschivlongin@gmail.com")){
-            
-        }
-        fab_addIngredient.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                navigateToAddIngredient();
-            }
-        });
+        if (FirebaseAuth.getInstance().getCurrentUser().getEmail().equals("paraschivlongin@gmail.com")) {
+            fab_addIngredient.setVisibility(View.VISIBLE);
+            fab_addIngredient.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    navigateToAddIngredient();
+                }
+            });
+        } else
+            fab_addIngredient.setVisibility(View.GONE);
 
 
         return view; // HAS TO BE THE LAST ONE ---------------------------------
@@ -94,6 +95,23 @@ public class HomeFragment extends Fragment {
         adapter.addFragment(new homeLunchFragment(), "Lunch");
         adapter.addFragment(new homeDinnerFragment(), "Dinner");
         viewPager.setAdapter(adapter);
+
+        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
     }
 
 

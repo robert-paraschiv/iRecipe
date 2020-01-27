@@ -4,7 +4,7 @@ import com.google.firebase.firestore.Exclude;
 
 import java.util.List;
 
-public class Recipe {
+public class Recipe implements Comparable<Recipe>{
     private String documentId;
     private String title;
     private String creator_docId;
@@ -15,6 +15,7 @@ public class Recipe {
     private Float avg_rating;
     private Boolean isFavorite;
     private String privacy;
+    private Integer missingIngredients;
 
 
     public Recipe() {
@@ -45,6 +46,15 @@ public class Recipe {
 
     public void setDocumentId(String documentId) {
         this.documentId = documentId;
+    }
+
+    @Exclude
+    public Integer getMissingIngredients() {
+        return missingIngredients;
+    }
+
+    public void setMissingIngredients(Integer missingIngredients) {
+        this.missingIngredients = missingIngredients;
     }
 
     public String getTitle() {
@@ -142,5 +152,10 @@ public class Recipe {
         if (obj == this)
             return true;
         return this.documentId.equals(((Recipe) obj).documentId);
+    }
+
+    @Override
+    public int compareTo(Recipe o) {
+        return this.getMissingIngredients().compareTo(o.getMissingIngredients());
     }
 }

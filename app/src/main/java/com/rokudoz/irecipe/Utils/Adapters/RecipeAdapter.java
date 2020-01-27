@@ -37,7 +37,7 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
     }
 
     public class RecipeViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        TextView tvTitle, tvDescription, tvNrOfFaves;
+        TextView tvTitle, tvDescription, tvNrOfFaves, tvNumMissingIngredients;
         ImageView mImageView, imgFavorited, imgPrivacy;
         Map<String, Boolean> ingredientTags;
 
@@ -49,6 +49,7 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
             imgFavorited = itemView.findViewById(R.id.recyclerview_favorite);
             tvNrOfFaves = itemView.findViewById(R.id.recyclerview_nrOfFaves_textView);
             imgPrivacy = itemView.findViewById(R.id.recycler_view_privacy);
+            tvNumMissingIngredients = itemView.findViewById(R.id.recycler_view_recipeItem_missingIngredients);
 
             itemView.setOnClickListener(this);
 
@@ -118,6 +119,15 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
                 }
             }
         });
+        if (currentItem.getMissingIngredients() != null) {
+            if (currentItem.getMissingIngredients() == 0) {
+                holder.tvNumMissingIngredients.setVisibility(View.GONE);
+            } else {
+                holder.tvNumMissingIngredients.setVisibility(View.VISIBLE);
+                holder.tvNumMissingIngredients.setText("Missing " + currentItem.getMissingIngredients() + " ingredients");
+            }
+        }else
+            holder.tvNumMissingIngredients.setVisibility(View.GONE);
 
         if (mRecipeList.get(position).getPrivacy().equals("Everyone")) {
             holder.imgPrivacy.setVisibility(View.GONE);

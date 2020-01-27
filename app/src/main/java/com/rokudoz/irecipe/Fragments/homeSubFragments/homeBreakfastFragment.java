@@ -39,6 +39,7 @@ import com.rokudoz.irecipe.R;
 import com.rokudoz.irecipe.Utils.Adapters.RecipeAdapter;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class homeBreakfastFragment extends Fragment implements RecipeAdapter.OnItemClickListener {
@@ -237,9 +238,16 @@ public class homeBreakfastFragment extends Fragment implements RecipeAdapter.OnI
                                                     numberOfMissingIngredients++;
                                                 }
                                             }
+                                            Log.d(TAG, "onEvent: " + recipe.getTitle() + " NR OF MISSING INGREDIENTS " + numberOfMissingIngredients);
                                             if (numberOfMissingIngredients < 3) {
-                                                if (!mRecipeList.contains(recipe))
+                                                if (!mRecipeList.contains(recipe)) {
+                                                    recipe.setMissingIngredients(numberOfMissingIngredients);
                                                     mRecipeList.add(recipe);
+                                                } else {
+                                                    recipe.setMissingIngredients(numberOfMissingIngredients);
+                                                    mRecipeList.set(mRecipeList.indexOf(recipe), recipe);
+                                                }
+                                                Collections.sort(mRecipeList);
                                                 mAdapter.notifyDataSetChanged();
                                             }
                                         }
@@ -320,10 +328,16 @@ public class homeBreakfastFragment extends Fragment implements RecipeAdapter.OnI
                                                     numberOfMissingIngredients++;
                                                 }
                                             }
-                                            Log.d(TAG, "onEvent: NR OF MISSING INGREDIENTS " + numberOfMissingIngredients);
+                                            Log.d(TAG, "onEvent: " + recipe.getTitle() + " NR OF MISSING INGREDIENTS " + numberOfMissingIngredients);
                                             if (numberOfMissingIngredients < 3) {
-                                                if (!mRecipeList.contains(recipe))
+                                                if (!mRecipeList.contains(recipe)) {
+                                                    recipe.setMissingIngredients(numberOfMissingIngredients);
                                                     mRecipeList.add(recipe);
+                                                } else {
+                                                    recipe.setMissingIngredients(numberOfMissingIngredients);
+                                                    mRecipeList.set(mRecipeList.indexOf(recipe), recipe);
+                                                }
+                                                Collections.sort(mRecipeList);
                                                 mAdapter.notifyDataSetChanged();
                                             }
                                         }
