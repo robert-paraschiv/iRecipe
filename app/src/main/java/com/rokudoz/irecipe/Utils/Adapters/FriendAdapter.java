@@ -8,13 +8,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.rokudoz.irecipe.Models.Friend;
 import com.rokudoz.irecipe.Models.User;
 import com.rokudoz.irecipe.R;
-import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
@@ -83,11 +83,7 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.FriendView
                     holder.tvName.setText(user.getName());
 
                     if (user.getUserProfilePicUrl() != null && !user.getUserProfilePicUrl().equals(""))
-                        Picasso.get()
-                                .load(user.getUserProfilePicUrl())
-                                .fit()
-                                .centerCrop()
-                                .into(holder.mImage);
+                        Glide.with(holder.mImage).load(user.getUserProfilePicUrl()).centerCrop().into(holder.mImage);
                 }
             }
         });

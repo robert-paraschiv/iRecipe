@@ -19,6 +19,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.button.MaterialButton;
@@ -43,7 +44,6 @@ import com.rokudoz.irecipe.Models.User;
 import com.rokudoz.irecipe.Models.UserWhoFaved;
 import com.rokudoz.irecipe.R;
 import com.rokudoz.irecipe.Utils.Adapters.PostParentCommentAdapter;
-import com.squareup.picasso.Picasso;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -258,11 +258,7 @@ public class PostDetailedFragment extends Fragment {
                 postDescription.setText(post.getText());
 
                 if (post.getImageUrl() != null) {
-                    Picasso.get()
-                            .load(post.getImageUrl())
-                            .fit()
-                            .centerCrop()
-                            .into(postImage);
+                    Glide.with(postImage).load(post.getImageUrl()).centerCrop().into(postImage);
                 }
 
                 usersRef.document(post.getCreatorId()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
@@ -270,11 +266,7 @@ public class PostDetailedFragment extends Fragment {
                     public void onSuccess(DocumentSnapshot documentSnapshot) {
                         final User user = documentSnapshot.toObject(User.class);
                         creatorName.setText(user.getName());
-                        Picasso.get()
-                                .load(user.getUserProfilePicUrl())
-                                .fit()
-                                .centerCrop()
-                                .into(creatorImage);
+                        Glide.with(creatorImage).load(user.getUserProfilePicUrl()).centerCrop().into(creatorImage);
                         creatorImage.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
@@ -358,11 +350,7 @@ public class PostDetailedFragment extends Fragment {
                     public void onSuccess(DocumentSnapshot documentSnapshot) {
                         Recipe recipe = documentSnapshot.toObject(Recipe.class);
                         recipeTitle.setText(recipe.getTitle());
-                        Picasso.get()
-                                .load(recipe.getImageUrls_list().get(0))
-                                .fit()
-                                .centerCrop()
-                                .into(recipeImage);
+                        Glide.with(recipeImage).load(recipe.getImageUrls_list().get(0)).centerCrop().into(recipeImage);
                     }
                 });
 

@@ -9,9 +9,9 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.rokudoz.irecipe.Models.Instruction;
 import com.rokudoz.irecipe.R;
-import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,7 +51,7 @@ public class RecipeInstructionsAdapter extends RecyclerView.Adapter<RecipeInstru
         holder.tvStepNumber.setText("Step " + currentItem.getStepNumber());
         holder.tvStepText.setText(currentItem.getText());
         if (!currentItem.getImgUrl().equals("")) {
-            Picasso.get().load(currentItem.getImgUrl()).fit().centerCrop().into(holder.stepImage);
+            Glide.with(holder.stepImage).load(currentItem.getImgUrl()).centerCrop().into(holder.stepImage);
         } else {
             holder.stepImage.setVisibility(View.GONE);
         }

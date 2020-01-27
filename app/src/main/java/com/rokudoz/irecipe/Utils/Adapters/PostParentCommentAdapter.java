@@ -9,6 +9,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.button.MaterialButton;
@@ -25,7 +26,6 @@ import com.rokudoz.irecipe.Fragments.PostDetailedFragmentDirections;
 import com.rokudoz.irecipe.Models.Comment;
 import com.rokudoz.irecipe.Models.User;
 import com.rokudoz.irecipe.R;
-import com.squareup.picasso.Picasso;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -124,11 +124,7 @@ public class PostParentCommentAdapter
             public void onSuccess(DocumentSnapshot documentSnapshot) {
                 User user = documentSnapshot.toObject(User.class);
                 if (user.getUserProfilePicUrl() != null) {
-                    Picasso.get()
-                            .load(user.getUserProfilePicUrl())
-                            .fit()
-                            .centerCrop()
-                            .into(holder.mImageView);
+                    Glide.with(holder.mImageView).load(user.getUserProfilePicUrl()).centerCrop().into(holder.mImageView);
                     holder.mName.setText(user.getName());
                 }
             }

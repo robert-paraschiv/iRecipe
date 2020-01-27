@@ -23,6 +23,7 @@ import android.webkit.MimeTypeMap;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.button.MaterialButton;
@@ -45,7 +46,6 @@ import com.rokudoz.irecipe.Models.User;
 import com.rokudoz.irecipe.R;
 import com.rokudoz.irecipe.Utils.Adapters.SectionsPagerAdapter;
 import com.rokudoz.irecipe.Utils.RotateBitmap;
-import com.squareup.picasso.Picasso;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -277,20 +277,9 @@ public class ProfileFragment extends Fragment {
                     UserDescriptionTv.setText(user.getDescription());
 
                     if (userProfilePicUrl != null && !userProfilePicUrl.equals("")) {
-                        Picasso.get()
-                                .load(userProfilePicUrl)
-                                .error(R.drawable.ic_account_circle_black_24dp)
-                                .fit()
-                                .centerCrop()
-                                .into(mProfileImage);
-
+                        Glide.with(mProfileImage).load(userProfilePicUrl).centerCrop().into(mProfileImage);
                     } else {
-                        Picasso.get()
-                                .load(R.drawable.ic_account_circle_black_24dp)
-                                .placeholder(R.drawable.ic_account_circle_black_24dp)
-                                .into(mProfileImage);
-
-
+                        Glide.with(mProfileImage).load(R.drawable.ic_account_circle_black_24dp).centerCrop().into(mProfileImage);
                         Log.d(TAG, "onEvent: Empty profile pic");
                     }
                 }

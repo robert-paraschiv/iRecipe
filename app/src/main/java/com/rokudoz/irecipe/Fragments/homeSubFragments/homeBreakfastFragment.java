@@ -61,7 +61,6 @@ public class homeBreakfastFragment extends Fragment implements RecipeAdapter.OnI
     private RecipeAdapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
 
-    private ArrayList<String> mDocumentIDs = new ArrayList<>();
     private List<Recipe> mRecipeList = new ArrayList<>();
     private List<Ingredient> userIngredientList = new ArrayList<>();
     private List<String> userFavRecipesList = new ArrayList<>();
@@ -207,7 +206,7 @@ public class homeBreakfastFragment extends Fragment implements RecipeAdapter.OnI
                         } else {
                             recipe.setFavorite(false);
                         }
-                        if (!mDocumentIDs.contains(document.getId())) {
+                        if (!mRecipeList.contains(recipe)) {
 
                             ////////////////////////////////////////////////////////// LOGIC TO GET RECIPES HERE
                             final List<Ingredient> recipeIngredientList = new ArrayList<>();
@@ -241,7 +240,6 @@ public class homeBreakfastFragment extends Fragment implements RecipeAdapter.OnI
                                             if (numberOfMissingIngredients < 3) {
                                                 if (!mRecipeList.contains(recipe))
                                                     mRecipeList.add(recipe);
-                                                mDocumentIDs.add(document.getId());
                                                 mAdapter.notifyDataSetChanged();
                                             }
                                         }
@@ -289,7 +287,7 @@ public class homeBreakfastFragment extends Fragment implements RecipeAdapter.OnI
                         } else {
                             recipe.setFavorite(false);
                         }
-                        if (!mDocumentIDs.contains(document.getId())) {
+                        if (!mRecipeList.contains(recipe)) {
 
 
                             ////////////////////////////////////////////////////////// LOGIC TO GET RECIPES HERE
@@ -326,7 +324,6 @@ public class homeBreakfastFragment extends Fragment implements RecipeAdapter.OnI
                                             if (numberOfMissingIngredients < 3) {
                                                 if (!mRecipeList.contains(recipe))
                                                     mRecipeList.add(recipe);
-                                                mDocumentIDs.add(document.getId());
                                                 mAdapter.notifyDataSetChanged();
                                             }
                                         }
@@ -356,7 +353,7 @@ public class homeBreakfastFragment extends Fragment implements RecipeAdapter.OnI
         mAdapter.setOnItemClickListener(new RecipeAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(int position) {
-                String id = mDocumentIDs.get(position);
+                String id = mRecipeList.get(position).getDocumentId();
                 String title = mRecipeList.get(position).getTitle();
                 Log.d(TAG, "onItemClick: CLICKED " + title + " id " + id);
 
@@ -366,7 +363,7 @@ public class homeBreakfastFragment extends Fragment implements RecipeAdapter.OnI
 
             @Override
             public void onFavoriteClick(final int position) {
-                String id = mDocumentIDs.get(position);
+                String id = mRecipeList.get(position).getDocumentId();
                 String title = mRecipeList.get(position).getTitle();
                 DocumentReference currentRecipeRef = recipeRef.document(id);
                 final CollectionReference currentRecipeSubCollection = currentRecipeRef.collection("UsersWhoFaved");

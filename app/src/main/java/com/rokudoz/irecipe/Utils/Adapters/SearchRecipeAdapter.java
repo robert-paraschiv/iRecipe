@@ -11,6 +11,7 @@ import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -18,7 +19,6 @@ import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.rokudoz.irecipe.Models.Recipe;
 import com.rokudoz.irecipe.R;
-import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -84,11 +84,8 @@ public class SearchRecipeAdapter extends RecyclerView.Adapter<SearchRecipeAdapte
 
         holder.tvTitle.setText(currentItem.getTitle());
         holder.tvDescription.setText(currentItem.getDescription());
-        Picasso.get()
-                .load(currentItem.getImageUrls_list().get(0))
-                .fit()
-                .centerCrop()
-                .into(holder.mImageView);
+
+        Glide.with(holder.mImageView).load(currentItem.getImageUrls_list().get(0)).centerCrop().into(holder.mImageView);
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         CollectionReference currentRecipeSubCollection = db.collection("Recipes").document(currentItem.getDocumentId())

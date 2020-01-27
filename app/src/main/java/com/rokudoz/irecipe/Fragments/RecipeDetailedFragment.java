@@ -30,6 +30,7 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.button.MaterialButton;
@@ -58,7 +59,6 @@ import com.rokudoz.irecipe.Utils.Adapters.RecipeIngredientsAdapter;
 import com.rokudoz.irecipe.Utils.Adapters.RecipeInstructionsAdapter;
 import com.rokudoz.irecipe.Utils.Adapters.RecipeParentCommentAdapter;
 import com.rokudoz.irecipe.Utils.Adapters.RecipeDetailedViewPagerAdapter;
-import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -473,18 +473,26 @@ public class RecipeDetailedFragment extends Fragment {
             @Override
             public void onSuccess(DocumentSnapshot documentSnapshot) {
                 Recipe recipe = documentSnapshot.toObject(Recipe.class);
-                title = recipe.getTitle();
-                String description = recipe.getDescription();
-                imageUrls = recipe.getImageUrls_list();
-                if (recipeDetailedViewPagerAdapter != null)
-                    recipeDetailedViewPagerAdapter.notifyDataSetChanged();
+                if (recipe.getTitle() != null) {
+                    title = recipe.getTitle();
+                    tvTitle.setText(title);
+                }
+                if (recipe.getDescription() != null) {
+                    String description = recipe.getDescription();
+                    tvDescription.setText(description);
+                }
 
-                tvTitle.setText(title);
-                tvDescription.setText(description);
+                if (recipe.getImageUrls_list() != null) {
+                    imageUrls = recipe.getImageUrls_list();
+                }
+                if (recipeDetailedViewPagerAdapter != null) {
+                    recipeDetailedViewPagerAdapter.notifyDataSetChanged();
+                }
+
                 ////////////////////////////////////////////////////////// LOGIC TO GET RECIPES INGREDIENTS AND INSTRUCTIONS HERE
 
 
-                if (recipe.getCreator_docId().equals(mUser.getUser_id())) {
+                if (recipe.getCreator_docId() != null && recipe.getCreator_docId().equals(mUser.getUser_id())) {
                     mDeleteRecipeBtn.setVisibility(View.VISIBLE);
                     mDeleteRecipeBtn.setOnClickListener(new View.OnClickListener() {
                         @Override
@@ -538,7 +546,7 @@ public class RecipeDetailedFragment extends Fragment {
             public void onSuccess(DocumentSnapshot documentSnapshot) {
                 User user = documentSnapshot.toObject(User.class);
                 tvCreatorName.setText(user.getName());
-                Picasso.get().load(user.getUserProfilePicUrl()).centerCrop().fit().into(mCreatorImage);
+                Glide.with(mCreatorImage).load(user.getUserProfilePicUrl()).centerCrop().into(mCreatorImage);
 
                 tvCreatorName.setOnClickListener(new View.OnClickListener() {
                     @Override

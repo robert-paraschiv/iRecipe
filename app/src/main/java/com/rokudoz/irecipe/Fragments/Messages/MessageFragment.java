@@ -17,6 +17,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.appbar.MaterialToolbar;
@@ -40,7 +41,6 @@ import com.rokudoz.irecipe.Models.User;
 import com.rokudoz.irecipe.R;
 import com.rokudoz.irecipe.Utils.Adapters.ConversationAdapter;
 import com.rokudoz.irecipe.Utils.Adapters.MessageAdapter;
-import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -207,7 +207,7 @@ public class MessageFragment extends Fragment {
                 userFriend = documentSnapshot.toObject(User.class);
 
                 friendName.setText(userFriend.getName());
-                Picasso.get().load(userFriend.getUserProfilePicUrl()).fit().centerCrop().into(friendImage);
+                Glide.with(friendImage).load(userFriend.getUserProfilePicUrl()).centerCrop().into(friendImage);
             }
         });
     }

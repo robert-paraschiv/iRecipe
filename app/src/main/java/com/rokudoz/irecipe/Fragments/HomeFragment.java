@@ -14,6 +14,7 @@ import androidx.viewpager.widget.ViewPager;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
+import com.google.firebase.auth.FirebaseAuth;
 import com.rokudoz.irecipe.AddIngredientActivity;
 import com.rokudoz.irecipe.AddRecipesActivity;
 import com.rokudoz.irecipe.Fragments.homeSubFragments.homeBreakfastFragment;
@@ -61,6 +62,10 @@ public class HomeFragment extends Fragment {
                 navigateToAddRecipes();
             }
         });
+
+        if (FirebaseAuth.getInstance().getCurrentUser().getEmail().equals("paraschivlongin@gmail.com")){
+            
+        }
         fab_addIngredient.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

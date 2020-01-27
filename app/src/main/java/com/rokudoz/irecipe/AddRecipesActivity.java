@@ -30,6 +30,7 @@ import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.button.MaterialButton;
@@ -48,7 +49,6 @@ import com.google.firebase.storage.UploadTask;
 import com.rokudoz.irecipe.Models.Ingredient;
 import com.rokudoz.irecipe.Models.Instruction;
 import com.rokudoz.irecipe.Models.Recipe;
-import com.squareup.picasso.Picasso;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -196,14 +196,14 @@ public class AddRecipesActivity extends AppCompatActivity {
                     mRecipeImageUriArray[i] = data.getClipData().getItemAt(i).getUri();
                     mRecipeImageUri = data.getClipData().getItemAt(i).getUri();
                 }
-                Picasso.get().load(mRecipeImageUri).into(mImageView);
+                Glide.with(mImageView).load(mRecipeImageUri).centerCrop().into(mImageView);
 
             } else if (data.getData() != null) {
                 //Only one image has been selected
                 mRecipeImageUri = data.getData();
                 mRecipeImageUriArray = new Uri[1];
                 mRecipeImageUriArray[0] = mRecipeImageUri;
-                Picasso.get().load(mRecipeImageUri).into(mImageView);
+                Glide.with(mImageView).load(mRecipeImageUri).centerCrop().into(mImageView);
             }
 
         } else if (requestCode >= SELECT_PICTURES + INSTRUCTION_PICTURE && resultCode == Activity.RESULT_OK && data != null) {
@@ -213,17 +213,16 @@ public class AddRecipesActivity extends AppCompatActivity {
                 for (int i = 0; i < count; i++) {
                     mInstructionStepUri = data.getClipData().getItemAt(i).getUri();
                 }
-                mInstructionStepImageUriList.set(requestCode - (SELECT_PICTURES + INSTRUCTION_PICTURE), mInstructionStepUri);
-                Picasso.get().load(mInstructionStepImageUriList.get(requestCode - (SELECT_PICTURES + INSTRUCTION_PICTURE)))
+                Glide.with(getApplication()).load(mInstructionStepImageUriList.get(requestCode - (SELECT_PICTURES + INSTRUCTION_PICTURE))).centerCrop()
                         .into(instructionStepImageViewList.get(instructionStepImageViewList.size() - 1));
 
             } else if (data.getData() != null) {
                 //Only one image has been selected
                 mInstructionStepUri = data.getData();
                 mInstructionStepImageUriList.set(requestCode - (SELECT_PICTURES + INSTRUCTION_PICTURE), mInstructionStepUri);
-                Picasso.get().load(mInstructionStepImageUriList.get(requestCode - (SELECT_PICTURES + INSTRUCTION_PICTURE)))
-                        .into(instructionStepImageViewList.get(instructionStepImageViewList.size() - 1));
 
+                Glide.with(getApplication()).load(mInstructionStepImageUriList.get(requestCode - (SELECT_PICTURES + INSTRUCTION_PICTURE))).centerCrop()
+                        .into(instructionStepImageViewList.get(instructionStepImageViewList.size() - 1));
             }
         }
     }
@@ -429,8 +428,10 @@ public class AddRecipesActivity extends AppCompatActivity {
                             });
                         }
                         Log.d(TAG, "onSuccess: doc id " + documentReference.getId());
+                        Intent intent = new Intent(AddRecipesActivity.this, MainActivity.class);
+                        intent.putExtra("recipe_id", documentReference.getId());
+                        startActivity(intent);
                         finish();
-                        startActivity(getIntent());
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {

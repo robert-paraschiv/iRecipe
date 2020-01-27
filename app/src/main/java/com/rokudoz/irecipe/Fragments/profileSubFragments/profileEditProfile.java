@@ -25,6 +25,7 @@ import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.button.MaterialButton;
@@ -41,7 +42,6 @@ import com.google.firebase.storage.StorageTask;
 import com.google.firebase.storage.UploadTask;
 import com.rokudoz.irecipe.Models.User;
 import com.rokudoz.irecipe.R;
-import com.squareup.picasso.Picasso;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -165,19 +165,11 @@ public class profileEditProfile extends Fragment {
                     userProfilePicUrl = mUser.getUserProfilePicUrl();
                     userDocumentID = mUser.getUser_id();
                     if (userProfilePicUrl != null && !mUser.getUserProfilePicUrl().equals("")) {
-                        Picasso.get()
-                                .load(mUser.getUserProfilePicUrl())
-                                .error(R.drawable.ic_account_circle_black_24dp)
-                                .fit()
-                                .centerCrop()
-                                .into(profilePicture_ImageView);
+                        Glide.with(profilePicture_ImageView).load(mUser.getUserProfilePicUrl()).centerCrop().into(profilePicture_ImageView);
 
                         changeProfilePic_MaterialButton.setText("Change profile picture");
                     } else {
-                        Picasso.get()
-                                .load(R.drawable.ic_account_circle_black_24dp)
-                                .placeholder(R.drawable.ic_account_circle_black_24dp)
-                                .into(profilePicture_ImageView);
+                        Glide.with(profilePicture_ImageView).load(R.drawable.ic_account_circle_black_24dp).centerCrop().into(profilePicture_ImageView);
 
                         changeProfilePic_MaterialButton.setText("Add profile picture");
 

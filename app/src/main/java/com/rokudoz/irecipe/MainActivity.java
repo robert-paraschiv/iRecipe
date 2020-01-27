@@ -39,6 +39,12 @@ public class MainActivity extends AppCompatActivity {
             args.putString("user_id", friend_id);
             navController.navigate(R.id.messageFragment,args );
         }
+        if (getIntent() != null && getIntent().getStringExtra("recipe_id") != null) {
+            String recipe_id = getIntent().getStringExtra("recipe_id");
+            Bundle args = new Bundle();
+            args.putString("documentID", recipe_id);
+            navController.navigate(R.id.recipeDetailedFragment,args );
+        }
     }
 
 

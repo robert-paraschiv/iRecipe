@@ -71,7 +71,6 @@ public class FeedFragment extends Fragment implements PostAdapter.OnItemClickLis
     private PostAdapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
 
-    private ArrayList<String> mDocumentIDs = new ArrayList<>();
     private ArrayList<Post> mPostList = new ArrayList<>();
     private List<String> userFavPostList = new ArrayList<>();
     private List<String> friends_userID_list = new ArrayList<>();
@@ -324,11 +323,10 @@ public class FeedFragment extends Fragment implements PostAdapter.OnItemClickLis
                         } else {
                             post.setFavorite(false);
                         }
-                        if (!mDocumentIDs.contains(document.getId())) {
-                            mDocumentIDs.add(document.getId());
+                        if (!mPostList.contains(post)) {
                             mPostList.add(post);
                         } else {
-                            Log.d(TAG, "onEvent: Already Contains docID");
+                            mPostList.set(mPostList.indexOf(post), post);
                         }
 
                     }
@@ -355,7 +353,7 @@ public class FeedFragment extends Fragment implements PostAdapter.OnItemClickLis
         mAdapter.setOnItemClickListener(new PostAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(int position) {
-                String id = mDocumentIDs.get(position);
+                String id = mPostList.get(position).getDocumentId();
                 Navigation.findNavController(view).navigate(FeedFragmentDirections.actionFeedFragmentToPostDetailed(id));
             }
 
@@ -364,7 +362,7 @@ public class FeedFragment extends Fragment implements PostAdapter.OnItemClickLis
 
                 ////////////////////////////////////////////////
 
-                String id = mDocumentIDs.get(position);
+                String id = mPostList.get(position).getDocumentId();
                 DocumentReference currentRecipeRef = postsRef.document(id);
                 final CollectionReference currentRecipeSubCollection = currentRecipeRef.collection("UsersWhoFaved");
 

@@ -110,4 +110,13 @@ public class Post {
                 ", creation_date=" + creation_date +
                 '}';
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof Post))
+            return false;
+        if (obj == this)
+            return true;
+        return this.documentId.equals(((Post) obj).documentId);
+    }
 }

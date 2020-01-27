@@ -18,7 +18,9 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.firebase.auth.FirebaseAuth;
@@ -42,7 +44,6 @@ import com.rokudoz.irecipe.Models.UserWhoFaved;
 import com.rokudoz.irecipe.R;
 import com.rokudoz.irecipe.Utils.Adapters.PostAdapter;
 import com.rokudoz.irecipe.Utils.Adapters.RecipeAdapter;
-import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -59,7 +60,6 @@ public class UserProfileFragment extends Fragment implements PostAdapter.OnItemC
     private MaterialButton mAddFriendButton;
     private CircleImageView mProfileImage;
     private View view;
-    private ArrayList<String> mDocumentIDs = new ArrayList<>();
     private ArrayList<Post> mPostList = new ArrayList<>();
     private List<String> userFavPostList = new ArrayList<>();
     private List<String> friends_userID_list = new ArrayList<>();
@@ -108,6 +108,9 @@ public class UserProfileFragment extends Fragment implements PostAdapter.OnItemC
         MaterialButton messageUser = view.findViewById(R.id.userprofile_messageUser_MaterialButton);
 
         mUser = new User();
+
+        BottomNavigationView navBar = getActivity().findViewById(R.id.bottom_navigation);
+        navBar.setVisibility(View.VISIBLE);
 
         UserProfileFragmentArgs userProfileFragmentArgs = UserProfileFragmentArgs.fromBundle(getArguments());
         getRecipeArgsPassed(userProfileFragmentArgs);
@@ -376,19 +379,9 @@ public class UserProfileFragment extends Fragment implements PostAdapter.OnItemC
                 UserDescriptionTv.setText(user.getDescription());
 
                 if (userProfilePicUrl != null && !userProfilePicUrl.equals("")) {
-                    Picasso.get()
-                            .load(userProfilePicUrl)
-                            .error(R.drawable.ic_account_circle_black_24dp)
-                            .fit()
-                            .centerCrop()
-                            .into(mProfileImage);
-
+                    Glide.with(mProfileImage).load(userProfilePicUrl).centerCrop().into(mProfileImage);
                 } else {
-                    Picasso.get()
-                            .load(R.drawable.ic_account_circle_black_24dp)
-                            .placeholder(R.drawable.ic_account_circle_black_24dp)
-                            .into(mProfileImage);
-
+                    Glide.with(mProfileImage).load(R.drawable.ic_account_circle_black_24dp).centerCrop().into(mProfileImage);
 
                     Toast.makeText(getContext(), "empty", Toast.LENGTH_SHORT).show();
                 }
@@ -439,8 +432,7 @@ public class UserProfileFragment extends Fragment implements PostAdapter.OnItemC
                         } else {
                             post.setFavorite(false);
                         }
-                        if (!mDocumentIDs.contains(document.getId())) {
-                            mDocumentIDs.add(document.getId());
+                        if (!mPostList.contains(post)) {
                             mPostList.add(post);
                         } else {
                             Log.d(TAG, "onEvent: Already Contains docID");
@@ -465,7 +457,7 @@ public class UserProfileFragment extends Fragment implements PostAdapter.OnItemC
         mAdapter.setOnItemClickListener(new PostAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(int position) {
-                String id = mDocumentIDs.get(position);
+                String id = mPostList.get(position).getDocumentId();
                 Navigation.findNavController(view).navigate(UserProfileFragmentDirections.actionUserProfileFragment2ToPostDetailed(id));
             }
 
@@ -474,7 +466,7 @@ public class UserProfileFragment extends Fragment implements PostAdapter.OnItemC
 
                 ////////////////////////////////////////////////
 
-                String id = mDocumentIDs.get(position);
+                String id = mPostList.get(position).getDocumentId();
                 DocumentReference currentRecipeRef = postsRef.document(id);
                 final CollectionReference currentRecipeSubCollection = currentRecipeRef.collection("UsersWhoFaved");
 

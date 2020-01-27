@@ -50,8 +50,6 @@ dependencies {
     implementation 'com.google.android.gms:play-services-auth:17.0.0'
     implementation 'com.crashlytics.sdk.android:crashlytics:2.10.1'
 
-    //Picasso
-    implementation 'com.squareup.picasso:picasso:2.71828'
 
     //Round ImageView hdodenhof
     implementation 'de.hdodenhof:circleimageview:3.0.1'
@@ -64,6 +62,9 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0-alpha03'
 
 
+    //Glide
+    implementation 'com.github.bumptech.glide:glide:4.11.0'
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.11.0'
 }
 
 apply plugin: 'com.google.gms.google-services'

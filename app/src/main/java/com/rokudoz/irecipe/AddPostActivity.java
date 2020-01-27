@@ -17,6 +17,7 @@ import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.button.MaterialButton;
@@ -33,7 +34,6 @@ import com.rokudoz.irecipe.Models.Ingredient;
 import com.rokudoz.irecipe.Models.Post;
 import com.rokudoz.irecipe.Models.Recipe;
 import com.rokudoz.irecipe.Utils.RotateBitmap;
-import com.squareup.picasso.Picasso;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -86,7 +86,7 @@ public class AddPostActivity extends AppCompatActivity {
                 postPicUrl = getIntent().getStringExtra("post_imageUrl");
                 if (!postPicUrl.equals("")){
                     choosePhotoBtn.setText("Change photo");
-                    Picasso.get().load(postPicUrl).fit().centerCrop().into(imageView);
+                    Glide.with(imageView).load(postPicUrl).centerCrop().into(imageView);
                 }
             }
         }

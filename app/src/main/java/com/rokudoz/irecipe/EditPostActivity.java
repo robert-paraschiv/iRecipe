@@ -12,6 +12,7 @@ import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
@@ -22,7 +23,6 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.rokudoz.irecipe.Fragments.PostDetailedFragmentDirections;
 import com.rokudoz.irecipe.Models.Post;
-import com.squareup.picasso.Picasso;
 
 public class EditPostActivity extends AppCompatActivity {
 
@@ -155,7 +155,7 @@ public class EditPostActivity extends AppCompatActivity {
             }
             if (getIntent().getStringExtra("post_imageUrl") != null) {
                 post_imageUrl = getIntent().getStringExtra("post_imageUrl");
-                Picasso.get().load(post_imageUrl).fit().centerCrop().into(postImage);
+                Glide.with(postImage).load(post_imageUrl).centerCrop().into(postImage);
             }
             if (getIntent().getStringExtra("post_text") != null) {
                 post_text = getIntent().getStringExtra("post_text");

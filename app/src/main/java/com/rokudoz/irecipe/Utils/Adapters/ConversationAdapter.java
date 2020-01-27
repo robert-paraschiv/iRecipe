@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
@@ -18,7 +19,6 @@ import com.rokudoz.irecipe.Models.Conversation;
 import com.rokudoz.irecipe.Models.Friend;
 import com.rokudoz.irecipe.Models.User;
 import com.rokudoz.irecipe.R;
-import com.squareup.picasso.Picasso;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -92,11 +92,7 @@ public class ConversationAdapter extends RecyclerView.Adapter<ConversationAdapte
                         holder.tvName.setText(user.getName());
 
                         if (user.getUserProfilePicUrl() != null && !user.getUserProfilePicUrl().equals(""))
-                            Picasso.get()
-                                    .load(user.getUserProfilePicUrl())
-                                    .fit()
-                                    .centerCrop()
-                                    .into(holder.mImage);
+                            Glide.with(holder.mImage).load(user.getUserProfilePicUrl()).centerCrop().into(holder.mImage);
                     }
                 }
             });

@@ -56,7 +56,6 @@ public class profileMyRecipesFragment extends Fragment implements RecipeAdapter.
     private ListenerRegistration currentSubCollectionListener, userDetailsListener, recipesListener;
     private FirebaseStorage mStorageRef;
 
-    private ArrayList<String> mDocumentIDs = new ArrayList<>();
     private ArrayList<Recipe> mRecipeList = new ArrayList<>();
     private List<String> userFavRecipesList = new ArrayList<>();
     private String userFavDocId = "";
@@ -172,8 +171,7 @@ public class profileMyRecipesFragment extends Fragment implements RecipeAdapter.
                         } else {
                             recipe.setFavorite(false);
                         }
-                        if (!mDocumentIDs.contains(document.getId())) {
-                            mDocumentIDs.add(document.getId());
+                        if (!mRecipeList.contains(recipe)) {
 
                             ////////////////////////////////////////////////////////// LOGIC TO GET RECIPES HERE
 
@@ -200,7 +198,7 @@ public class profileMyRecipesFragment extends Fragment implements RecipeAdapter.
         mAdapter.setOnItemClickListener(new RecipeAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(int position) {
-                String id = mDocumentIDs.get(position);
+                String id = mRecipeList.get(position).getDocumentId();
                 String title = mRecipeList.get(position).getTitle();
                 Log.d(TAG, "onItemClick: CLICKED " + title + " id " + id);
 
@@ -210,7 +208,7 @@ public class profileMyRecipesFragment extends Fragment implements RecipeAdapter.
 
             @Override
             public void onFavoriteClick(final int position) {
-                String id = mDocumentIDs.get(position);
+                String id = mRecipeList.get(position).getDocumentId();
                 String title = mRecipeList.get(position).getTitle();
                 DocumentReference currentRecipeRef = recipeRef.document(id);
                 final CollectionReference currentRecipeSubCollection = currentRecipeRef.collection("UsersWhoFaved");

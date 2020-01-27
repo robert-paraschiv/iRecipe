@@ -13,6 +13,7 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
@@ -33,7 +34,6 @@ import com.rokudoz.irecipe.Models.Recipe;
 import com.rokudoz.irecipe.Models.User;
 import com.rokudoz.irecipe.Models.UserWhoFaved;
 import com.rokudoz.irecipe.Utils.Adapters.RecipeAdapter;
-import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -267,20 +267,9 @@ public class FriendRequestActivity extends AppCompatActivity implements RecipeAd
                 UserDescriptionTv.setText(user.getDescription());
 
                 if (userProfilePicUrl != null && !userProfilePicUrl.equals("")) {
-                    Picasso.get()
-                            .load(userProfilePicUrl)
-                            .error(R.drawable.ic_account_circle_black_24dp)
-                            .fit()
-                            .centerCrop()
-                            .into(mProfileImage);
-
+                    Glide.with(mProfileImage).load(userProfilePicUrl).centerCrop().into(mProfileImage);
                 } else {
-                    Picasso.get()
-                            .load(R.drawable.ic_account_circle_black_24dp)
-                            .placeholder(R.drawable.ic_account_circle_black_24dp)
-                            .into(mProfileImage);
-
-
+                    Glide.with(mProfileImage).load(R.drawable.ic_account_circle_black_24dp).centerCrop().into(mProfileImage);
                     Toast.makeText(FriendRequestActivity.this, "empty", Toast.LENGTH_SHORT).show();
                 }
             }

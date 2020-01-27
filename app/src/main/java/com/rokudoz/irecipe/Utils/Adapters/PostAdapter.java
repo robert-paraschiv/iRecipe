@@ -1,15 +1,24 @@
 package com.rokudoz.irecipe.Utils.Adapters;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Context;
+import android.graphics.drawable.Drawable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
@@ -22,7 +31,6 @@ import com.google.firebase.firestore.QuerySnapshot;
 import com.rokudoz.irecipe.Models.Post;
 import com.rokudoz.irecipe.Models.User;
 import com.rokudoz.irecipe.R;
-import com.squareup.picasso.Picasso;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -35,6 +43,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 
 public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder> {
+    private static final String TAG = "PostAdapter";
     private List<Post> post_List;
     private OnItemClickListener mListener;
 
@@ -110,12 +119,10 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
         final Post currentItem = post_List.get(position);
 
         holder.tvDescription.setText(currentItem.getText());
-        if (!currentItem.getImageUrl().equals(""))
-            Picasso.get()
-                    .load(currentItem.getImageUrl())
-                    .fit()
-                    .centerCrop()
-                    .into(holder.mImageView);
+        if (!currentItem.getImageUrl().equals("")) {
+
+            Glide.with(holder.mImageView.getContext()).load(currentItem.getImageUrl()).centerCrop().into(holder.mImageView);
+        }
 
         if (currentItem.getCreation_date() != null) {
             Date date = currentItem.getCreation_date();
@@ -134,43 +141,36 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
             CollectionReference currentRecipeSubCollection = db.collection("Posts").document(currentItem.getDocumentId())
                     .collection("UsersWhoFaved");
 
-            db.collection("Users").document(currentItem.getCreatorId()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+            db.collection("Users").document(currentItem.getCreatorId()).addSnapshotListener(new EventListener<DocumentSnapshot>() {
                 @Override
-                public void onSuccess(DocumentSnapshot documentSnapshot) {
-                    User user = documentSnapshot.toObject(User.class);
-                    holder.creatorName.setText(user.getName());
-                    Picasso.get().load(user.getUserProfilePicUrl()).fit().centerCrop().into(holder.creatorImage);
-                }
-            });
-            currentRecipeSubCollection.addSnapshotListener(new EventListener<QuerySnapshot>() {
-                @Override
-                public void onEvent(@javax.annotation.Nullable QuerySnapshot queryDocumentSnapshots, @javax.annotation.Nullable FirebaseFirestoreException e) {
+                public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
                     if (e != null) {
+                        Log.w(TAG, "onEvent: ", e);
                         return;
                     }
-                    boolean fav = false;
-                    for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
-                        if (documentSnapshot.getId().equals(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
-                            fav = true;
-                        }
-                    }
-                    if (fav)
-                        holder.imgFavorited.setImageResource(R.drawable.ic_favorite_red_24dp);
-                    else
-                        holder.imgFavorited.setImageResource(R.drawable.ic_favorite_border_black_24dp);
+                    User user = documentSnapshot.toObject(User.class);
+                    holder.creatorName.setText(user.getName());
+                    Glide.with(holder.creatorImage).load(user.getUserProfilePicUrl()).centerCrop().into(holder.creatorImage);
+                }
+            });
 
-                    holder.tvNrOfFaves.setText("" + queryDocumentSnapshots.size());
+            currentRecipeSubCollection.get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                @Override
+                public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                    if (queryDocumentSnapshots != null)
+                        holder.tvNrOfFaves.setText("" + queryDocumentSnapshots.size());
 
                 }
             });
+
+            if (currentItem.getFavorite() != null) {
+                boolean fav = currentItem.getFavorite();
+                if (fav)
+                    holder.imgFavorited.setImageResource(R.drawable.ic_favorite_red_24dp);
+                else
+                    holder.imgFavorited.setImageResource(R.drawable.ic_favorite_border_black_24dp);
+            }
         }
-
-
-//        holder.imgFavorited.setImageResource(R.drawable.ic_favorite_border_black_24dp);
-//        if (currentItem.getFavorite() != null && currentItem.getFavorite()) {
-//            holder.imgFavorited.setImageResource(R.drawable.ic_favorite_red_24dp);
-//        }
-
 
     }
 

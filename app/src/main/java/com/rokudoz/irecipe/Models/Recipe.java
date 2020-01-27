@@ -141,6 +141,6 @@ public class Recipe {
             return false;
         if (obj == this)
             return true;
-        return this.title.equals(((Recipe) obj).title);
+        return this.documentId.equals(((Recipe) obj).documentId);
     }
 }
