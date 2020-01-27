@@ -126,7 +126,8 @@ public class FeedFragment extends Fragment implements PostAdapter.OnItemClickLis
     public void onStart() {
         super.onStart();
         FirebaseAuth.getInstance().addAuthStateListener(mAuthListener);
-        getUnreadConversationNr();
+        if (FirebaseAuth.getInstance().getCurrentUser() != null)
+            getUnreadConversationNr();
     }
 
 

@@ -6,93 +6,83 @@ import com.google.firebase.firestore.ServerTimestamp;
 import java.util.Date;
 
 public class Comment {
-    private String documentId;
-    private String mRecipeDocumentId;
-    private String mUserId;
-    private String mImageUrl;
-    private String mName;
-    private String mCommentText;
+    private String documentID;
+    private String recipe_documentID;
+    private String user_id;
+    private String comment_text;
 
     private @ServerTimestamp
-    Date mCommentTimeStamp;
+    Date comment_timeStamp;
 
-    public Comment(String mRecipeDocumentId, String mUserId, String mImageUrl, String mName, String mCommentText, Date mCommentTimeStamp) {
-        this.mRecipeDocumentId = mRecipeDocumentId;
-        this.mUserId = mUserId;
-        this.mImageUrl = mImageUrl;
-        this.mName = mName;
-        this.mCommentText = mCommentText;
-        this.mCommentTimeStamp = mCommentTimeStamp;
+
+    public Comment(String recipe_documentID, String user_id, String comment_text, Date comment_timeStamp) {
+        this.recipe_documentID = recipe_documentID;
+        this.user_id = user_id;
+        this.comment_text = comment_text;
+        this.comment_timeStamp = comment_timeStamp;
     }
 
     public Comment() {
     }
+
     @Exclude
-    public String getDocumentId() {
-        return documentId;
+    public String getDocumentID() {
+        return documentID;
     }
 
-    public void setDocumentId(String documentId) {
-        this.documentId = documentId;
+    public void setDocumentID(String documentID) {
+        this.documentID = documentID;
     }
 
-    public String getmImageUrl() {
-        return mImageUrl;
+    public String getRecipe_documentID() {
+        return recipe_documentID;
     }
 
-    public void setmImageUrl(String mImageUrl) {
-        this.mImageUrl = mImageUrl;
+    public void setRecipe_documentID(String recipe_documentID) {
+        this.recipe_documentID = recipe_documentID;
     }
 
-    public String getmName() {
-        return mName;
+    public String getUser_id() {
+        return user_id;
     }
 
-    public void setmName(String mName) {
-        this.mName = mName;
+    public void setUser_id(String user_id) {
+        this.user_id = user_id;
     }
 
-    public String getmCommentText() {
-        return mCommentText;
+    public String getComment_text() {
+        return comment_text;
     }
 
-    public void setmCommentText(String mCommentText) {
-        this.mCommentText = mCommentText;
+    public void setComment_text(String comment_text) {
+        this.comment_text = comment_text;
     }
 
-    public String getmUserId() {
-        return mUserId;
+    public Date getComment_timeStamp() {
+        return comment_timeStamp;
     }
 
-    public void setmUserId(String mUserId) {
-        this.mUserId = mUserId;
-    }
-
-    public String getmRecipeDocumentId() {
-        return mRecipeDocumentId;
-    }
-
-    public void setmRecipeDocumentId(String mRecipeDocumentId) {
-        this.mRecipeDocumentId = mRecipeDocumentId;
-    }
-
-    public Date getmCommentTimeStamp() {
-        return mCommentTimeStamp;
-    }
-
-    public void setmCommentTimeStamp(Date mCommentTimeStamp) {
-        this.mCommentTimeStamp = mCommentTimeStamp;
+    public void setComment_timeStamp(Date comment_timeStamp) {
+        this.comment_timeStamp = comment_timeStamp;
     }
 
     @Override
     public String toString() {
         return "Comment{" +
-                "mRecipeDocumentId='" + mRecipeDocumentId + '\'' +
-                ", mUserId='" + mUserId + '\'' +
-                ", mImageUrl='" + mImageUrl + '\'' +
-                ", mName='" + mName + '\'' +
-                ", mCommentText='" + mCommentText + '\'' +
-                ", mCommentTimeStamp=" + mCommentTimeStamp +
+                "documentID='" + documentID + '\'' +
+                ", recipe_documentID='" + recipe_documentID + '\'' +
+                ", user_id='" + user_id + '\'' +
+                ", comment_text='" + comment_text + '\'' +
+                ", comment_timeStamp=" + comment_timeStamp +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof Comment))
+            return false;
+        if (obj == this)
+            return true;
+        return this.documentID.equals(((Comment) obj).documentID);
     }
 }

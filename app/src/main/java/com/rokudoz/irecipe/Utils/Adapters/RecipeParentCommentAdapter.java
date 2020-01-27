@@ -102,7 +102,7 @@ public class RecipeParentCommentAdapter
     @Override
     public void onClick(View v) {
         CommentViewHolder holder = (CommentViewHolder) v.getTag();
-        String commentID = mCommentList.get(holder.getAdapterPosition()).getmCommentText();
+        String commentID = mCommentList.get(holder.getAdapterPosition()).getComment_text();
 
         if (holder.llExpandArea.getVisibility() == View.VISIBLE) {
             holder.llExpandArea.setVisibility(View.GONE);
@@ -119,7 +119,7 @@ public class RecipeParentCommentAdapter
         final Comment currentItem = mCommentList.get(position);
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-        db.collection("Users").document(currentItem.getmUserId()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+        db.collection("Users").document(currentItem.getUser_id()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
             @Override
             public void onSuccess(DocumentSnapshot documentSnapshot) {
                 User user = documentSnapshot.toObject(User.class);
@@ -130,14 +130,14 @@ public class RecipeParentCommentAdapter
             }
         });
 
-        holder.mCommentText.setText(currentItem.getmCommentText());
+        holder.mCommentText.setText(currentItem.getComment_text());
 
-        Date date = currentItem.getmCommentTimeStamp();
+        Date date = currentItem.getComment_timeStamp();
         if (date != null) {
             DateFormat dateFormat = new SimpleDateFormat("HH:mm, MMM d", Locale.getDefault());
             String creationDate = dateFormat.format(date);
             long time = date.getTime();
-            if (currentItem.getmCommentTimeStamp() != null && !currentItem.getmCommentTimeStamp().equals("")) {
+            if (currentItem.getComment_timeStamp() != null && !currentItem.getComment_timeStamp().equals("")) {
                 holder.mCommentTimeStamp.setText(getTimeAgo(time));
             }
         }
@@ -150,10 +150,9 @@ public class RecipeParentCommentAdapter
                 FirebaseFirestore db = FirebaseFirestore.getInstance();
 
                 if (!replyText.trim().equals("")) {
-                    Comment comment = new Comment(currentItem.getmRecipeDocumentId(), mUser.getUser_id(), mUser.getUserProfilePicUrl()
-                            , mUser.getName(), replyText, null);
-                    db.collection("Recipes").document(currentItem.getmRecipeDocumentId()).collection("Comments")
-                            .document(currentItem.getDocumentId()).collection("ChildComments").add(comment)
+                    Comment comment = new Comment(currentItem.getRecipe_documentID(), mUser.getUser_id(), replyText, null);
+                    db.collection("Recipes").document(currentItem.getRecipe_documentID()).collection("Comments")
+                            .document(currentItem.getDocumentID()).collection("ChildComments").add(comment)
                             .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                                 @Override
                                 public void onSuccess(DocumentReference documentReference) {
@@ -175,7 +174,7 @@ public class RecipeParentCommentAdapter
         holder.mImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Navigation.findNavController(v).navigate(RecipeDetailedFragmentDirections.actionRecipeDetailedFragmentToUserProfileFragment2(currentItem.getmUserId()));
+                Navigation.findNavController(v).navigate(RecipeDetailedFragmentDirections.actionRecipeDetailedFragmentToUserProfileFragment2(currentItem.getUser_id()));
             }
         });
 
@@ -198,8 +197,8 @@ public class RecipeParentCommentAdapter
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         final ArrayList<Comment> childComments = new ArrayList<>();
         final ArrayList<String> childcommentID = new ArrayList<>();
-        db.collection("Recipes").document(comment.getmRecipeDocumentId()).collection("Comments")
-                .document(comment.getDocumentId()).collection("ChildComments").orderBy("mCommentTimeStamp", Query.Direction.ASCENDING)
+        db.collection("Recipes").document(comment.getRecipe_documentID()).collection("Comments")
+                .document(comment.getDocumentID()).collection("ChildComments").orderBy("comment_timeStamp", Query.Direction.ASCENDING)
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
                     public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {

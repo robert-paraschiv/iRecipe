@@ -70,7 +70,7 @@ public class RecipeChildCommentAdapter extends RecyclerView.Adapter<RecipeChildC
         final Comment currentItem = mCommentList.get(position);
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-        db.collection("Users").whereEqualTo("user_id", currentItem.getmUserId()).addSnapshotListener(new EventListener<QuerySnapshot>() {
+        db.collection("Users").whereEqualTo("user_id", currentItem.getUser_id()).addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@androidx.annotation.Nullable QuerySnapshot queryDocumentSnapshots, @androidx.annotation.Nullable FirebaseFirestoreException e) {
                 if (e != null) {
@@ -85,21 +85,21 @@ public class RecipeChildCommentAdapter extends RecyclerView.Adapter<RecipeChildC
 
             }
         });
-        holder.mCommentText.setText(currentItem.getmCommentText());
+        holder.mCommentText.setText(currentItem.getComment_text());
 
-        Date date = currentItem.getmCommentTimeStamp();
+        Date date = currentItem.getComment_timeStamp();
         if (date != null) {
             DateFormat dateFormat = new SimpleDateFormat("HH:mm, MMM d", Locale.getDefault());
             String creationDate = dateFormat.format(date);
             long time = date.getTime();
-            if (currentItem.getmCommentTimeStamp() != null && !currentItem.getmCommentTimeStamp().equals("")) {
+            if (currentItem.getComment_timeStamp() != null && !currentItem.getComment_timeStamp().equals("")) {
                 holder.mCommentTimeStamp.setText(getTimeAgo(time));
             }
         }
         holder.mImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Navigation.findNavController(v).navigate(RecipeDetailedFragmentDirections.actionRecipeDetailedFragmentToUserProfileFragment2(currentItem.getmUserId()));
+                Navigation.findNavController(v).navigate(RecipeDetailedFragmentDirections.actionRecipeDetailedFragmentToUserProfileFragment2(currentItem.getUser_id()));
             }
         });
 

@@ -46,6 +46,14 @@
                 <action android:name="com.rokudoz.foodify.PostLikeNotification" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
+            <intent-filter>
+                <action android:name="com.rokudoz.foodify.PostCommentNotification" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="com.rokudoz.foodify.RecipeCommentNotification" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
         </activity>
 
         <service android:name=".Utils.FirebaseMessagingService">

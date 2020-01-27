@@ -52,6 +52,8 @@ public class MainActivity extends AppCompatActivity {
             args.putString("documentID", post_id);
             navController.navigate(R.id.postDetailed,args );
         }
+
+
     }
 
 

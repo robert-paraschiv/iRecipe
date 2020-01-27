@@ -165,9 +165,7 @@ public class PostDetailedFragment extends Fragment {
     private void addComment() {
         String commentText = commentEditText.getText().toString();
 
-
-        final Comment comment = new Comment(documentID, FirebaseAuth.getInstance().getCurrentUser().getUid(),
-                "", "", commentText, null);
+        final Comment comment = new Comment(documentID,FirebaseAuth.getInstance().getCurrentUser().getUid(),commentText,null);
         DocumentReference currentRecipeRef = postsRef.document(documentID);
         CollectionReference commentRef = currentRecipeRef.collection("Comments");
 
@@ -194,10 +192,10 @@ public class PostDetailedFragment extends Fragment {
 
         Query commentQuery = null;
         if (mLastQueriedDocument != null) {
-            commentQuery = commentRef.orderBy("mCommentTimeStamp", Query.Direction.ASCENDING)
+            commentQuery = commentRef.orderBy("comment_timeStamp", Query.Direction.ASCENDING)
                     .startAfter(mLastQueriedDocument); // Necessary so we don't have the same results multiple times
         } else {
-            commentQuery = commentRef.orderBy("mCommentTimeStamp", Query.Direction.ASCENDING);
+            commentQuery = commentRef.orderBy("comment_timeStamp", Query.Direction.ASCENDING);
         }
 
         commentListener = commentQuery
@@ -216,7 +214,7 @@ public class PostDetailedFragment extends Fragment {
 
                                     Log.d(TAG, "onEvent: doc id" + document.getId());
 
-                                    comment.setDocumentId(document.getId());
+                                    comment.setDocumentID(document.getId());
                                     commentList.add(0, comment);
                                     Log.d(TAG, "onEvent: currrent commentID " + document.getId());
                                     newItemsToAdd.add(document.getId());
