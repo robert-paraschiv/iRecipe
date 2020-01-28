@@ -39,7 +39,6 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
     public class RecipeViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         TextView tvTitle, tvDescription, tvNrOfFaves, tvNumMissingIngredients;
         ImageView mImageView, imgFavorited, imgPrivacy;
-        Map<String, Boolean> ingredientTags;
 
         public RecipeViewHolder(View itemView) {
             super(itemView);
@@ -75,7 +74,6 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
                 }
             }
         }
-
     }
 
     public RecipeAdapter(List<Recipe> recipeList) {
@@ -95,30 +93,11 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
         holder.tvTitle.setText(currentItem.getTitle());
         holder.tvDescription.setText(currentItem.getDescription());
 
-//        Picasso.get()
-//                .load(currentItem.getImageUrls_list().get(0))
-//                .fit()
-//                .centerCrop()
-//                .into(holder.mImageView);
-
         Glide.with(holder.mImageView).load(currentItem.getImageUrls_list().get(0)).centerCrop().into(holder.mImageView);
 
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        CollectionReference currentRecipeSubCollection = db.collection("Recipes").document(currentItem.getDocumentId())
-                .collection("UsersWhoFaved");
-
-        currentRecipeSubCollection.addSnapshotListener(new EventListener<QuerySnapshot>() {
-            @Override
-            public void onEvent(@javax.annotation.Nullable QuerySnapshot queryDocumentSnapshots, @javax.annotation.Nullable FirebaseFirestoreException e) {
-                if (e != null) {
-                    return;
-                }
-                currentItem.setAvg_rating((float) queryDocumentSnapshots.size());
-                if (currentItem.getAvg_rating() != null) {
-                    holder.tvNrOfFaves.setText("" + queryDocumentSnapshots.size());
-                }
-            }
-        });
+        if (currentItem.getNrOfLikes() != null) {
+            holder.tvNrOfFaves.setText("" + currentItem.getNrOfLikes());
+        }
         if (currentItem.getMissingIngredients() != null) {
             if (currentItem.getNrOfMissingIngredients() == 0) {
                 holder.tvNumMissingIngredients.setVisibility(View.GONE);
@@ -145,9 +124,7 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
             holder.imgFavorited.setImageResource(R.drawable.ic_favorite_red_24dp);
         }
 
-
     }
-
 
     @Override
     public int getItemCount() {

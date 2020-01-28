@@ -170,20 +170,54 @@ public class profileMyRecipesFragment extends Fragment implements RecipeAdapter.
                 }
                 if (queryDocumentSnapshots != null) {
                     for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
-                        Recipe recipe = document.toObject(Recipe.class);
+                        final Recipe recipe = document.toObject(Recipe.class);
                         recipe.setDocumentId(document.getId());
 
-                        if (userFavRecipesList != null && userFavRecipesList.contains(document.getId())) {
-                            recipe.setFavorite(true);
-                        } else {
-                            recipe.setFavorite(false);
-                        }
                         if (!mRecipeList.contains(recipe)) {
-
+                            recipeRef.document(recipe.getDocumentId()).collection("UsersWhoFaved").addSnapshotListener(new EventListener<QuerySnapshot>() {
+                                @Override
+                                public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                                    if (e != null) {
+                                        Log.w(TAG, "onEvent: ", e);
+                                        return;
+                                    }
+                                    if (queryDocumentSnapshots != null) {
+                                        Boolean fav = false;
+                                        for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                                            if (documentSnapshot.getId().equals(mUser.getUser_id())) {
+                                                fav = true;
+                                            }
+                                        }
+                                        recipe.setFavorite(fav);
+                                        recipe.setNrOfLikes(queryDocumentSnapshots.size());
+                                        mAdapter.notifyDataSetChanged();
+                                    }
+                                }
+                            });
                             ////////////////////////////////////////////////////////// LOGIC TO GET RECIPES HERE
 
                             mRecipeList.add(recipe);
                         } else {
+                            recipeRef.document(recipe.getDocumentId()).collection("UsersWhoFaved").addSnapshotListener(new EventListener<QuerySnapshot>() {
+                                @Override
+                                public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                                    if (e != null) {
+                                        Log.w(TAG, "onEvent: ", e);
+                                        return;
+                                    }
+                                    if (queryDocumentSnapshots != null) {
+                                        Boolean fav = false;
+                                        for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                                            if (documentSnapshot.getId().equals(mUser.getUser_id())) {
+                                                fav = true;
+                                            }
+                                        }
+                                        recipe.setFavorite(fav);
+                                        recipe.setNrOfLikes(queryDocumentSnapshots.size());
+                                        mAdapter.notifyDataSetChanged();
+                                    }
+                                }
+                            });
                             Log.d(TAG, "onEvent: Already Contains docID");
                         }
 

@@ -207,7 +207,8 @@ public class RecipeDetailedFragment extends Fragment {
                     currentRecipeSubCollection.document(mUser.getUser_id()).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void aVoid) {
-                            Toast.makeText(getContext(), "Removed from favorites", Toast.LENGTH_SHORT).show();
+                            if (getContext() != null)
+                                Toast.makeText(getContext(), "Removed from favorites", Toast.LENGTH_SHORT).show();
                         }
                     });
                 } else {
