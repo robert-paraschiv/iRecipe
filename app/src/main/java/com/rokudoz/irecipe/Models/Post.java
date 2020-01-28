@@ -14,6 +14,10 @@ public class Post {
     private String imageUrl;
     private Boolean isFavorite;
     private String privacy;
+    private String creator_name;
+    private String creator_imageUrl;
+    private Integer number_of_comments;
+    private Integer number_of_likes;
 
     private @ServerTimestamp
     Date creation_date;
@@ -29,6 +33,38 @@ public class Post {
     }
 
     public Post() {
+    }
+    @Exclude
+    public String getCreator_name() {
+        return creator_name;
+    }
+
+    public void setCreator_name(String creator_name) {
+        this.creator_name = creator_name;
+    }
+    @Exclude
+    public String getCreator_imageUrl() {
+        return creator_imageUrl;
+    }
+
+    public void setCreator_imageUrl(String creator_imageUrl) {
+        this.creator_imageUrl = creator_imageUrl;
+    }
+    @Exclude
+    public Integer getNumber_of_comments() {
+        return number_of_comments;
+    }
+    @Exclude
+    public void setNumber_of_comments(Integer number_of_comments) {
+        this.number_of_comments = number_of_comments;
+    }
+    @Exclude
+    public Integer getNumber_of_likes() {
+        return number_of_likes;
+    }
+
+    public void setNumber_of_likes(Integer number_of_likes) {
+        this.number_of_likes = number_of_likes;
     }
 
     @Exclude

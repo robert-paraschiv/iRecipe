@@ -66,7 +66,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
     }
 
     public class PostViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        TextView tvDescription, tvNrOfFaves, creatorName, creationDate,tvNumberOfComments;
+        TextView tvDescription, tvNrOfFaves, creatorName, creationDate, tvNumberOfComments;
         ImageView mImageView, imgFavorited, imgComment;
         CircleImageView creatorImage;
 
@@ -150,48 +150,24 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
             }
         }
 
-        if (currentItem.getDocumentId() != null && !currentItem.getDocumentId().equals("")) {
-            FirebaseFirestore db = FirebaseFirestore.getInstance();
-            CollectionReference currentRecipeSubCollection = db.collection("Posts").document(currentItem.getDocumentId())
-                    .collection("UsersWhoFaved");
-
-            db.collection("Users").document(currentItem.getCreatorId()).addSnapshotListener(new EventListener<DocumentSnapshot>() {
-                @Override
-                public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
-                    if (e != null) {
-                        Log.w(TAG, "onEvent: ", e);
-                        return;
-                    }
-                    User user = documentSnapshot.toObject(User.class);
-                    holder.creatorName.setText(user.getName());
-                    Glide.with(holder.creatorImage).load(user.getUserProfilePicUrl()).centerCrop().into(holder.creatorImage);
-                }
-            });
-
-            currentRecipeSubCollection.get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-                @Override
-                public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                    if (queryDocumentSnapshots != null)
-                        holder.tvNrOfFaves.setText("" + queryDocumentSnapshots.size());
-
-                }
-            });
-            db.collection("Posts").document(currentItem.getDocumentId())
-                    .collection("Comments").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-                @Override
-                public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                    if (queryDocumentSnapshots != null)
-                        holder.tvNumberOfComments.setText("" + queryDocumentSnapshots.size());
-                }
-            });
-
-            if (currentItem.getFavorite() != null) {
-                boolean fav = currentItem.getFavorite();
-                if (fav)
-                    holder.imgFavorited.setImageResource(R.drawable.ic_favorite_red_24dp);
-                else
-                    holder.imgFavorited.setImageResource(R.drawable.ic_favorite_border_black_24dp);
-            }
+        if (currentItem.getFavorite() != null) {
+            boolean fav = currentItem.getFavorite();
+            if (fav)
+                holder.imgFavorited.setImageResource(R.drawable.ic_favorite_red_24dp);
+            else
+                holder.imgFavorited.setImageResource(R.drawable.ic_favorite_border_black_24dp);
+        }
+        if (currentItem.getCreator_name() != null) {
+            holder.creatorName.setText(currentItem.getCreator_name());
+        }
+        if (currentItem.getCreator_imageUrl() != null && !currentItem.getCreator_imageUrl().equals("")) {
+            Glide.with(holder.creatorImage).load(currentItem.getCreator_imageUrl()).centerCrop().into(holder.creatorImage);
+        }
+        if (currentItem.getNumber_of_likes() != null) {
+            holder.tvNrOfFaves.setText(""+currentItem.getNumber_of_likes());
+        }
+        if (currentItem.getNumber_of_comments() != null) {
+            holder.tvNumberOfComments.setText(""+currentItem.getNumber_of_comments());
         }
 
     }

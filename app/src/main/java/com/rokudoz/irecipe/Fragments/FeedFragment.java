@@ -335,7 +335,7 @@ public class FeedFragment extends Fragment implements PostAdapter.OnItemClickLis
                                 @javax.annotation.Nullable FirebaseFirestoreException e) {
                 if (queryDocumentSnapshots != null) {
                     for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
-                        Post post = document.toObject(Post.class);
+                        final Post post = document.toObject(Post.class);
                         post.setDocumentId(document.getId());
 
                         if (userFavPostList != null && userFavPostList.contains(document.getId())) {
@@ -348,6 +348,29 @@ public class FeedFragment extends Fragment implements PostAdapter.OnItemClickLis
                         } else {
                             mPostList.set(mPostList.indexOf(post), post);
                         }
+                        usersReference.document(post.getCreatorId()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                            @Override
+                            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                                User user = documentSnapshot.toObject(User.class);
+                                post.setCreator_name(user.getName());
+                                post.setCreator_imageUrl(user.getUserProfilePicUrl());
+                                mAdapter.notifyDataSetChanged();
+                            }
+                        });
+                        postsRef.document(post.getDocumentId()).collection("Comments").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                            @Override
+                            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                                post.setNumber_of_comments(queryDocumentSnapshots.size());
+                                mAdapter.notifyDataSetChanged();
+                            }
+                        });
+                        postsRef.document(post.getDocumentId()).collection("UsersWhoFaved").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                            @Override
+                            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                                post.setNumber_of_likes(queryDocumentSnapshots.size());
+                                mAdapter.notifyDataSetChanged();
+                            }
+                        });
 
                     }
 
