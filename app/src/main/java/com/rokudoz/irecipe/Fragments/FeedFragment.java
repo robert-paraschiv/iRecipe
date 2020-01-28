@@ -67,7 +67,8 @@ public class FeedFragment extends Fragment implements PostAdapter.OnItemClickLis
     private CollectionReference postsRef = db.collection("Posts");
     private CollectionReference usersReference = db.collection("Users");
     private FirebaseStorage mStorageRef;
-    private ListenerRegistration userDetailsListener, userFriendListListener, userFavoritePostsListener, userUnreadConversationsListener, postsListener;
+    private ListenerRegistration userDetailsListener, userFriendListListener, userFavoritePostsListener, userUnreadConversationsListener, postsListener,
+            postCreatorDetailsListener, postCommentsNumberListener, postLikesNumberListener;
 
     private RecyclerView mRecyclerView;
     private PostAdapter mAdapter;
@@ -169,6 +170,18 @@ public class FeedFragment extends Fragment implements PostAdapter.OnItemClickLis
         if (userUnreadConversationsListener != null) {
             userUnreadConversationsListener.remove();
             userUnreadConversationsListener = null;
+        }
+        if (postCreatorDetailsListener != null) {
+            postCreatorDetailsListener.remove();
+            postCreatorDetailsListener = null;
+        }
+        if (postCommentsNumberListener != null) {
+            postCommentsNumberListener.remove();
+            postCommentsNumberListener = null;
+        }
+        if (postLikesNumberListener != null) {
+            postLikesNumberListener.remove();
+            postLikesNumberListener = null;
         }
     }
 
@@ -348,30 +361,44 @@ public class FeedFragment extends Fragment implements PostAdapter.OnItemClickLis
                         } else {
                             mPostList.set(mPostList.indexOf(post), post);
                         }
-                        usersReference.document(post.getCreatorId()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                        //Get post creator details
+                        postCreatorDetailsListener = usersReference.document(post.getCreatorId()).addSnapshotListener(new EventListener<DocumentSnapshot>() {
                             @Override
-                            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                            public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
+                                if (e != null) {
+                                    Log.w(TAG, "onEvent: ", e);
+                                    return;
+                                }
                                 User user = documentSnapshot.toObject(User.class);
                                 post.setCreator_name(user.getName());
                                 post.setCreator_imageUrl(user.getUserProfilePicUrl());
                                 mAdapter.notifyDataSetChanged();
                             }
                         });
-                        postsRef.document(post.getDocumentId()).collection("Comments").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                        //Get post comments number
+                        postCommentsNumberListener = postsRef.document(post.getDocumentId()).collection("Comments").addSnapshotListener(new EventListener<QuerySnapshot>() {
                             @Override
-                            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                                if (e != null) {
+                                    Log.w(TAG, "onEvent: ", e);
+                                    return;
+                                }
                                 post.setNumber_of_comments(queryDocumentSnapshots.size());
                                 mAdapter.notifyDataSetChanged();
                             }
                         });
-                        postsRef.document(post.getDocumentId()).collection("UsersWhoFaved").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                        //Get post likes number
+                        postLikesNumberListener = postsRef.document(post.getDocumentId()).collection("UsersWhoFaved").addSnapshotListener(new EventListener<QuerySnapshot>() {
                             @Override
-                            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                                if (e != null) {
+                                    Log.w(TAG, "onEvent: ", e);
+                                    return;
+                                }
                                 post.setNumber_of_likes(queryDocumentSnapshots.size());
                                 mAdapter.notifyDataSetChanged();
                             }
                         });
-
                     }
 
                     if (queryDocumentSnapshots.getDocuments().size() != 0) {
