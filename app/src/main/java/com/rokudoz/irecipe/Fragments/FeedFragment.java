@@ -36,6 +36,8 @@ import com.rokudoz.irecipe.Models.Post;
 import com.rokudoz.irecipe.Models.User;
 import com.rokudoz.irecipe.Models.UserWhoFaved;
 import com.rokudoz.irecipe.R;
+import com.rokudoz.irecipe.SearchRecipeActivity;
+import com.rokudoz.irecipe.SearchUserActivity;
 import com.rokudoz.irecipe.Utils.Adapters.PostAdapter;
 
 import java.util.ArrayList;
@@ -100,6 +102,7 @@ public class FeedFragment extends Fragment implements PostAdapter.OnItemClickLis
         fab = view.findViewById(R.id.fab_add_recipe);
         mRecyclerView = view.findViewById(R.id.recycler_view);
         MaterialButton messagesBtn = view.findViewById(R.id.feedFragment_messages_MaterialBtn);
+        MaterialButton searchUserBtn = view.findViewById(R.id.feedFragment_searchUser_MaterialBtn);
         unreadMessagesTv = view.findViewById(R.id.feedFragment_messages_UnreadText);
 
         pbLoading.setVisibility(View.VISIBLE);
@@ -109,6 +112,12 @@ public class FeedFragment extends Fragment implements PostAdapter.OnItemClickLis
             @Override
             public void onClick(View v) {
                 Navigation.findNavController(view).navigate(FeedFragmentDirections.actionFeedFragmentToAllMessagesFragment());
+            }
+        });
+        searchUserBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                navigateToSearchUser();
             }
         });
 
@@ -228,46 +237,48 @@ public class FeedFragment extends Fragment implements PostAdapter.OnItemClickLis
                     friends_userID_list.add(FirebaseAuth.getInstance().getCurrentUser().getUid());
                 }
 
-                userFriendListListener = usersReference.document(user.getUser_id()).collection("FriendList").addSnapshotListener(new EventListener<QuerySnapshot>() {
-                    @Override
-                    public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
-                        if (e != null) {
-                            Log.w(TAG, "onEvent: ", e);
-                            return;
-                        }
-                        for (QueryDocumentSnapshot queryDocumentSnapshot : queryDocumentSnapshots) {
-                            Friend friend = queryDocumentSnapshot.toObject(Friend.class);
-                            if (!friendList.contains(friend)) {
-                                if (friend.getFriend_status().equals("friends") || friend.getFriend_status().equals("friend_request_accepted"))
-                                    friendList.add(friend);
-                            }
-                        }
-                        for (Friend friend : friendList) {
-                            if (!friends_userID_list.contains(friend.getFriend_user_id()))
-                                friends_userID_list.add(friend.getFriend_user_id());
-                        }
-                        userFavoritePostsListener = usersReference.document(user.getUser_id()).collection("FavoritePosts").addSnapshotListener(new EventListener<QuerySnapshot>() {
+                userFriendListListener = usersReference.document(user.getUser_id()).collection("FriendList")
+                        .addSnapshotListener(new EventListener<QuerySnapshot>() {
                             @Override
                             public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
                                 if (e != null) {
                                     Log.w(TAG, "onEvent: ", e);
                                     return;
                                 }
-                                if (queryDocumentSnapshots != null) {
-                                    for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
-                                        String favPostID = documentSnapshot.getId();
-                                        if (!userFavPostList.contains(favPostID))
-                                            userFavPostList.add(favPostID);
+                                for (QueryDocumentSnapshot queryDocumentSnapshot : queryDocumentSnapshots) {
+                                    Friend friend = queryDocumentSnapshot.toObject(Friend.class);
+                                    if (!friendList.contains(friend)) {
+                                        if (friend.getFriend_status().equals("friends") || friend.getFriend_status().equals("friend_request_accepted"))
+                                            friendList.add(friend);
                                     }
-
-                                    performQuery();
                                 }
+                                for (Friend friend : friendList) {
+                                    if (!friends_userID_list.contains(friend.getFriend_user_id()))
+                                        friends_userID_list.add(friend.getFriend_user_id());
+                                }
+                                userFavoritePostsListener = usersReference.document(user.getUser_id()).collection("FavoritePosts")
+                                        .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                                            @Override
+                                            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                                                if (e != null) {
+                                                    Log.w(TAG, "onEvent: ", e);
+                                                    return;
+                                                }
+                                                if (queryDocumentSnapshots != null) {
+                                                    for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                                                        String favPostID = documentSnapshot.getId();
+                                                        if (!userFavPostList.contains(favPostID))
+                                                            userFavPostList.add(favPostID);
+                                                    }
+
+                                                    performQuery();
+                                                }
+
+                                            }
+                                        });
 
                             }
                         });
-
-                    }
-                });
 
 
             }
@@ -423,8 +434,13 @@ public class FeedFragment extends Fragment implements PostAdapter.OnItemClickLis
     }
 
 
-    public void navigateToAddPost() {
+    private void navigateToAddPost() {
         Intent intent = new Intent(getContext(), AddPostActivity.class);
+        startActivity(intent);
+    }
+
+    private void navigateToSearchUser() {
+        Intent intent = new Intent(getContext(), SearchUserActivity.class);
         startActivity(intent);
     }
 

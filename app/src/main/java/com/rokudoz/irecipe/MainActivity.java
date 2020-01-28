@@ -38,19 +38,25 @@ public class MainActivity extends AppCompatActivity {
             String friend_id = getIntent().getStringExtra("friend_id");
             Bundle args = new Bundle();
             args.putString("user_id", friend_id);
-            navController.navigate(R.id.messageFragment,args );
+            navController.navigate(R.id.messageFragment, args);
         }
         if (getIntent() != null && getIntent().getStringExtra("recipe_id") != null) {
             String recipe_id = getIntent().getStringExtra("recipe_id");
             Bundle args = new Bundle();
             args.putString("documentID", recipe_id);
-            navController.navigate(R.id.recipeDetailedFragment,args );
+            navController.navigate(R.id.recipeDetailedFragment, args);
         }
         if (getIntent() != null && getIntent().getStringExtra("post_id") != null) {
             String post_id = getIntent().getStringExtra("post_id");
             Bundle args = new Bundle();
             args.putString("documentID", post_id);
-            navController.navigate(R.id.postDetailed,args );
+            navController.navigate(R.id.postDetailed, args);
+        }
+        if (getIntent() != null && getIntent().getStringExtra("user_id") != null) {
+            String user_id = getIntent().getStringExtra("user_id");
+            Bundle args = new Bundle();
+            args.putString("documentID", user_id);
+            navController.navigate(R.id.userProfileFragment2, args);
         }
 
 

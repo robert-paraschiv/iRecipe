@@ -129,4 +129,12 @@ public class User {
                 ", favoriteRecipes=" + favoriteRecipes +
                 '}';
     }
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof User))
+            return false;
+        if (obj == this)
+            return true;
+        return this.getUser_id().equals(((User) obj).getUser_id());
+    }
 }

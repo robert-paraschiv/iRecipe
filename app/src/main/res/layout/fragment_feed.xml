@@ -38,6 +38,15 @@
                 tools:text="2"
                 android:layout_alignParentEnd="true"/>
 
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/feedFragment_searchUser_MaterialBtn"
+                android:layout_width="35dp"
+                android:layout_height="35dp"
+                android:layout_toStartOf="@id/feedFragment_messages_MaterialBtn"
+                android:layout_centerVertical="true"
+                app:icon="@drawable/ic_search_black_24dp"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                />
 
         </RelativeLayout>
 

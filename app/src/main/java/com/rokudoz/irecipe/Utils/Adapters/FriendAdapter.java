@@ -3,6 +3,7 @@ package com.rokudoz.irecipe.Utils.Adapters;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,6 +23,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 
 public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.FriendViewHolder> {
+    private static final String TAG = "FriendAdapter";
     private List<Friend> mFriendList;
     private OnItemClickListener mListener;
     TextView friendReqReceivedTv;
@@ -74,6 +76,7 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.FriendView
     public void onBindViewHolder(@NonNull final FriendViewHolder holder, int position) {
         final Friend currentItem = mFriendList.get(position);
 
+        Log.d(TAG, "onBindViewHolder: ");
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.collection("Users").document(currentItem.getFriend_user_id()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
             @Override
