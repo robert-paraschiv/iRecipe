@@ -114,19 +114,19 @@ public class FavoritesFragment extends Fragment implements RecipeAdapter.OnItemC
         if (mAuthListener != null) {
             FirebaseAuth.getInstance().removeAuthStateListener(mAuthListener);
         }
-        DetatchFirestoreListeners();
+        DetachFireStoreListeners();
         Log.d(TAG, "onStop: ");
     }
 
 
-    private void DetatchFirestoreListeners() {
-        if (favoriteRecipesListener != null) {
-            favoriteRecipesListener.remove();
-            favoriteRecipesListener = null;
-        }
+    private void DetachFireStoreListeners() {
         if (userDetailsListener != null) {
             userDetailsListener.remove();
             userDetailsListener = null;
+        }
+        if (favoriteRecipesListener != null) {
+            favoriteRecipesListener.remove();
+            favoriteRecipesListener = null;
         }
         if (recipesListener != null) {
             recipesListener.remove();

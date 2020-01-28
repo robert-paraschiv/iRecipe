@@ -76,7 +76,7 @@ public class UserProfileFragment extends Fragment implements PostAdapter.OnItemC
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private CollectionReference usersReference = db.collection("Users");
     private CollectionReference postsRef = db.collection("Posts");
-    private ListenerRegistration creatorDetailsListener, currentSubCollectionListener, recipesListener;
+    private ListenerRegistration userDetailsListener, userFriendListListener, userFavoritePostsListener, userFriendListener, postsListener;
 
     public UserProfileFragment() {
         // Required empty public constructor
@@ -140,23 +140,31 @@ public class UserProfileFragment extends Fragment implements PostAdapter.OnItemC
     }
 
     private void DetachFirestoneListeners() {
-        if (currentSubCollectionListener != null) {
-            currentSubCollectionListener.remove();
-            currentSubCollectionListener = null;
+        if (postsListener != null) {
+            postsListener.remove();
+            postsListener = null;
         }
-        if (creatorDetailsListener != null) {
-            creatorDetailsListener.remove();
-            creatorDetailsListener = null;
+        if (userDetailsListener != null) {
+            userDetailsListener.remove();
+            userDetailsListener = null;
         }
-        if (recipesListener != null) {
-            recipesListener.remove();
-            recipesListener = null;
+        if (userFavoritePostsListener != null) {
+            userFavoritePostsListener.remove();
+            userFavoritePostsListener = null;
+        }
+        if (userFriendListListener != null) {
+            userFriendListListener.remove();
+            userFriendListListener = null;
+        }
+        if (userFriendListener != null) {
+            userFriendListener.remove();
+            userFriendListener = null;
         }
     }
 
     private void getCurrentUserDetails() {
 
-        usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).addSnapshotListener(new EventListener<DocumentSnapshot>() {
+        userDetailsListener = usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).addSnapshotListener(new EventListener<DocumentSnapshot>() {
             @Override
             public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
                 if (e != null) {
@@ -174,7 +182,7 @@ public class UserProfileFragment extends Fragment implements PostAdapter.OnItemC
                     friends_userID_list.add(FirebaseAuth.getInstance().getCurrentUser().getUid());
                 }
 
-                usersReference.document(user.getUser_id()).collection("FriendList").addSnapshotListener(new EventListener<QuerySnapshot>() {
+                userFriendListListener = usersReference.document(user.getUser_id()).collection("FriendList").addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
                     public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
                         if (e != null) {
@@ -192,7 +200,7 @@ public class UserProfileFragment extends Fragment implements PostAdapter.OnItemC
                             if (!friends_userID_list.contains(friend.getFriend_user_id()))
                                 friends_userID_list.add(friend.getFriend_user_id());
                         }
-                        usersReference.document(user.getUser_id()).collection("FavoritePosts").addSnapshotListener(new EventListener<QuerySnapshot>() {
+                        userFavoritePostsListener = usersReference.document(user.getUser_id()).collection("FavoritePosts").addSnapshotListener(new EventListener<QuerySnapshot>() {
                             @Override
                             public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
                                 if (e != null) {
@@ -221,7 +229,7 @@ public class UserProfileFragment extends Fragment implements PostAdapter.OnItemC
 
         // ADD TO FRIEND LIST
         if (!documentID.equals(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
-            usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).collection("FriendList").document(documentID).addSnapshotListener(new EventListener<DocumentSnapshot>() {
+            userFriendListener = usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).collection("FriendList").document(documentID).addSnapshotListener(new EventListener<DocumentSnapshot>() {
                 @Override
                 public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
                     if (e != null) {
@@ -403,22 +411,22 @@ public class UserProfileFragment extends Fragment implements PostAdapter.OnItemC
     }
 
     private void performQuery() {
-        Query recipesQuery = null;
+        Query postsQuery = null;
         if (mLastQueriedDocument != null) {
-            recipesQuery = postsRef.whereEqualTo("creatorId", documentID).whereEqualTo("privacy", "Everyone")
+            postsQuery = postsRef.whereEqualTo("creatorId", documentID).whereEqualTo("privacy", "Everyone")
                     .startAfter(mLastQueriedDocument); // Necessary so we don't have the same results multiple times
 //                                    .limit(3);
         } else {
-            recipesQuery = postsRef.whereEqualTo("creatorId", documentID).whereEqualTo("privacy", "Everyone");
+            postsQuery = postsRef.whereEqualTo("creatorId", documentID).whereEqualTo("privacy", "Everyone");
 //                                    .limit(3);
         }
-        PerformMainQuery(recipesQuery);
+        PerformMainQuery(postsQuery);
         initializeRecyclerViewAdapterOnClicks();
     }
 
-    private void PerformMainQuery(Query notesQuery) {
+    private void PerformMainQuery(Query postsQuery) {
 
-        notesQuery.addSnapshotListener(new EventListener<QuerySnapshot>() {
+        postsListener = postsQuery.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@javax.annotation.Nullable QuerySnapshot queryDocumentSnapshots,
                                 @javax.annotation.Nullable FirebaseFirestoreException e) {

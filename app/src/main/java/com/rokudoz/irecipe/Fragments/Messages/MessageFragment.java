@@ -31,6 +31,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -70,6 +71,7 @@ public class MessageFragment extends Fragment {
     //Firebase
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private CollectionReference usersReference = db.collection("Users");
+    private ListenerRegistration messagesListener,friendDetailsListener;
 
     public MessageFragment() {
         // Required empty public constructor
@@ -121,6 +123,23 @@ public class MessageFragment extends Fragment {
         getMessages();
     }
 
+    @Override
+    public void onStop() {
+        super.onStop();
+        DetachFireStoreListeners();
+    }
+
+    private void DetachFireStoreListeners() {
+        if (messagesListener != null) {
+            messagesListener.remove();
+            messagesListener = null;
+        }
+        if (friendDetailsListener != null) {
+            friendDetailsListener.remove();
+            friendDetailsListener = null;
+        }
+    }
+
     private void buildRecyclerView() {
         Log.d(TAG, "buildRecyclerView: ");
         mRecyclerView.setHasFixedSize(true);
@@ -137,7 +156,7 @@ public class MessageFragment extends Fragment {
 
 
     private void getMessages() {
-        usersReference.document(currentUserId).collection("Conversations").document(friendUserId)
+        messagesListener = usersReference.document(currentUserId).collection("Conversations").document(friendUserId)
                 .collection(friendUserId).orderBy("timestamp", Query.Direction.ASCENDING).addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
@@ -197,7 +216,7 @@ public class MessageFragment extends Fragment {
     }
 
     private void getFriendDetails() {
-        usersReference.document(friendUserId).addSnapshotListener(new EventListener<DocumentSnapshot>() {
+        friendDetailsListener = usersReference.document(friendUserId).addSnapshotListener(new EventListener<DocumentSnapshot>() {
             @Override
             public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
                 if (e != null) {

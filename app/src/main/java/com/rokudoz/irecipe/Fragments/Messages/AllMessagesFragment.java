@@ -14,7 +14,6 @@ import android.view.InflateException;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ProgressBar;
 
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -28,19 +27,12 @@ import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
-import com.google.firebase.storage.FirebaseStorage;
-import com.rokudoz.irecipe.Fragments.FeedFragmentDirections;
-import com.rokudoz.irecipe.Fragments.ProfileFragmentDirections;
-import com.rokudoz.irecipe.Fragments.profileSubFragments.profileMyFriendList;
 import com.rokudoz.irecipe.Models.Conversation;
-import com.rokudoz.irecipe.Models.Friend;
 import com.rokudoz.irecipe.Models.User;
 import com.rokudoz.irecipe.R;
 import com.rokudoz.irecipe.Utils.Adapters.ConversationAdapter;
-import com.rokudoz.irecipe.Utils.Adapters.FriendAdapter;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -58,6 +50,7 @@ public class AllMessagesFragment extends Fragment implements ConversationAdapter
     private User mUser;
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private CollectionReference usersReference = db.collection("Users");
+    private ListenerRegistration userConversationsListener;
 
     private ArrayList<Conversation> conversationList = new ArrayList<>();
 
@@ -116,6 +109,18 @@ public class AllMessagesFragment extends Fragment implements ConversationAdapter
         });
     }
 
+    @Override
+    public void onStop() {
+        super.onStop();
+        DetachFireStoreListeners();
+    }
+
+    private void DetachFireStoreListeners() {
+        if (userConversationsListener != null) {
+            userConversationsListener.remove();
+            userConversationsListener = null;
+        }
+    }
 
     private void buildRecyclerView() {
         Log.d(TAG, "buildRecyclerView: ");
@@ -133,7 +138,7 @@ public class AllMessagesFragment extends Fragment implements ConversationAdapter
 
     private void performQuery() {
         initializeRecyclerViewAdapterOnClicks();
-        usersReference.document(mUser.getUser_id()).collection("Conversations").addSnapshotListener(new EventListener<QuerySnapshot>() {
+        userConversationsListener = usersReference.document(mUser.getUser_id()).collection("Conversations").addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
                 if (e != null) {

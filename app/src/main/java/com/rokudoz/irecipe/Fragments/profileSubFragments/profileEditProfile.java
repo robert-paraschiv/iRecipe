@@ -36,6 +36,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.StorageTask;
@@ -59,6 +60,7 @@ public class profileEditProfile extends Fragment {
     private CollectionReference usersReference = db.collection("Users");
     private CollectionReference ingredientsReference = db.collection("Ingredients");
     private StorageReference mStorageRef = FirebaseStorage.getInstance().getReference("UsersPhotos");
+    private ListenerRegistration userDetailsListener;
     private StorageTask mUploadTask;
 
     private Uri mImageUri;
@@ -129,6 +131,19 @@ public class profileEditProfile extends Fragment {
         return view;
     }
 
+    @Override
+    public void onStop() {
+        super.onStop();
+        DetachFireStoreListeners();
+    }
+
+    private void DetachFireStoreListeners() {
+        if (userDetailsListener != null) {
+            userDetailsListener.remove();
+            userDetailsListener = null;
+        }
+    }
+
     private void saveUserDetails() {
         String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
         String name = user_name_TextInput.getText().toString();
@@ -156,7 +171,7 @@ public class profileEditProfile extends Fragment {
     }
 
     private void getCurrentUserDetails() {
-        usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).addSnapshotListener(new EventListener<DocumentSnapshot>() {
+        userDetailsListener = usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).addSnapshotListener(new EventListener<DocumentSnapshot>() {
             @Override
             public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
                 if (documentSnapshot != null) {

@@ -82,7 +82,7 @@ public class PostDetailedFragment extends Fragment {
 
     private FirebaseAuth.AuthStateListener mAuthListener;
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
-    private ListenerRegistration currentSubCollectionListener, userRefListener, numberofFavListener, commentListener;
+    private ListenerRegistration numberofFavListener, commentListener;
     private DocumentSnapshot mLastQueriedDocument;
 
     private CollectionReference recipeRef = db.collection("Recipes");
@@ -161,11 +161,27 @@ public class PostDetailedFragment extends Fragment {
         commentRecyclerView.setAdapter(mAdapter);
     }
 
+    @Override
+    public void onStop() {
+        super.onStop();
+        DetachFireStoreListeners();
+    }
+
+    private void DetachFireStoreListeners() {
+        if (numberofFavListener != null) {
+            numberofFavListener.remove();
+            numberofFavListener = null;
+        }
+        if (commentListener != null) {
+            commentListener.remove();
+            commentListener = null;
+        }
+    }
 
     private void addComment() {
         String commentText = commentEditText.getText().toString();
 
-        final Comment comment = new Comment(documentID,FirebaseAuth.getInstance().getCurrentUser().getUid(),commentText,null);
+        final Comment comment = new Comment(documentID, FirebaseAuth.getInstance().getCurrentUser().getUid(), commentText, null);
         DocumentReference currentRecipeRef = postsRef.document(documentID);
         CollectionReference commentRef = currentRecipeRef.collection("Comments");
 

@@ -56,7 +56,7 @@ public class homeBreakfastFragment extends Fragment implements RecipeAdapter.OnI
     private CollectionReference recipeRef = db.collection("Recipes");
     private CollectionReference usersReference = db.collection("Users");
     private FirebaseStorage mStorageRef;
-    private ListenerRegistration currentSubCollectionListener, userDetailsListener, recipesListener, privateRecipesListener;
+    private ListenerRegistration userDetailsListener, userIngredientsListener, recipesListener, privateRecipesListener, privateRecipeIngredientsListener, recipesIngredientsListener;
 
     private RecyclerView mRecyclerView;
     private RecipeAdapter mAdapter;
@@ -96,7 +96,7 @@ public class homeBreakfastFragment extends Fragment implements RecipeAdapter.OnI
     }
 
     private void getUserIngredients() {
-        usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).collection("Ingredients")
+        userIngredientsListener = usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).collection("Ingredients")
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
                     public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
@@ -125,13 +125,13 @@ public class homeBreakfastFragment extends Fragment implements RecipeAdapter.OnI
     }
 
     private void DetachFireStoreListeners() {
-        if (currentSubCollectionListener != null) {
-            currentSubCollectionListener.remove();
-            currentSubCollectionListener = null;
-        }
         if (userDetailsListener != null) {
             userDetailsListener.remove();
             userDetailsListener = null;
+        }
+        if (userIngredientsListener != null) {
+            userIngredientsListener.remove();
+            userIngredientsListener = null;
         }
         if (recipesListener != null) {
             recipesListener.remove();
@@ -140,6 +140,14 @@ public class homeBreakfastFragment extends Fragment implements RecipeAdapter.OnI
         if (privateRecipesListener != null) {
             privateRecipesListener.remove();
             privateRecipesListener = null;
+        }
+        if (recipesIngredientsListener != null) {
+            recipesIngredientsListener.remove();
+            recipesIngredientsListener = null;
+        }
+        if (privateRecipeIngredientsListener != null) {
+            privateRecipeIngredientsListener.remove();
+            privateRecipeIngredientsListener = null;
         }
     }
 
@@ -213,7 +221,7 @@ public class homeBreakfastFragment extends Fragment implements RecipeAdapter.OnI
                             final List<Ingredient> recipeIngredientList = new ArrayList<>();
                             final List<String> missingIngredients = new ArrayList<>();
 
-                            recipeRef.document(recipe.getDocumentId()).collection("RecipeIngredients")
+                            recipesIngredientsListener = recipeRef.document(recipe.getDocumentId()).collection("RecipeIngredients")
                                     .addSnapshotListener(new EventListener<QuerySnapshot>() {
                                         @Override
                                         public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
@@ -308,7 +316,7 @@ public class homeBreakfastFragment extends Fragment implements RecipeAdapter.OnI
                             final List<Ingredient> recipeIngredientList = new ArrayList<>();
                             final List<String> missingIngredients = new ArrayList<>();
 
-                            recipeRef.document(recipe.getDocumentId()).collection("RecipeIngredients")
+                            privateRecipeIngredientsListener = recipeRef.document(recipe.getDocumentId()).collection("RecipeIngredients")
                                     .addSnapshotListener(new EventListener<QuerySnapshot>() {
                                         @Override
                                         public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {

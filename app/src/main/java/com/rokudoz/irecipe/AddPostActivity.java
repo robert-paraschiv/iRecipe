@@ -168,7 +168,7 @@ public class AddPostActivity extends AppCompatActivity {
             //Compress image
             Bitmap bitmap = imageBitmap;
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 25, baos);
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 75, baos);
             byte[] data = baos.toByteArray();
 
             //Upload image to FireStore Storage

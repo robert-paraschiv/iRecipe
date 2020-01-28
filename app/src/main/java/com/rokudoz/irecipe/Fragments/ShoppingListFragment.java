@@ -43,6 +43,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.rokudoz.irecipe.Account.LoginActivity;
@@ -74,6 +75,7 @@ public class ShoppingListFragment extends Fragment {
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private CollectionReference usersReference = db.collection("Users");
     private CollectionReference ingredientsReference = db.collection("Ingredients");
+    private ListenerRegistration userIngredientsListener,userShoppingListListener;
 
 
     public static ShoppingListFragment newInstance() {
@@ -93,9 +95,26 @@ public class ShoppingListFragment extends Fragment {
         return view;
     }
 
+    @Override
+    public void onStop() {
+        super.onStop();
+        DetachFireStoreListeners();
+    }
+
+    private void DetachFireStoreListeners() {
+        if (userIngredientsListener != null) {
+            userIngredientsListener.remove();
+            userIngredientsListener = null;
+        }
+        if (userShoppingListListener != null) {
+            userShoppingListListener.remove();
+            userShoppingListListener = null;
+        }
+    }
+
     private void getUserIngredients() {
         userDocumentID = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        usersReference.document(userDocumentID).collection("Ingredients").addSnapshotListener(new EventListener<QuerySnapshot>() {
+        userIngredientsListener = usersReference.document(userDocumentID).collection("Ingredients").addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
                 if (e != null) {
@@ -118,7 +137,7 @@ public class ShoppingListFragment extends Fragment {
 
     private void getUserShoppingList() {
         userDocumentID = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        usersReference.document(userDocumentID).collection("ShoppingList").addSnapshotListener(new EventListener<QuerySnapshot>() {
+        userShoppingListListener = usersReference.document(userDocumentID).collection("ShoppingList").addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
                 if (e != null) {

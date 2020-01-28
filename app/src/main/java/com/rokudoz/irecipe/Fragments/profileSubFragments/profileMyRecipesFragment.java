@@ -3,6 +3,7 @@ package com.rokudoz.irecipe.Fragments.profileSubFragments;
 
 import android.os.Bundle;
 
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -21,7 +22,9 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -53,7 +56,7 @@ public class profileMyRecipesFragment extends Fragment implements RecipeAdapter.
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private CollectionReference recipeRef = db.collection("Recipes");
     private CollectionReference usersReference = db.collection("Users");
-    private ListenerRegistration currentSubCollectionListener, userDetailsListener, recipesListener;
+    private ListenerRegistration userDetailsListener, recipesListener;
     private FirebaseStorage mStorageRef;
 
     private ArrayList<Recipe> mRecipeList = new ArrayList<>();
@@ -104,10 +107,6 @@ public class profileMyRecipesFragment extends Fragment implements RecipeAdapter.
     }
 
     private void DetachFirestoneListeners() {
-        if (currentSubCollectionListener != null) {
-            currentSubCollectionListener.remove();
-            currentSubCollectionListener = null;
-        }
         if (userDetailsListener != null) {
             userDetailsListener.remove();
             userDetailsListener = null;
@@ -132,9 +131,13 @@ public class profileMyRecipesFragment extends Fragment implements RecipeAdapter.
     }
 
     private void getCurrentUserDetails() {
-        usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+        userDetailsListener = usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).addSnapshotListener(new EventListener<DocumentSnapshot>() {
             @Override
-            public void onSuccess(DocumentSnapshot documentSnapshot) {
+            public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
+                if (e != null) {
+                    Log.w(TAG, "onEvent: ", e);
+                    return;
+                }
                 mUser = documentSnapshot.toObject(User.class);
                 performQuery();
             }
@@ -156,11 +159,15 @@ public class profileMyRecipesFragment extends Fragment implements RecipeAdapter.
         initializeRecyclerViewAdapterOnClicks();
     }
 
-    private void PerformMainQuery(Query notesQuery) {
+    private void PerformMainQuery(Query recipesQuery) {
 
-        notesQuery.get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+        recipesListener = recipesQuery.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
-            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                if (e != null) {
+                    Log.w(TAG, "onEvent: ", e);
+                    return;
+                }
                 if (queryDocumentSnapshots != null) {
                     for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
                         Recipe recipe = document.toObject(Recipe.class);

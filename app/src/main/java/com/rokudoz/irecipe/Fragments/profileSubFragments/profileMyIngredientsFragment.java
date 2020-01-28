@@ -28,6 +28,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.rokudoz.irecipe.Models.Ingredient;
@@ -55,6 +56,7 @@ public class profileMyIngredientsFragment extends Fragment {
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private CollectionReference usersReference = db.collection("Users");
     private CollectionReference ingredientsReference = db.collection("Ingredients");
+    private ListenerRegistration userDetailsListener,userIngredientListListener,allIngredientsListener;
 
 
     public profileMyIngredientsFragment() {
@@ -91,9 +93,29 @@ public class profileMyIngredientsFragment extends Fragment {
         return view;
     }
 
+    @Override
+    public void onStop() {
+        super.onStop();
+        DetachFireStoreListeners();
+    }
+
+    private void DetachFireStoreListeners() {
+        if (userDetailsListener != null) {
+            userDetailsListener.remove();
+            userDetailsListener = null;
+        }
+        if (allIngredientsListener != null) {
+            allIngredientsListener.remove();
+            allIngredientsListener = null;
+        }
+        if (userIngredientListListener != null) {
+            userIngredientListListener.remove();
+            userIngredientListListener = null;
+        }
+    }
 
     private void getUserInfo() {
-        usersReference.document(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid())
+        userDetailsListener = usersReference.document(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid())
                 .addSnapshotListener(new EventListener<DocumentSnapshot>() {
                     @Override
                     public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
@@ -107,7 +129,7 @@ public class profileMyIngredientsFragment extends Fragment {
     }
 
     private void getAllIngredientsList() {
-        ingredientsReference.addSnapshotListener(new EventListener<QuerySnapshot>() {
+        allIngredientsListener = ingredientsReference.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
                 if (e == null) {
@@ -126,7 +148,7 @@ public class profileMyIngredientsFragment extends Fragment {
     }
 
     private void getUserIngredientList() {
-        usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).collection("Ingredients")
+        userIngredientListListener = usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).collection("Ingredients")
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
                     public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {

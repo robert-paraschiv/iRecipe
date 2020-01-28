@@ -3,6 +3,7 @@ package com.rokudoz.irecipe.Fragments.Messages;
 
 import android.os.Bundle;
 
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -19,7 +20,9 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -52,7 +55,7 @@ public class SelectFriendToOpenConverstationFragment extends Fragment implements
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private CollectionReference recipeRef = db.collection("Recipes");
     private CollectionReference usersReference = db.collection("Users");
-    private ListenerRegistration currentSubCollectionListener, userDetailsListener, recipesListener;
+    private ListenerRegistration userDetailsListener, userFriendListListener;
     private FirebaseStorage mStorageRef;
 
     private ArrayList<Friend> mFriendList = new ArrayList<>();
@@ -68,7 +71,7 @@ public class SelectFriendToOpenConverstationFragment extends Fragment implements
 
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         if (view != null) {
             ViewGroup parent = (ViewGroup) view.getParent();
@@ -94,12 +97,32 @@ public class SelectFriendToOpenConverstationFragment extends Fragment implements
         return view;
     }
 
+    @Override
+    public void onStop() {
+        super.onStop();
+        DetachFireStoreListeners();
+    }
 
+    private void DetachFireStoreListeners() {
+        if (userDetailsListener != null) {
+            userDetailsListener.remove();
+            userDetailsListener = null;
+        }
+        if (userFriendListListener != null) {
+            userFriendListListener.remove();
+            userFriendListListener = null;
+        }
+    }
 
     private void getCurrentUserDetails() {
-        usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+
+        userDetailsListener = usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).addSnapshotListener(new EventListener<DocumentSnapshot>() {
             @Override
-            public void onSuccess(DocumentSnapshot documentSnapshot) {
+            public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
+                if (e != null) {
+                    Log.w(TAG, "onEvent: ", e);
+                    return;
+                }
                 mUser = documentSnapshot.toObject(User.class);
                 performQuery();
             }
@@ -114,10 +137,14 @@ public class SelectFriendToOpenConverstationFragment extends Fragment implements
         acceptedStatusList.add("friend_request_received");
         acceptedStatusList.add("friend_request_accepted");
 
-        usersReference.document(mUser.getUser_id()).collection("FriendList").whereIn("friend_status", acceptedStatusList).get()
-                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+        userFriendListListener = usersReference.document(mUser.getUser_id()).collection("FriendList").whereIn("friend_status", acceptedStatusList)
+                .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
-                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                    public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                        if (e != null) {
+                            Log.w(TAG, "onEvent: ", e);
+                            return;
+                        }
                         for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
                             Friend friend = documentSnapshot.toObject(Friend.class);
                             if (!mFriendList.contains(friend)) {
@@ -128,7 +155,6 @@ public class SelectFriendToOpenConverstationFragment extends Fragment implements
                         mAdapter.notifyDataSetChanged();
                     }
                 });
-
 
     }
 
