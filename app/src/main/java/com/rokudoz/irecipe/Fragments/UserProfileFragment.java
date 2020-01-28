@@ -76,7 +76,8 @@ public class UserProfileFragment extends Fragment implements PostAdapter.OnItemC
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private CollectionReference usersReference = db.collection("Users");
     private CollectionReference postsRef = db.collection("Posts");
-    private ListenerRegistration userDetailsListener, userFriendListListener, userFavoritePostsListener, userFriendListener, postsListener;
+    private ListenerRegistration userDetailsListener, userFriendListListener, userFavoritePostsListener, userFriendListener, postsListener,
+            postCreatorDetailsListener, postCommentsNumberListener, postLikesNumberListener;
 
     public UserProfileFragment() {
         // Required empty public constructor
@@ -159,6 +160,18 @@ public class UserProfileFragment extends Fragment implements PostAdapter.OnItemC
         if (userFriendListener != null) {
             userFriendListener.remove();
             userFriendListener = null;
+        }
+        if (postCreatorDetailsListener != null) {
+            postCreatorDetailsListener.remove();
+            postCreatorDetailsListener = null;
+        }
+        if (postCommentsNumberListener != null) {
+            postCommentsNumberListener.remove();
+            postCommentsNumberListener = null;
+        }
+        if (postLikesNumberListener != null) {
+            postLikesNumberListener.remove();
+            postLikesNumberListener = null;
         }
     }
 
@@ -432,7 +445,7 @@ public class UserProfileFragment extends Fragment implements PostAdapter.OnItemC
                                 @javax.annotation.Nullable FirebaseFirestoreException e) {
                 if (queryDocumentSnapshots != null) {
                     for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
-                        Post post = document.toObject(Post.class);
+                        final Post post = document.toObject(Post.class);
                         post.setDocumentId(document.getId());
 
                         if (userFavPostList != null && userFavPostList.contains(document.getId())) {
@@ -443,9 +456,46 @@ public class UserProfileFragment extends Fragment implements PostAdapter.OnItemC
                         if (!mPostList.contains(post)) {
                             mPostList.add(post);
                         } else {
-                            Log.d(TAG, "onEvent: Already Contains docID");
+                            mPostList.set(mPostList.indexOf(post), post);
                         }
-
+                        //Get post creator details
+                        postCreatorDetailsListener = usersReference.document(post.getCreatorId()).addSnapshotListener(new EventListener<DocumentSnapshot>() {
+                            @Override
+                            public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
+                                if (e != null) {
+                                    Log.w(TAG, "onEvent: ", e);
+                                    return;
+                                }
+                                User user = documentSnapshot.toObject(User.class);
+                                post.setCreator_name(user.getName());
+                                post.setCreator_imageUrl(user.getUserProfilePicUrl());
+                                mAdapter.notifyDataSetChanged();
+                            }
+                        });
+                        //Get post comments number
+                        postCommentsNumberListener = postsRef.document(post.getDocumentId()).collection("Comments").addSnapshotListener(new EventListener<QuerySnapshot>() {
+                            @Override
+                            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                                if (e != null) {
+                                    Log.w(TAG, "onEvent: ", e);
+                                    return;
+                                }
+                                post.setNumber_of_comments(queryDocumentSnapshots.size());
+                                mAdapter.notifyDataSetChanged();
+                            }
+                        });
+                        //Get post likes number
+                        postLikesNumberListener = postsRef.document(post.getDocumentId()).collection("UsersWhoFaved").addSnapshotListener(new EventListener<QuerySnapshot>() {
+                            @Override
+                            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                                if (e != null) {
+                                    Log.w(TAG, "onEvent: ", e);
+                                    return;
+                                }
+                                post.setNumber_of_likes(queryDocumentSnapshots.size());
+                                mAdapter.notifyDataSetChanged();
+                            }
+                        });
                     }
 
                     if (queryDocumentSnapshots.getDocuments().size() != 0) {
@@ -454,6 +504,11 @@ public class UserProfileFragment extends Fragment implements PostAdapter.OnItemC
                     }
                 } else {
                     Log.d(TAG, "onEvent: Querry result is null");
+                }
+                if (mPostList.isEmpty()) {
+                    mPostList.add(new Post("", "", "Add friends to see posts just like this one", ""
+                            , false, "Everyone", null));
+                    Log.d(TAG, "EMPTY: ");
                 }
                 mAdapter.notifyDataSetChanged();
 
