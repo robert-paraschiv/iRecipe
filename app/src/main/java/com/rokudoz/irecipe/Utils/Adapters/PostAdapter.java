@@ -57,6 +57,8 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
         void onItemClick(int position);
 
         void onFavoriteClick(int position);
+
+        void onCommentClick(int position);
     }
 
     public void setOnItemClickListener(OnItemClickListener listener) {
@@ -64,8 +66,8 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
     }
 
     public class PostViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        TextView tvDescription, tvNrOfFaves, creatorName, creationDate;
-        ImageView mImageView, imgFavorited;
+        TextView tvDescription, tvNrOfFaves, creatorName, creationDate,tvNumberOfComments;
+        ImageView mImageView, imgFavorited, imgComment;
         CircleImageView creatorImage;
 
         public PostViewHolder(View itemView) {
@@ -74,10 +76,11 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
             mImageView = itemView.findViewById(R.id.postItem_image);
             imgFavorited = itemView.findViewById(R.id.recycler_view_postItem_favorite);
             tvNrOfFaves = itemView.findViewById(R.id.recycler_view_postItem_nrOfFaves_textView);
+            tvNumberOfComments = itemView.findViewById(R.id.recycler_view_postItem_nrOfComments_textView);
             creatorName = itemView.findViewById(R.id.postItem_creator_name_textView);
             creatorImage = itemView.findViewById(R.id.postItem_creator_image);
             creationDate = itemView.findViewById(R.id.postItem_creationDate_text_view);
-
+            imgComment = itemView.findViewById(R.id.postItem_comment);
             itemView.setOnClickListener(this);
 
             imgFavorited.setOnClickListener(new View.OnClickListener() {
@@ -87,6 +90,17 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
                         int position = getAdapterPosition();
                         if (position != RecyclerView.NO_POSITION) {
                             mListener.onFavoriteClick(position);
+                        }
+                    }
+                }
+            });
+            imgComment.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (mListener != null) {
+                        int position = getAdapterPosition();
+                        if (position != RecyclerView.NO_POSITION) {
+                            mListener.onCommentClick(position);
                         }
                     }
                 }
@@ -160,6 +174,14 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
                     if (queryDocumentSnapshots != null)
                         holder.tvNrOfFaves.setText("" + queryDocumentSnapshots.size());
 
+                }
+            });
+            db.collection("Posts").document(currentItem.getDocumentId())
+                    .collection("Comments").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                @Override
+                public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                    if (queryDocumentSnapshots != null)
+                        holder.tvNumberOfComments.setText("" + queryDocumentSnapshots.size());
                 }
             });
 

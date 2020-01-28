@@ -430,6 +430,12 @@ public class FeedFragment extends Fragment implements PostAdapter.OnItemClickLis
                 /////////////////////////////////////
             }
 
+            @Override
+            public void onCommentClick(int position) {
+                String id = mPostList.get(position).getDocumentId();
+                Navigation.findNavController(view).navigate(FeedFragmentDirections.actionFeedFragmentToPostComments(id));
+            }
+
         });
     }
 
@@ -497,6 +503,11 @@ public class FeedFragment extends Fragment implements PostAdapter.OnItemClickLis
 
     @Override
     public void onFavoriteClick(int position) {
+
+    }
+
+    @Override
+    public void onCommentClick(int position) {
 
     }
 

@@ -79,7 +79,6 @@
             android:layout_marginTop="12dp"
             android:layout_marginEnd="8dp"
             android:contentDescription="Post Image"
-            android:elevation="4dp"
             android:src="@drawable/ic_favorite_border_black_24dp" />
 
         <TextView
@@ -91,6 +90,27 @@
             android:layout_marginStart="12dp"
             android:layout_marginEnd="8dp"
             tools:text="Description" />
+
+        <TextView
+            android:id="@+id/recycler_view_postItem_nrOfComments_textView"
+            style="@style/TextAppearance.MaterialComponents.Chip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/recycler_view_postItem_Image_CardView"
+            android:layout_marginTop="14dp"
+            android:layout_marginEnd="8dp"
+            android:layout_toStartOf="@id/postItem_comment"
+            tools:text="88" />
+        <ImageView
+            android:id="@+id/postItem_comment"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:layout_below="@id/recycler_view_postItem_Image_CardView"
+            android:layout_alignParentEnd="true"
+            android:layout_marginTop="12dp"
+            android:layout_marginEnd="8dp"
+            android:contentDescription="Post Comment"
+            android:src="@drawable/ic_mode_comment_black_24dp" />
 
 
     </RelativeLayout>

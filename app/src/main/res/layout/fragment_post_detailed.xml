@@ -9,23 +9,21 @@
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="40dp"
-        >
+        android:layout_height="40dp">
 
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
             <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/postDetailed_creatorImage_ImageView"
                 android:layout_width="33dp"
                 android:layout_height="33dp"
-                tools:src="@color/colorPrimaryDark"
-                android:id="@+id/postDetailed_creatorImage_ImageView"
                 android:layout_alignParentStart="true"
                 android:layout_centerVertical="true"
                 android:layout_marginStart="4dp"
                 android:layout_marginTop="8dp"
-                />
+                tools:src="@color/colorPrimaryDark" />
 
 
             <TextView
@@ -96,52 +94,46 @@
                 android:layout_toStartOf="@id/postDetailed_imageView_favorite_icon"
                 tools:text="88" />
 
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/postDetailed_recipe_cardView"
-                android:layout_width="200dp"
+            <RelativeLayout
+                android:id="@+id/postDetailed_recipeLayout"
+                android:layout_width="wrap_content"
                 android:layout_height="35dp"
-                android:layout_marginTop="8dp"
                 android:layout_below="@id/postDetailed_ImageView_Card"
                 android:layout_centerHorizontal="true"
-                app:cardCornerRadius="8dp">
+                android:layout_marginTop="8dp">
 
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent">
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/postDetailed_recipeImage_CardView"
+                    android:layout_width="50dp"
+                    android:layout_height="35dp"
+                    android:layout_marginStart="8dp"
+                    app:cardCornerRadius="8dp">
 
-                    <com.google.android.material.card.MaterialCardView
-                        android:id="@+id/postDetailed_recipeImage_CardView"
-                        android:layout_width="50dp"
-                        android:layout_height="35dp"
-                        android:layout_marginStart="8dp"
-                        app:cardCornerRadius="8dp">
+                    <ImageView
+                        android:id="@+id/postDetailed_recipeImage"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        tools:src="@color/colorPrimaryDark" />
+                </com.google.android.material.card.MaterialCardView>
 
-                        <ImageView
-                            android:id="@+id/postDetailed_recipeImage"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            tools:src="@color/colorPrimaryDark" />
-                    </com.google.android.material.card.MaterialCardView>
+                <TextView
+                    android:id="@+id/postDetailed_recipe_name_TextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_toEndOf="@id/postDetailed_recipeImage_CardView"
+                    tools:text="Recipe name" />
+            </RelativeLayout>
 
-                    <TextView
-                        android:id="@+id/postDetailed_recipe_name_TextView"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_centerVertical="true"
-                        android:layout_marginStart="8dp"
-                        android:layout_marginEnd="8dp"
-                        android:layout_toEndOf="@id/postDetailed_recipeImage_CardView"
-                        tools:text="Recipe name" />
-                </RelativeLayout>
-
-            </com.google.android.material.card.MaterialCardView>
 
             <TextView
                 android:id="@+id/postDetailed_tvDescription"
                 style="@style/TextAppearance.AppCompat"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/postDetailed_recipe_cardView"
+                android:layout_below="@+id/postDetailed_recipeLayout"
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="8dp"

@@ -1,6 +1,7 @@
 package com.rokudoz.irecipe.Utils.Adapters;
 
 import android.content.Context;
+import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -174,7 +175,9 @@ public class PostParentCommentAdapter
         holder.mImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Navigation.findNavController(v).navigate(PostDetailedFragmentDirections.actionPostDetailedToUserProfileFragment2(currentItem.getUser_id()));
+                Bundle args = new Bundle();
+                args.putString("documentID", currentItem.getUser_id());
+                Navigation.findNavController(v).navigate(R.id.userProfileFragment2,args);
             }
         });
 

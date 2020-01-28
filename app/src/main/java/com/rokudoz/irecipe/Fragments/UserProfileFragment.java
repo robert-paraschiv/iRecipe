@@ -522,6 +522,12 @@ public class UserProfileFragment extends Fragment implements PostAdapter.OnItemC
                 /////////////////////////////////////
             }
 
+            @Override
+            public void onCommentClick(int position) {
+                String id = mPostList.get(position).getDocumentId();
+                Navigation.findNavController(view).navigate(UserProfileFragmentDirections.actionUserProfileFragment2ToPostComments(id));
+            }
+
         });
     }
 
@@ -533,6 +539,11 @@ public class UserProfileFragment extends Fragment implements PostAdapter.OnItemC
 
     @Override
     public void onFavoriteClick(int position) {
+
+    }
+
+    @Override
+    public void onCommentClick(int position) {
 
     }
 }

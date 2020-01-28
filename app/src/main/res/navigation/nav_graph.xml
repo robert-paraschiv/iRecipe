@@ -54,6 +54,9 @@
         <action
             android:id="@+id/action_feedFragment_to_messageFragment"
             app:destination="@id/messageFragment" />
+        <action
+            android:id="@+id/action_feedFragment_to_postComments"
+            app:destination="@id/postComments" />
     </fragment>
     <fragment
         android:id="@+id/favoritesFragment"
@@ -131,6 +134,9 @@
         <action
             android:id="@+id/action_userProfileFragment2_to_postDetailed"
             app:destination="@id/postDetailed" />
+        <action
+            android:id="@+id/action_userProfileFragment2_to_postComments"
+            app:destination="@id/postComments" />
     </fragment>
     <fragment
         android:id="@+id/postDetailed"
@@ -183,5 +189,14 @@
         <action
             android:id="@+id/action_messageFragment_to_userProfileFragment2"
             app:destination="@id/userProfileFragment2" />
+    </fragment>
+    <fragment
+        android:id="@+id/postComments"
+        android:name="com.rokudoz.irecipe.Fragments.PostComments"
+        android:label="fragment_post_comments"
+        tools:layout="@layout/fragment_post_comments" >
+        <argument
+            android:name="documentID"
+            app:argType="string" />
     </fragment>
 </navigation>

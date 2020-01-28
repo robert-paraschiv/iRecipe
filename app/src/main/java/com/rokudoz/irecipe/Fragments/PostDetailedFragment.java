@@ -16,6 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -69,7 +70,7 @@ public class PostDetailedFragment extends Fragment {
     private MaterialButton editPostBtn, addCommentBtn;
     private EditText commentEditText;
     private RecyclerView commentRecyclerView;
-    private MaterialCardView recipeCardView;
+    private RelativeLayout recipeLayout;
 
     private String documentID = "";
     private List<String> userFavPostList = new ArrayList<>();
@@ -78,7 +79,6 @@ public class PostDetailedFragment extends Fragment {
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
     private ArrayList<Comment> commentList = new ArrayList<>();
-    private ArrayList<String> newItemsToAdd = new ArrayList<>();
 
     private FirebaseAuth.AuthStateListener mAuthListener;
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -113,7 +113,7 @@ public class PostDetailedFragment extends Fragment {
         addCommentBtn = view.findViewById(R.id.postDetailed_addComment_btn);
         commentEditText = view.findViewById(R.id.postDetailed_et_commentInput);
         commentRecyclerView = view.findViewById(R.id.postDetailed_comment_recycler_view);
-        recipeCardView = view.findViewById(R.id.postDetailed_recipe_cardView);
+        recipeLayout = view.findViewById(R.id.postDetailed_recipeLayout);
 
         PostDetailedFragmentArgs postDetailedFragmentArgs = PostDetailedFragmentArgs.fromBundle(getArguments());
         documentID = postDetailedFragmentArgs.getDocumentID();
@@ -226,14 +226,9 @@ public class PostDetailedFragment extends Fragment {
                         if (queryDocumentSnapshots != null) {
                             for (final QueryDocumentSnapshot document : queryDocumentSnapshots) {
                                 final Comment comment = document.toObject(Comment.class);
-                                if (!newItemsToAdd.contains(document.getId())) {
-
-                                    Log.d(TAG, "onEvent: doc id" + document.getId());
-
-                                    comment.setDocumentID(document.getId());
+                                comment.setDocumentID(document.getId());
+                                if (!commentList.contains(comment)) {
                                     commentList.add(0, comment);
-                                    Log.d(TAG, "onEvent: currrent commentID " + document.getId());
-                                    newItemsToAdd.add(document.getId());
                                     mAdapter.notifyDataSetChanged();
 
                                 }
@@ -245,7 +240,6 @@ public class PostDetailedFragment extends Fragment {
                             }
                         }
                         mAdapter.notifyDataSetChanged();
-                        Log.d(TAG, "onEvent: querrysize " + queryDocumentSnapshots.size() + " ListSize: " + commentList.size());
                     }
                 });
 
@@ -368,7 +362,7 @@ public class PostDetailedFragment extends Fragment {
                     }
                 });
 
-                recipeCardView.setOnClickListener(new View.OnClickListener() {
+                recipeLayout.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         Navigation.findNavController(view).navigate(PostDetailedFragmentDirections.actionPostDetailedToRecipeDetailedFragment(post.getReferenced_recipe_docId()));

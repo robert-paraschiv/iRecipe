@@ -112,10 +112,10 @@ public class SearchUserAdapter extends RecyclerView.Adapter<SearchUserAdapter.Se
 
     @Override
     public Filter getFilter() {
-        return recipeFilter;
+        return postFilter;
     }
 
-    private Filter recipeFilter = new Filter() {
+    private Filter postFilter = new Filter() {
         @Override
         protected FilterResults performFiltering(CharSequence constraint) {
             List<User> filteredList = new ArrayList<>();
