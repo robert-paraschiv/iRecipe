@@ -27,6 +27,7 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
         String messageBody = remoteMessage.getNotification().getBody();
         String click_action = remoteMessage.getNotification().getClickAction();
         String friend_id = remoteMessage.getData().get("friend_id");
+        String user_id = remoteMessage.getData().get("user_id");
         String friend_status = remoteMessage.getData().get("friend_status");
         String post_id = remoteMessage.getData().get("post_id");
         String recipe_id = remoteMessage.getData().get("recipe_id");
@@ -43,14 +44,26 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
 
 
         Intent resultIntent = new Intent(click_action);
-        if (click_action.equals("com.rokudoz.foodify.MessageNotification"))
+        if (click_action != null && click_action.equals("com.rokudoz.foodify.MessageNotification")) {
             resultIntent.putExtra("friend_id", friend_id);
-        if (click_action.equals("com.rokudoz.foodify.FriendRequestNotification"))
-            resultIntent.putExtra("user_id", friend_id);
+        }
+        if (click_action != null && click_action.equals("com.rokudoz.foodify.FriendRequestNotification")) {
+            resultIntent.putExtra("user_id", user_id);
+            resultIntent.putExtra("friend_status", friend_status);
+        }
+        if (click_action != null && click_action.equals("com.rokudoz.foodify.RecipeLikeNotification")){
+            resultIntent.putExtra("recipe_id", recipe_id);
+        }
+        if (click_action != null && click_action.equals("com.rokudoz.foodify.RecipeCommentNotification")){
+            resultIntent.putExtra("recipe_id", recipe_id);
+        }
+        if (click_action != null && click_action.equals("com.rokudoz.foodify.PostLikeNotification")){
+            resultIntent.putExtra("post_id", post_id);
+        }
+        if (click_action != null && click_action.equals("com.rokudoz.foodify.PostCommentNotification")){
+            resultIntent.putExtra("post_id", post_id);
+        }
 
-        resultIntent.putExtra("friend_status", friend_status);
-        resultIntent.putExtra("post_id", post_id);
-        resultIntent.putExtra("recipe_id", recipe_id);
         PendingIntent resultPendingIntent = PendingIntent.getActivity(this, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         builder.setContentIntent(resultPendingIntent);
 

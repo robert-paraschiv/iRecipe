@@ -267,20 +267,19 @@ public class UserProfileFragment extends Fragment implements PostAdapter.OnItemC
                                             "Yes",
                                             new DialogInterface.OnClickListener() {
                                                 public void onClick(DialogInterface dialog, int id) {
-                                                    usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).collection("FriendList").document(documentID)
-                                                            .delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                    //Delete user from friends
+                                                    WriteBatch batch = db.batch();
+                                                    batch.delete(usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).collection("FriendList")
+                                                            .document(documentID));
+                                                    batch.delete(usersReference.document(documentID).collection("FriendList")
+                                                            .document(FirebaseAuth.getInstance().getCurrentUser().getUid()));
+                                                    batch.commit().addOnSuccessListener(new OnSuccessListener<Void>() {
                                                         @Override
                                                         public void onSuccess(Void aVoid) {
-                                                            usersReference.document(documentID).collection("FriendList")
-                                                                    .document(FirebaseAuth.getInstance().getCurrentUser().getUid()).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                                @Override
-                                                                public void onSuccess(Void aVoid) {
-                                                                    if (getActivity() != null)
-                                                                        Toast.makeText(getActivity(), "Removed from friend list", Toast.LENGTH_SHORT).show();
-                                                                    mAddFriendButton.setText("Add Friend");
-                                                                    mAddFriendButton.setEnabled(true);
-                                                                }
-                                                            });
+                                                            if (getActivity() != null)
+                                                                Toast.makeText(getActivity(), "Removed from friend list", Toast.LENGTH_SHORT).show();
+                                                            mAddFriendButton.setText("Add Friend");
+                                                            mAddFriendButton.setEnabled(true);
                                                         }
                                                     });
                                                     dialog.cancel();
@@ -305,19 +304,19 @@ public class UserProfileFragment extends Fragment implements PostAdapter.OnItemC
                             mAddFriendButton.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
-                                    usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).collection("FriendList").document(documentID)
-                                            .delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    //Delete user from friends
+                                    WriteBatch batch = db.batch();
+                                    batch.delete(usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                                            .collection("FriendList").document(documentID));
+                                    batch.delete(usersReference.document(documentID).collection("FriendList")
+                                            .document(FirebaseAuth.getInstance().getCurrentUser().getUid()));
+                                    batch.commit().addOnSuccessListener(new OnSuccessListener<Void>() {
                                         @Override
                                         public void onSuccess(Void aVoid) {
-                                            usersReference.document(documentID).collection("FriendList")
-                                                    .document(FirebaseAuth.getInstance().getCurrentUser().getUid()).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                @Override
-                                                public void onSuccess(Void aVoid) {
-                                                    Toast.makeText(getActivity(), "Cancelled friend request", Toast.LENGTH_SHORT).show();
-                                                    mAddFriendButton.setText("Add Friend");
-                                                    mAddFriendButton.setEnabled(true);
-                                                }
-                                            });
+                                            if (getActivity() != null)
+                                                Toast.makeText(getActivity(), "Cancelled friend request", Toast.LENGTH_SHORT).show();
+                                            mAddFriendButton.setText("Add Friend");
+                                            mAddFriendButton.setEnabled(true);
                                         }
                                     });
                                 }
@@ -329,18 +328,17 @@ public class UserProfileFragment extends Fragment implements PostAdapter.OnItemC
                                 @Override
                                 public void onClick(View v) {
                                     Friend friendForCurrentUser = new Friend(documentID, "friends", null);
-                                    usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).collection("FriendList").document(documentID)
-                                            .set(friendForCurrentUser).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    Friend friendForOtherUser = new Friend(FirebaseAuth.getInstance().getCurrentUser().getUid(), "friend_request_accepted", null);
+                                    WriteBatch batch = db.batch();
+                                    batch.set(usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).collection("FriendList")
+                                            .document(documentID), friendForCurrentUser);
+                                    batch.set(usersReference.document(documentID).collection("FriendList")
+                                            .document(FirebaseAuth.getInstance().getCurrentUser().getUid()), friendForOtherUser);
+                                    batch.commit().addOnSuccessListener(new OnSuccessListener<Void>() {
                                         @Override
                                         public void onSuccess(Void aVoid) {
-                                            Friend friendForOtherUser = new Friend(FirebaseAuth.getInstance().getCurrentUser().getUid(), "friend_request_accepted", null);
-                                            usersReference.document(documentID).collection("FriendList")
-                                                    .document(FirebaseAuth.getInstance().getCurrentUser().getUid()).set(friendForOtherUser).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                @Override
-                                                public void onSuccess(Void aVoid) {
-                                                    Toast.makeText(getActivity(), "Accepted friend request", Toast.LENGTH_SHORT).show();
-                                                }
-                                            });
+                                            if (getActivity() != null)
+                                                Toast.makeText(getActivity(), "Accepted friend request", Toast.LENGTH_SHORT).show();
                                         }
                                     });
                                 }
@@ -354,19 +352,18 @@ public class UserProfileFragment extends Fragment implements PostAdapter.OnItemC
                             @Override
                             public void onClick(View v) {
                                 Friend friendForCurrentUser = new Friend(documentID, "friend_request_sent", null);
-                                usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).collection("FriendList").document(documentID)
-                                        .set(friendForCurrentUser).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                Friend friendForOtherUser = new Friend(FirebaseAuth.getInstance().getCurrentUser().getUid(), "friend_request_received", null);
+                                WriteBatch batch = db.batch();
+                                batch.set(usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).collection("FriendList")
+                                        .document(documentID), friendForCurrentUser);
+                                batch.set(usersReference.document(documentID).collection("FriendList")
+                                        .document(FirebaseAuth.getInstance().getCurrentUser().getUid()), friendForOtherUser);
+                                batch.commit().addOnSuccessListener(new OnSuccessListener<Void>() {
                                     @Override
                                     public void onSuccess(Void aVoid) {
-                                        Friend friendForOtherUser = new Friend(FirebaseAuth.getInstance().getCurrentUser().getUid(), "friend_request_received", null);
-                                        usersReference.document(documentID).collection("FriendList")
-                                                .document(FirebaseAuth.getInstance().getCurrentUser().getUid()).set(friendForOtherUser).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                            @Override
-                                            public void onSuccess(Void aVoid) {
-                                                Toast.makeText(getActivity(), "Sent friend request", Toast.LENGTH_SHORT).show();
-                                                mAddFriendButton.setText("Cancel Friend request");
-                                            }
-                                        });
+                                        if (getActivity() != null)
+                                            Toast.makeText(getActivity(), "Sent friend request", Toast.LENGTH_SHORT).show();
+                                        mAddFriendButton.setText("Cancel Friend request");
                                     }
                                 });
                             }
