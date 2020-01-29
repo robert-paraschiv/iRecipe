@@ -53,8 +53,9 @@
                 android:layout_width="33dp"
                 android:layout_height="33dp"
                 android:layout_below="@id/recipeDetailed_viewPager_Card"
-                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
                 android:layout_marginTop="8dp"
+                android:layout_toStartOf="@id/recipeDetailed_creatorName_TextView"
                 tools:src="@color/colorPrimaryDark" />
 
             <TextView
@@ -62,9 +63,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/recipeDetailed_viewPager_Card"
-                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
                 android:layout_marginTop="14dp"
-                android:layout_toEndOf="@id/recipeDetailed_creatorImage_ImageView"
+                android:layout_alignParentEnd="true"
                 tools:text="Creator name" />
 
             <TextView
@@ -102,7 +103,7 @@
                 android:layout_width="33dp"
                 android:layout_height="33dp"
                 android:layout_below="@id/recipeDetailed_viewPager_Card"
-                android:layout_alignParentEnd="true"
+                android:layout_alignParentStart="true"
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="8dp"
                 android:elevation="4dp"
@@ -116,7 +117,7 @@
                 android:layout_below="@id/recipeDetailed_viewPager_Card"
                 android:layout_marginTop="14dp"
                 android:layout_marginEnd="4dp"
-                android:layout_toStartOf="@id/imageview_favorite_icon"
+                android:layout_toEndOf="@id/imageview_favorite_icon"
                 tools:text="88" />
 
             <com.google.android.material.button.MaterialButton

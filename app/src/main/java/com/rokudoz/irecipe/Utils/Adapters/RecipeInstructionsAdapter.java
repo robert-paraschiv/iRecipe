@@ -20,8 +20,17 @@ import java.util.Map;
 
 public class RecipeInstructionsAdapter extends RecyclerView.Adapter<RecipeInstructionsAdapter.RecipeInstructionViewHolder> {
     private List<Instruction> instructionList = new ArrayList<>();
+    private OnItemClickListener mListener;
 
-    public class RecipeInstructionViewHolder extends RecyclerView.ViewHolder {
+    public interface OnItemClickListener {
+        void onItemImageClick(int position);
+    }
+
+    public void setOnItemClickListener(OnItemClickListener listener) {
+        mListener = listener;
+    }
+
+    public class RecipeInstructionViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         TextView tvStepNumber, tvStepText;
         ImageView stepImage;
 
@@ -30,8 +39,28 @@ public class RecipeInstructionsAdapter extends RecyclerView.Adapter<RecipeInstru
             tvStepNumber = itemView.findViewById(R.id.step_item_StepNumber_TextView);
             tvStepText = itemView.findViewById(R.id.step_item_StepText_TextView);
             stepImage = itemView.findViewById(R.id.stepItem_image);
-        }
 
+            stepImage.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (mListener != null) {
+                        int position = getAdapterPosition();
+                        if (position != RecyclerView.NO_POSITION) {
+                            mListener.onItemImageClick(position);
+                        }
+                    }
+                }
+            });
+        }
+        @Override
+        public void onClick(View v) {
+            if (mListener != null) {
+                int position = getAdapterPosition();
+                if (position != RecyclerView.NO_POSITION) {
+                    mListener.onItemImageClick(position);
+                }
+            }
+        }
     }
 
     public RecipeInstructionsAdapter(List<Instruction> instructionList) {
