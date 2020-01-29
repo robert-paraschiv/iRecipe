@@ -91,7 +91,6 @@ public class SearchUserActivity extends AppCompatActivity implements SearchUserA
 
                 mUser = documentSnapshot.toObject(User.class);
                 loggedInUserDocumentId = documentSnapshot.getId();
-                userFavRecipesList = mUser.getFavoriteRecipes();
                 if (!friends_userID_list.contains(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
                     friends_userID_list.add(FirebaseAuth.getInstance().getCurrentUser().getUid());
                 }

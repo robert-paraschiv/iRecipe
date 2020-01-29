@@ -43,7 +43,11 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
 
 
         Intent resultIntent = new Intent(click_action);
-        resultIntent.putExtra("friend_id", friend_id);
+        if (click_action.equals("com.rokudoz.foodify.MessageNotification"))
+            resultIntent.putExtra("friend_id", friend_id);
+        if (click_action.equals("com.rokudoz.foodify.FriendRequestNotification"))
+            resultIntent.putExtra("user_id", friend_id);
+
         resultIntent.putExtra("friend_status", friend_status);
         resultIntent.putExtra("post_id", post_id);
         resultIntent.putExtra("recipe_id", recipe_id);

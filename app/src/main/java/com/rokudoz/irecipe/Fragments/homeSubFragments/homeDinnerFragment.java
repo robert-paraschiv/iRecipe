@@ -66,7 +66,6 @@ public class homeDinnerFragment extends Fragment implements RecipeAdapter.OnItem
 
     private List<Recipe> mRecipeList = new ArrayList<>();
     private List<Ingredient> userIngredientList = new ArrayList<>();
-    private List<String> userFavRecipesList = new ArrayList<>();
     private String loggedInUserDocumentId = "";
     private String userFavDocId = "";
 
@@ -180,7 +179,6 @@ public class homeDinnerFragment extends Fragment implements RecipeAdapter.OnItem
 
                         mUser = documentSnapshot.toObject(User.class);
                         loggedInUserDocumentId = documentSnapshot.getId();
-                        userFavRecipesList = mUser.getFavoriteRecipes();
 
                         Query recipesQuery = null;
                         if (mLastQueriedDocument != null) {
@@ -466,16 +464,9 @@ public class homeDinnerFragment extends Fragment implements RecipeAdapter.OnItem
                 DocumentReference currentRecipeRef = recipeRef.document(id);
                 final CollectionReference currentRecipeSubCollection = currentRecipeRef.collection("UsersWhoFaved");
 
-                mUser.setFavoriteRecipes(userFavRecipesList);
-                DocumentReference favRecipesRef = usersReference.document(loggedInUserDocumentId);
-
                 Log.d(TAG, "onFavoriteClick: " + mRecipeList.get(position).getDocumentId());
 
-                if (userFavRecipesList == null) {
-                    userFavRecipesList = new ArrayList<>();
-                }
-                if (userFavRecipesList.contains(id)) {
-                    userFavRecipesList.remove(id);
+                if (mRecipeList.get(position).getFavorite()) {
                     mRecipeList.get(position).setFavorite(false);
 
                     currentRecipeSubCollection.document(mUser.getUser_id()).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -486,16 +477,11 @@ public class homeDinnerFragment extends Fragment implements RecipeAdapter.OnItem
                     });
 
                 } else {
-                    userFavRecipesList.add(id);
                     mRecipeList.get(position).setFavorite(true);
                     UserWhoFaved userWhoFaved = new UserWhoFaved(mUser.getUser_id(), null);
                     currentRecipeSubCollection.document(mUser.getUser_id()).set(userWhoFaved);
                     Toast.makeText(getContext(), "Added " + title + " to favorites", Toast.LENGTH_SHORT).show();
                 }
-
-                mUser.setFavoriteRecipes(userFavRecipesList);
-                favRecipesRef.update("favoriteRecipes", userFavRecipesList);
-
 
                 mAdapter.notifyDataSetChanged();
             }

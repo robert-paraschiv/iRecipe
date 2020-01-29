@@ -14,7 +14,6 @@ public class User {
     private String gender;
     private String nationality;
     private String userProfilePicUrl;
-    private List<String> favoriteRecipes;
     private String user_tokenID;
 
     public User() {
@@ -22,7 +21,7 @@ public class User {
     }
 
     public User(String user_id, String name, String username, String email, String description, String gender
-            , String nationality, String userProfilePicUrl, List<String> favoriteRecipes) {
+            , String nationality, String userProfilePicUrl) {
         this.user_id = user_id;
         this.name = name;
         this.username = username;
@@ -31,7 +30,6 @@ public class User {
         this.gender = gender;
         this.nationality = nationality;
         this.userProfilePicUrl = userProfilePicUrl;
-        this.favoriteRecipes = favoriteRecipes;
     }
 
     public String getUser_id() {
@@ -99,14 +97,6 @@ public class User {
     }
 
 
-    public List<String> getFavoriteRecipes() {
-        return favoriteRecipes;
-    }
-
-    public void setFavoriteRecipes(List<String> favoriteRecipes) {
-        this.favoriteRecipes = favoriteRecipes;
-    }
-
     public String getUser_tokenID() {
         return user_tokenID;
     }
@@ -126,7 +116,6 @@ public class User {
                 ", gender='" + gender + '\'' +
                 ", nationality='" + nationality + '\'' +
                 ", userProfilePicUrl='" + userProfilePicUrl + '\'' +
-                ", favoriteRecipes=" + favoriteRecipes +
                 '}';
     }
     @Override

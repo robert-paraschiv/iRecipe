@@ -157,7 +157,7 @@ public class profileEditProfile extends Fragment {
             Toast.makeText(getContext(), "Please make sure you've filled your info", Toast.LENGTH_SHORT).show();
         } else {
 
-            final User user = new User(mUser.getUser_id(), name, userName, email, description, gender, nationality, mUser.getUserProfilePicUrl(), mUser.getFavoriteRecipes());
+            final User user = new User(mUser.getUser_id(), name, userName, email, description, gender, nationality, mUser.getUserProfilePicUrl());
 
             usersReference.document(userId).set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
                 @Override

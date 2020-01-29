@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -36,6 +37,7 @@ import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.WriteBatch;
 import com.rokudoz.irecipe.EditPostActivity;
 import com.rokudoz.irecipe.Models.Comment;
 import com.rokudoz.irecipe.Models.FavoritePost;
@@ -73,7 +75,6 @@ public class PostDetailedFragment extends Fragment {
     private RelativeLayout recipeLayout;
 
     private String documentID = "";
-    private List<String> userFavPostList = new ArrayList<>();
     private View view;
 
     private RecyclerView.Adapter mAdapter;
@@ -242,14 +243,20 @@ public class PostDetailedFragment extends Fragment {
                         mAdapter.notifyDataSetChanged();
                     }
                 });
-
-
     }
 
     private void getPostDetails() {
-        postsRef.document(documentID).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+        final String currentUserID = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+        postsRef.document(documentID).addSnapshotListener(new EventListener<DocumentSnapshot>() {
             @Override
-            public void onSuccess(DocumentSnapshot documentSnapshot) {
+            public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
+                if (e != null) {
+                    Log.w(TAG, "onEvent: ", e);
+                    return;
+                }
+
+
                 final Post post = documentSnapshot.toObject(Post.class);
                 post.setDocumentId(documentSnapshot.getId());
 
@@ -281,78 +288,78 @@ public class PostDetailedFragment extends Fragment {
                                 Navigation.findNavController(view).navigate(PostDetailedFragmentDirections.actionPostDetailedToUserProfileFragment2(user.getUser_id()));
                             }
                         });
-                        final String loggedInUserDocId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-                        usersRef.document(loggedInUserDocId).collection("FavoritePosts").get()
-                                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-                                    @Override
-                                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                                        if (queryDocumentSnapshots != null) {
-                                            for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
-                                                String favPostID = documentSnapshot.getId();
-                                                if (!userFavPostList.contains(favPostID))
-                                                    userFavPostList.add(favPostID);
-                                            }
-                                            if (userFavPostList.contains(post.getDocumentId())) {
-                                                post.setFavorite(true);
-                                                postFavoriteIcon.setImageResource(R.drawable.ic_favorite_red_24dp);
-                                            } else {
-                                                Log.d(TAG, "onSuccess: NOT COINAIN");
-                                                post.setFavorite(false);
-                                                postFavoriteIcon.setImageResource(R.drawable.ic_favorite_border_black_24dp);
-                                            }
-                                            Log.d(TAG, "onSuccess: userfav : " + userFavPostList + " PSOT ID : " + post.getDocumentId());
 
-                                            postFavoriteIcon.setOnClickListener(new View.OnClickListener() {
-                                                @Override
-                                                public void onClick(View v) {
-                                                    ////////////////////////////////////////////////
-
-                                                    String id = documentID;
-                                                    DocumentReference currentRecipeRef = postsRef.document(id);
-                                                    final CollectionReference currentRecipeSubCollection = currentRecipeRef.collection("UsersWhoFaved");
-
-                                                    DocumentReference currentUserRef = usersRef.document(loggedInUserDocId);
-
-
-                                                    if (userFavPostList == null) {
-                                                        userFavPostList = new ArrayList<>();
-                                                    }
-                                                    if (userFavPostList.contains(id)) {
-                                                        currentUserRef.collection("FavoritePosts").document(id).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                            @Override
-                                                            public void onSuccess(Void aVoid) {
-                                                                Log.d(TAG, "onSuccess: Deleted from user FAV posts");
-                                                            }
-                                                        });
-                                                        userFavPostList.remove(id);
-                                                        post.setFavorite(false);
-                                                        postFavoriteIcon.setImageResource(R.drawable.ic_favorite_border_black_24dp);
-
-                                                        currentRecipeSubCollection.document(loggedInUserDocId).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                            @Override
-                                                            public void onSuccess(Void aVoid) {
-                                                                Log.d(TAG, "onSuccess: deleted user from post users who faved");
-                                                            }
-                                                        });
-
-                                                    } else {
-                                                        userFavPostList.add(id);
-                                                        post.setFavorite(true);
-                                                        postFavoriteIcon.setImageResource(R.drawable.ic_favorite_red_24dp);
-                                                        UserWhoFaved userWhoFaved = new UserWhoFaved(loggedInUserDocId, null);
-                                                        currentRecipeSubCollection.document(loggedInUserDocId).set(userWhoFaved);
-
-                                                        FavoritePost favoritePost = new FavoritePost(null);
-                                                        currentUserRef.collection("FavoritePosts").document(id).set(favoritePost);
-                                                        Log.d(TAG, "onClick: added to favorites");
-                                                    }
-                                                }
-                                            });
-                                        }
-                                    }
-                                });
                     }
                 });
+                postsRef.document(post.getDocumentId()).collection("UsersWhoFaved").addSnapshotListener(new EventListener<QuerySnapshot>() {
+                    @Override
+                    public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                        if (e != null) {
+                            Log.w(TAG, "onEvent: ", e);
+                            return;
+                        }
+                        Boolean fav = false;
+                        for (QueryDocumentSnapshot documentSnapshot1 : queryDocumentSnapshots) {
+                            if (documentSnapshot1.getId().equals(currentUserID))
+                                fav = true;
+                        }
+                        if (fav) {
+                            post.setFavorite(true);
+                            postFavoriteIcon.setImageResource(R.drawable.ic_favorite_red_24dp);
+                        } else {
+                            post.setFavorite(false);
+                            postFavoriteIcon.setImageResource(R.drawable.ic_favorite_border_black_24dp);
+                        }
+                    }
+                });
+
+                postFavoriteIcon.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        ////////////////////////////////////////////////
+
+                        String id = documentID;
+                        DocumentReference currentRecipeRef = postsRef.document(id);
+                        final CollectionReference currentRecipeSubCollection = currentRecipeRef.collection("UsersWhoFaved");
+
+                        DocumentReference currentUserRef = usersRef.document(currentUserID);
+
+
+                        if (post.getFavorite()) {
+                            currentUserRef.collection("FavoritePosts").document(id).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                    Log.d(TAG, "onSuccess: Deleted from user FAV posts");
+                                }
+                            });
+                            post.setFavorite(false);
+                            postFavoriteIcon.setImageResource(R.drawable.ic_favorite_border_black_24dp);
+
+                            currentRecipeSubCollection.document(currentUserID).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                    Log.d(TAG, "onSuccess: deleted user from post users who faved");
+                                }
+                            });
+
+                        } else {
+                            post.setFavorite(true);
+                            postFavoriteIcon.setImageResource(R.drawable.ic_favorite_red_24dp);
+                            UserWhoFaved userWhoFaved = new UserWhoFaved(currentUserID, null);
+                            FavoritePost favoritePost = new FavoritePost(null);
+                            WriteBatch batch = db.batch();
+                            batch.set(currentRecipeSubCollection.document(currentUserID), userWhoFaved);
+                            batch.set(currentUserRef.collection("FavoritePosts").document(id), favoritePost);
+                            batch.commit().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                    Log.d(TAG, "onFavoriteClick: Added to favorites");
+                                }
+                            });
+                        }
+                    }
+                });
+
                 recipeRef.document(post.getReferenced_recipe_docId()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                     @Override
                     public void onSuccess(DocumentSnapshot documentSnapshot) {

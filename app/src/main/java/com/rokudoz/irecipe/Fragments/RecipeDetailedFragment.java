@@ -116,7 +116,6 @@ public class RecipeDetailedFragment extends Fragment {
     private List<Ingredient> recipeIngredientList = new ArrayList<>();
     private List<Instruction> recipeInstructionList = new ArrayList<>();
     private ArrayList<Comment> commentList = new ArrayList<>();
-    private List<String> userFavRecipesList = new ArrayList<>();
     private Integer numberOfFav;
     private ArrayList<String> newItemsToAdd = new ArrayList<>();
     private User mUser;
@@ -197,13 +196,9 @@ public class RecipeDetailedFragment extends Fragment {
         mFavoriteIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (userFavRecipesList == null) {
-                    userFavRecipesList = new ArrayList<>();
-                }
-                if (userFavRecipesList.contains(documentID)) {
-                    userFavRecipesList.remove(documentID);
+                if (isRecipeFavorite) {
                     isRecipeFavorite = false;
-
+                    setFavoriteIcon(isRecipeFavorite);
                     currentRecipeSubCollection.document(mUser.getUser_id()).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void aVoid) {
@@ -212,17 +207,15 @@ public class RecipeDetailedFragment extends Fragment {
                         }
                     });
                 } else {
-                    userFavRecipesList.add(documentID);
                     isRecipeFavorite = true;
+                    setFavoriteIcon(isRecipeFavorite);
                     UserWhoFaved userWhoFaved = new UserWhoFaved(mUser.getUser_id(), null);
                     currentRecipeSubCollection.document(mUser.getUser_id()).set(userWhoFaved);
                     Toast.makeText(getContext(), "Added " + title + " to favorites", Toast.LENGTH_SHORT).show();
                     Log.d(TAG, "onClick: ADDED + " + title + " " + documentID + " to favorites");
                 }
-                setFavoriteIcon(isRecipeFavorite);
 
-                DocumentReference favRecipesRef = usersRef.document(loggedInUserDocumentId);
-                favRecipesRef.update("favoriteRecipes", userFavRecipesList);
+
             }
         });
 
@@ -402,12 +395,8 @@ public class RecipeDetailedFragment extends Fragment {
                 mUser = documentSnapshot.toObject(User.class);
                 currentUserImageUrl = mUser.getUserProfilePicUrl();
                 currentUserName = mUser.getName();
-                userFavRecipesList = mUser.getFavoriteRecipes();
                 loggedInUserDocumentId = documentSnapshot.getId();
-                if (userFavRecipesList != null && !userFavRecipesList.isEmpty())
-                    isRecipeFavorite = userFavRecipesList.contains(documentID);
 
-                setFavoriteIcon(isRecipeFavorite);
 
                 getUserIngredientList(mUser.getUser_id(), view);
 
@@ -468,6 +457,23 @@ public class RecipeDetailedFragment extends Fragment {
                 if (recipeDetailedViewPagerAdapter != null) {
                     recipeDetailedViewPagerAdapter.notifyDataSetChanged();
                 }
+                recipeRef.document(documentID).collection("UsersWhoFaved").addSnapshotListener(new EventListener<QuerySnapshot>() {
+                    @Override
+                    public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                        if (e != null) {
+                            Log.w(TAG, "onEvent: ", e);
+                            return;
+                        }
+                        Boolean fav = false;
+                        for (QueryDocumentSnapshot documentSnapshot1 : queryDocumentSnapshots) {
+                            if (documentSnapshot1.getId().equals(loggedInUserDocumentId)) {
+                                fav = true;
+                            }
+                        }
+                        isRecipeFavorite = fav;
+                        setFavoriteIcon(isRecipeFavorite);
+                    }
+                });
 
                 ////////////////////////////////////////////////////////// LOGIC TO GET RECIPES INGREDIENTS AND INSTRUCTIONS HERE
 

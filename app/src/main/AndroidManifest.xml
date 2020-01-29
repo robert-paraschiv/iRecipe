@@ -16,13 +16,6 @@
         <activity android:name=".EditPostActivity" />
         <activity android:name=".SearchRecipeActivity" />
         <activity android:name=".AddPostActivity" />
-        <activity android:name=".FriendRequestActivity">
-            <intent-filter>
-                <action android:name="com.rokudoz.foodify.FriendRequestNotification" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
         <activity android:name=".AddIngredientActivity" />
         <activity android:name=".Account.RegisterActivity" />
         <activity android:name=".AddRecipesActivity" />
@@ -58,6 +51,11 @@
             </intent-filter>
             <intent-filter>
                 <action android:name="com.rokudoz.foodify.RecipeCommentNotification" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="com.rokudoz.foodify.FriendRequestNotification" />
 
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>

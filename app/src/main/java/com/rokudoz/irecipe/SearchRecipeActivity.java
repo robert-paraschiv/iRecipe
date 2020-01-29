@@ -189,7 +189,6 @@ public class SearchRecipeActivity extends AppCompatActivity implements SearchRec
 
                 mUser = documentSnapshot.toObject(User.class);
                 loggedInUserDocumentId = documentSnapshot.getId();
-                userFavRecipesList = mUser.getFavoriteRecipes();
                 if (!friends_userID_list.contains(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
                     friends_userID_list.add(FirebaseAuth.getInstance().getCurrentUser().getUid());
                 }

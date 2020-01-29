@@ -60,7 +60,6 @@ public class profileMyRecipesFragment extends Fragment implements RecipeAdapter.
     private FirebaseStorage mStorageRef;
 
     private ArrayList<Recipe> mRecipeList = new ArrayList<>();
-    private List<String> userFavRecipesList = new ArrayList<>();
     private String userFavDocId = "";
 
     private DocumentSnapshot mLastQueriedDocument;
@@ -254,16 +253,11 @@ public class profileMyRecipesFragment extends Fragment implements RecipeAdapter.
                 DocumentReference currentRecipeRef = recipeRef.document(id);
                 final CollectionReference currentRecipeSubCollection = currentRecipeRef.collection("UsersWhoFaved");
 
-                mUser.setFavoriteRecipes(userFavRecipesList);
                 DocumentReference favRecipesRef = usersReference.document(mUser.getUser_id());
 
                 Log.d(TAG, "onFavoriteClick: " + mRecipeList.get(position).getDocumentId());
 
-                if (userFavRecipesList == null) {
-                    userFavRecipesList = new ArrayList<>();
-                }
-                if (userFavRecipesList.contains(id)) {
-                    userFavRecipesList.remove(id);
+                if (mRecipeList.get(position).getFavorite()) {
                     mRecipeList.get(position).setFavorite(false);
 
                     currentRecipeSubCollection.document(mUser.getUser_id()).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -274,16 +268,11 @@ public class profileMyRecipesFragment extends Fragment implements RecipeAdapter.
                     });
 
                 } else {
-                    userFavRecipesList.add(id);
                     mRecipeList.get(position).setFavorite(true);
                     UserWhoFaved userWhoFaved = new UserWhoFaved(mUser.getUser_id(), null);
                     currentRecipeSubCollection.document(mUser.getUser_id()).set(userWhoFaved);
                     Toast.makeText(getContext(), "Added " + title + " to favorites", Toast.LENGTH_SHORT).show();
                 }
-
-                mUser.setFavoriteRecipes(userFavRecipesList);
-                favRecipesRef.update("favoriteRecipes", userFavRecipesList);
-
 
                 mAdapter.notifyDataSetChanged();
             }
