@@ -1,27 +1,24 @@
 package com.rokudoz.irecipe.Fragments.profileSubFragments;
 
 
-import android.content.Context;
-import android.content.res.Resources;
-import android.graphics.Typeface;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.ItemTouchHelper;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.InflateException;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CompoundButton;
-import android.widget.LinearLayout;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 
-import com.google.android.material.card.MaterialCardView;
-import com.google.android.material.checkbox.MaterialCheckBox;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -34,6 +31,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 import com.rokudoz.irecipe.Models.Ingredient;
 import com.rokudoz.irecipe.Models.User;
 import com.rokudoz.irecipe.R;
+import com.rokudoz.irecipe.Utils.Adapters.MyIngredientAdapter;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -44,19 +42,21 @@ public class profileMyIngredientsFragment extends Fragment {
     private static final String TAG = "profileMyIngredientsFra";
 
     private View view;
+    private ProgressBar progressBar;
+    private RelativeLayout relativeLayout;
 
     private String userDocId;
     private List<Ingredient> userIngredientList;
-    private List<Ingredient> allIngredientsList;
 
-    private LinearLayout ingredientsLinearLayout;
-    private List<MaterialCheckBox> ingredientCheckBoxList;
+    private RecyclerView ingredientsRecyclerView;
+    private MyIngredientAdapter ingredientsAdapter;
+    private RecyclerView.LayoutManager ingredientsLayoutManager;
 
     //Firebase
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private CollectionReference usersReference = db.collection("Users");
     private CollectionReference ingredientsReference = db.collection("Ingredients");
-    private ListenerRegistration userDetailsListener,userIngredientListListener,allIngredientsListener;
+    private ListenerRegistration userDetailsListener, userIngredientListListener, allIngredientsListener;
 
 
     public profileMyIngredientsFragment() {
@@ -80,17 +80,25 @@ public class profileMyIngredientsFragment extends Fragment {
             Log.e(TAG, "onCreateView: ", e);
         }
 
-
-        ingredientsLinearLayout = view.findViewById(R.id.profileMyIngredientsFragment_ingredients_linear_layout);
-
+        relativeLayout = view.findViewById(R.id.profileFragmentMyIngredients_relativelayout);
+        ingredientsRecyclerView = view.findViewById(R.id.profileMyIngredientsFragment_recycler_view);
+        progressBar = view.findViewById(R.id.profileMyIngredientsFragment_pbLoading);
         userIngredientList = new ArrayList<>();
-        allIngredientsList = new ArrayList<>();
-        ingredientCheckBoxList = new ArrayList<>();
 
+        buildRecyclerView();
         getUserInfo();
 
         Log.d(TAG, "onCreateView: ");
         return view;
+    }
+
+    private void buildRecyclerView() {
+        ingredientsRecyclerView.setHasFixedSize(true);
+        ingredientsLayoutManager = new LinearLayoutManager(getContext());
+        ingredientsAdapter = new MyIngredientAdapter(userIngredientList);
+        ingredientsRecyclerView.setLayoutManager(ingredientsLayoutManager);
+        new ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(ingredientsRecyclerView);
+        ingredientsRecyclerView.setAdapter(ingredientsAdapter);
     }
 
     @Override
@@ -103,10 +111,6 @@ public class profileMyIngredientsFragment extends Fragment {
         if (userDetailsListener != null) {
             userDetailsListener.remove();
             userDetailsListener = null;
-        }
-        if (allIngredientsListener != null) {
-            allIngredientsListener.remove();
-            allIngredientsListener = null;
         }
         if (userIngredientListListener != null) {
             userIngredientListListener.remove();
@@ -122,30 +126,12 @@ public class profileMyIngredientsFragment extends Fragment {
                         if (e == null) {
                             User user = Objects.requireNonNull(documentSnapshot).toObject(User.class);
                             userDocId = Objects.requireNonNull(user).getUser_id();
-                            getAllIngredientsList();
+                            getUserIngredientList();
                         }
                     }
                 });
     }
 
-    private void getAllIngredientsList() {
-        allIngredientsListener = ingredientsReference.addSnapshotListener(new EventListener<QuerySnapshot>() {
-            @Override
-            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
-                if (e == null) {
-                    for (QueryDocumentSnapshot queryDocumentSnapshot : queryDocumentSnapshots) {
-                        if (!Objects.requireNonNull(queryDocumentSnapshot).getId().equals("ingredient_list")) {
-                            Ingredient ingredient = queryDocumentSnapshot.toObject(Ingredient.class);
-                            ingredient.setDocumentId(queryDocumentSnapshot.getId());
-                            if (!allIngredientsList.contains(ingredient))
-                                allIngredientsList.add(ingredient);
-                        }
-                    }
-                    getUserIngredientList();
-                }
-            }
-        });
-    }
 
     private void getUserIngredientList() {
         userIngredientListListener = usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).collection("Ingredients")
@@ -153,41 +139,21 @@ public class profileMyIngredientsFragment extends Fragment {
                     @Override
                     public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
                         if (e == null) {
+                            progressBar.setVisibility(View.GONE);
                             for (QueryDocumentSnapshot queryDocumentSnapshot : Objects.requireNonNull(queryDocumentSnapshots)) {
                                 if (!Objects.requireNonNull(queryDocumentSnapshot).getId().equals("ingredient_list")) {
                                     Ingredient ingredient = queryDocumentSnapshot.toObject(Ingredient.class);
                                     ingredient.setDocumentId(queryDocumentSnapshot.getId());
-                                    if (!userIngredientList.contains(ingredient))
+                                    if (!userIngredientList.contains(ingredient) && ingredient.getOwned()) {
                                         userIngredientList.add(ingredient);
+                                        ingredientsAdapter.notifyDataSetChanged();
+                                    } else if (userIngredientList.contains(ingredient)) {
+                                        userIngredientList.set(userIngredientList.indexOf(ingredient), ingredient);
+                                        ingredientsAdapter.notifyDataSetChanged();
+                                    }
+                                    Collections.sort(userIngredientList);
+                                    ingredientsAdapter.notifyDataSetChanged();
                                 }
-                            }
-                            for (Ingredient ing : allIngredientsList) {
-                                if (!userIngredientList.contains(ing)) {
-                                    userIngredientList.add(ing);
-                                }
-                            }
-
-                            List<String> checkboxNames = new ArrayList<>();
-                            List<String> ingredientCategoryList = new ArrayList<>();
-
-                            //setup ingredient names so that they don't duplicate later
-                            for (MaterialCheckBox materialCheckBox : ingredientCheckBoxList) {
-                                checkboxNames.add(materialCheckBox.getText().toString());
-                            }
-                            //Setup categories
-                            for (Ingredient ingredient : userIngredientList) {
-                                if (!ingredientCategoryList.contains(ingredient.getCategory())) {
-                                    ingredientCategoryList.add(ingredient.getCategory());
-                                }
-                            }
-                            Collections.sort(ingredientCategoryList);
-                            for (String category : ingredientCategoryList) {
-                                List<Ingredient> ingredientsByCategoryList = new ArrayList<>();
-                                for (Ingredient ingredient : userIngredientList) {
-                                    if (ingredient.getCategory().equals(category) && !checkboxNames.contains(ingredient.getName()))
-                                        ingredientsByCategoryList.add(ingredient);
-                                }
-                                addCategoryOfIngredientsLayout(ingredientsByCategoryList, category);
                             }
 
                         }
@@ -195,57 +161,34 @@ public class profileMyIngredientsFragment extends Fragment {
                 });
     }
 
-    private void addCategoryOfIngredientsLayout(List<Ingredient> ingredientList, String categoryName) {
-        if (getActivity() != null && !ingredientList.isEmpty()) {
-            Log.d(TAG, "addCategoryOfIngredientsLayout: ");
-            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT
-            );
-            params.setMargins(0, 4, 0, 4);
-
-            final LinearLayout linearLayout = new LinearLayout(getActivity());
-            linearLayout.setOrientation(LinearLayout.VERTICAL);
-            linearLayout.setLayoutParams(params);
-
-            TextView categoryNameTextView = new TextView(getActivity());
-            categoryNameTextView.setText(categoryName);
-            categoryNameTextView.setTextSize(12);
-//            categoryNameTextView.setTypeface(Typeface.DEFAULT_BOLD);
-            categoryNameTextView.setTextAppearance(R.style.TextAppearance_MaterialComponents_Headline6);
-            categoryNameTextView.setPadding(convertDpToPixel(8), 4, 0, 0);
-            linearLayout.addView(categoryNameTextView);
-
-            for (Ingredient ingredient : ingredientList) {
-                addIngredientLayout(ingredient, linearLayout);
-            }
-            ingredientsLinearLayout.addView(linearLayout);
+    ItemTouchHelper.SimpleCallback itemTouchHelperCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.RIGHT | ItemTouchHelper.LEFT) {
+        @Override
+        public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
+            return false;
         }
-    }
 
-    private void addIngredientLayout(final Ingredient ingredient, LinearLayout linearLayout) {
+        @Override
+        public void onSwiped(@NonNull final RecyclerView.ViewHolder viewHolder, int direction) {
+            final Ingredient ingredient = userIngredientList.get(viewHolder.getAdapterPosition());
+            final int position = viewHolder.getAdapterPosition();
 
-        MaterialCheckBox materialCheckBox = new MaterialCheckBox(getActivity());
-        materialCheckBox.setText(ingredient.getName());
-        materialCheckBox.setChecked(ingredient.getOwned());
-        materialCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                userIngredientList.get(userIngredientList.indexOf(ingredient)).setOwned(isChecked);
-                usersReference.document(userDocId).collection("Ingredients").document(ingredient.getDocumentId()).set(ingredient);
-            }
-        });
-        linearLayout.addView(materialCheckBox);
+            usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).collection("Ingredients")
+                    .document(ingredient.getDocumentId()).update("owned", false);
+            Snackbar snackbar = Snackbar.make(view.findViewById(R.id.profileFragmentMyIngredients_relativelayout), ingredient.getName() + " removed",
+                    Snackbar.LENGTH_SHORT)
+                    .setAction("Undo", new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            userIngredientList.add(position, ingredient);
+                            usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).collection("Ingredients")
+                                    .document(ingredient.getDocumentId()).update("owned", true);
+                        }
+                    });
+            snackbar.show();
 
-        ingredientCheckBoxList.add(materialCheckBox);
-
-    }
-
-    //This function to convert DPs to pixels
-    private int convertDpToPixel(float dp) {
-        DisplayMetrics metrics = Resources.getSystem().getDisplayMetrics();
-        float px = dp * (metrics.densityDpi / 160f);
-        return Math.round(px);
-    }
+            userIngredientList.remove(viewHolder.getAdapterPosition());
+            ingredientsAdapter.notifyItemRemoved(viewHolder.getAdapterPosition());
+        }
+    };
 
 }

@@ -658,7 +658,7 @@ public class RecipeDetailedFragment extends Fragment implements RecipeInstructio
                                 instructionsAdapter.notifyDataSetChanged();
                             }
                         }
-                        initializeRecyclerViewAdapterOnClicks();
+//                        initializeRecyclerViewAdapterOnClicks();
                     }
                 });
     }
@@ -806,14 +806,6 @@ public class RecipeDetailedFragment extends Fragment implements RecipeInstructio
 
     @Override
     public void onItemImageClick(int position) {
-
-    }
-    private void initializeRecyclerViewAdapterOnClicks(){
-        instructionsAdapter.setOnItemClickListener(new RecipeInstructionsAdapter.OnItemClickListener() {
-            @Override
-            public void onItemImageClick(int position) {
-                zoomImageFromThumb(instructionsRecyclewView.getChildAt(position), recipeInstructionList.get(position).getImgUrl());
-            }
-        });
+        zoomImageFromThumb(instructionsRecyclewView.getChildAt(position), recipeInstructionList.get(position).getImgUrl());
     }
 }

@@ -12,17 +12,26 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".SearchUserActivity"></activity>
-        <activity android:name=".EditPostActivity" />
-        <activity android:name=".SearchRecipeActivity" />
-        <activity android:name=".AddPostActivity" />
-        <activity android:name=".AddIngredientActivity" />
-        <activity android:name=".Account.RegisterActivity" />
-        <activity android:name=".AddRecipesActivity" />
-        <activity android:name=".Account.LoginActivity" />
+        <activity android:name=".SearchUserActivity"
+            android:screenOrientation="portrait"></activity>
+        <activity android:name=".EditPostActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".SearchRecipeActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".AddPostActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".AddIngredientActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".Account.RegisterActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".AddRecipesActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".Account.LoginActivity"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".MainActivity"
-            android:windowSoftInputMode="adjustPan">
+            android:windowSoftInputMode="adjustPan"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <action android:name="android.intent.action.MAIN" />

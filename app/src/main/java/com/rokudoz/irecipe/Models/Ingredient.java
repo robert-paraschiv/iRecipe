@@ -2,7 +2,7 @@ package com.rokudoz.irecipe.Models;
 
 import com.google.firebase.firestore.Exclude;
 
-public class Ingredient {
+public class Ingredient implements Comparable<Ingredient>{
     private String documentId;
     private String name;
     private String category;
@@ -90,5 +90,11 @@ public class Ingredient {
         if (obj == this)
             return true;
         return this.name.equals(((Ingredient) obj).name);
+    }
+
+    @Override
+    public int compareTo(Ingredient ingredient) {
+        return this.getCategory().compareTo(ingredient.getCategory());
+
     }
 }
