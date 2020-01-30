@@ -1,6 +1,7 @@
 package com.rokudoz.irecipe.Fragments.profileSubFragments;
 
 
+import android.content.DialogInterface;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -10,17 +11,27 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.text.InputType;
 import android.util.Log;
 import android.view.InflateException;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
+import android.widget.Spinner;
+import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -43,10 +54,11 @@ public class profileMyIngredientsFragment extends Fragment {
 
     private View view;
     private ProgressBar progressBar;
-    private RelativeLayout relativeLayout;
+    private FloatingActionButton fab;
 
     private String userDocId;
     private List<Ingredient> userIngredientList;
+    private List<Ingredient> allIngredientsList = new ArrayList<>();
 
     private RecyclerView ingredientsRecyclerView;
     private MyIngredientAdapter ingredientsAdapter;
@@ -80,10 +92,30 @@ public class profileMyIngredientsFragment extends Fragment {
             Log.e(TAG, "onCreateView: ", e);
         }
 
-        relativeLayout = view.findViewById(R.id.profileFragmentMyIngredients_relativelayout);
+        fab = view.findViewById(R.id.profileFragmentMyIngredients_addIngredientBtn);
         ingredientsRecyclerView = view.findViewById(R.id.profileMyIngredientsFragment_recycler_view);
         progressBar = view.findViewById(R.id.profileMyIngredientsFragment_pbLoading);
         userIngredientList = new ArrayList<>();
+
+        ingredientsRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+
+                if (dy > 0) {
+                    // Scroll Down
+                    if (fab.isShown()) {
+                        fab.hide();
+                    }
+                } else if (dy < 0) {
+                    // Scroll Up
+                    if (!fab.isShown()) {
+                        fab.show();
+                    }
+                }
+            }
+        });
+
 
         buildRecyclerView();
         getUserInfo();
@@ -151,10 +183,72 @@ public class profileMyIngredientsFragment extends Fragment {
                                         userIngredientList.set(userIngredientList.indexOf(ingredient), ingredient);
                                         ingredientsAdapter.notifyDataSetChanged();
                                     }
+
                                     Collections.sort(userIngredientList);
                                     ingredientsAdapter.notifyDataSetChanged();
                                 }
                             }
+                            //Button to add ingredient manually
+                            fab.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    final LinearLayout linearLayout = new LinearLayout(getActivity());
+                                    linearLayout.setOrientation(LinearLayout.VERTICAL);
+                                    final EditText input = new EditText(getActivity());
+                                    final Spinner spinner = new Spinner(getActivity());
+                                    String[] items = new String[]{"Vegetables", "Fruits", "Meats", "Dairy", "Seafood", "Condiments"
+                                            , "Oils", "Flour/Grains/Cereals", "Batter/Breading/Pastas"};
+                                    //create an adapter to describe how the items are displayed, adapters are used in several places in android.
+                                    //There are multiple variations of this, but this is the basic variant.
+                                    ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_dropdown_item, items);
+                                    //set the spinners adapter to the previously created one.
+                                    spinner.setAdapter(adapter);
+                                    input.setInputType(InputType.TYPE_TEXT_FLAG_CAP_WORDS);
+                                    MaterialAlertDialogBuilder materialAlertDialogBuilder = new MaterialAlertDialogBuilder(getActivity(), R.style.ThemeOverlay_MaterialComponents_MaterialAlertDialog_Centered);
+                                    linearLayout.addView(input);
+                                    linearLayout.addView(spinner);
+                                    materialAlertDialogBuilder.setView(linearLayout);
+                                    materialAlertDialogBuilder.setMessage("Add ingredient to list");
+                                    materialAlertDialogBuilder.setCancelable(true);
+                                    materialAlertDialogBuilder.setPositiveButton(
+                                            "Confirm",
+                                            new DialogInterface.OnClickListener() {
+                                                public void onClick(DialogInterface dialog, int id) {
+                                                    //
+                                                    Ingredient ingredient = new Ingredient(input.getText().toString(), spinner.getSelectedItem().toString(), 0f, "g", true);
+
+                                                    if (input.getText().toString().trim().equals("")) {
+                                                        Toast.makeText(getActivity(), "You need to write the name of what you want to add to the list", Toast.LENGTH_SHORT).show();
+                                                    } else {
+                                                        if (userIngredientList.contains(ingredient)) {
+                                                            Toast.makeText(getActivity(), "" + input.getText().toString() + " is already in your list", Toast.LENGTH_SHORT).show();
+                                                        } else {
+                                                            usersReference.document(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid()).collection("Ingredients").add(ingredient).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                                                                @Override
+                                                                public void onSuccess(DocumentReference documentReference) {
+                                                                    Log.d(TAG, "onSuccess: added to db");
+                                                                }
+                                                            });
+
+                                                        }
+                                                        dialog.cancel();
+                                                    }
+
+                                                }
+                                            });
+
+                                    materialAlertDialogBuilder.setNegativeButton(
+                                            "Cancel",
+                                            new DialogInterface.OnClickListener() {
+                                                public void onClick(DialogInterface dialog, int id) {
+                                                    dialog.cancel();
+                                                }
+                                            });
+
+                                    materialAlertDialogBuilder.show();
+
+                                }
+                            });
 
                         }
                     }
