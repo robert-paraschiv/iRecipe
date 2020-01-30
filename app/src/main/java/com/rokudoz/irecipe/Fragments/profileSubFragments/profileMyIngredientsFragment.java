@@ -43,6 +43,7 @@ import com.rokudoz.irecipe.Models.Ingredient;
 import com.rokudoz.irecipe.Models.User;
 import com.rokudoz.irecipe.R;
 import com.rokudoz.irecipe.Utils.Adapters.MyIngredientAdapter;
+import com.rokudoz.irecipe.Utils.Adapters.MyIngredients.MyIngredientsAdapter;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -61,7 +62,7 @@ public class profileMyIngredientsFragment extends Fragment {
     private List<Ingredient> allIngredientsList = new ArrayList<>();
 
     private RecyclerView ingredientsRecyclerView;
-    private MyIngredientAdapter ingredientsAdapter;
+    private MyIngredientsAdapter ingredientsAdapter;
     private RecyclerView.LayoutManager ingredientsLayoutManager;
 
     //Firebase
@@ -127,7 +128,7 @@ public class profileMyIngredientsFragment extends Fragment {
     private void buildRecyclerView() {
         ingredientsRecyclerView.setHasFixedSize(true);
         ingredientsLayoutManager = new LinearLayoutManager(getContext());
-        ingredientsAdapter = new MyIngredientAdapter(userIngredientList);
+        ingredientsAdapter = new MyIngredientsAdapter(getActivity(), userIngredientList);
         ingredientsRecyclerView.setLayoutManager(ingredientsLayoutManager);
         new ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(ingredientsRecyclerView);
         ingredientsRecyclerView.setAdapter(ingredientsAdapter);
@@ -172,22 +173,48 @@ public class profileMyIngredientsFragment extends Fragment {
                     public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
                         if (e == null) {
                             progressBar.setVisibility(View.GONE);
+                            List<Ingredient> ingredientList = new ArrayList<>();
+
                             for (QueryDocumentSnapshot queryDocumentSnapshot : Objects.requireNonNull(queryDocumentSnapshots)) {
                                 if (!Objects.requireNonNull(queryDocumentSnapshot).getId().equals("ingredient_list")) {
                                     Ingredient ingredient = queryDocumentSnapshot.toObject(Ingredient.class);
                                     ingredient.setDocumentId(queryDocumentSnapshot.getId());
-                                    if (!userIngredientList.contains(ingredient) && ingredient.getOwned()) {
-                                        userIngredientList.add(ingredient);
-                                        ingredientsAdapter.notifyDataSetChanged();
-                                    } else if (userIngredientList.contains(ingredient)) {
-                                        userIngredientList.set(userIngredientList.indexOf(ingredient), ingredient);
-                                        ingredientsAdapter.notifyDataSetChanged();
+                                    if (!allIngredientsList.contains(ingredient)) {
+                                        allIngredientsList.add(ingredient);
+                                    } else if (allIngredientsList.contains(ingredient)) {
+                                        allIngredientsList.set(allIngredientsList.indexOf(ingredient), ingredient);
                                     }
 
-                                    Collections.sort(userIngredientList);
-                                    ingredientsAdapter.notifyDataSetChanged();
+                                    Collections.sort(allIngredientsList);
                                 }
                             }
+
+                            for (Ingredient ingredientt : allIngredientsList) {
+                                if (!ingredientList.contains(ingredientt) && ingredientt.getOwned())
+                                    ingredientList.add(ingredientt);
+                            }
+                            Collections.sort(ingredientList);
+
+                            List<String> categories = new ArrayList<>();
+                            for (Ingredient ing : ingredientList) {
+                                if (!categories.contains(ing.getCategory()))
+                                    categories.add(ing.getCategory());
+                            }
+                            for (String categoryName : categories) {
+                                Ingredient ingg = new Ingredient();
+                                ingg.setName(categoryName);
+                                ingg.setCategory_name(categoryName);
+                                if (!userIngredientList.contains(ingg))
+                                    userIngredientList.add(ingg);
+                                for (Ingredient inggg : ingredientList) {
+                                    if (inggg.getCategory().equals(categoryName) && !userIngredientList.contains(inggg))
+                                        userIngredientList.add(inggg);
+                                }
+
+                            }
+                            ingredientsAdapter.notifyDataSetChanged();
+
+
                             //Button to add ingredient manually
                             fab.setOnClickListener(new View.OnClickListener() {
                                 @Override
@@ -222,8 +249,13 @@ public class profileMyIngredientsFragment extends Fragment {
                                                     } else {
                                                         if (userIngredientList.contains(ingredient)) {
                                                             Toast.makeText(getActivity(), "" + input.getText().toString() + " is already in your list", Toast.LENGTH_SHORT).show();
+                                                        } else if (allIngredientsList.contains(ingredient) && !allIngredientsList.get(allIngredientsList.indexOf(ingredient)).getOwned()) {
+                                                            ingredient.setDocumentId(allIngredientsList.get(allIngredientsList.indexOf(ingredient)).getDocumentId());
+                                                            usersReference.document(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid()).collection("Ingredients")
+                                                                    .document(ingredient.getDocumentId()).set(ingredient);
                                                         } else {
-                                                            usersReference.document(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid()).collection("Ingredients").add(ingredient).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                                                            usersReference.document(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid()).collection("Ingredients")
+                                                                    .add(ingredient).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                                                                 @Override
                                                                 public void onSuccess(DocumentReference documentReference) {
                                                                     Log.d(TAG, "onSuccess: added to db");
@@ -255,16 +287,25 @@ public class profileMyIngredientsFragment extends Fragment {
                 });
     }
 
-    ItemTouchHelper.SimpleCallback itemTouchHelperCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.RIGHT | ItemTouchHelper.LEFT) {
+    ItemTouchHelper.SimpleCallback itemTouchHelperCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.RIGHT) {
         @Override
         public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
             return false;
         }
 
         @Override
+        public int getSwipeDirs(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder) {
+            if (viewHolder instanceof MyIngredientsAdapter.CategoryViewHolder)
+                return 0;
+            return super.getSwipeDirs(recyclerView, viewHolder);
+        }
+
+        @Override
         public void onSwiped(@NonNull final RecyclerView.ViewHolder viewHolder, int direction) {
             final Ingredient ingredient = userIngredientList.get(viewHolder.getAdapterPosition());
             final int position = viewHolder.getAdapterPosition();
+
+            Log.d(TAG, "onSwiped: " + ingredient.getName() + position + "");
 
             usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).collection("Ingredients")
                     .document(ingredient.getDocumentId()).update("owned", false);

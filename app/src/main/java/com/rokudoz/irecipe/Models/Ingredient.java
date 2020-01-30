@@ -2,13 +2,14 @@ package com.rokudoz.irecipe.Models;
 
 import com.google.firebase.firestore.Exclude;
 
-public class Ingredient implements Comparable<Ingredient>{
+public class Ingredient implements Comparable<Ingredient> {
     private String documentId;
     private String name;
     private String category;
     private Float quantity;
     private String quantity_type;
     private Boolean owned;
+    private String category_name;
 
     public Ingredient() {
         //public no-arg constructor needed
@@ -29,6 +30,15 @@ public class Ingredient implements Comparable<Ingredient>{
 
     public void setDocumentId(String documentId) {
         this.documentId = documentId;
+    }
+
+    @Exclude
+    public String getCategory_name() {
+        return category_name;
+    }
+
+    public void setCategory_name(String category_name) {
+        this.category_name = category_name;
     }
 
     public String getCategory() {
