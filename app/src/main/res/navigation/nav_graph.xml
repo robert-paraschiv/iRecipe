@@ -50,13 +50,22 @@
             app:destination="@id/postDetailed" />
         <action
             android:id="@+id/action_feedFragment_to_allMessagesFragment"
-            app:destination="@id/allMessagesFragment" />
+            app:destination="@id/allMessagesFragment"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"/>
         <action
             android:id="@+id/action_feedFragment_to_messageFragment"
             app:destination="@id/messageFragment" />
         <action
             android:id="@+id/action_feedFragment_to_postComments"
-            app:destination="@id/postComments" />
+            app:destination="@id/postComments"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            />
     </fragment>
     <fragment
         android:id="@+id/favoritesFragment"
@@ -84,7 +93,7 @@
             app:destination="@id/profileEditProfile" />
         <action
             android:id="@+id/action_profileFragment_to_userProfileFragment2"
-            app:destination="@id/userProfileFragment2" />
+            app:destination="@id/userProfileFragment2"/>
     </fragment>
     <fragment
         android:id="@+id/recipeDetailedFragment"
@@ -130,7 +139,11 @@
         <action
             android:id="@+id/action_userProfileFragment2_to_messageFragment"
             app:destination="@id/messageFragment"
-            app:popUpTo="@+id/allMessagesFragment" />
+            app:popUpTo="@+id/allMessagesFragment"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"/>
         <action
             android:id="@+id/action_userProfileFragment2_to_postDetailed"
             app:destination="@id/postDetailed" />
@@ -163,7 +176,11 @@
         tools:layout="@layout/fragment_all_messages" >
         <action
             android:id="@+id/action_allMessagesFragment_to_messageFragment"
-            app:destination="@id/messageFragment" />
+            app:destination="@id/messageFragment"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"/>
         <action
             android:id="@+id/action_allMessagesFragment_to_selectFriendToOpenConverstationFragment"
             app:destination="@id/selectFriendToOpenConverstationFragment" />

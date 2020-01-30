@@ -58,7 +58,7 @@ public class UserProfileFragment extends Fragment implements PostAdapter.OnItemC
     private String userProfilePicUrl = "";
     private User mUser;
     private TextView UserNameTv, UserUsernameTv, UserDescriptionTv;
-    private MaterialButton mAddFriendButton;
+    private MaterialButton mAddFriendButton, messageUser;
     private CircleImageView mProfileImage;
     private View view;
     private ArrayList<Post> mPostList = new ArrayList<>();
@@ -107,7 +107,7 @@ public class UserProfileFragment extends Fragment implements PostAdapter.OnItemC
         mProfileImage = view.findViewById(R.id.userprofileFragment_profileImage);
         mRecyclerView = view.findViewById(R.id.userprofile_recycler_view);
         mAddFriendButton = view.findViewById(R.id.userprofile_addFriend_MaterialButton);
-        MaterialButton messageUser = view.findViewById(R.id.userprofile_messageUser_MaterialButton);
+        messageUser = view.findViewById(R.id.userprofile_messageUser_MaterialButton);
 
         mUser = new User();
 
@@ -116,18 +116,6 @@ public class UserProfileFragment extends Fragment implements PostAdapter.OnItemC
 
         UserProfileFragmentArgs userProfileFragmentArgs = UserProfileFragmentArgs.fromBundle(getArguments());
         getRecipeArgsPassed(userProfileFragmentArgs);
-
-        if (documentID.equals(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
-            messageUser.setVisibility(View.GONE);
-        } else {
-            messageUser.setVisibility(View.VISIBLE);
-            messageUser.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Navigation.findNavController(view).navigate(UserProfileFragmentDirections.actionUserProfileFragment2ToMessageFragment(documentID));
-                }
-            });
-        }
 
 
         buildRecyclerView();
@@ -256,6 +244,19 @@ public class UserProfileFragment extends Fragment implements PostAdapter.OnItemC
                             Log.d(TAG, "onSuccess: WE FRIENDS ALREADY");
                             mAddFriendButton.setText("Unfriend");
                             mAddFriendButton.setVisibility(View.VISIBLE);
+
+                            if (documentID.equals(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
+                                messageUser.setVisibility(View.GONE);
+                            } else {
+                                messageUser.setVisibility(View.VISIBLE);
+                                messageUser.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        Navigation.findNavController(view).navigate(UserProfileFragmentDirections.actionUserProfileFragment2ToMessageFragment(documentID));
+                                    }
+                                });
+                            }
+
                             mAddFriendButton.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
@@ -301,6 +302,9 @@ public class UserProfileFragment extends Fragment implements PostAdapter.OnItemC
                         } else if (friend.getFriend_status().equals("friend_request_sent")) {
                             mAddFriendButton.setText("Cancel Friend request");
                             mAddFriendButton.setVisibility(View.VISIBLE);
+
+                            messageUser.setVisibility(View.GONE);
+
                             mAddFriendButton.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
@@ -324,6 +328,7 @@ public class UserProfileFragment extends Fragment implements PostAdapter.OnItemC
                         } else if (friend.getFriend_status().equals("friend_request_received")) {
                             mAddFriendButton.setText("Accept Friend request");
                             mAddFriendButton.setVisibility(View.VISIBLE);
+                            messageUser.setVisibility(View.GONE);
                             mAddFriendButton.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
@@ -348,6 +353,7 @@ public class UserProfileFragment extends Fragment implements PostAdapter.OnItemC
                     } else {
                         mAddFriendButton.setText("Add friend");
                         mAddFriendButton.setVisibility(View.VISIBLE);
+                        messageUser.setVisibility(View.GONE);
                         mAddFriendButton.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
