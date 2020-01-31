@@ -90,6 +90,7 @@
                     />
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/userprofile_messageUser_MaterialButton"
+                    android:layout_centerHorizontal="true"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Send a message"

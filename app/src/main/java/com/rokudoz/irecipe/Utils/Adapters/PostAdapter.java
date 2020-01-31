@@ -66,9 +66,9 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
     }
 
     public class PostViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        TextView tvDescription, tvNrOfFaves, creatorName, creationDate, tvNumberOfComments;
+        TextView tvDescription, tvNrOfFaves, creatorName, creationDate, tvNumberOfComments, recipeNameTv;
         ImageView mImageView, imgFavorited, imgComment;
-        CircleImageView creatorImage;
+        CircleImageView creatorImage, recipeImage;
 
         public PostViewHolder(View itemView) {
             super(itemView);
@@ -81,6 +81,8 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
             creatorImage = itemView.findViewById(R.id.postItem_creator_image);
             creationDate = itemView.findViewById(R.id.postItem_creationDate_text_view);
             imgComment = itemView.findViewById(R.id.postItem_comment);
+            recipeNameTv = itemView.findViewById(R.id.recycler_view_postItem_recipeName);
+            recipeImage = itemView.findViewById(R.id.recycler_view_postItem_recipeImage);
             itemView.setOnClickListener(this);
 
             imgFavorited.setOnClickListener(new View.OnClickListener() {
@@ -164,10 +166,16 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
             Glide.with(holder.creatorImage).load(currentItem.getCreator_imageUrl()).centerCrop().into(holder.creatorImage);
         }
         if (currentItem.getNumber_of_likes() != null) {
-            holder.tvNrOfFaves.setText(""+currentItem.getNumber_of_likes());
+            holder.tvNrOfFaves.setText("" + currentItem.getNumber_of_likes());
         }
         if (currentItem.getNumber_of_comments() != null) {
-            holder.tvNumberOfComments.setText(""+currentItem.getNumber_of_comments());
+            holder.tvNumberOfComments.setText("" + currentItem.getNumber_of_comments());
+        }
+        if (currentItem.getRecipe_name() != null && !currentItem.getRecipe_name().equals("")) {
+            holder.recipeNameTv.setText("Recipe: " + currentItem.getRecipe_name());
+        }
+        if (currentItem.getRecipe_imageUrl() != null && !currentItem.getRecipe_imageUrl().equals("")) {
+//            Glide.with(holder.recipeImage).load(currentItem.getRecipe_imageUrl()).centerCrop().into(holder.recipeImage);
         }
 
     }

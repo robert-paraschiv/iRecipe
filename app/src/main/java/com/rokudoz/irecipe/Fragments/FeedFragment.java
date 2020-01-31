@@ -34,6 +34,7 @@ import com.rokudoz.irecipe.Models.FavoritePost;
 import com.rokudoz.irecipe.Models.Friend;
 import com.rokudoz.irecipe.Models.Ingredient;
 import com.rokudoz.irecipe.Models.Post;
+import com.rokudoz.irecipe.Models.Recipe;
 import com.rokudoz.irecipe.Models.User;
 import com.rokudoz.irecipe.Models.UserWhoFaved;
 import com.rokudoz.irecipe.R;
@@ -66,6 +67,7 @@ public class FeedFragment extends Fragment implements PostAdapter.OnItemClickLis
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private CollectionReference postsRef = db.collection("Posts");
     private CollectionReference usersReference = db.collection("Users");
+    private CollectionReference recipesRef = db.collection("Recipes");
     private FirebaseStorage mStorageRef;
     private ListenerRegistration userDetailsListener, userFriendListListener, postLikesListener, userUnreadConversationsListener, postsListener,
             postCreatorDetailsListener, postCommentsNumberListener, postLikesNumberListener;
@@ -223,13 +225,15 @@ public class FeedFragment extends Fragment implements PostAdapter.OnItemClickLis
 
                 if (!recyclerView.canScrollVertically(1)) {
                     performQuery();
+                }else if(!recyclerView.canScrollVertically(0)){
+                    performQuery();
                 }
             }
         });
     }
 
     private void getCurrentUserDetails() {
-        userDetailsListener = usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).addSnapshotListener(new EventListener<DocumentSnapshot>() {
+        usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).addSnapshotListener(new EventListener<DocumentSnapshot>() {
             @Override
             public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
                 if (e != null) {
@@ -247,7 +251,7 @@ public class FeedFragment extends Fragment implements PostAdapter.OnItemClickLis
                     friends_userID_list.add(FirebaseAuth.getInstance().getCurrentUser().getUid());
                 }
 
-                userFriendListListener = usersReference.document(user.getUser_id()).collection("FriendList")
+                usersReference.document(user.getUser_id()).collection("FriendList")
                         .addSnapshotListener(new EventListener<QuerySnapshot>() {
                             @Override
                             public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
@@ -276,25 +280,25 @@ public class FeedFragment extends Fragment implements PostAdapter.OnItemClickLis
     }
 
     private void getUnreadConversationNr() {
-        userUnreadConversationsListener = usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).collection("Conversations")
+        usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).collection("Conversations")
                 .whereEqualTo("type", "message_received").whereEqualTo("read", false).addSnapshotListener(new EventListener<QuerySnapshot>() {
-                    @Override
-                    public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
-                        if (e != null) {
-                            Log.w(TAG, "onEvent: ", e);
-                            return;
-                        }
-                        if (queryDocumentSnapshots != null && queryDocumentSnapshots.size() > 0) {
-                            String number = "";
-                            number = "" + queryDocumentSnapshots.size();
-                            unreadMessagesTv.setText(number);
+            @Override
+            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                if (e != null) {
+                    Log.w(TAG, "onEvent: ", e);
+                    return;
+                }
+                if (queryDocumentSnapshots != null && queryDocumentSnapshots.size() > 0) {
+                    String number = "";
+                    number = "" + queryDocumentSnapshots.size();
+                    unreadMessagesTv.setText(number);
 
-                        }
-                        if (queryDocumentSnapshots != null && queryDocumentSnapshots.size() == 0) {
-                            unreadMessagesTv.setText("");
-                        }
-                    }
-                });
+                }
+                if (queryDocumentSnapshots != null && queryDocumentSnapshots.size() == 0) {
+                    unreadMessagesTv.setText("");
+                }
+            }
+        });
     }
 
     private void performQuery() {
@@ -318,7 +322,7 @@ public class FeedFragment extends Fragment implements PostAdapter.OnItemClickLis
 
     private void PerformMainQuery(Query postsQuery) {
 
-        postsListener = postsQuery.addSnapshotListener(new EventListener<QuerySnapshot>() {
+        postsQuery.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@javax.annotation.Nullable QuerySnapshot queryDocumentSnapshots,
                                 @javax.annotation.Nullable FirebaseFirestoreException e) {
@@ -379,6 +383,22 @@ public class FeedFragment extends Fragment implements PostAdapter.OnItemClickLis
                                 }
                                 post.setNumber_of_likes(queryDocumentSnapshots.size());
                                 mAdapter.notifyDataSetChanged();
+                            }
+                        });
+                        //Get post referenced Recipe details
+                        recipesRef.document(post.getReferenced_recipe_docId()).addSnapshotListener(new EventListener<DocumentSnapshot>() {
+                            @Override
+                            public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
+                                if (e != null) {
+                                    Log.w(TAG, "onEvent: ", e);
+                                    return;
+                                }
+                                if (documentSnapshot != null) {
+                                    Recipe recipe = documentSnapshot.toObject(Recipe.class);
+                                    post.setRecipe_name(recipe.getTitle());
+                                    post.setRecipe_imageUrl(recipe.getImageUrls_list().get(0));
+                                    mAdapter.notifyDataSetChanged();
+                                }
                             }
                         });
 

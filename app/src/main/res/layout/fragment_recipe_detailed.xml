@@ -202,35 +202,49 @@
 
             </com.google.android.material.card.MaterialCardView>
 
-
-            <EditText
-                android:id="@+id/recipeDetailed_et_commentInput"
+            <RelativeLayout
+                android:id="@+id/recipeDetailed_text_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/recipeDetailed_instruction_Card"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="20dp"
-                android:layout_toStartOf="@+id/recipeDetailed_addComment_btn"
-                android:hint="Comment here" />
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"
+                android:layout_below="@id/recipeDetailed_instruction_Card">
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/recipeDetailed_addComment_btn"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/recipeDetailed_instruction_Card"
-                android:layout_alignParentEnd="true"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="20dp"
-                android:layout_marginEnd="16dp"
-                android:text="Post"
-                app:cornerRadius="18dp" />
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/commentFragment_input_card"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="4dp"
+                    android:layout_marginEnd="70dp"
+                    app:cardCornerRadius="30dp">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/recipeDetailed_et_commentInput"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginStart="8dp"
+                        android:layout_marginEnd="8dp"
+                        android:hint="Comment"
+                        android:inputType="textCapSentences" />
+                </com.google.android.material.card.MaterialCardView>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/recipeDetailed_addComment_btn"
+                    style="@style/Widget.MaterialComponents.Button.TextButton"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginEnd="8dp"
+                    app:icon="@drawable/ic_send_black_24dp" />
+            </RelativeLayout>
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/comment_recycler_view"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_below="@id/recipeDetailed_et_commentInput"
+                android:layout_below="@id/recipeDetailed_text_layout"
                 android:layout_marginTop="10dp"
                 android:transitionName="example_transition" />
         </RelativeLayout>

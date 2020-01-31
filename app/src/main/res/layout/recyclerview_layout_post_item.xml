@@ -14,13 +14,12 @@
         android:padding="4dp">
 
         <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/postItem_creator_image"
             android:layout_width="25dp"
             android:layout_height="25dp"
-            tools:src="@color/colorPrimaryDark"
-            android:id="@+id/postItem_creator_image"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
-            />
+            tools:src="@color/colorPrimaryDark" />
 
         <TextView
             android:id="@+id/postItem_creator_name_textView"
@@ -57,60 +56,100 @@
             android:layout_marginTop="8dp"
             android:layout_marginEnd="8dp"
             android:textSize="12sp"
-            tools:text="20:40, Jan 21" />
+            tools:text="30 hours ago" />
 
-        <TextView
-            android:id="@+id/recycler_view_postItem_nrOfFaves_textView"
-            style="@style/TextAppearance.MaterialComponents.Chip"
+
+
+        <RelativeLayout
+            android:id="@+id/recycler_view_relativeLayout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/recycler_view_postItem_Image_CardView"
-            android:layout_marginTop="14dp"
-            android:layout_marginEnd="4dp"
-            android:layout_toEndOf="@id/recycler_view_postItem_favorite"
-            tools:text="88" />
+            android:layout_marginTop="8dp">
 
-        <ImageView
-            android:id="@+id/recycler_view_postItem_favorite"
-            android:layout_width="25dp"
-            android:layout_height="25dp"
-            android:layout_below="@id/recycler_view_postItem_Image_CardView"
-            android:layout_alignParentStart="true"
-            android:layout_marginTop="12dp"
-            android:layout_marginEnd="8dp"
-            android:contentDescription="Post Image"
-            android:src="@drawable/ic_favorite_border_black_24dp" />
+            <TextView
+                android:id="@+id/recycler_view_postItem_nrOfFaves_textView"
+                style="@style/TextAppearance.MaterialComponents.Chip"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:layout_marginEnd="4dp"
+                android:layout_toEndOf="@id/recycler_view_postItem_favorite"
+                android:layout_centerVertical="true"
+                tools:text="88" />
+
+            <ImageView
+                android:id="@+id/recycler_view_postItem_favorite"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:layout_marginTop="12dp"
+                android:layout_marginEnd="8dp"
+                android:src="@drawable/ic_favorite_border_black_24dp" />
+
+            <RelativeLayout
+                android:id="@+id/recycler_view_postItem_recipeLayout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_centerHorizontal="true"
+                >
+
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:id="@+id/recycler_view_postItem_recipeImage"
+                    android:layout_centerVertical="true"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:visibility="gone"
+                    tools:src="@color/colorPrimary" />
+
+                <TextView
+                    android:id="@+id/recycler_view_postItem_recipeName"
+                    android:layout_toEndOf="@id/recycler_view_postItem_recipeImage"
+                    android:layout_marginStart="6dp"
+                    android:layout_centerVertical="true"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    tools:text="Recipe name here"
+                    />
+            </RelativeLayout>
+
+
+            <TextView
+                android:id="@+id/recycler_view_postItem_nrOfComments_textView"
+                style="@style/TextAppearance.MaterialComponents.Chip"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginTop="14dp"
+                android:layout_marginEnd="8dp"
+                android:layout_toStartOf="@id/postItem_comment"
+                tools:text="88" />
+
+            <ImageView
+                android:id="@+id/postItem_comment"
+                android:layout_centerVertical="true"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:layout_alignParentEnd="true"
+                android:layout_marginTop="12dp"
+                android:layout_marginEnd="8dp"
+                android:contentDescription="Post Comment"
+                android:src="@drawable/ic_mode_comment_black_24dp" />
+
+        </RelativeLayout>
 
         <TextView
             android:id="@+id/postItem_description_text_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/recycler_view_postItem_favorite"
+            android:layout_below="@id/recycler_view_relativeLayout"
             android:layout_alignParentStart="true"
             android:layout_marginStart="12dp"
             android:layout_marginEnd="8dp"
             tools:text="Description" />
 
-        <TextView
-            android:id="@+id/recycler_view_postItem_nrOfComments_textView"
-            style="@style/TextAppearance.MaterialComponents.Chip"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/recycler_view_postItem_Image_CardView"
-            android:layout_marginTop="14dp"
-            android:layout_marginEnd="8dp"
-            android:layout_toStartOf="@id/postItem_comment"
-            tools:text="88" />
-        <ImageView
-            android:id="@+id/postItem_comment"
-            android:layout_width="25dp"
-            android:layout_height="25dp"
-            android:layout_below="@id/recycler_view_postItem_Image_CardView"
-            android:layout_alignParentEnd="true"
-            android:layout_marginTop="12dp"
-            android:layout_marginEnd="8dp"
-            android:contentDescription="Post Comment"
-            android:src="@drawable/ic_mode_comment_black_24dp" />
 
 
     </RelativeLayout>

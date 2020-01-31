@@ -77,6 +77,7 @@ public class UserProfileFragment extends Fragment implements PostAdapter.OnItemC
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private CollectionReference usersReference = db.collection("Users");
     private CollectionReference postsRef = db.collection("Posts");
+    private CollectionReference recipesRef = db.collection("Recipes");
     private ListenerRegistration userDetailsListener, userFriendListListener, userFavoritePostsListener, userFriendListener, postsListener,
             postCreatorDetailsListener, postCommentsNumberListener, postLikesNumberListener;
 
@@ -504,6 +505,22 @@ public class UserProfileFragment extends Fragment implements PostAdapter.OnItemC
                                 }
                                 post.setNumber_of_likes(queryDocumentSnapshots.size());
                                 mAdapter.notifyDataSetChanged();
+                            }
+                        });
+                        //Get post referenced Recipe details
+                        recipesRef.document(post.getReferenced_recipe_docId()).addSnapshotListener(new EventListener<DocumentSnapshot>() {
+                            @Override
+                            public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
+                                if (e != null) {
+                                    Log.w(TAG, "onEvent: ", e);
+                                    return;
+                                }
+                                if (documentSnapshot != null) {
+                                    Recipe recipe = documentSnapshot.toObject(Recipe.class);
+                                    post.setRecipe_name(recipe.getTitle());
+                                    post.setRecipe_imageUrl(recipe.getImageUrls_list().get(0));
+                                    mAdapter.notifyDataSetChanged();
+                                }
                             }
                         });
 

@@ -18,6 +18,8 @@ public class Post {
     private String creator_imageUrl;
     private Integer number_of_comments;
     private Integer number_of_likes;
+    private String recipe_name;
+    private String recipe_imageUrl;
 
     private @ServerTimestamp
     Date creation_date;
@@ -34,6 +36,8 @@ public class Post {
 
     public Post() {
     }
+
+
     @Exclude
     public String getCreator_name() {
         return creator_name;
@@ -42,6 +46,7 @@ public class Post {
     public void setCreator_name(String creator_name) {
         this.creator_name = creator_name;
     }
+
     @Exclude
     public String getCreator_imageUrl() {
         return creator_imageUrl;
@@ -50,14 +55,17 @@ public class Post {
     public void setCreator_imageUrl(String creator_imageUrl) {
         this.creator_imageUrl = creator_imageUrl;
     }
+
     @Exclude
     public Integer getNumber_of_comments() {
         return number_of_comments;
     }
+
     @Exclude
     public void setNumber_of_comments(Integer number_of_comments) {
         this.number_of_comments = number_of_comments;
     }
+
     @Exclude
     public Integer getNumber_of_likes() {
         return number_of_likes;
@@ -132,6 +140,23 @@ public class Post {
         this.privacy = privacy;
     }
 
+    @Exclude
+    public String getRecipe_name() {
+        return recipe_name;
+    }
+
+    public void setRecipe_name(String recipe_name) {
+        this.recipe_name = recipe_name;
+    }
+
+    @Exclude
+    public String getRecipe_imageUrl() {
+        return recipe_imageUrl;
+    }
+
+    public void setRecipe_imageUrl(String recipe_imageUrl) {
+        this.recipe_imageUrl = recipe_imageUrl;
+    }
 
     @Override
     public String toString() {
