@@ -22,13 +22,13 @@
             />
 
     </RelativeLayout>
+
     <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/allMessages_addConversation_fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/allMessages_addConversation_fab"
         android:layout_gravity="bottom|end"
         android:layout_margin="16dp"
-        android:src="@drawable/ic_fb_plus"
-        />
+        android:src="@drawable/ic_chat_black_24dp" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

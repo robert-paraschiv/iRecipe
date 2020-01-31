@@ -104,7 +104,7 @@ public class RecipeDetailedFragment extends Fragment implements RecipeInstructio
     private RecipeIngredientsAdapter ingredientsAdapter;
     private RecyclerView.LayoutManager ingredientsLayoutManager;
 
-    private ScrollView nestedScrollView;
+    private NestedScrollView nestedScrollView;
 
     private MaterialButton mDeleteRecipeBtn;
     private TextView tvTitle, tvDescription, tvIngredients, mFavoriteNumber, tvMissingIngredientsNumber, tvCreatorName;

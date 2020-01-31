@@ -244,51 +244,32 @@ public class homeDinnerFragment extends Fragment implements RecipeAdapter.OnItem
                                             }
                                             Log.d(TAG, "onEvent: " + recipe.getTitle() + " NR OF MISSING INGREDIENTS " + numberOfMissingIngredients);
                                             if (numberOfMissingIngredients < 3) {
+                                                recipeRef.document(recipe.getDocumentId()).collection("UsersWhoFaved").addSnapshotListener(new EventListener<QuerySnapshot>() {
+                                                    @Override
+                                                    public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                                                        if (e != null) {
+                                                            Log.w(TAG, "onEvent: ", e);
+                                                            return;
+                                                        }
+                                                        if (queryDocumentSnapshots != null) {
+                                                            Boolean fav = false;
+                                                            for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                                                                if (documentSnapshot.getId().equals(mUser.getUser_id())) {
+                                                                    fav = true;
+                                                                }
+                                                            }
+                                                            recipe.setFavorite(fav);
+                                                            recipe.setNrOfLikes(queryDocumentSnapshots.size());
+                                                            mAdapter.notifyDataSetChanged();
+                                                        }
+                                                    }
+                                                });
                                                 if (!mRecipeList.contains(recipe)) {
                                                     recipe.setNrOfMissingIngredients(numberOfMissingIngredients);
                                                     recipe.setMissingIngredients(missingIngredients);
-                                                    recipeRef.document(recipe.getDocumentId()).collection("UsersWhoFaved").addSnapshotListener(new EventListener<QuerySnapshot>() {
-                                                        @Override
-                                                        public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
-                                                            if (e != null) {
-                                                                Log.w(TAG, "onEvent: ", e);
-                                                                return;
-                                                            }
-                                                            if (queryDocumentSnapshots != null) {
-                                                                Boolean fav = false;
-                                                                for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
-                                                                    if (documentSnapshot.getId().equals(mUser.getUser_id())) {
-                                                                        fav = true;
-                                                                    }
-                                                                }
-                                                                recipe.setFavorite(fav);
-                                                                recipe.setNrOfLikes(queryDocumentSnapshots.size());
-                                                                mAdapter.notifyDataSetChanged();
-                                                            }
-                                                        }
-                                                    });
+
                                                     mRecipeList.add(recipe);
                                                 } else {
-                                                    recipeRef.document(recipe.getDocumentId()).collection("UsersWhoFaved").addSnapshotListener(new EventListener<QuerySnapshot>() {
-                                                        @Override
-                                                        public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
-                                                            if (e != null) {
-                                                                Log.w(TAG, "onEvent: ", e);
-                                                                return;
-                                                            }
-                                                            if (queryDocumentSnapshots != null) {
-                                                                Boolean fav = false;
-                                                                for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
-                                                                    if (documentSnapshot.getId().equals(mUser.getUser_id())) {
-                                                                        fav = true;
-                                                                    }
-                                                                }
-                                                                recipe.setFavorite(fav);
-                                                                recipe.setNrOfLikes(queryDocumentSnapshots.size());
-                                                                mAdapter.notifyDataSetChanged();
-                                                            }
-                                                        }
-                                                    });
                                                     recipe.setNrOfMissingIngredients(numberOfMissingIngredients);
                                                     recipe.setMissingIngredients(missingIngredients);
                                                     mRecipeList.set(mRecipeList.indexOf(recipe), recipe);
@@ -371,51 +352,32 @@ public class homeDinnerFragment extends Fragment implements RecipeAdapter.OnItem
                                             }
                                             Log.d(TAG, "onEvent: " + recipe.getTitle() + " NR OF MISSING INGREDIENTS " + numberOfMissingIngredients);
                                             if (numberOfMissingIngredients < 3) {
+                                                recipeRef.document(recipe.getDocumentId()).collection("UsersWhoFaved").addSnapshotListener(new EventListener<QuerySnapshot>() {
+                                                    @Override
+                                                    public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                                                        if (e != null) {
+                                                            Log.w(TAG, "onEvent: ", e);
+                                                            return;
+                                                        }
+                                                        if (queryDocumentSnapshots != null) {
+                                                            Boolean fav = false;
+                                                            for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                                                                if (documentSnapshot.getId().equals(mUser.getUser_id())) {
+                                                                    fav = true;
+                                                                }
+                                                            }
+                                                            recipe.setFavorite(fav);
+                                                            recipe.setNrOfLikes(queryDocumentSnapshots.size());
+                                                            mAdapter.notifyDataSetChanged();
+                                                        }
+                                                    }
+                                                });
                                                 if (!mRecipeList.contains(recipe)) {
+
                                                     recipe.setNrOfMissingIngredients(numberOfMissingIngredients);
                                                     recipe.setMissingIngredients(missingIngredients);
-                                                    recipeRef.document(recipe.getDocumentId()).collection("UsersWhoFaved").addSnapshotListener(new EventListener<QuerySnapshot>() {
-                                                        @Override
-                                                        public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
-                                                            if (e != null) {
-                                                                Log.w(TAG, "onEvent: ", e);
-                                                                return;
-                                                            }
-                                                            if (queryDocumentSnapshots != null) {
-                                                                Boolean fav = false;
-                                                                for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
-                                                                    if (documentSnapshot.getId().equals(mUser.getUser_id())) {
-                                                                        fav = true;
-                                                                    }
-                                                                }
-                                                                recipe.setFavorite(fav);
-                                                                recipe.setNrOfLikes(queryDocumentSnapshots.size());
-                                                                mAdapter.notifyDataSetChanged();
-                                                            }
-                                                        }
-                                                    });
                                                     mRecipeList.add(recipe);
                                                 } else {
-                                                    recipeRef.document(recipe.getDocumentId()).collection("UsersWhoFaved").addSnapshotListener(new EventListener<QuerySnapshot>() {
-                                                        @Override
-                                                        public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
-                                                            if (e != null) {
-                                                                Log.w(TAG, "onEvent: ", e);
-                                                                return;
-                                                            }
-                                                            if (queryDocumentSnapshots != null) {
-                                                                Boolean fav = false;
-                                                                for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
-                                                                    if (documentSnapshot.getId().equals(mUser.getUser_id())) {
-                                                                        fav = true;
-                                                                    }
-                                                                }
-                                                                recipe.setFavorite(fav);
-                                                                recipe.setNrOfLikes(queryDocumentSnapshots.size());
-                                                                mAdapter.notifyDataSetChanged();
-                                                            }
-                                                        }
-                                                    });
                                                     recipe.setNrOfMissingIngredients(numberOfMissingIngredients);
                                                     recipe.setMissingIngredients(missingIngredients);
                                                     mRecipeList.set(mRecipeList.indexOf(recipe), recipe);

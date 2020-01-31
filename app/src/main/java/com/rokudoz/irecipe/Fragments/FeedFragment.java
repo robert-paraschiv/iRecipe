@@ -223,8 +223,6 @@ public class FeedFragment extends Fragment implements PostAdapter.OnItemClickLis
 
                 if (!recyclerView.canScrollVertically(1)) {
                     performQuery();
-                    Log.d(TAG, "onScrollStateChanged: ");
-
                 }
             }
         });

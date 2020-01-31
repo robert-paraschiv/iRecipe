@@ -35,6 +35,7 @@ import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.ListenerRegistration;
+import com.google.firebase.firestore.WriteBatch;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.StorageTask;
@@ -111,7 +112,9 @@ public class ProfileFragment extends Fragment {
             @Override
             public void onClick(View v) {
 
-                usersReference.document(userDocumentID).update("user_tokenID", "").addOnSuccessListener(new OnSuccessListener<Void>() {
+                WriteBatch batch = db.batch();
+                batch.update(usersReference.document(userDocumentID),"user_tokenID", "");
+                batch.commit().addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
                         FirebaseAuth.getInstance().signOut();
@@ -120,7 +123,6 @@ public class ProfileFragment extends Fragment {
                         getActivity().finish();
                     }
                 });
-
             }
         });
         mEditProfileBtn.setOnClickListener(new View.OnClickListener() {

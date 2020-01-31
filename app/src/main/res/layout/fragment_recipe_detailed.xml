@@ -1,60 +1,63 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/container"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true">
 
-    <com.google.android.material.appbar.MaterialToolbar
+    <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="40dp"
-        app:title="Recipe Detailed" />
+        android:layout_height="wrap_content">
+
+        <com.google.android.material.appbar.CollapsingToolbarLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fitsSystemWindows="true"
+            app:expandedTitleGravity="top"
+            app:expandedTitleMarginEnd="64dp"
+            app:expandedTitleMarginStart="48dp"
+            app:layout_scrollFlags="scroll|exitUntilCollapsed|snap">
+
+            <androidx.viewpager.widget.ViewPager
+                android:id="@+id/view_pager"
+                android:layout_width="match_parent"
+                android:layout_height="400dp"
+                app:layout_collapseMode="parallax" />
+
+        </com.google.android.material.appbar.CollapsingToolbarLayout>
+    </com.google.android.material.appbar.AppBarLayout>
+
 
     <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
         android:id="@+id/fab_addMissingIngredients"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentBottom="true"
+        android:layout_gravity="bottom|end"
         android:layout_margin="8dp"
         android:text="+"
         app:icon="@drawable/ic_shopping_basket_black_24dp" />
 
-    <ScrollView
+    <androidx.core.widget.NestedScrollView
         android:id="@+id/nestedScrollView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/toolbar">
+        android:layout_below="@id/toolbar"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
-
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/recipeDetailed_viewPager_Card"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="4dp"
-                app:cardCornerRadius="18dp">
-
-                <androidx.viewpager.widget.ViewPager
-                    android:id="@+id/view_pager"
-                    android:layout_width="match_parent"
-                    android:layout_height="400dp"
-                    android:elevation="4dp"
-                    android:transitionName="example_transition" />
-            </com.google.android.material.card.MaterialCardView>
 
 
             <de.hdodenhof.circleimageview.CircleImageView
                 android:id="@+id/recipeDetailed_creatorImage_ImageView"
                 android:layout_width="33dp"
                 android:layout_height="33dp"
-                android:layout_below="@id/recipeDetailed_viewPager_Card"
-                android:layout_marginEnd="8dp"
                 android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
                 android:layout_toStartOf="@id/recipeDetailed_creatorName_TextView"
                 tools:src="@color/colorPrimaryDark" />
 
@@ -62,10 +65,9 @@
                 android:id="@+id/recipeDetailed_creatorName_TextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/recipeDetailed_viewPager_Card"
-                android:layout_marginEnd="8dp"
-                android:layout_marginTop="14dp"
                 android:layout_alignParentEnd="true"
+                android:layout_marginTop="14dp"
+                android:layout_marginEnd="8dp"
                 tools:text="Creator name" />
 
             <TextView
@@ -102,7 +104,6 @@
                 android:id="@+id/imageview_favorite_icon"
                 android:layout_width="33dp"
                 android:layout_height="33dp"
-                android:layout_below="@id/recipeDetailed_viewPager_Card"
                 android:layout_alignParentStart="true"
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="8dp"
@@ -114,7 +115,6 @@
                 style="@style/TextAppearance.MaterialComponents.Chip"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/recipeDetailed_viewPager_Card"
                 android:layout_marginTop="14dp"
                 android:layout_marginEnd="4dp"
                 android:layout_toEndOf="@id/imageview_favorite_icon"
@@ -154,8 +154,8 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
                         android:layout_marginTop="8dp"
-                        android:textSize="18sp"
-                        android:text="Ingredients" />
+                        android:text="Ingredients"
+                        android:textSize="18sp" />
 
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/recipeDetailed_ingredients_recycler_view"
@@ -235,7 +235,7 @@
                 android:transitionName="example_transition" />
         </RelativeLayout>
 
-    </ScrollView>
+    </androidx.core.widget.NestedScrollView>
 
     <ImageView
         android:id="@+id/expanded_image"
@@ -244,4 +244,4 @@
         android:contentDescription="Expanded image"
         android:visibility="invisible" />
 
-</RelativeLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
