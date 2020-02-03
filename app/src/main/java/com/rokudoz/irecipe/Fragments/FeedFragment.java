@@ -50,6 +50,7 @@ import com.rokudoz.irecipe.Utils.Adapters.PostAdapter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Random;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -58,10 +59,10 @@ import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-public class FeedFragment extends Fragment {
+public class FeedFragment extends Fragment implements FeedAdapter.OnItemClickListener {
     private static final String TAG = "FeedFragment";
 
-    private static final int NUMBER_OF_ADS = 1;
+    private static final int NUMBER_OF_ADS = 5;
 
     public View view;
     private TextView unreadMessagesTv;
@@ -145,7 +146,7 @@ public class FeedFragment extends Fragment {
         fab.setVisibility(View.INVISIBLE);
         buildRecyclerView();
         setupFirebaseAuth();
-
+        loadNativeAds();
 
         return view; // HAS TO BE THE LAST ONE ---------------------------------
     }
@@ -158,7 +159,6 @@ public class FeedFragment extends Fragment {
             public void onUnifiedNativeAdLoaded(UnifiedNativeAd unifiedNativeAd) {
                 nativeAds.add(unifiedNativeAd);
                 if (!adLoader.isLoading()) {
-                    insertAdsInRecyclerView();
                 }
             }
         }).withAdListener(new AdListener() {
@@ -166,25 +166,20 @@ public class FeedFragment extends Fragment {
             public void onAdFailedToLoad(int i) {
                 super.onAdFailedToLoad(i);
                 Log.d(TAG, "onAdFailedToLoad: " + i);
-                if (!adLoader.isLoading()) {
-                    insertAdsInRecyclerView();
-                }
+
             }
         }).build();
-        adLoader.loadAds(new AdRequest.Builder().build(), NUMBER_OF_ADS);
+        adLoader.loadAds(new AdRequest.Builder().addTestDevice("717A151EFF00FB99F1DBE6C94A2837BA").addTestDevice("06562AD747A6C127AD23FE62AFCEF0E4").build(), NUMBER_OF_ADS);
     }
 
     private void insertAdsInRecyclerView() {
-        if (nativeAds.size() < 0) {
+        if (nativeAds.size() <= 0) {
             return;
         }
-        int offset = (mPostList.size() / nativeAds.size()) + 1;
-        int index = 0;
-        for (UnifiedNativeAd ad : nativeAds) {
-            mPostList.add(index, ad);
-            index = index + offset;
-        }
 
+        Random rand = new Random();
+        int index = rand.nextInt(nativeAds.size());
+        mPostList.add(mPostList.size() , nativeAds.get(index));
         mAdapter.notifyDataSetChanged();
     }
 
@@ -252,7 +247,7 @@ public class FeedFragment extends Fragment {
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setAdapter(mAdapter);
 
-//        mAdapter.setOnItemClickListener(FeedFragment.this);
+        mAdapter.setOnItemClickListener(FeedFragment.this);
 
 
         mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
@@ -362,20 +357,21 @@ public class FeedFragment extends Fragment {
             postsQuery = postsRef.orderBy("creation_date", Query.Direction.DESCENDING).whereIn("creatorId", friends_userID_list)
                     .whereEqualTo("privacy", "Everyone")
                     .startAfter(mLastQueriedDocument) // Necessary so we don't have the same results multiple times
-                    .limit(20);
+                    .limit(10);
         } else {
             postsQuery = postsRef.orderBy("creation_date", Query.Direction.DESCENDING).whereIn("creatorId", friends_userID_list)
                     .whereEqualTo("privacy", "Everyone")
-                    .limit(20);
+                    .limit(10);
         }
         PerformMainQuery(postsQuery);
         pbLoading.setVisibility(View.INVISIBLE);
 
-//        initializeRecyclerViewAdapterOnClicks();
+        initializeRecyclerViewAdapterOnClicks();
 
     }
 
     private void PerformMainQuery(Query postsQuery) {
+
 
         postsQuery.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
@@ -459,8 +455,10 @@ public class FeedFragment extends Fragment {
 
                         if (!mPostList.contains(post)) {
                             mPostList.add(post);
+                            insertAdsInRecyclerView();
                             mAdapter.notifyDataSetChanged();
                         } else {
+                            insertAdsInRecyclerView();
                             mPostList.set(mPostList.indexOf(post), post);
                         }
                     }
@@ -469,6 +467,8 @@ public class FeedFragment extends Fragment {
                         mLastQueriedDocument = queryDocumentSnapshots.getDocuments()
                                 .get(queryDocumentSnapshots.getDocuments().size() - 1);
                     }
+
+
                 } else {
                     Log.d(TAG, "onEvent: Querry result is null");
                 }
@@ -478,88 +478,89 @@ public class FeedFragment extends Fragment {
                     Log.d(TAG, "EMPTY: ");
                 }
                 mAdapter.notifyDataSetChanged();
-
             }
         });
-        loadNativeAds();
     }
 
-//    private void initializeRecyclerViewAdapterOnClicks() {
-//        mAdapter.setOnItemClickListener(new PostAdapter.OnItemClickListener() {
-//            @Override
-//            public void onItemClick(int position) {
-//                String id = mPostList.get(position).getDocumentId();
-//                if (id != null && !id.equals("")) {
-//                    Navigation.findNavController(view).navigate(FeedFragmentDirections.actionFeedFragmentToPostDetailed(id));
-//                } else {
-//                    if (getActivity() != null)
-//                        Toast.makeText(getActivity(), "This is just a demo card, add a post or add friends", Toast.LENGTH_SHORT).show();
-//                }
-//            }
-//
-//            @Override
-//            public void onFavoriteClick(final int position) {
-//                ////////////////////////////////////////////////
-//                final String id = mPostList.get(position).getDocumentId();
-//                if (id != null && !id.equals("")) {
-//                    DocumentReference currentRecipeRef = postsRef.document(id);
-//                    final CollectionReference currentRecipeSubCollection = currentRecipeRef.collection("UsersWhoFaved");
-//
-//                    DocumentReference currentUserRef = usersReference.document(loggedInUserDocumentId);
-//
-//                    Log.d(TAG, "onFavoriteClick: " + mPostList.get(position).getDocumentId());
-//
-//                    if (mPostList.get(position).getFavorite()) {
-//                        WriteBatch batch = db.batch();
-//                        batch.delete(currentUserRef.collection("FavoritePosts").document(id));
-//                        batch.delete(currentRecipeSubCollection.document(mUser.getUser_id()));
-//                        batch.commit().addOnSuccessListener(new OnSuccessListener<Void>() {
-//                            @Override
-//                            public void onSuccess(Void aVoid) {
-//                                Log.d(TAG, "onSuccess: like deleted from db");
-//                            }
-//                        });
-//                        userFavPostList.remove(id);
-//                        mPostList.get(position).setFavorite(false);
-//                        mAdapter.notifyDataSetChanged();
-//
-//                    } else {
-//                        mPostList.get(position).setFavorite(true);
-//                        UserWhoFaved userWhoFaved = new UserWhoFaved(mUser.getUser_id(), null);
-//                        FavoritePost favoritePost = new FavoritePost(null);
-//
-//                        WriteBatch batch = db.batch();
-//                        batch.set(currentRecipeSubCollection.document(mUser.getUser_id()), userWhoFaved);
-//                        batch.set(currentUserRef.collection("FavoritePosts").document(id), favoritePost);
-//                        batch.commit().addOnSuccessListener(new OnSuccessListener<Void>() {
-//                            @Override
-//                            public void onSuccess(Void aVoid) {
-//                                Log.d(TAG, "onFavoriteClick: Added to favorites");
-//                            }
-//                        });
-//
-//                        mAdapter.notifyDataSetChanged();
-//                    }
-//                } else {
-//                    if (getActivity() != null)
-//                        Toast.makeText(getActivity(), "This is just a demo card, add a post or add friends", Toast.LENGTH_SHORT).show();
-//                }
-//
-//            }
-//
-//            @Override
-//            public void onCommentClick(int position) {
-//                String id = mPostList.get(position).getDocumentId();
-//                if (id != null && !id.equals("")) {
-//                    Navigation.findNavController(view).navigate(FeedFragmentDirections.actionFeedFragmentToPostComments(id));
-//                } else {
-//                    if (getActivity() != null)
-//                        Toast.makeText(getActivity(), "This is just a demo card, add a post or add friends", Toast.LENGTH_SHORT).show();
-//                }
-//            }
-//
-//        });
-//    }
+    private void initializeRecyclerViewAdapterOnClicks() {
+        mAdapter.setOnItemClickListener(new FeedAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(int position) {
+                Post post = (Post) mPostList.get(position);
+                String id = post.getDocumentId();
+                if (id != null && !id.equals("")) {
+                    Navigation.findNavController(view).navigate(FeedFragmentDirections.actionFeedFragmentToPostDetailed(id));
+                } else {
+                    if (getActivity() != null)
+                        Toast.makeText(getActivity(), "This is just a demo card, add a post or add friends", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFavoriteClick(final int position) {
+                ////////////////////////////////////////////////
+                Post post = (Post) mPostList.get(position);
+                final String id = post.getDocumentId();
+                if (id != null && !id.equals("")) {
+                    DocumentReference currentRecipeRef = postsRef.document(id);
+                    final CollectionReference currentRecipeSubCollection = currentRecipeRef.collection("UsersWhoFaved");
+
+                    DocumentReference currentUserRef = usersReference.document(loggedInUserDocumentId);
+
+                    Log.d(TAG, "onFavoriteClick: " + post.getDocumentId());
+
+                    if (post.getFavorite()) {
+                        WriteBatch batch = db.batch();
+                        batch.delete(currentUserRef.collection("FavoritePosts").document(id));
+                        batch.delete(currentRecipeSubCollection.document(mUser.getUser_id()));
+                        batch.commit().addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                Log.d(TAG, "onSuccess: like deleted from db");
+                            }
+                        });
+                        userFavPostList.remove(id);
+                        post.setFavorite(false);
+                        mAdapter.notifyDataSetChanged();
+
+                    } else {
+                        post.setFavorite(true);
+                        UserWhoFaved userWhoFaved = new UserWhoFaved(mUser.getUser_id(), null);
+                        FavoritePost favoritePost = new FavoritePost(null);
+
+                        WriteBatch batch = db.batch();
+                        batch.set(currentRecipeSubCollection.document(mUser.getUser_id()), userWhoFaved);
+                        batch.set(currentUserRef.collection("FavoritePosts").document(id), favoritePost);
+                        batch.commit().addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                Log.d(TAG, "onFavoriteClick: Added to favorites");
+                            }
+                        });
+
+                        mAdapter.notifyDataSetChanged();
+                    }
+                } else {
+                    if (getActivity() != null)
+                        Toast.makeText(getActivity(), "This is just a demo card, add a post or add friends", Toast.LENGTH_SHORT).show();
+                }
+
+            }
+
+            @Override
+            public void onCommentClick(int position) {
+                Post post = (Post) mPostList.get(position);
+                String id = post.getDocumentId();
+                if (id != null && !id.equals("")) {
+                    Navigation.findNavController(view).navigate(FeedFragmentDirections.actionFeedFragmentToPostComments(id));
+                } else {
+                    if (getActivity() != null)
+                        Toast.makeText(getActivity(), "This is just a demo card, add a post or add friends", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+        });
+    }
 
 
     private void navigateToAddPost() {
@@ -616,5 +617,20 @@ public class FeedFragment extends Fragment {
                 // ...
             }
         };
+    }
+
+    @Override
+    public void onItemClick(int position) {
+
+    }
+
+    @Override
+    public void onFavoriteClick(int position) {
+
+    }
+
+    @Override
+    public void onCommentClick(int position) {
+
     }
 }

@@ -15,9 +15,9 @@
         <item>Only Me</item>
     </string-array>
 
-    <string name="admob_app_id">ca-app-pub-3940256099942544~3347511713</string>
-    <string name="admob_unit_id">ca-app-pub-3940256099942544/2247696110</string>
+<!--    <string name="admob_app_id">ca-app-pub-3940256099942544~3347511713</string>-->
+<!--    <string name="admob_unit_id">ca-app-pub-3940256099942544/2247696110</string>-->
 
-<!--    <string name="admob_app_id">ca-app-pub-3327926907082370~2010958549</string>-->
-<!--    <string name="admob_unit_id">ca-app-pub-3327926907082370/4824824147</string>-->
+    <string name="admob_app_id">ca-app-pub-3327926907082370~2010958549</string>
+    <string name="admob_unit_id">ca-app-pub-3327926907082370/4824824147</string>
 </resources>

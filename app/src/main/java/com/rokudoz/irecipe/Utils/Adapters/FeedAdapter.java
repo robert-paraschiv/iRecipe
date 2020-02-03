@@ -33,6 +33,20 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private Context context;
     private final int POST_ITEM_VIEW_TYPE = 0;
     private final int UNIFIED_NATIVE_AD_VIEW_TYPE = 1;
+    private OnItemClickListener mListener;
+
+
+    public interface OnItemClickListener {
+        void onItemClick(int position);
+
+        void onFavoriteClick(int position);
+
+        void onCommentClick(int position);
+    }
+
+    public void setOnItemClickListener(OnItemClickListener listener) {
+        mListener = listener;
+    }
 
 
     //get time ago
@@ -181,7 +195,7 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         return itemList.size();
     }
 
-    public class PostItemViewHolder extends RecyclerView.ViewHolder {
+    public class PostItemViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         TextView tvDescription, tvNrOfFaves, creatorName, creationDate, tvNumberOfComments, recipeNameTv;
         ImageView mImageView, imgFavorited, imgComment;
         CircleImageView creatorImage, recipeImage;
@@ -199,6 +213,40 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             imgComment = itemView.findViewById(R.id.postItem_comment);
             recipeNameTv = itemView.findViewById(R.id.recycler_view_postItem_recipeName);
             recipeImage = itemView.findViewById(R.id.recycler_view_postItem_recipeImage);
+
+            itemView.setOnClickListener(this);
+
+            imgFavorited.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (mListener != null) {
+                        int position = getAdapterPosition();
+                        if (position != RecyclerView.NO_POSITION) {
+                            mListener.onFavoriteClick(position);
+                        }
+                    }
+                }
+            });
+            imgComment.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (mListener != null) {
+                        int position = getAdapterPosition();
+                        if (position != RecyclerView.NO_POSITION) {
+                            mListener.onCommentClick(position);
+                        }
+                    }
+                }
+            });
+        }
+        @Override
+        public void onClick(View v) {
+            if (mListener != null) {
+                int position = getAdapterPosition();
+                if (position != RecyclerView.NO_POSITION) {
+                    mListener.onItemClick(position);
+                }
+            }
         }
     }
 
