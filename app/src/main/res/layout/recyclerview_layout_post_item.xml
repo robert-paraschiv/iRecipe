@@ -15,8 +15,8 @@
 
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/postItem_creator_image"
-            android:layout_width="25dp"
-            android:layout_height="25dp"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             tools:src="@color/colorPrimaryDark" />
@@ -27,7 +27,7 @@
             android:layout_height="wrap_content"
             android:layout_centerVertical="@id/postItem_creator_image"
             android:layout_marginStart="4dp"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="14dp"
             android:layout_toEndOf="@id/postItem_creator_image"
             tools:text="Creator Name" />
 
@@ -43,7 +43,7 @@
             <ImageView
                 android:id="@+id/postItem_image"
                 android:layout_width="match_parent"
-                android:layout_height="340dp"
+                android:layout_height="460dp"
                 tools:src="@color/colorPrimary" />
         </com.google.android.material.card.MaterialCardView>
 
@@ -53,7 +53,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="14dp"
             android:layout_marginEnd="8dp"
             android:textSize="12sp"
             tools:text="30 hours ago" />
@@ -80,8 +80,8 @@
 
             <ImageView
                 android:id="@+id/recycler_view_postItem_favorite"
-                android:layout_width="25dp"
-                android:layout_height="25dp"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
                 android:layout_alignParentStart="true"
                 android:layout_centerVertical="true"
                 android:layout_marginTop="12dp"
@@ -130,8 +130,8 @@
             <ImageView
                 android:id="@+id/postItem_comment"
                 android:layout_centerVertical="true"
-                android:layout_width="25dp"
-                android:layout_height="25dp"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
                 android:layout_alignParentEnd="true"
                 android:layout_marginTop="12dp"
                 android:layout_marginEnd="8dp"

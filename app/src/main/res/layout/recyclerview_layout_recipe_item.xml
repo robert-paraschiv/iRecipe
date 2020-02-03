@@ -35,7 +35,7 @@
             <ImageView
                 android:id="@+id/recipeItem_image"
                 android:layout_width="match_parent"
-                android:layout_height="340dp"
+                android:layout_height="460dp"
                 tools:src="@color/colorPrimary"/>
         </com.google.android.material.card.MaterialCardView>
 
@@ -54,8 +54,8 @@
             style="@style/TextAppearance.MaterialComponents.Chip"/>
         <ImageView
             android:id="@+id/recyclerview_favorite"
-            android:layout_width="25dp"
-            android:layout_height="25dp"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
             android:elevation="4dp"
             android:layout_below="@id/recycler_view_recipeItem_Image_CardView"
             android:layout_marginEnd="8dp"

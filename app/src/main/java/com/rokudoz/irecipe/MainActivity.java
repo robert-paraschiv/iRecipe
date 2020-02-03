@@ -58,9 +58,5 @@ public class MainActivity extends AppCompatActivity {
             args.putString("documentID", user_id);
             navController.navigate(R.id.userProfileFragment2, args);
         }
-
-
     }
-
-
 }

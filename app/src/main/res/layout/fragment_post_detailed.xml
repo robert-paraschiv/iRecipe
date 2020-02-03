@@ -17,8 +17,8 @@
 
             <de.hdodenhof.circleimageview.CircleImageView
                 android:id="@+id/postDetailed_creatorImage_ImageView"
-                android:layout_width="33dp"
-                android:layout_height="33dp"
+                android:layout_width="35dp"
+                android:layout_height="35dp"
                 android:layout_alignParentStart="true"
                 android:layout_centerVertical="true"
                 android:layout_marginStart="4dp"
@@ -68,7 +68,7 @@
                 <ImageView
                     android:id="@+id/postDetailed_ImageView"
                     android:layout_width="match_parent"
-                    android:layout_height="400dp"
+                    android:layout_height="500dp"
                     tools:src="@color/colorPrimaryDark" />
             </com.google.android.material.card.MaterialCardView>
 

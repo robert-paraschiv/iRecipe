@@ -33,11 +33,11 @@ public class MyIngredientsAdapter extends RecyclerView.Adapter<RecyclerView.View
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int viewType) {
         View view;
-        if (viewType == TYPE_CATEGORY) { // for call layout
+        if (viewType == TYPE_CATEGORY) { // for category layout
             view = LayoutInflater.from(context).inflate(R.layout.category_title, viewGroup, false);
             return new CategoryViewHolder(view);
 
-        } else { // for email layout
+        } else { // for ingredient layout
             view = LayoutInflater.from(context).inflate(R.layout.ingredient_title, viewGroup, false);
             return new MyIngredientViewHolder(view);
         }
