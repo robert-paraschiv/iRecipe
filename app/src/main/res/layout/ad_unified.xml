@@ -51,7 +51,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_below="@id/ad_headline"
-                    android:textSize="14sp"
+                    android:textSize="12sp"
                     tools:text="Advertiser" />
 
                 <androidx.appcompat.widget.AppCompatRatingBar

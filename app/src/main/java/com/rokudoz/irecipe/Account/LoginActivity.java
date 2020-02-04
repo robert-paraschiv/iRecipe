@@ -26,6 +26,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.button.MaterialButton;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
@@ -70,6 +71,7 @@ public class LoginActivity extends AppCompatActivity implements
     private TextView mRegister;
     private EditText mEmail, mPassword;
     private Button mLogin;
+    private MaterialButton mForgotPassword;
     private ProgressBar mProgressBar;
     private ImageView mLogo;
 
@@ -89,6 +91,7 @@ public class LoginActivity extends AppCompatActivity implements
         mPassword = findViewById(R.id.input_password);
         mLogin = findViewById(R.id.btn_login);
         mLogo = findViewById(R.id.logo);
+        mForgotPassword = findViewById(R.id.login_forgotPassword_btn);
         mContext = LoginActivity.this;
         mUser = new User();
 
@@ -110,6 +113,28 @@ public class LoginActivity extends AppCompatActivity implements
         mAuth = FirebaseAuth.getInstance();
         // [END initialize_auth]
 
+        mForgotPassword.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mEmail.getText().toString().trim().equals("")){
+                    Toast.makeText(mContext, "Make sure you have filled the email field", Toast.LENGTH_SHORT).show();
+                }else {
+                    FirebaseAuth.getInstance().sendPasswordResetEmail(mEmail.getText().toString())
+                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                    Toast.makeText(mContext, "Sent password reset email", Toast.LENGTH_SHORT).show();
+                                }
+                            }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Toast.makeText(mContext, "" + e.getMessage(), Toast.LENGTH_SHORT).show();
+                            Log.w(TAG, "onFailure: " + e);
+                        }
+                    });
+                }
+            }
+        });
 
         initProgressBar();
         setupFirebaseAuth();
@@ -135,7 +160,7 @@ public class LoginActivity extends AppCompatActivity implements
                                 public void onSuccess(final AuthResult authResult) {
                                     hideProgressBar();
                                     String token_id = FirebaseInstanceId.getInstance().getToken();
-                                    userRef.document(authResult.getUser().getUid()).update("user_tokenID",token_id).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    userRef.document(authResult.getUser().getUid()).update("user_tokenID", token_id).addOnSuccessListener(new OnSuccessListener<Void>() {
                                         @Override
                                         public void onSuccess(Void aVoid) {
                                             Log.d(TAG, "onSuccess: Updated Token ID");
@@ -317,7 +342,7 @@ public class LoginActivity extends AppCompatActivity implements
                                 finish();
                             }
                             String token_id = FirebaseInstanceId.getInstance().getToken();
-                            userRef.document(mAuth.getCurrentUser().getUid()).update("user_tokenID",token_id).addOnSuccessListener(new OnSuccessListener<Void>() {
+                            userRef.document(mAuth.getCurrentUser().getUid()).update("user_tokenID", token_id).addOnSuccessListener(new OnSuccessListener<Void>() {
                                 @Override
                                 public void onSuccess(Void aVoid) {
                                     Log.d(TAG, "onSuccess: Updated Token ID");

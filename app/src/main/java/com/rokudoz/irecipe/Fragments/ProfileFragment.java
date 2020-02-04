@@ -66,7 +66,7 @@ public class ProfileFragment extends Fragment {
     private TextView UserUsernameTv;
     private TextView UserDescriptionTv;
     private CircleImageView mProfileImage;
-    private MaterialButton mSignOutBtn, mEditProfileBtn;
+    private MaterialButton mSignOutBtn, mEditProfileBtn, mAddPhotoBtn;
 
     private ViewPager viewPager;
 
@@ -98,6 +98,7 @@ public class ProfileFragment extends Fragment {
         mProfileImage = view.findViewById(R.id.profileFragment_profileImage);
         mSignOutBtn = view.findViewById(R.id.profileFragment_signOut_materialButton);
         mEditProfileBtn = view.findViewById(R.id.profileFragment_editProfile_materialButton);
+        mAddPhotoBtn = view.findViewById(R.id.profileFragment_changePic_Btn);
 
         //Tab layout
         viewPager = view.findViewById(R.id.profileFragment_container);
@@ -113,7 +114,7 @@ public class ProfileFragment extends Fragment {
             public void onClick(View v) {
 
                 WriteBatch batch = db.batch();
-                batch.update(usersReference.document(userDocumentID),"user_tokenID", "");
+                batch.update(usersReference.document(userDocumentID), "user_tokenID", "");
                 batch.commit().addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
@@ -132,6 +133,17 @@ public class ProfileFragment extends Fragment {
             }
         });
         mProfileImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mUploadTask != null && mUploadTask.isInProgress()) {
+                    Toast.makeText(getContext(), "Upload in progress...", Toast.LENGTH_SHORT).show();
+
+                } else {
+                    openFileChooser();
+                }
+            }
+        });
+        mAddPhotoBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (mUploadTask != null && mUploadTask.isInProgress()) {

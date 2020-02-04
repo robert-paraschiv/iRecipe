@@ -17,6 +17,8 @@
             android:layout_width="wrap_content"
             android:layout_height="75dp"
             android:layout_gravity="center_horizontal"
+            android:src="@drawable/foodify_logo_black"
+            android:layout_marginBottom="40dp"
             android:id="@+id/logo"/>
 
         <com.google.android.material.textfield.TextInputLayout
@@ -54,11 +56,23 @@
             app:cornerRadius="18dp"
             style="@style/Widget.MaterialComponents.Button.OutlinedButton"
             android:layout_marginTop="25dp"
-            android:layout_marginBottom="25dp"
-            android:text="Login"
+            android:text="Log in"
+            android:textAllCaps="false"
             android:id="@+id/btn_login"
-            android:padding="12dp"
-            android:background="@drawable/white_onclick_grey"/>
+            android:padding="14dp"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/login_forgotPassword_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:textSize="12sp"
+            android:textStyle="normal"
+            android:textAllCaps="false"
+            android:layout_marginBottom="25dp"
+            android:text="Forgot your password ?"
+            />
 
         <TextView
             android:layout_width="match_parent"
@@ -71,7 +85,6 @@
             android:textColor="@color/colorPrimary"/>
 
         <com.google.android.gms.common.SignInButton
-
             android:id="@+id/signInButton"
             app:cornerRadius="18dp"
             android:layout_width="wrap_content"
