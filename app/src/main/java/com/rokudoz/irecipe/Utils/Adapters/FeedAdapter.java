@@ -29,8 +29,6 @@ import java.util.Locale;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-
-    private Context context;
     private final int POST_ITEM_VIEW_TYPE = 0;
     private final int UNIFIED_NATIVE_AD_VIEW_TYPE = 1;
     private OnItemClickListener mListener;
@@ -58,8 +56,7 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private List<Object> itemList;
 
-    public FeedAdapter(Context context, List<Object> itemList) {
-        this.context = context;
+    public FeedAdapter(List<Object> itemList) {
         this.itemList = itemList;
     }
 
@@ -158,7 +155,7 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         if (icon == null) {
             adView.getIconView().setVisibility(View.GONE);
         } else {
-            ((ImageView) adView.getIconView()).setImageDrawable(icon.getDrawable());
+            ((CircleImageView) adView.getIconView()).setImageDrawable(icon.getDrawable());
             adView.getIconView().setVisibility(View.VISIBLE);
         }
         if (unifiedNativeAd.getPrice() == null) {

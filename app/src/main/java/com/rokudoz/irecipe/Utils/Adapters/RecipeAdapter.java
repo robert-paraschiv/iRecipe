@@ -37,7 +37,7 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
     }
 
     public class RecipeViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        TextView tvTitle, tvDescription, tvNrOfFaves, tvNumMissingIngredients;
+        TextView tvTitle, tvDescription, tvNrOfFaves, tvNumMissingIngredients, tvNumComments;
         ImageView mImageView, imgFavorited, imgPrivacy;
 
         public RecipeViewHolder(View itemView) {
@@ -49,6 +49,7 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
             tvNrOfFaves = itemView.findViewById(R.id.recyclerview_nrOfFaves_textView);
             imgPrivacy = itemView.findViewById(R.id.recycler_view_privacy);
             tvNumMissingIngredients = itemView.findViewById(R.id.recycler_view_recipeItem_missingIngredients);
+            tvNumComments = itemView.findViewById(R.id.recycler_view_recipeItem_nrOfComments_textView);
 
             itemView.setOnClickListener(this);
 
@@ -122,6 +123,9 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
         holder.imgFavorited.setImageResource(R.drawable.ic_favorite_border_black_24dp);
         if (currentItem.getFavorite() != null && currentItem.getFavorite()) {
             holder.imgFavorited.setImageResource(R.drawable.ic_favorite_red_24dp);
+        }
+        if (currentItem.getNrOfComments() != null) {
+            holder.tvNumComments.setText("" + currentItem.getNrOfComments());
         }
 
     }

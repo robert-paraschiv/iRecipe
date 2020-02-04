@@ -35,12 +35,9 @@
             <ImageView
                 android:id="@+id/recipeItem_image"
                 android:layout_width="match_parent"
-                android:layout_height="460dp"
+                android:layout_height="440dp"
                 tools:src="@color/colorPrimary"/>
         </com.google.android.material.card.MaterialCardView>
-
-
-
 
         <TextView
             android:id="@+id/recyclerview_nrOfFaves_textView"
@@ -63,6 +60,29 @@
             android:layout_alignParentStart="true"
             android:src="@drawable/ic_favorite_border_black_24dp"
             android:contentDescription="Recipe Image" />
+
+
+        <TextView
+            android:id="@+id/recycler_view_recipeItem_nrOfComments_textView"
+            style="@style/TextAppearance.MaterialComponents.Chip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/recycler_view_recipeItem_Image_CardView"
+            android:layout_marginTop="14dp"
+            android:layout_marginEnd="8dp"
+            android:layout_toStartOf="@id/recipeItem_comment"
+            tools:text="88" />
+
+        <ImageView
+            android:id="@+id/recipeItem_comment"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_alignParentEnd="true"
+            android:layout_below="@id/recycler_view_recipeItem_Image_CardView"
+            android:layout_marginTop="12dp"
+            android:contentDescription="Post Comment"
+            android:src="@drawable/ic_mode_comment_black_24dp" />
+
 
         <TextView
             android:id="@+id/text_view_description"

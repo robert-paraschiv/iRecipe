@@ -65,7 +65,7 @@ public class PostParentCommentAdapter
         public TextView mName;
         public TextView mCommentText;
         public TextView mCommentTimeStamp;
-        public MaterialButton mAddReplyBtn;
+        public MaterialButton mAddReplyBtn,deleteCommentBtn;
         public TextInputEditText mReplyText;
         RelativeLayout llExpandArea;
         RecyclerView rv_child;
@@ -79,6 +79,7 @@ public class PostParentCommentAdapter
             llExpandArea = itemView.findViewById(R.id.llExpandArea);
             rv_child = itemView.findViewById(R.id.comment_rv_childRecyclerView);
             mAddReplyBtn = itemView.findViewById(R.id.comment_rv_addReply_btn);
+            deleteCommentBtn = itemView.findViewById(R.id.comment_rv_deleteBtn);
             mReplyText = itemView.findViewById(R.id.comment_rv_reply_editText);
         }
     }
@@ -119,7 +120,7 @@ public class PostParentCommentAdapter
     public void onBindViewHolder(@NonNull final CommentViewHolder holder, int position) {
         final Comment currentItem = mCommentList.get(position);
 
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        final FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.collection("Users").document(currentItem.getUser_id()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
             @Override
             public void onSuccess(DocumentSnapshot documentSnapshot) {
@@ -157,7 +158,7 @@ public class PostParentCommentAdapter
                             .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                                 @Override
                                 public void onSuccess(DocumentReference documentReference) {
-                                    Toast.makeText(ctx, "Succesfully Added Reply", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(ctx, "Successfully Added Reply", Toast.LENGTH_SHORT).show();
                                     holder.mReplyText.setText("");
                                 }
                             })
@@ -171,6 +172,26 @@ public class PostParentCommentAdapter
 
             }
         });
+
+        if (currentItem.getUser_id().equals(FirebaseAuth.getInstance().getCurrentUser().getUid())){
+            holder.deleteCommentBtn.setVisibility(View.VISIBLE);
+
+            holder.deleteCommentBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mCommentList.remove(currentItem);
+                    db.collection("Posts").document(currentItem.getRecipe_documentID()).collection("Comments").document(currentItem.getDocumentID()).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            Toast.makeText(ctx, "Deleted comment", Toast.LENGTH_SHORT).show();
+                            Log.d(TAG, "onSuccess: Deleted comm");
+                        }
+                    });
+                }
+            });
+        }else {
+            holder.deleteCommentBtn.setVisibility(View.GONE);
+        }
 
         holder.mImageView.setOnClickListener(new View.OnClickListener() {
             @Override

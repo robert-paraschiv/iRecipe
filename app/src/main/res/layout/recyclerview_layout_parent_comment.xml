@@ -42,6 +42,14 @@
                 android:textAppearance="@style/TextAppearance.AppCompat.Medium"
                 tools:text="Name" />
 
+            <com.google.android.material.button.MaterialButton
+                android:layout_width="33dp"
+                android:layout_height="33dp"
+                android:id="@+id/comment_rv_deleteBtn"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                app:icon="@drawable/ic_delete_black_24dp"
+                android:layout_alignParentEnd="true"/>
+
             <TextView
                 android:id="@+id/comment_rv_tv_comment_text"
                 android:layout_width="wrap_content"

@@ -14,6 +14,7 @@ import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdLoader;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.MobileAds;
+import com.google.android.gms.ads.formats.NativeAd;
 import com.google.android.gms.ads.formats.UnifiedNativeAd;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -63,6 +64,8 @@ public class FeedFragment extends Fragment implements FeedAdapter.OnItemClickLis
     private static final String TAG = "FeedFragment";
 
     private static final int NUMBER_OF_ADS = 5;
+    private int nrPostsLoaded = 0;
+    private int nrOfAdsLoaded = 0;
 
     public View view;
     private TextView unreadMessagesTv;
@@ -176,11 +179,17 @@ public class FeedFragment extends Fragment implements FeedAdapter.OnItemClickLis
         if (nativeAds.size() <= 0) {
             return;
         }
+        nrOfAdsLoaded++;
 
         Random rand = new Random();
         int index = rand.nextInt(nativeAds.size());
-        mPostList.add(mPostList.size() , nativeAds.get(index));
+        mPostList.add(mPostList.size(), nativeAds.get(index));
         mAdapter.notifyDataSetChanged();
+
+        if (nrOfAdsLoaded == 5) {
+            nativeAds = new ArrayList<>();
+            loadNativeAds();
+        }
     }
 
 
@@ -242,7 +251,7 @@ public class FeedFragment extends Fragment implements FeedAdapter.OnItemClickLis
         mRecyclerView.setHasFixedSize(true);
         mLayoutManager = new LinearLayoutManager(getContext());
 
-        mAdapter = new FeedAdapter(getActivity(), mPostList);
+        mAdapter = new FeedAdapter(mPostList);
 
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setAdapter(mAdapter);
@@ -455,10 +464,18 @@ public class FeedFragment extends Fragment implements FeedAdapter.OnItemClickLis
 
                         if (!mPostList.contains(post)) {
                             mPostList.add(post);
-                            insertAdsInRecyclerView();
+                            nrPostsLoaded++;
+                            if (nrPostsLoaded >= 5) {
+                                insertAdsInRecyclerView();
+                                nrPostsLoaded = 0;
+                            }
                             mAdapter.notifyDataSetChanged();
                         } else {
-                            insertAdsInRecyclerView();
+                            nrPostsLoaded++;
+                            if (nrPostsLoaded >= 5) {
+                                insertAdsInRecyclerView();
+                                nrPostsLoaded = 0;
+                            }
                             mPostList.set(mPostList.indexOf(post), post);
                         }
                     }
@@ -467,7 +484,6 @@ public class FeedFragment extends Fragment implements FeedAdapter.OnItemClickLis
                         mLastQueriedDocument = queryDocumentSnapshots.getDocuments()
                                 .get(queryDocumentSnapshots.getDocuments().size() - 1);
                     }
-
 
                 } else {
                     Log.d(TAG, "onEvent: Querry result is null");

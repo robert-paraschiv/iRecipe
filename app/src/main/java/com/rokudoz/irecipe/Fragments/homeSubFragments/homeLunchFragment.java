@@ -265,6 +265,19 @@ public class homeLunchFragment extends Fragment implements RecipeAdapter.OnItemC
                                                         }
                                                     }
                                                 });
+                                                recipeRef.document(recipe.getDocumentId()).collection("Comments").addSnapshotListener(new EventListener<QuerySnapshot>() {
+                                                    @Override
+                                                    public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                                                        if (e != null) {
+                                                            Log.w(TAG, "onEvent: ", e);
+                                                            return;
+                                                        }
+                                                        if (queryDocumentSnapshots != null) {
+                                                            recipe.setNrOfComments(queryDocumentSnapshots.size());
+                                                            mAdapter.notifyDataSetChanged();
+                                                        }
+                                                    }
+                                                });
                                                 if (!mRecipeList.contains(recipe)) {
                                                     recipe.setNrOfMissingIngredients(numberOfMissingIngredients);
                                                     recipe.setMissingIngredients(missingIngredients);

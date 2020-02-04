@@ -18,35 +18,30 @@
             android:layout_width="35dp"
             android:layout_height="35dp"
             android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="4dp"
             tools:src="@color/colorPrimaryDark" />
 
         <TextView
             android:id="@+id/postItem_creator_name_textView"
+            style="@style/TextAppearance.MaterialComponents.Subtitle2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="@id/postItem_creator_image"
             android:layout_marginStart="4dp"
-            android:layout_marginTop="14dp"
+            android:layout_marginTop="2dp"
             android:layout_toEndOf="@id/postItem_creator_image"
             tools:text="Creator Name" />
 
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/recycler_view_postItem_Image_CardView"
-            android:layout_width="match_parent"
+        <TextView
+            android:id="@+id/recycler_view_postItem_recipeName"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/postItem_creator_image"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="4dp"
-            app:cardCornerRadius="18dp">
-
-            <ImageView
-                android:id="@+id/postItem_image"
-                android:layout_width="match_parent"
-                android:layout_height="460dp"
-                tools:src="@color/colorPrimary" />
-        </com.google.android.material.card.MaterialCardView>
-
+            android:layout_below="@id/postItem_creator_name_textView"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="4dp"
+            android:layout_toEndOf="@id/postItem_creator_image"
+            android:textSize="12sp"
+            tools:text="Recipe name here" />
 
         <TextView
             android:id="@+id/postItem_creationDate_text_view"
@@ -58,7 +53,21 @@
             android:textSize="12sp"
             tools:text="30 hours ago" />
 
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/recycler_view_postItem_Image_CardView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/recycler_view_postItem_recipeName"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="6dp"
+            app:cardCornerRadius="18dp">
 
+            <ImageView
+                android:id="@+id/postItem_image"
+                android:layout_width="match_parent"
+                android:layout_height="440dp"
+                tools:src="@color/colorPrimary" />
+        </com.google.android.material.card.MaterialCardView>
 
         <RelativeLayout
             android:id="@+id/recycler_view_relativeLayout"
@@ -72,10 +81,10 @@
                 style="@style/TextAppearance.MaterialComponents.Chip"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
                 android:layout_marginTop="14dp"
                 android:layout_marginEnd="4dp"
                 android:layout_toEndOf="@id/recycler_view_postItem_favorite"
-                android:layout_centerVertical="true"
                 tools:text="88" />
 
             <ImageView
@@ -92,27 +101,17 @@
                 android:id="@+id/recycler_view_postItem_recipeLayout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
                 android:layout_centerHorizontal="true"
-                >
+                android:layout_centerVertical="true">
 
                 <de.hdodenhof.circleimageview.CircleImageView
                     android:id="@+id/recycler_view_postItem_recipeImage"
-                    android:layout_centerVertical="true"
                     android:layout_width="30dp"
                     android:layout_height="30dp"
+                    android:layout_centerVertical="true"
                     android:visibility="gone"
                     tools:src="@color/colorPrimary" />
 
-                <TextView
-                    android:id="@+id/recycler_view_postItem_recipeName"
-                    android:layout_toEndOf="@id/recycler_view_postItem_recipeImage"
-                    android:layout_marginStart="6dp"
-                    android:layout_centerVertical="true"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    tools:text="Recipe name here"
-                    />
             </RelativeLayout>
 
 
@@ -129,12 +128,11 @@
 
             <ImageView
                 android:id="@+id/postItem_comment"
-                android:layout_centerVertical="true"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
                 android:layout_marginTop="12dp"
-                android:layout_marginEnd="8dp"
                 android:contentDescription="Post Comment"
                 android:src="@drawable/ic_mode_comment_black_24dp" />
 
@@ -149,8 +147,6 @@
             android:layout_marginStart="12dp"
             android:layout_marginEnd="8dp"
             tools:text="Description" />
-
-
 
     </RelativeLayout>
 </com.google.android.material.card.MaterialCardView>
