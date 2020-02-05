@@ -81,7 +81,7 @@
             android:layout_below="@id/recycler_view_recipeItem_Image_CardView"
             android:layout_marginTop="12dp"
             android:contentDescription="Post Comment"
-            android:src="@drawable/ic_mode_comment_black_24dp" />
+            android:src="@drawable/ic_baseline_chat_bubble_outline_24" />
 
 
         <TextView

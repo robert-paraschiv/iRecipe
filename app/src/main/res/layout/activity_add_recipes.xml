@@ -179,8 +179,55 @@
                 </RelativeLayout>
             </com.google.android.material.card.MaterialCardView>
 
+            <TextView
+                android:layout_marginTop="8dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:text="How much does it take to make this ?"
+                />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="4dp"
+                >
+                <EditText
+                    android:id="@+id/addRecipe_duration_editText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:inputType="number"
+                    android:hint="Duration"/>
+                <androidx.appcompat.widget.AppCompatSpinner
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/addRecipe_durationType_Spinner"
+                    android:entries="@array/DurationType"
+                    android:spinnerMode="dropdown"/>
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:text="How hard do you think it is to make this ?"
+                />
+            <androidx.appcompat.widget.AppCompatSpinner
+                android:layout_marginTop="4dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/addRecipe_complexity_Spinner"
+                android:entries="@array/Complexity"
+                android:spinnerMode="dropdown"/>
+
+
             <com.google.android.material.textfield.TextInputLayout
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
+                android:layout_marginTop="4dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="Keywords">

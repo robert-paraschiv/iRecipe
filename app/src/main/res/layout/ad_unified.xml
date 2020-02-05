@@ -31,6 +31,7 @@
                 android:id="@+id/ad_icon"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
+                android:scaleType="centerCrop"
                 android:layout_marginEnd="4dp"
                 tools:src="@color/colorPrimary" />
 
@@ -120,6 +121,22 @@
                 tools:text="Button text"
                 android:layout_below="@id/pricecard"
                 android:layout_centerHorizontal="true"/>
+            <ImageView
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:src="@drawable/ic_favorite_border_black_24dp"
+                android:layout_marginTop="4dp"
+                android:layout_below="@id/pricecard"
+                android:layout_alignParentStart="true"
+                />
+            <ImageView
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:src="@drawable/ic_mode_comment_black_24dp"
+                android:layout_marginTop="4dp"
+                android:layout_below="@id/pricecard"
+                android:layout_alignParentEnd="true"
+                />
         </RelativeLayout>
     </com.google.android.gms.ads.formats.UnifiedNativeAdView>
 

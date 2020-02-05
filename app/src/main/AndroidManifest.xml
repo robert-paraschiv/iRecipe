@@ -28,6 +28,7 @@
             android:screenOrientation="portrait"/>
         <activity android:name=".Account.LoginActivity"
             android:screenOrientation="portrait"/>
+        <activity android:name=".UpdateRecipesActivity"/>
         <activity
             android:name=".MainActivity"
             android:windowSoftInputMode="adjustPan"

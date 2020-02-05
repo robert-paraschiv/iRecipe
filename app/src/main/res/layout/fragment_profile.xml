@@ -8,14 +8,35 @@
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="40dp"
-        app:title="My Profile" />
+        android:layout_height="40dp">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:text="My Profile"
+                style="@style/TextAppearance.MaterialComponents.Headline6"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:layout_alignParentEnd="true"
+                android:layout_marginEnd="4dp"
+                android:id="@+id/profileFragment_signOut_materialButton"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:layout_width="25dp"
+                android:layout_height="35dp"
+                android:text="x"
+                android:textSize="12sp" />
+        </RelativeLayout>
+    </com.google.android.material.appbar.MaterialToolbar>
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/profileFragment_userDetails_MaterialCard"
-        android:layout_below="@id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_below="@id/toolbar"
         android:layout_centerHorizontal="true"
         android:layout_margin="8dp"
         app:cardCornerRadius="18dp">
@@ -33,73 +54,63 @@
                 app:civ_border_color="#FF000000"
                 app:civ_border_width="0.5dp"
                 tools:src="@drawable/ic_launcher_background" />
+
             <com.google.android.material.button.MaterialButton
+                android:id="@+id/profileFragment_changePic_Btn"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
                 android:layout_width="35dp"
                 android:layout_height="35dp"
-                android:id="@+id/profileFragment_changePic_Btn"
-                android:layout_marginTop="90dp"
                 android:layout_marginStart="80dp"
-                style="@style/Widget.MaterialComponents.Button.TextButton"
-                app:icon="@drawable/ic_add_a_photo_black_24dp"
-                />
+                android:layout_marginTop="90dp"
+                app:icon="@drawable/ic_add_a_photo_black_24dp" />
 
             <RelativeLayout
-                android:layout_width="wrap_content"
+                android:id="@+id/profileFragment_userDetailsLayout"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
                 android:layout_toEndOf="@id/profileFragment_profileImage">
 
                 <TextView
                     android:id="@+id/profileFragment_user_name_TextView"
+                    style="@style/TextAppearance.MaterialComponents.Headline6"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="30dp"
                     android:textSize="16sp"
-                    style="@style/TextAppearance.MaterialComponents.Headline6"
                     tools:text="Name" />
-
-                <com.google.android.material.button.MaterialButton
-                    android:layout_width="25dp"
-                    android:layout_height="35dp"
-                    android:id="@+id/profileFragment_signOut_materialButton"
-                    android:layout_alignParentEnd="true"
-                    style="@style/Widget.MaterialComponents.Button.TextButton"
-                    android:text="x"
-                    android:textSize="12sp"
-                    />
 
                 <TextView
                     android:id="@+id/profileFragment_userName_TextView"
+                    style="@style/TextAppearance.MaterialComponents.Caption"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_below="@id/profileFragment_user_name_TextView"
                     android:layout_marginStart="30dp"
                     android:textSize="15sp"
-                    style="@style/TextAppearance.MaterialComponents.Caption"
                     tools:text="UserName" />
 
                 <TextView
                     android:id="@+id/profileFragment_user_description_TextView"
+                    style="@style/TextAppearance.MaterialComponents.Headline2"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_below="@id/profileFragment_userName_TextView"
+                    android:layout_alignParentStart="true"
                     android:layout_marginStart="30dp"
                     android:layout_marginTop="8dp"
-                    android:layout_alignParentStart="true"
-                    style="@style/TextAppearance.MaterialComponents.Headline2"
                     android:textSize="14sp"
                     tools:text="Description" />
 
                 <com.google.android.material.button.MaterialButton
+                    android:id="@+id/profileFragment_editProfile_materialButton"
+                    style="@style/Widget.MaterialComponents.Button.TextButton"
                     android:layout_width="wrap_content"
                     android:layout_height="40dp"
+                    android:layout_below="@id/profileFragment_user_description_TextView"
                     android:layout_centerHorizontal="true"
                     android:layout_marginTop="8dp"
-                    android:id="@+id/profileFragment_editProfile_materialButton"
-                    android:layout_below="@id/profileFragment_user_description_TextView"
-                    style="@style/Widget.MaterialComponents.Button.TextButton"
-                    android:text="Edit Profile"
-                    />
+                    android:text="Edit Profile" />
             </RelativeLayout>
 
 
@@ -131,7 +142,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_below="@id/profileFragment_app_bar"
-            android:layout_marginTop="35dp"/>
+            android:layout_marginTop="35dp" />
     </com.google.android.material.card.MaterialCardView>
 
 

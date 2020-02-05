@@ -172,7 +172,12 @@ public class FeedFragment extends Fragment implements FeedAdapter.OnItemClickLis
 
             }
         }).build();
-        adLoader.loadAds(new AdRequest.Builder().addTestDevice("717A151EFF00FB99F1DBE6C94A2837BA").addTestDevice("06562AD747A6C127AD23FE62AFCEF0E4").build(), NUMBER_OF_ADS);
+        adLoader.loadAds(new AdRequest.Builder()
+                .addTestDevice("717A151EFF00FB99F1DBE6C94A2837BA")
+                .addTestDevice("06562AD747A6C127AD23FE62AFCEF0E4")
+                .addTestDevice("6BC23AEACA857DDF15F1B0BA94497105")
+                .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
+                .build(), NUMBER_OF_ADS);
     }
 
     private void insertAdsInRecyclerView() {

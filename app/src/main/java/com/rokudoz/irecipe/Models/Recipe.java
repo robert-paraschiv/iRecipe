@@ -12,6 +12,9 @@ public class Recipe implements Comparable<Recipe> {
     private String description;
     private List<String> keywords;
     private List<String> imageUrls_list;
+    private String complexity;
+    private Float duration;
+    private String durationType;
     private Float avg_rating;
     private Boolean isFavorite;
     private String privacy;
@@ -26,7 +29,7 @@ public class Recipe implements Comparable<Recipe> {
     }
 
     public Recipe(String title, String creator_docId, String category, String description, List<String> keywords
-            , List<String> imageUrls_list, Float avg_rating, Boolean isFavorite, String privacy) {
+            , List<String> imageUrls_list, String complexity, Float duration, String durationType, Float avg_rating, Boolean isFavorite, String privacy) {
 
         if (title.trim().equals("")) {
             title = "No Title";
@@ -37,6 +40,9 @@ public class Recipe implements Comparable<Recipe> {
         this.description = description;
         this.keywords = keywords;
         this.imageUrls_list = imageUrls_list;
+        this.complexity = complexity;
+        this.duration = duration;
+        this.durationType = durationType;
         this.avg_rating = avg_rating;
         this.isFavorite = isFavorite;
         this.privacy = privacy;
@@ -85,6 +91,30 @@ public class Recipe implements Comparable<Recipe> {
 
     public void setMissingIngredients(List<String> missingIngredients) {
         this.missingIngredients = missingIngredients;
+    }
+
+    public String getComplexity() {
+        return complexity;
+    }
+
+    public void setComplexity(String complexity) {
+        this.complexity = complexity;
+    }
+
+    public Float getDuration() {
+        return duration;
+    }
+
+    public void setDuration(Float duration) {
+        this.duration = duration;
+    }
+
+    public String getDurationType() {
+        return durationType;
+    }
+
+    public void setDurationType(String durationType) {
+        this.durationType = durationType;
     }
 
     public String getTitle() {
@@ -169,9 +199,16 @@ public class Recipe implements Comparable<Recipe> {
                 ", description='" + description + '\'' +
                 ", keywords=" + keywords +
                 ", imageUrls_list=" + imageUrls_list +
+                ", complexity='" + complexity + '\'' +
+                ", duration=" + duration +
+                ", durationType='" + durationType + '\'' +
                 ", avg_rating=" + avg_rating +
                 ", isFavorite=" + isFavorite +
                 ", privacy='" + privacy + '\'' +
+                ", nrOfMissingIngredients=" + nrOfMissingIngredients +
+                ", missingIngredients=" + missingIngredients +
+                ", nrOfLikes=" + nrOfLikes +
+                ", nrOfComments=" + nrOfComments +
                 '}';
     }
 

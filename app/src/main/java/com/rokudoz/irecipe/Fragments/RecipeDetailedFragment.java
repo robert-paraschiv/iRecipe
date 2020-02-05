@@ -107,7 +107,7 @@ public class RecipeDetailedFragment extends Fragment implements RecipeInstructio
     private NestedScrollView nestedScrollView;
 
     private MaterialButton mDeleteRecipeBtn;
-    private TextView tvTitle, tvDescription, tvIngredients, mFavoriteNumber, tvMissingIngredientsNumber, tvCreatorName;
+    private TextView tvTitle, tvDescription, mFavoriteNumber, tvMissingIngredientsNumber, tvCreatorName, tvDuration, tvComplexity;
     private ImageView mFavoriteIcon;
     private CircleImageView mCreatorImage;
     private Button mAddCommentBtn;
@@ -154,12 +154,12 @@ public class RecipeDetailedFragment extends Fragment implements RecipeInstructio
         mDeleteRecipeBtn = view.findViewById(R.id.recipeDetailed_deleteRecipe_MaterialBtn);
         tvCreatorName = view.findViewById(R.id.recipeDetailed_creatorName_TextView);
         mCreatorImage = view.findViewById(R.id.recipeDetailed_creatorImage_ImageView);
+        tvDuration = view.findViewById(R.id.recipeDetailed_duration);
+        tvComplexity = view.findViewById(R.id.recipeDetailed_complexity);
         mAddMissingIngredientsFAB.hide();
-
 
         RecipeDetailedFragmentArgs recipeDetailedFragmentArgs = RecipeDetailedFragmentArgs.fromBundle(getArguments());
         getRecipeArgsPassed(recipeDetailedFragmentArgs);
-
 
         DocumentReference currentRecipeRef = recipeRef.document(documentID);
         final CollectionReference currentRecipeSubCollection = currentRecipeRef.collection("UsersWhoFaved");
@@ -181,7 +181,6 @@ public class RecipeDetailedFragment extends Fragment implements RecipeInstructio
                 }
             }
         });
-
 
         mAddCommentBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -214,8 +213,6 @@ public class RecipeDetailedFragment extends Fragment implements RecipeInstructio
                     Toast.makeText(getContext(), "Added " + title + " to favorites", Toast.LENGTH_SHORT).show();
                     Log.d(TAG, "onClick: ADDED + " + title + " " + documentID + " to favorites");
                 }
-
-
             }
         });
 
@@ -248,7 +245,6 @@ public class RecipeDetailedFragment extends Fragment implements RecipeInstructio
         super.onStop();
         DetatchFirestoreListeners();
         Log.d(TAG, "onStop: ");
-
     }
 
     private void DetatchFirestoreListeners() {
@@ -322,7 +318,6 @@ public class RecipeDetailedFragment extends Fragment implements RecipeInstructio
         commentRecyclerView.setLayoutManager(commentLayoutManager);
         commentRecyclerView.setAdapter(commentAdapter);
 
-
         instructionsRecyclewView.setHasFixedSize(true);
         instructionsLayoutManager = new LinearLayoutManager(getContext());
         instructionsAdapter = new RecipeInstructionsAdapter(recipeInstructionList);
@@ -371,9 +366,7 @@ public class RecipeDetailedFragment extends Fragment implements RecipeInstructio
                                     Log.d(TAG, "onEvent: currrent commentID " + document.getId());
                                     newItemsToAdd.add(document.getId());
                                     commentAdapter.notifyDataSetChanged();
-
                                 }
-
                             }
                             if (queryDocumentSnapshots.getDocuments().size() != 0) {
                                 mLastQueriedDocument = queryDocumentSnapshots.getDocuments()
@@ -384,31 +377,34 @@ public class RecipeDetailedFragment extends Fragment implements RecipeInstructio
                         Log.d(TAG, "onEvent: querrysize " + queryDocumentSnapshots.size() + " ListSize: " + commentList.size());
                     }
                 });
-
-
     }
 
     private void getCurrentUserDetails(final View view) {
-        usersRef.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+        usersRef.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).addSnapshotListener(new EventListener<DocumentSnapshot>() {
             @Override
-            public void onSuccess(DocumentSnapshot documentSnapshot) {
-
+            public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
+                if (e != null) {
+                    Log.w(TAG, "onEvent: ", e);
+                    return;
+                }
                 mUser = documentSnapshot.toObject(User.class);
                 currentUserImageUrl = mUser.getUserProfilePicUrl();
                 currentUserName = mUser.getName();
                 loggedInUserDocumentId = documentSnapshot.getId();
 
-
                 getUserIngredientList(mUser.getUser_id(), view);
-
             }
         });
     }
 
     private void getUserIngredientList(String user_id, final View view) {
-        usersRef.document(user_id).collection("Ingredients").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+        usersRef.document(user_id).collection("Ingredients").addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
-            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                if (e != null) {
+                    Log.w(TAG, "onEvent: ", e);
+                    return;
+                }
                 for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
                     Ingredient ingredient = documentSnapshot.toObject(Ingredient.class);
                     if (!userIngredientList.contains(ingredient)) {
@@ -421,10 +417,13 @@ public class RecipeDetailedFragment extends Fragment implements RecipeInstructio
     }
 
     private void getUserShoppingList(final String userDocId, final View view) {
-
-        usersRef.document(userDocId).collection("ShoppingList").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+        usersRef.document(userDocId).collection("ShoppingList").addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
-            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                if (e != null) {
+                    Log.w(TAG, "onEvent: ", e);
+                    return;
+                }
                 for (DocumentChange documentSnapshot : queryDocumentSnapshots.getDocumentChanges()) {
                     Ingredient ingredient = documentSnapshot.getDocument().toObject(Ingredient.class);
                     if (!userShoppingIngredientList.contains(ingredient)) {
@@ -435,92 +434,96 @@ public class RecipeDetailedFragment extends Fragment implements RecipeInstructio
                 getRecipeDocument(view);
             }
         });
+
     }
 
     private void getRecipeDocument(final View view) {
-
-        recipeRef.document(documentID).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+        recipeRef.document(documentID).addSnapshotListener(new EventListener<DocumentSnapshot>() {
             @Override
-            public void onSuccess(DocumentSnapshot documentSnapshot) {
-                Recipe recipe = documentSnapshot.toObject(Recipe.class);
-                if (recipe.getTitle() != null) {
-                    title = recipe.getTitle();
-                    tvTitle.setText(title);
+            public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
+                if (e != null) {
+                    Log.w(TAG, "onEvent: ", e);
+                    return;
                 }
-                if (recipe.getDescription() != null) {
-                    String description = recipe.getDescription();
-                    tvDescription.setText(description);
-                }
-
-                if (recipe.getImageUrls_list() != null) {
-                    imageUrls = recipe.getImageUrls_list();
-                }
-                if (recipeDetailedViewPagerAdapter != null) {
-                    recipeDetailedViewPagerAdapter.notifyDataSetChanged();
-                }
-                recipeRef.document(documentID).collection("UsersWhoFaved").addSnapshotListener(new EventListener<QuerySnapshot>() {
-                    @Override
-                    public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
-                        if (e != null) {
-                            Log.w(TAG, "onEvent: ", e);
-                            return;
-                        }
-                        Boolean fav = false;
-                        for (QueryDocumentSnapshot documentSnapshot1 : queryDocumentSnapshots) {
-                            if (documentSnapshot1.getId().equals(loggedInUserDocumentId)) {
-                                fav = true;
-                            }
-                        }
-                        isRecipeFavorite = fav;
-                        setFavoriteIcon(isRecipeFavorite);
+                if (documentSnapshot != null) {
+                    Recipe recipe = documentSnapshot.toObject(Recipe.class);
+                    if (recipe.getTitle() != null) {
+                        title = recipe.getTitle();
+                        tvTitle.setText(title);
                     }
-                });
-
-                ////////////////////////////////////////////////////////// LOGIC TO GET RECIPES INGREDIENTS AND INSTRUCTIONS HERE
-
-
-                if (recipe.getCreator_docId() != null && recipe.getCreator_docId().equals(mUser.getUser_id())) {
-                    mDeleteRecipeBtn.setVisibility(View.VISIBLE);
-                    mDeleteRecipeBtn.setOnClickListener(new View.OnClickListener() {
+                    if (recipe.getDuration() != null && recipe.getDurationType() != null) {
+                        tvDuration.setText("" + recipe.getDuration() + " " + recipe.getDurationType());
+                    }
+                    if (recipe.getComplexity() != null) {
+                        tvComplexity.setText("Complexity: " + recipe.getComplexity());
+                    }
+                    if (recipe.getDescription() != null) {
+                        String description = recipe.getDescription();
+                        tvDescription.setText(description);
+                    }
+                    if (recipe.getImageUrls_list() != null) {
+                        imageUrls = recipe.getImageUrls_list();
+                    }
+                    if (recipeDetailedViewPagerAdapter != null) {
+                        recipeDetailedViewPagerAdapter.notifyDataSetChanged();
+                    }
+                    recipeRef.document(documentID).collection("UsersWhoFaved").addSnapshotListener(new EventListener<QuerySnapshot>() {
                         @Override
-                        public void onClick(View v) {
-                            MaterialAlertDialogBuilder materialAlertDialogBuilder = new MaterialAlertDialogBuilder(getActivity(), R.style.ThemeOverlay_MaterialComponents_MaterialAlertDialog_Centered);
-                            materialAlertDialogBuilder.setMessage("Are you sure you want to delete your recipe?");
-                            materialAlertDialogBuilder.setCancelable(true);
-                            materialAlertDialogBuilder.setPositiveButton(
-                                    "Yes",
-                                    new DialogInterface.OnClickListener() {
-                                        public void onClick(DialogInterface dialog, int id) {
-                                            recipeRef.document(documentID).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                @Override
-                                                public void onSuccess(Void aVoid) {
-                                                    Toast.makeText(getActivity(), "Successfully deleted", Toast.LENGTH_SHORT).show();
-                                                    Navigation.findNavController(view).popBackStack();
-                                                }
-                                            });
-                                            dialog.cancel();
-                                        }
-                                    });
-
-                            materialAlertDialogBuilder.setNegativeButton(
-                                    "No",
-                                    new DialogInterface.OnClickListener() {
-                                        public void onClick(DialogInterface dialog, int id) {
-                                            dialog.cancel();
-                                        }
-                                    });
-
-                            materialAlertDialogBuilder.show();
-
-
+                        public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                            if (e != null) {
+                                Log.w(TAG, "onEvent: ", e);
+                                return;
+                            }
+                            Boolean fav = false;
+                            for (QueryDocumentSnapshot documentSnapshot1 : queryDocumentSnapshots) {
+                                if (documentSnapshot1.getId().equals(loggedInUserDocumentId)) {
+                                    fav = true;
+                                }
+                            }
+                            isRecipeFavorite = fav;
+                            setFavoriteIcon(isRecipeFavorite);
                         }
                     });
+
+                    ////////////////////////////////////////////////////////// LOGIC TO GET RECIPES INGREDIENTS AND INSTRUCTIONS HERE
+                    if (recipe.getCreator_docId() != null && recipe.getCreator_docId().equals(mUser.getUser_id())) {
+                        mDeleteRecipeBtn.setVisibility(View.VISIBLE);
+                        mDeleteRecipeBtn.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                MaterialAlertDialogBuilder materialAlertDialogBuilder = new MaterialAlertDialogBuilder(getActivity(), R.style.ThemeOverlay_MaterialComponents_MaterialAlertDialog_Centered);
+                                materialAlertDialogBuilder.setMessage("Are you sure you want to delete your recipe?");
+                                materialAlertDialogBuilder.setCancelable(true);
+                                materialAlertDialogBuilder.setPositiveButton(
+                                        "Yes",
+                                        new DialogInterface.OnClickListener() {
+                                            public void onClick(DialogInterface dialog, int id) {
+                                                recipeRef.document(documentID).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                    @Override
+                                                    public void onSuccess(Void aVoid) {
+                                                        Toast.makeText(getActivity(), "Successfully deleted", Toast.LENGTH_SHORT).show();
+                                                        Navigation.findNavController(view).popBackStack();
+                                                    }
+                                                });
+                                                dialog.cancel();
+                                            }
+                                        });
+                                materialAlertDialogBuilder.setNegativeButton(
+                                        "No",
+                                        new DialogInterface.OnClickListener() {
+                                            public void onClick(DialogInterface dialog, int id) {
+                                                dialog.cancel();
+                                            }
+                                        });
+                                materialAlertDialogBuilder.show();
+                            }
+                        });
+                    }
+                    getRecipeCreatorDetails(recipe.getCreator_docId());
+                    getRecipeIngredients();
+
+                    setupViewPager(view);
                 }
-
-                getRecipeCreatorDetails(recipe.getCreator_docId());
-                getRecipeIngredients();
-
-                setupViewPager(view);
             }
         });
 

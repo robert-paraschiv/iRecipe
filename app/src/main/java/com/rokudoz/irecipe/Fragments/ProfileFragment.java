@@ -20,6 +20,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.MimeTypeMap;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -67,6 +68,7 @@ public class ProfileFragment extends Fragment {
     private TextView UserDescriptionTv;
     private CircleImageView mProfileImage;
     private MaterialButton mSignOutBtn, mEditProfileBtn, mAddPhotoBtn;
+    private RelativeLayout userDetailsLayout;
 
     private ViewPager viewPager;
 
@@ -99,7 +101,7 @@ public class ProfileFragment extends Fragment {
         mSignOutBtn = view.findViewById(R.id.profileFragment_signOut_materialButton);
         mEditProfileBtn = view.findViewById(R.id.profileFragment_editProfile_materialButton);
         mAddPhotoBtn = view.findViewById(R.id.profileFragment_changePic_Btn);
-
+        userDetailsLayout = view.findViewById(R.id.profileFragment_userDetailsLayout);
         //Tab layout
         viewPager = view.findViewById(R.id.profileFragment_container);
         setupViewPager(viewPager);
@@ -124,6 +126,12 @@ public class ProfileFragment extends Fragment {
                         getActivity().finish();
                     }
                 });
+            }
+        });
+        userDetailsLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Navigation.findNavController(view).navigate(ProfileFragmentDirections.actionProfileFragmentToProfileEditProfile());
             }
         });
         mEditProfileBtn.setOnClickListener(new View.OnClickListener() {
