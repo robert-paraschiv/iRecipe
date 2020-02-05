@@ -74,7 +74,8 @@
                 android:id="@+id/recipeDetailed_complexityLayout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/imageview_favorite_icon"
+                android:layout_below="@id/recipeDetailed_numberOfFaved"
+                android:layout_marginTop="4dp"
                 android:layout_centerHorizontal="true">
 
                 <ImageView
@@ -109,7 +110,7 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/recipeDetailed_complexityLayout"
                 android:layout_marginStart="16dp"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="14dp"
                 tools:text="TitleHere" />
 
             <TextView
@@ -150,6 +151,7 @@
                 android:layout_marginTop="14dp"
                 android:layout_marginEnd="4dp"
                 android:layout_toEndOf="@id/imageview_favorite_icon"
+                android:layout_toStartOf="@id/recipeDetailed_creatorImage_ImageView"
                 tools:text="88" />
 
             <com.google.android.material.button.MaterialButton

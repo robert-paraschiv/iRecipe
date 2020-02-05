@@ -216,14 +216,43 @@ public class RecipeDetailedFragment extends Fragment implements RecipeInstructio
             }
         });
 
-        numberofFavListener = currentRecipeSubCollection.addSnapshotListener(new EventListener<QuerySnapshot>() {
+        currentRecipeSubCollection.orderBy("mFaveTimestamp", Query.Direction.DESCENDING).addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
-            public void onEvent(@javax.annotation.Nullable QuerySnapshot queryDocumentSnapshots, @javax.annotation.Nullable FirebaseFirestoreException e) {
+            public void onEvent(@javax.annotation.Nullable final QuerySnapshot queryDocumentSnapshots, @javax.annotation.Nullable FirebaseFirestoreException e) {
                 if (e != null) {
                     return;
                 }
-                numberOfFav = queryDocumentSnapshots.size();
-                mFavoriteNumber.setText(Integer.toString(numberOfFav));
+                if (queryDocumentSnapshots != null) {
+                    if (queryDocumentSnapshots.size() > 0) {
+
+                        UserWhoFaved userWhoFaved = queryDocumentSnapshots.getDocuments().get(0).toObject(UserWhoFaved.class);
+                        usersRef.document(userWhoFaved.getUserID()).addSnapshotListener(new EventListener<DocumentSnapshot>() {
+                            @Override
+                            public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
+                                if (e != null) {
+                                    Log.w(TAG, "onEvent: ", e);
+                                    return;
+                                }
+                                if (documentSnapshot != null) {
+                                    User user = documentSnapshot.toObject(User.class);
+                                    StringBuilder favText = new StringBuilder();
+
+                                    if (queryDocumentSnapshots.size() > 1) {
+                                        favText.append(user.getName());
+                                        favText.append("\n and ").append(queryDocumentSnapshots.size() - 1).append(" others ");
+                                    } else {
+                                        favText.append(user.getName());
+                                    }
+                                    mFavoriteNumber.setText(favText);
+                                }
+                            }
+                        });
+                    } else {
+                        mFavoriteNumber.setText("" + 0);
+                    }
+                } else {
+                    mFavoriteNumber.setText("" + 0);
+                }
             }
         });
 
