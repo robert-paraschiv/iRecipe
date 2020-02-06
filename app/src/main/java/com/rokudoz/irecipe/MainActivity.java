@@ -1,5 +1,6 @@
 package com.rokudoz.irecipe;
 
+import com.google.android.gms.ads.MobileAds;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.rokudoz.irecipe.Fragments.FeedFragmentDirections;
 
@@ -22,7 +23,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        MobileAds.initialize(this, getResources().getString(R.string.admob_app_id));
 
         setUpNavigation();
 
