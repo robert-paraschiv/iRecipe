@@ -125,24 +125,6 @@ public class PostDetailedFragment extends Fragment {
         DocumentReference currentRecipeRef = postsRef.document(documentID);
         final CollectionReference currentRecipeSubCollection = currentRecipeRef.collection("UsersWhoFaved");
 
-
-        numberofFavListener = currentRecipeSubCollection.addSnapshotListener(new EventListener<QuerySnapshot>() {
-            @Override
-            public void onEvent(@javax.annotation.Nullable QuerySnapshot queryDocumentSnapshots, @javax.annotation.Nullable FirebaseFirestoreException e) {
-                if (e != null) {
-                    return;
-                }
-                int numberOfFav = queryDocumentSnapshots.size();
-                postFavoriteNumber.setText(Integer.toString(numberOfFav));
-                postFavoriteNumber.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Navigation.findNavController(view).navigate(PostDetailedFragmentDirections.actionPostDetailedToUsersWhoLiked(documentID,"Posts"));
-                    }
-                });
-            }
-        });
-
         addCommentBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -162,6 +144,58 @@ public class PostDetailedFragment extends Fragment {
                 }
             }
         });
+
+        //Get post number of likes
+        numberofFavListener = currentRecipeSubCollection.orderBy("mFaveTimestamp", Query.Direction.DESCENDING)
+                .addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@javax.annotation.Nullable final QuerySnapshot queryDocumentSnapshots, @javax.annotation.Nullable FirebaseFirestoreException e) {
+                if (e != null) {
+                    return;
+                }
+                if (queryDocumentSnapshots != null) {
+                    if (queryDocumentSnapshots.size() > 0) {
+                        UserWhoFaved userWhoFaved = queryDocumentSnapshots.getDocuments().get(0).toObject(UserWhoFaved.class);
+                        usersRef.document(userWhoFaved.getUserID()).addSnapshotListener(new EventListener<DocumentSnapshot>() {
+                            @Override
+                            public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
+                                if (e != null) {
+                                    Log.w(TAG, "onEvent: ", e);
+                                    return;
+                                }
+                                if (documentSnapshot != null) {
+                                    User user = documentSnapshot.toObject(User.class);
+                                    StringBuilder favText = new StringBuilder();
+
+                                    if (queryDocumentSnapshots.size() == 1) {
+                                        favText.append(user.getName()).append(" likes this");
+                                    } else if (queryDocumentSnapshots.size() == 2) {
+                                        favText.append(user.getName());
+                                        favText.append(" and ").append(queryDocumentSnapshots.size() - 1).append(" other");
+                                    } else if (queryDocumentSnapshots.size() > 2) {
+                                        favText.append(user.getName());
+                                        favText.append(" and ").append(queryDocumentSnapshots.size() - 1).append(" others");
+                                    }
+                                    postFavoriteNumber.setText(favText);
+                                    postFavoriteNumber.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View v) {
+                                            Navigation.findNavController(view).navigate(PostDetailedFragmentDirections
+                                                    .actionPostDetailedToUsersWhoLiked(documentID, "Posts"));
+                                        }
+                                    });
+                                }
+                            }
+                        });
+                    } else {
+                        postFavoriteNumber.setText("" + 0);
+                    }
+                } else {
+                    postFavoriteNumber.setText("" + 0);
+                }
+            }
+        });
+
 
         buildRecyclerView();
         getCommentsFromDb();
@@ -199,7 +233,8 @@ public class PostDetailedFragment extends Fragment {
     private void addComment() {
         String commentText = commentEditText.getText().toString();
 
-        final Comment comment = new Comment(documentID, FirebaseAuth.getInstance().getCurrentUser().getUid(), mUser.getName(), mUser.getUserProfilePicUrl(), commentText, null);
+        final Comment comment = new Comment(documentID, FirebaseAuth.getInstance().getCurrentUser().getUid(), mUser.getName()
+                , mUser.getUserProfilePicUrl(), commentText, null);
         DocumentReference currentRecipeRef = postsRef.document(documentID);
         CollectionReference commentRef = currentRecipeRef.collection("Comments");
 
@@ -302,7 +337,8 @@ public class PostDetailedFragment extends Fragment {
                         creatorImage.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                Navigation.findNavController(view).navigate(PostDetailedFragmentDirections.actionPostDetailedToUserProfileFragment2(post.getCreatorId()));
+                                Navigation.findNavController(view).navigate(PostDetailedFragmentDirections
+                                        .actionPostDetailedToUserProfileFragment2(post.getCreatorId()));
                             }
                         });
                     }
@@ -385,7 +421,8 @@ public class PostDetailedFragment extends Fragment {
                     recipeLayout.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            Navigation.findNavController(view).navigate(PostDetailedFragmentDirections.actionPostDetailedToRecipeDetailedFragment(post.getReferenced_recipe_docId()));
+                            Navigation.findNavController(view).navigate(PostDetailedFragmentDirections
+                                    .actionPostDetailedToRecipeDetailedFragment(post.getReferenced_recipe_docId()));
                         }
                     });
 

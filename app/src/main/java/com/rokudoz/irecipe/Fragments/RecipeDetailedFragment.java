@@ -216,6 +216,7 @@ public class RecipeDetailedFragment extends Fragment implements RecipeInstructio
             }
         });
 
+        //Get recipe number of likes
         currentRecipeSubCollection.orderBy("mFaveTimestamp", Query.Direction.DESCENDING).addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@javax.annotation.Nullable final QuerySnapshot queryDocumentSnapshots, @javax.annotation.Nullable FirebaseFirestoreException e) {
@@ -224,7 +225,6 @@ public class RecipeDetailedFragment extends Fragment implements RecipeInstructio
                 }
                 if (queryDocumentSnapshots != null) {
                     if (queryDocumentSnapshots.size() > 0) {
-
                         UserWhoFaved userWhoFaved = queryDocumentSnapshots.getDocuments().get(0).toObject(UserWhoFaved.class);
                         usersRef.document(userWhoFaved.getUserID()).addSnapshotListener(new EventListener<DocumentSnapshot>() {
                             @Override
@@ -237,18 +237,21 @@ public class RecipeDetailedFragment extends Fragment implements RecipeInstructio
                                     User user = documentSnapshot.toObject(User.class);
                                     StringBuilder favText = new StringBuilder();
 
-                                    if (queryDocumentSnapshots.size() > 1) {
+                                    if (queryDocumentSnapshots.size() == 1) {
+                                        favText.append(user.getName()).append(" likes this");
+                                    } else if (queryDocumentSnapshots.size() == 2) {
                                         favText.append(user.getName());
-                                        favText.append("\n and ").append(queryDocumentSnapshots.size() - 1).append(" others ");
-                                    } else {
+                                        favText.append(" and ").append(queryDocumentSnapshots.size() - 1).append(" other");
+                                    } else if (queryDocumentSnapshots.size() > 2) {
                                         favText.append(user.getName());
+                                        favText.append(" and ").append(queryDocumentSnapshots.size() - 1).append(" others");
                                     }
                                     mFavoriteNumber.setText(favText);
                                     mFavoriteNumber.setOnClickListener(new View.OnClickListener() {
                                         @Override
                                         public void onClick(View v) {
                                             Navigation.findNavController(view).navigate(RecipeDetailedFragmentDirections
-                                                    .actionRecipeDetailedFragmentToUsersWhoLiked(documentID,"Recipes"));
+                                                    .actionRecipeDetailedFragmentToUsersWhoLiked(documentID, "Recipes"));
                                         }
                                     });
                                 }

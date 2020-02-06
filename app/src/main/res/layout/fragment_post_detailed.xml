@@ -85,13 +85,13 @@
 
             <TextView
                 android:id="@+id/postDetailed_numberOfFaved"
-                style="@style/TextAppearance.MaterialComponents.Chip"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/postDetailed_ImageView_Card"
                 android:layout_marginStart="4dp"
                 android:layout_marginTop="14dp"
                 android:layout_toEndOf="@id/postDetailed_imageView_favorite_icon"
+                android:layout_toStartOf="@id/postDetailed_recipeLayout"
                 tools:text="88" />
 
             <RelativeLayout
@@ -99,14 +99,16 @@
                 android:layout_width="wrap_content"
                 android:layout_height="35dp"
                 android:layout_below="@id/postDetailed_ImageView_Card"
-                android:layout_centerHorizontal="true"
-                android:layout_marginTop="8dp">
+                android:layout_alignParentEnd="true"
+                android:layout_marginTop="4dp">
 
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/postDetailed_recipeImage_CardView"
+                    android:layout_toEndOf="@id/postDetailed_recipe_name_TextView"
                     android:layout_width="50dp"
                     android:layout_height="35dp"
-                    android:layout_marginStart="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginTop="4dp"
                     app:cardCornerRadius="8dp">
 
                     <ImageView
@@ -123,7 +125,6 @@
                     android:layout_centerVertical="true"
                     android:layout_marginStart="8dp"
                     android:layout_marginEnd="8dp"
-                    android:layout_toEndOf="@id/postDetailed_recipeImage_CardView"
                     tools:text="Recipe name" />
             </RelativeLayout>
 
@@ -133,9 +134,9 @@
                 style="@style/TextAppearance.AppCompat"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/postDetailed_recipeLayout"
+                android:layout_below="@+id/postDetailed_editPost_MaterialBtn"
                 android:layout_marginStart="16dp"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="14dp"
                 android:layout_marginEnd="8dp"
                 tools:text="Description Here lmao it can have more text    k                 k k k k kkkkk \n
                  than you think lol wtf kkkkkkkkkkkkkkkkkkkkk" />
@@ -145,7 +146,7 @@
                 style="@style/Widget.MaterialComponents.Button.TextButton"
                 android:layout_width="33dp"
                 android:layout_height="33dp"
-                android:layout_below="@id/postDetailed_ImageView_Card"
+                android:layout_below="@id/postDetailed_recipeLayout"
                 android:layout_alignParentEnd="true"
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="8dp"

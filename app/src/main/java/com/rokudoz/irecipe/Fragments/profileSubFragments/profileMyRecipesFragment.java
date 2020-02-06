@@ -193,6 +193,19 @@ public class profileMyRecipesFragment extends Fragment implements RecipeAdapter.
                                     }
                                 }
                             });
+                            recipeRef.document(recipe.getDocumentId()).collection("Comments").addSnapshotListener(new EventListener<QuerySnapshot>() {
+                                @Override
+                                public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                                    if (e != null) {
+                                        Log.w(TAG, "onEvent: ", e);
+                                        return;
+                                    }
+                                    if (queryDocumentSnapshots != null) {
+                                        recipe.setNrOfComments(queryDocumentSnapshots.size());
+                                        mAdapter.notifyDataSetChanged();
+                                    }
+                                }
+                            });
                             ////////////////////////////////////////////////////////// LOGIC TO GET RECIPES HERE
 
                             mRecipeList.add(recipe);
@@ -213,6 +226,19 @@ public class profileMyRecipesFragment extends Fragment implements RecipeAdapter.
                                         }
                                         recipe.setFavorite(fav);
                                         recipe.setNrOfLikes(queryDocumentSnapshots.size());
+                                        mAdapter.notifyDataSetChanged();
+                                    }
+                                }
+                            });
+                            recipeRef.document(recipe.getDocumentId()).collection("Comments").addSnapshotListener(new EventListener<QuerySnapshot>() {
+                                @Override
+                                public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                                    if (e != null) {
+                                        Log.w(TAG, "onEvent: ", e);
+                                        return;
+                                    }
+                                    if (queryDocumentSnapshots != null) {
+                                        recipe.setNrOfComments(queryDocumentSnapshots.size());
                                         mAdapter.notifyDataSetChanged();
                                     }
                                 }
