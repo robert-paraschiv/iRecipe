@@ -4,6 +4,7 @@ package com.rokudoz.irecipe.Fragments;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -30,6 +31,7 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.rokudoz.irecipe.Models.Comment;
+import com.rokudoz.irecipe.Models.User;
 import com.rokudoz.irecipe.R;
 import com.rokudoz.irecipe.Utils.Adapters.PostParentCommentAdapter;
 
@@ -42,8 +44,8 @@ import java.util.Objects;
 public class PostComments extends Fragment {
     private static final String TAG = "PostComments";
 
-    private String documentID ="";
-    private String loggedInUserId ="";
+    private String documentID = "";
+    private String loggedInUserId = "";
 
     private MaterialButton addCommentBtn;
     private TextInputEditText commentTextInput;
@@ -61,6 +63,8 @@ public class PostComments extends Fragment {
     private CollectionReference recipeRef = db.collection("Recipes");
     private CollectionReference usersRef = db.collection("Users");
     private CollectionReference postsRef = db.collection("Posts");
+
+    private User mUser = new User();
 
     private View view;
 
@@ -90,6 +94,14 @@ public class PostComments extends Fragment {
             }
         });
 
+        usersRef.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).addSnapshotListener(new EventListener<DocumentSnapshot>() {
+            @Override
+            public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
+                if (e == null && documentSnapshot != null) {
+                    mUser = documentSnapshot.toObject(User.class);
+                }
+            }
+        });
 
         buildRecyclerView();
         getCommentsFromDb();
@@ -123,7 +135,7 @@ public class PostComments extends Fragment {
     private void addComment() {
         String commentText = Objects.requireNonNull(commentTextInput.getText()).toString();
 
-        final Comment comment = new Comment(documentID, FirebaseAuth.getInstance().getCurrentUser().getUid(), commentText, null);
+        final Comment comment = new Comment(documentID, FirebaseAuth.getInstance().getCurrentUser().getUid(), mUser.getName(), mUser.getUserProfilePicUrl(), commentText, null);
         DocumentReference currentRecipeRef = postsRef.document(documentID);
         CollectionReference commentRef = currentRecipeRef.collection("Comments");
 

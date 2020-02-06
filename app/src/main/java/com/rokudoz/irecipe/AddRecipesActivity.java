@@ -38,7 +38,10 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
@@ -49,6 +52,7 @@ import com.google.firebase.storage.UploadTask;
 import com.rokudoz.irecipe.Models.Ingredient;
 import com.rokudoz.irecipe.Models.Instruction;
 import com.rokudoz.irecipe.Models.Recipe;
+import com.rokudoz.irecipe.Models.User;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -66,6 +70,8 @@ public class AddRecipesActivity extends AppCompatActivity {
     private CollectionReference usersReference = db.collection("Users");
     private CollectionReference ingredientsReference = db.collection("Ingredients");
     private StorageReference mStorageRef = FirebaseStorage.getInstance().getReference("RecipePhotos");
+
+    private User mUser = new User();
 
     private static final int SELECT_PICTURES = 1;
     private static final int RECIPE_PICTURE = 0;
@@ -169,6 +175,14 @@ public class AddRecipesActivity extends AppCompatActivity {
             }
         });
 
+        usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).addSnapshotListener(new EventListener<DocumentSnapshot>() {
+            @Override
+            public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
+                if (e == null && documentSnapshot != null) {
+                    mUser = documentSnapshot.toObject(User.class);
+                }
+            }
+        });
     }
 
 
@@ -408,7 +422,8 @@ public class AddRecipesActivity extends AppCompatActivity {
         }
 
 
-        Recipe recipe = new Recipe(title, creator_docId, category, description, keywords, imageUrls_list, complexity, duration, durationType, 0f, isFavorite, privacy);
+        Recipe recipe = new Recipe(title, creator_docId, mUser.getName(), mUser.getUserProfilePicUrl(), category, description, keywords
+                , imageUrls_list, complexity, duration, durationType, 0f, isFavorite, privacy);
 
 //        // Sends recipe data to Firestore database
         recipesReference.add(recipe)

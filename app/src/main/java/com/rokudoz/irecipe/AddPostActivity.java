@@ -25,7 +25,10 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.StorageTask;
@@ -33,6 +36,7 @@ import com.google.firebase.storage.UploadTask;
 import com.rokudoz.irecipe.Models.Ingredient;
 import com.rokudoz.irecipe.Models.Post;
 import com.rokudoz.irecipe.Models.Recipe;
+import com.rokudoz.irecipe.Models.User;
 import com.rokudoz.irecipe.Utils.RotateBitmap;
 
 import java.io.ByteArrayOutputStream;
@@ -50,7 +54,10 @@ public class AddPostActivity extends AppCompatActivity {
     //FireBase refs
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private StorageReference mStorageRef = FirebaseStorage.getInstance().getReference("PostPhotos");
+    private CollectionReference usersReference = db.collection("Users");
     private StorageTask mUploadTask;
+
+    private User mUser = new User();
 
 
     MaterialButton searchRecipeBtn, publishBtn, choosePhotoBtn;
@@ -82,9 +89,9 @@ public class AddPostActivity extends AppCompatActivity {
                 referencedRecipeDocID = getIntent().getStringExtra("recipe_doc_id");
                 searchRecipeBtn.setText("Change recipe");
             }
-            if (getIntent().getStringExtra("post_imageUrl") != null){
+            if (getIntent().getStringExtra("post_imageUrl") != null) {
                 postPicUrl = getIntent().getStringExtra("post_imageUrl");
-                if (!postPicUrl.equals("")){
+                if (!postPicUrl.equals("")) {
                     choosePhotoBtn.setText("Change photo");
                     Glide.with(imageView).load(postPicUrl).centerCrop().into(imageView);
                 }
@@ -123,6 +130,19 @@ public class AddPostActivity extends AppCompatActivity {
                     Toast.makeText(AddPostActivity.this, "No post picture selected selected", Toast.LENGTH_SHORT).show();
                 } else
                     addPost();
+            }
+        });
+
+        usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).addSnapshotListener(new EventListener<DocumentSnapshot>() {
+            @Override
+            public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
+                if (e != null) {
+                    Log.w(TAG, "onEvent: ", e);
+                    return;
+                }
+                if (documentSnapshot != null) {
+                    mUser = documentSnapshot.toObject(User.class);
+                }
             }
         });
     }
@@ -206,7 +226,8 @@ public class AddPostActivity extends AppCompatActivity {
         String text = descriptionInputText.getText().toString();
         String privacy = privacySpinner.getSelectedItem().toString();
 
-        Post post = new Post(referencedRecipeDocID, creatorId, text, postPicUrl, false, privacy, null);
+        Post post = new Post(referencedRecipeDocID, creatorId, mUser.getName(), mUser.getUserProfilePicUrl(), text, postPicUrl,
+                false, privacy, null);
         if (postPicUrl.equals("")) {
             Toast.makeText(this, "Please select a photo for your post", Toast.LENGTH_SHORT).show();
         } else {
@@ -221,7 +242,5 @@ public class AddPostActivity extends AppCompatActivity {
                 }
             });
         }
-
-
     }
 }

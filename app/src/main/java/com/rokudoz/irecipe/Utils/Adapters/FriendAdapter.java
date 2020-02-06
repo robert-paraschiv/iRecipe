@@ -77,19 +77,11 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.FriendView
         final Friend currentItem = mFriendList.get(position);
 
         Log.d(TAG, "onBindViewHolder: ");
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        db.collection("Users").document(currentItem.getFriend_user_id()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-            @Override
-            public void onSuccess(DocumentSnapshot documentSnapshot) {
-                if (documentSnapshot != null) {
-                    User user = documentSnapshot.toObject(User.class);
-                    holder.tvName.setText(user.getName());
-
-                    if (user.getUserProfilePicUrl() != null && !user.getUserProfilePicUrl().equals(""))
-                        Glide.with(holder.mImage).load(user.getUserProfilePicUrl()).centerCrop().into(holder.mImage);
-                }
-            }
-        });
+        if (currentItem.getFriend_user_name() != null)
+            holder.tvName.setText(currentItem.getFriend_user_name());
+        if (currentItem.getFriend_user_profilePic() != null && !currentItem.getFriend_user_profilePic().equals("")) {
+            Glide.with(holder.mImage).load(currentItem.getFriend_user_profilePic()).centerCrop().into(holder.mImage);
+        }
         if (currentItem.getFriend_status().equals("friend_request_received")) {
             friendReqReceivedTv.setVisibility(View.VISIBLE);
         } else if (currentItem.getFriend_status().equals("friends") || currentItem.getFriend_status().equals("friend_request_accepted")) {

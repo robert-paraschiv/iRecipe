@@ -81,19 +81,11 @@ public class SearchUserAdapter extends RecyclerView.Adapter<SearchUserAdapter.Se
         final User currentItem = mUserList.get(position);
 
         Log.d(TAG, "onBindViewHolder: ");
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        db.collection("Users").document(currentItem.getUser_id()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-            @Override
-            public void onSuccess(DocumentSnapshot documentSnapshot) {
-                if (documentSnapshot != null) {
-                    User user = documentSnapshot.toObject(User.class);
-                    holder.tvName.setText(user.getName());
 
-                    if (user.getUserProfilePicUrl() != null && !user.getUserProfilePicUrl().equals(""))
-                        Glide.with(holder.mImage).load(user.getUserProfilePicUrl()).centerCrop().into(holder.mImage);
-                }
-            }
-        });
+        if (currentItem.getName() != null)
+            holder.tvName.setText(currentItem.getName());
+        if (currentItem.getUserProfilePicUrl() != null && !currentItem.getUserProfilePicUrl().equals(""))
+            Glide.with(holder.mImage).load(currentItem.getUserProfilePicUrl()).centerCrop().into(holder.mImage);
 
 //        if (currentItem.getFriend_status().equals("friend_request_received")) {
 //            friendReqReceivedTv.setVisibility(View.VISIBLE);
@@ -107,7 +99,6 @@ public class SearchUserAdapter extends RecyclerView.Adapter<SearchUserAdapter.Se
     public int getItemCount() {
         return mUserList.size();
     }
-
 
 
     @Override

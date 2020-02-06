@@ -156,28 +156,30 @@ public class FeedFragment extends Fragment implements FeedAdapter.OnItemClickLis
 
 
     private void loadNativeAds() {
-        AdLoader.Builder builder = new AdLoader.Builder(Objects.requireNonNull(getActivity()), getResources().getString(R.string.admob_unit_id));
-        adLoader = builder.forUnifiedNativeAd(new UnifiedNativeAd.OnUnifiedNativeAdLoadedListener() {
-            @Override
-            public void onUnifiedNativeAdLoaded(UnifiedNativeAd unifiedNativeAd) {
-                nativeAds.add(unifiedNativeAd);
-                if (!adLoader.isLoading()) {
+        if (getActivity() != null) {
+            AdLoader.Builder builder = new AdLoader.Builder(Objects.requireNonNull(getActivity()), getResources().getString(R.string.admob_unit_id));
+            adLoader = builder.forUnifiedNativeAd(new UnifiedNativeAd.OnUnifiedNativeAdLoadedListener() {
+                @Override
+                public void onUnifiedNativeAdLoaded(UnifiedNativeAd unifiedNativeAd) {
+                    nativeAds.add(unifiedNativeAd);
+                    if (!adLoader.isLoading()) {
+                    }
                 }
-            }
-        }).withAdListener(new AdListener() {
-            @Override
-            public void onAdFailedToLoad(int i) {
-                super.onAdFailedToLoad(i);
-                Log.d(TAG, "onAdFailedToLoad: " + i);
+            }).withAdListener(new AdListener() {
+                @Override
+                public void onAdFailedToLoad(int i) {
+                    super.onAdFailedToLoad(i);
+                    Log.d(TAG, "onAdFailedToLoad: " + i);
 
-            }
-        }).build();
-        adLoader.loadAds(new AdRequest.Builder()
-                .addTestDevice("717A151EFF00FB99F1DBE6C94A2837BA")
-                .addTestDevice("06562AD747A6C127AD23FE62AFCEF0E4")
-                .addTestDevice("6BC23AEACA857DDF15F1B0BA94497105")
-                .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
-                .build(), NUMBER_OF_ADS);
+                }
+            }).build();
+            adLoader.loadAds(new AdRequest.Builder()
+                    .addTestDevice("717A151EFF00FB99F1DBE6C94A2837BA")
+                    .addTestDevice("06562AD747A6C127AD23FE62AFCEF0E4")
+                    .addTestDevice("6BC23AEACA857DDF15F1B0BA94497105")
+                    .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
+                    .build(), NUMBER_OF_ADS);
+        }
     }
 
     private void insertAdsInRecyclerView() {
@@ -412,20 +414,6 @@ public class FeedFragment extends Fragment implements FeedAdapter.OnItemClickLis
                                 post.setFavorite(fav);
                             }
                         });
-                        //Get post creator details
-                        usersReference.document(post.getCreatorId()).addSnapshotListener(new EventListener<DocumentSnapshot>() {
-                            @Override
-                            public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
-                                if (e != null) {
-                                    Log.w(TAG, "onEvent: ", e);
-                                    return;
-                                }
-                                User user = documentSnapshot.toObject(User.class);
-                                post.setCreator_name(user.getName());
-                                post.setCreator_imageUrl(user.getUserProfilePicUrl());
-                                mAdapter.notifyDataSetChanged();
-                            }
-                        });
                         //Get post comments number
                         postsRef.document(post.getDocumentId()).collection("Comments").addSnapshotListener(new EventListener<QuerySnapshot>() {
                             @Override
@@ -494,7 +482,7 @@ public class FeedFragment extends Fragment implements FeedAdapter.OnItemClickLis
                     Log.d(TAG, "onEvent: Querry result is null");
                 }
                 if (mPostList.isEmpty()) {
-                    mPostList.add(new Post("", "", "Add friends to see posts just like this one", ""
+                    mPostList.add(new Post("", "", "", "", "Add friends to see posts just like this one", ""
                             , false, "Everyone", null));
                     Log.d(TAG, "EMPTY: ");
                 }
@@ -546,7 +534,7 @@ public class FeedFragment extends Fragment implements FeedAdapter.OnItemClickLis
 
                     } else {
                         post.setFavorite(true);
-                        UserWhoFaved userWhoFaved = new UserWhoFaved(mUser.getUser_id(), null);
+                        UserWhoFaved userWhoFaved = new UserWhoFaved(mUser.getUser_id(), mUser.getName(), mUser.getUserProfilePicUrl(), null);
                         FavoritePost favoritePost = new FavoritePost(null);
 
                         WriteBatch batch = db.batch();

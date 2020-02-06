@@ -65,7 +65,7 @@ public class PostParentCommentAdapter
         public TextView mName;
         public TextView mCommentText;
         public TextView mCommentTimeStamp;
-        public MaterialButton mAddReplyBtn,deleteCommentBtn;
+        public MaterialButton mAddReplyBtn, deleteCommentBtn;
         public TextInputEditText mReplyText;
         RelativeLayout llExpandArea;
         RecyclerView rv_child;
@@ -121,16 +121,11 @@ public class PostParentCommentAdapter
         final Comment currentItem = mCommentList.get(position);
 
         final FirebaseFirestore db = FirebaseFirestore.getInstance();
-        db.collection("Users").document(currentItem.getUser_id()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-            @Override
-            public void onSuccess(DocumentSnapshot documentSnapshot) {
-                User user = documentSnapshot.toObject(User.class);
-                if (user.getUserProfilePicUrl() != null) {
-                    Glide.with(holder.mImageView).load(user.getUserProfilePicUrl()).centerCrop().into(holder.mImageView);
-                    holder.mName.setText(user.getName());
-                }
-            }
-        });
+
+        if (currentItem.getUser_name() != null)
+            holder.mName.setText(currentItem.getUser_name());
+        if (currentItem.getUser_profilePic() != null && !currentItem.getUser_profilePic().equals(""))
+            Glide.with(holder.mImageView).load(currentItem.getUser_profilePic()).centerCrop().into(holder.mImageView);
 
         holder.mCommentText.setText(currentItem.getComment_text());
 
@@ -152,7 +147,7 @@ public class PostParentCommentAdapter
                 FirebaseFirestore db = FirebaseFirestore.getInstance();
 
                 if (!replyText.trim().equals("")) {
-                    Comment comment = new Comment(currentItem.getRecipe_documentID(), mUser.getUser_id(), replyText, null);
+                    Comment comment = new Comment(currentItem.getRecipe_documentID(), mUser.getUser_id(), mUser.getName(), mUser.getUserProfilePicUrl(), replyText, null);
                     db.collection("Posts").document(currentItem.getRecipe_documentID()).collection("Comments")
                             .document(currentItem.getDocumentID()).collection("ChildComments").add(comment)
                             .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
@@ -173,7 +168,7 @@ public class PostParentCommentAdapter
             }
         });
 
-        if (currentItem.getUser_id().equals(FirebaseAuth.getInstance().getCurrentUser().getUid())){
+        if (currentItem.getUser_id().equals(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
             holder.deleteCommentBtn.setVisibility(View.VISIBLE);
 
             holder.deleteCommentBtn.setOnClickListener(new View.OnClickListener() {
@@ -189,7 +184,7 @@ public class PostParentCommentAdapter
                     });
                 }
             });
-        }else {
+        } else {
             holder.deleteCommentBtn.setVisibility(View.GONE);
         }
 
@@ -198,7 +193,7 @@ public class PostParentCommentAdapter
             public void onClick(View v) {
                 Bundle args = new Bundle();
                 args.putString("documentID", currentItem.getUser_id());
-                Navigation.findNavController(v).navigate(R.id.userProfileFragment2,args);
+                Navigation.findNavController(v).navigate(R.id.userProfileFragment2, args);
             }
         });
 

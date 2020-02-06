@@ -8,6 +8,8 @@ public class Recipe implements Comparable<Recipe> {
     private String documentId;
     private String title;
     private String creator_docId;
+    private String creator_name;
+    private String creator_imageUrl;
     private String category;
     private String description;
     private List<String> keywords;
@@ -28,7 +30,7 @@ public class Recipe implements Comparable<Recipe> {
         //public no-arg constructor needed
     }
 
-    public Recipe(String title, String creator_docId, String category, String description, List<String> keywords
+    public Recipe(String title, String creator_docId, String creator_name, String creator_imageUrl, String category, String description, List<String> keywords
             , List<String> imageUrls_list, String complexity, Float duration, String durationType, Float avg_rating, Boolean isFavorite, String privacy) {
 
         if (title.trim().equals("")) {
@@ -36,6 +38,8 @@ public class Recipe implements Comparable<Recipe> {
         }
         this.title = title;
         this.creator_docId = creator_docId;
+        this.creator_name = creator_name;
+        this.creator_imageUrl = creator_imageUrl;
         this.category = category;
         this.description = description;
         this.keywords = keywords;
@@ -91,6 +95,22 @@ public class Recipe implements Comparable<Recipe> {
 
     public void setMissingIngredients(List<String> missingIngredients) {
         this.missingIngredients = missingIngredients;
+    }
+
+    public String getCreator_name() {
+        return creator_name;
+    }
+
+    public void setCreator_name(String creator_name) {
+        this.creator_name = creator_name;
+    }
+
+    public String getCreator_imageUrl() {
+        return creator_imageUrl;
+    }
+
+    public void setCreator_imageUrl(String creator_imageUrl) {
+        this.creator_imageUrl = creator_imageUrl;
     }
 
     public String getComplexity() {
@@ -195,6 +215,8 @@ public class Recipe implements Comparable<Recipe> {
                 "documentId='" + documentId + '\'' +
                 ", title='" + title + '\'' +
                 ", creator_docId='" + creator_docId + '\'' +
+                ", creator_name='" + creator_name + '\'' +
+                ", creator_imageUrl='" + creator_imageUrl + '\'' +
                 ", category='" + category + '\'' +
                 ", description='" + description + '\'' +
                 ", keywords=" + keywords +

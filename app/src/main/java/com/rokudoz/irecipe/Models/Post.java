@@ -24,9 +24,12 @@ public class Post {
     private @ServerTimestamp
     Date creation_date;
 
-    public Post(String referenced_recipe_docId, String creatorId, String text, String imageUrl, Boolean isFavorite, String privacy, Date creation_date) {
+    public Post(String referenced_recipe_docId, String creatorId, String creator_name, String creator_imageUrl, String text, String imageUrl, Boolean isFavorite, String privacy
+            , Date creation_date) {
         this.referenced_recipe_docId = referenced_recipe_docId;
         this.creatorId = creatorId;
+        this.creator_name = creator_name;
+        this.creator_imageUrl = creator_imageUrl;
         this.text = text;
         this.imageUrl = imageUrl;
         this.isFavorite = isFavorite;
@@ -38,7 +41,6 @@ public class Post {
     }
 
 
-    @Exclude
     public String getCreator_name() {
         return creator_name;
     }
@@ -47,7 +49,6 @@ public class Post {
         this.creator_name = creator_name;
     }
 
-    @Exclude
     public String getCreator_imageUrl() {
         return creator_imageUrl;
     }

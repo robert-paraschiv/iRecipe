@@ -70,22 +70,11 @@ public class PostChildCommentAdapter extends RecyclerView.Adapter<PostChildComme
     public void onBindViewHolder(@NonNull final CommentViewHolder holder, int position) {
         final Comment currentItem = mCommentList.get(position);
 
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        db.collection("Users").whereEqualTo("user_id", currentItem.getUser_id()).addSnapshotListener(new EventListener<QuerySnapshot>() {
-            @Override
-            public void onEvent(@androidx.annotation.Nullable QuerySnapshot queryDocumentSnapshots, @androidx.annotation.Nullable FirebaseFirestoreException e) {
-                if (e != null) {
-                    Log.w(TAG, "onEvent: ", e);
-                    return;
-                }
-                User user = Objects.requireNonNull(queryDocumentSnapshots).getDocuments().get(0).toObject(User.class);
-                if (user.getUserProfilePicUrl() != null) {
-                    Glide.with(holder.mImageView).load(user.getUserProfilePicUrl()).centerCrop().into(holder.mImageView);
-                    holder.mName.setText(user.getName());
-                }
+        if (currentItem.getUser_name() != null)
+            holder.mName.setText(currentItem.getUser_name());
+        if (currentItem.getUser_profilePic() != null && !currentItem.getUser_profilePic().equals(""))
+            Glide.with(holder.mImageView).load(currentItem.getUser_profilePic()).centerCrop().into(holder.mImageView);
 
-            }
-        });
         holder.mCommentText.setText(currentItem.getComment_text());
 
         Date date = currentItem.getComment_timeStamp();
@@ -102,7 +91,7 @@ public class PostChildCommentAdapter extends RecyclerView.Adapter<PostChildComme
             public void onClick(View v) {
                 Bundle args = new Bundle();
                 args.putString("documentID", currentItem.getUser_id());
-                Navigation.findNavController(v).navigate(R.id.userProfileFragment2,args);
+                Navigation.findNavController(v).navigate(R.id.userProfileFragment2, args);
             }
         });
 

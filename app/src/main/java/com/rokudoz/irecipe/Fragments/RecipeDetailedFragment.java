@@ -208,7 +208,7 @@ public class RecipeDetailedFragment extends Fragment implements RecipeInstructio
                 } else {
                     isRecipeFavorite = true;
                     setFavoriteIcon(isRecipeFavorite);
-                    UserWhoFaved userWhoFaved = new UserWhoFaved(mUser.getUser_id(), null);
+                    UserWhoFaved userWhoFaved = new UserWhoFaved(mUser.getUser_id(), mUser.getName(), mUser.getUserProfilePicUrl(), null);
                     currentRecipeSubCollection.document(mUser.getUser_id()).set(userWhoFaved);
                     Toast.makeText(getContext(), "Added " + title + " to favorites", Toast.LENGTH_SHORT).show();
                     Log.d(TAG, "onClick: ADDED + " + title + " " + documentID + " to favorites");
@@ -308,7 +308,7 @@ public class RecipeDetailedFragment extends Fragment implements RecipeInstructio
         String commentText = mCommentEditText.getText().toString();
 
 
-        final Comment comment = new Comment(documentID, FirebaseAuth.getInstance().getCurrentUser().getUid(), commentText, null);
+        final Comment comment = new Comment(documentID, FirebaseAuth.getInstance().getCurrentUser().getUid(), mUser.getName(), mUser.getUserProfilePicUrl(), commentText, null);
         DocumentReference currentRecipeRef = recipeRef.document(documentID);
         CollectionReference commentRef = currentRecipeRef.collection("Comments");
 
@@ -475,7 +475,7 @@ public class RecipeDetailedFragment extends Fragment implements RecipeInstructio
                     return;
                 }
                 if (documentSnapshot != null) {
-                    Recipe recipe = documentSnapshot.toObject(Recipe.class);
+                    final Recipe recipe = documentSnapshot.toObject(Recipe.class);
                     if (recipe.getTitle() != null) {
                         title = recipe.getTitle();
                         tvTitle.setText(title);
@@ -548,7 +548,27 @@ public class RecipeDetailedFragment extends Fragment implements RecipeInstructio
                             }
                         });
                     }
-                    getRecipeCreatorDetails(recipe.getCreator_docId());
+
+                    if (recipe.getCreator_name() != null && recipe.getCreator_imageUrl() != null) {
+                        tvCreatorName.setText(recipe.getCreator_name());
+                        Glide.with(mCreatorImage).load(recipe.getCreator_imageUrl()).centerCrop().into(mCreatorImage);
+
+                        tvCreatorName.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                Navigation.findNavController(view).navigate(RecipeDetailedFragmentDirections
+                                        .actionRecipeDetailedFragmentToUserProfileFragment2(recipe.getCreator_docId()));
+                            }
+                        });
+                        mCreatorImage.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                Navigation.findNavController(view).navigate(RecipeDetailedFragmentDirections
+                                        .actionRecipeDetailedFragmentToUserProfileFragment2(recipe.getCreator_docId()));
+                            }
+                        });
+                    }
+
                     getRecipeIngredients();
 
                     setupViewPager(view);
@@ -559,31 +579,6 @@ public class RecipeDetailedFragment extends Fragment implements RecipeInstructio
         getCommentsFromDb();
     }
 
-    private void getRecipeCreatorDetails(final String creator_docId) {
-        usersRef.document(creator_docId).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-            @Override
-            public void onSuccess(DocumentSnapshot documentSnapshot) {
-                User user = documentSnapshot.toObject(User.class);
-                tvCreatorName.setText(user.getName());
-                Glide.with(mCreatorImage).load(user.getUserProfilePicUrl()).centerCrop().into(mCreatorImage);
-
-                tvCreatorName.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Navigation.findNavController(view).navigate(RecipeDetailedFragmentDirections
-                                .actionRecipeDetailedFragmentToUserProfileFragment2(creator_docId));
-                    }
-                });
-                mCreatorImage.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Navigation.findNavController(view).navigate(RecipeDetailedFragmentDirections
-                                .actionRecipeDetailedFragmentToUserProfileFragment2(creator_docId));
-                    }
-                });
-            }
-        });
-    }
 
     private void getRecipeIngredients() {
 

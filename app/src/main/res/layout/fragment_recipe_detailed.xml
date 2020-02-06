@@ -38,7 +38,10 @@
         android:layout_gravity="bottom|end"
         android:layout_margin="8dp"
         android:text="+"
-        app:icon="@drawable/ic_shopping_basket_black_24dp" />
+        app:icon="@drawable/ic_shopping_basket_black_24dp"
+        android:padding="2dp"
+        app:iconPadding="2dp"
+        tools:text="+ 333" />
 
     <androidx.core.widget.NestedScrollView
         android:id="@+id/nestedScrollView"
@@ -75,8 +78,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/recipeDetailed_numberOfFaved"
-                android:layout_marginTop="4dp"
-                android:layout_centerHorizontal="true">
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="4dp">
 
                 <ImageView
                     android:id="@+id/recipeDetailed_watch"
@@ -138,8 +141,8 @@
                 android:layout_width="33dp"
                 android:layout_height="33dp"
                 android:layout_alignParentStart="true"
+                android:layout_marginStart="8dp"
                 android:layout_marginTop="8dp"
-                android:layout_marginEnd="8dp"
                 android:elevation="4dp"
                 android:src="@drawable/ic_favorite_border_black_24dp" />
 
@@ -148,10 +151,10 @@
                 style="@style/TextAppearance.MaterialComponents.Chip"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
                 android:layout_marginTop="14dp"
-                android:layout_marginEnd="4dp"
-                android:layout_toEndOf="@id/imageview_favorite_icon"
                 android:layout_toStartOf="@id/recipeDetailed_creatorImage_ImageView"
+                android:layout_toEndOf="@id/imageview_favorite_icon"
                 tools:text="88" />
 
             <com.google.android.material.button.MaterialButton

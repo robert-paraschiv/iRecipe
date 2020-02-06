@@ -30,13 +30,12 @@ public class RecipeInstructionsAdapter extends RecyclerView.Adapter<RecipeInstru
         mListener = listener;
     }
 
-    public class RecipeInstructionViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
-        TextView tvStepNumber, tvStepText;
+    public class RecipeInstructionViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+        TextView tvStepText;
         ImageView stepImage;
 
         public RecipeInstructionViewHolder(View itemView) {
             super(itemView);
-            tvStepNumber = itemView.findViewById(R.id.step_item_StepNumber_TextView);
             tvStepText = itemView.findViewById(R.id.step_item_StepText_TextView);
             stepImage = itemView.findViewById(R.id.stepItem_image);
 
@@ -52,6 +51,7 @@ public class RecipeInstructionsAdapter extends RecyclerView.Adapter<RecipeInstru
                 }
             });
         }
+
         @Override
         public void onClick(View v) {
             if (mListener != null) {
@@ -77,7 +77,6 @@ public class RecipeInstructionsAdapter extends RecyclerView.Adapter<RecipeInstru
     public void onBindViewHolder(@NonNull final RecipeInstructionViewHolder holder, int position) {
         final Instruction currentItem = instructionList.get(position);
 
-        holder.tvStepNumber.setText("Step " + currentItem.getStepNumber());
         holder.tvStepText.setText(currentItem.getText());
         if (!currentItem.getImgUrl().equals("")) {
             Glide.with(holder.stepImage).load(currentItem.getImgUrl()).centerCrop().into(holder.stepImage);

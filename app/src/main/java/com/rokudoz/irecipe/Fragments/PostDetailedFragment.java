@@ -90,6 +90,8 @@ public class PostDetailedFragment extends Fragment {
     private CollectionReference usersRef = db.collection("Users");
     private CollectionReference postsRef = db.collection("Posts");
 
+    private User mUser = new User();
+
 
     public PostDetailedFragment() {
         // Required empty public constructor
@@ -146,6 +148,15 @@ public class PostDetailedFragment extends Fragment {
             }
         });
 
+        usersRef.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).addSnapshotListener(new EventListener<DocumentSnapshot>() {
+            @Override
+            public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
+                if (e == null && documentSnapshot != null) {
+                    mUser = documentSnapshot.toObject(User.class);
+                }
+            }
+        });
+
         buildRecyclerView();
         getCommentsFromDb();
         getPostDetails();
@@ -182,7 +193,7 @@ public class PostDetailedFragment extends Fragment {
     private void addComment() {
         String commentText = commentEditText.getText().toString();
 
-        final Comment comment = new Comment(documentID, FirebaseAuth.getInstance().getCurrentUser().getUid(), commentText, null);
+        final Comment comment = new Comment(documentID, FirebaseAuth.getInstance().getCurrentUser().getUid(), mUser.getName(), mUser.getUserProfilePicUrl(), commentText, null);
         DocumentReference currentRecipeRef = postsRef.document(documentID);
         CollectionReference commentRef = currentRecipeRef.collection("Comments");
 
@@ -256,145 +267,140 @@ public class PostDetailedFragment extends Fragment {
                     return;
                 }
 
+                if (documentSnapshot != null) {
+                    final Post post = documentSnapshot.toObject(Post.class);
+                    if (post != null)
+                        post.setDocumentId(documentSnapshot.getId());
 
-                final Post post = documentSnapshot.toObject(Post.class);
-                post.setDocumentId(documentSnapshot.getId());
-
-                Date date = post.getCreation_date();
-                if (date != null) {
-                    DateFormat dateFormat = new SimpleDateFormat("HH:mm, MMM d", Locale.getDefault());
-                    String creationDate = dateFormat.format(date);
-                    long time = date.getTime();
-                    if (post.getCreation_date() != null && !post.getCreation_date().equals("")) {
-                        postCreationDate.setText(getTimeAgo(time));
+                    Date date = post.getCreation_date();
+                    if (date != null) {
+                        DateFormat dateFormat = new SimpleDateFormat("HH:mm, MMM d", Locale.getDefault());
+                        String creationDate = dateFormat.format(date);
+                        long time = date.getTime();
+                        if (post.getCreation_date() != null && !post.getCreation_date().equals("")) {
+                            postCreationDate.setText(getTimeAgo(time));
+                        }
                     }
-                }
 
-                postDescription.setText(post.getText());
+                    if (post.getText() != null)
+                        postDescription.setText(post.getText());
 
-                if (post.getImageUrl() != null) {
-                    Glide.with(postImage).load(post.getImageUrl()).centerCrop().into(postImage);
-                }
+                    if (post.getImageUrl() != null) {
+                        Glide.with(postImage).load(post.getImageUrl()).centerCrop().into(postImage);
+                    }
 
-                usersRef.document(post.getCreatorId()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                    @Override
-                    public void onSuccess(DocumentSnapshot documentSnapshot) {
-                        final User user = documentSnapshot.toObject(User.class);
-                        creatorName.setText(user.getName());
-                        Glide.with(creatorImage).load(user.getUserProfilePicUrl()).centerCrop().into(creatorImage);
+                    if (post.getCreator_name() != null)
+                        creatorName.setText(post.getCreator_name());
+                    if (post.getCreator_imageUrl() != null && !post.getCreator_imageUrl().equals("")) {
+                        Glide.with(creatorImage).load(post.getCreator_imageUrl()).centerCrop().into(creatorImage);
                         creatorImage.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                Navigation.findNavController(view).navigate(PostDetailedFragmentDirections.actionPostDetailedToUserProfileFragment2(user.getUser_id()));
+                                Navigation.findNavController(view).navigate(PostDetailedFragmentDirections.actionPostDetailedToUserProfileFragment2(post.getCreatorId()));
                             }
                         });
-
                     }
-                });
-                postsRef.document(post.getDocumentId()).collection("UsersWhoFaved").addSnapshotListener(new EventListener<QuerySnapshot>() {
-                    @Override
-                    public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
-                        if (e != null) {
-                            Log.w(TAG, "onEvent: ", e);
-                            return;
-                        }
-                        Boolean fav = false;
-                        for (QueryDocumentSnapshot documentSnapshot1 : queryDocumentSnapshots) {
-                            if (documentSnapshot1.getId().equals(currentUserID))
-                                fav = true;
-                        }
-                        if (fav) {
-                            post.setFavorite(true);
-                            postFavoriteIcon.setImageResource(R.drawable.ic_favorite_red_24dp);
-                        } else {
-                            post.setFavorite(false);
-                            postFavoriteIcon.setImageResource(R.drawable.ic_favorite_border_black_24dp);
-                        }
-                    }
-                });
-
-                postFavoriteIcon.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        ////////////////////////////////////////////////
-
-                        String id = documentID;
-                        DocumentReference currentRecipeRef = postsRef.document(id);
-                        final CollectionReference currentRecipeSubCollection = currentRecipeRef.collection("UsersWhoFaved");
-
-                        DocumentReference currentUserRef = usersRef.document(currentUserID);
-
-
-                        if (post.getFavorite()) {
-                            currentUserRef.collection("FavoritePosts").document(id).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
-                                @Override
-                                public void onSuccess(Void aVoid) {
-                                    Log.d(TAG, "onSuccess: Deleted from user FAV posts");
-                                }
-                            });
-                            post.setFavorite(false);
-                            postFavoriteIcon.setImageResource(R.drawable.ic_favorite_border_black_24dp);
-
-                            currentRecipeSubCollection.document(currentUserID).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
-                                @Override
-                                public void onSuccess(Void aVoid) {
-                                    Log.d(TAG, "onSuccess: deleted user from post users who faved");
-                                }
-                            });
-
-                        } else {
-                            post.setFavorite(true);
-                            postFavoriteIcon.setImageResource(R.drawable.ic_favorite_red_24dp);
-                            UserWhoFaved userWhoFaved = new UserWhoFaved(currentUserID, null);
-                            FavoritePost favoritePost = new FavoritePost(null);
-                            WriteBatch batch = db.batch();
-                            batch.set(currentRecipeSubCollection.document(currentUserID), userWhoFaved);
-                            batch.set(currentUserRef.collection("FavoritePosts").document(id), favoritePost);
-                            batch.commit().addOnSuccessListener(new OnSuccessListener<Void>() {
-                                @Override
-                                public void onSuccess(Void aVoid) {
-                                    Log.d(TAG, "onFavoriteClick: Added to favorites");
-                                }
-                            });
-                        }
-                    }
-                });
-
-                recipeRef.document(post.getReferenced_recipe_docId()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                    @Override
-                    public void onSuccess(DocumentSnapshot documentSnapshot) {
-                        Recipe recipe = documentSnapshot.toObject(Recipe.class);
-                        recipeTitle.setText(recipe.getTitle());
-                        Glide.with(recipeImage).load(recipe.getImageUrls_list().get(0)).centerCrop().into(recipeImage);
-                    }
-                });
-
-                recipeLayout.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Navigation.findNavController(view).navigate(PostDetailedFragmentDirections.actionPostDetailedToRecipeDetailedFragment(post.getReferenced_recipe_docId()));
-                    }
-                });
-
-                if (FirebaseAuth.getInstance().getCurrentUser().getUid().equals(post.getCreatorId())) {
-                    editPostBtn.setVisibility(View.VISIBLE);
-                    editPostBtn.setOnClickListener(new View.OnClickListener() {
+                    postsRef.document(post.getDocumentId()).collection("UsersWhoFaved").addSnapshotListener(new EventListener<QuerySnapshot>() {
                         @Override
-                        public void onClick(View v) {
-                            Intent intent = new Intent(getActivity(), EditPostActivity.class);
-                            intent.putExtra("post_id", documentID);
-                            intent.putExtra("post_imageUrl", post.getImageUrl());
-                            intent.putExtra("post_text", post.getText());
-                            intent.putExtra("post_privacy", post.getPrivacy());
-                            intent.putExtra("post_referencedRecipe", post.getReferenced_recipe_docId());
-                            startActivity(intent);
+                        public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                            if (e != null) {
+                                Log.w(TAG, "onEvent: ", e);
+                                return;
+                            }
+                            Boolean fav = false;
+                            for (QueryDocumentSnapshot documentSnapshot1 : queryDocumentSnapshots) {
+                                if (documentSnapshot1.getId().equals(currentUserID))
+                                    fav = true;
+                            }
+                            if (fav) {
+                                post.setFavorite(true);
+                                postFavoriteIcon.setImageResource(R.drawable.ic_favorite_red_24dp);
+                            } else {
+                                post.setFavorite(false);
+                                postFavoriteIcon.setImageResource(R.drawable.ic_favorite_border_black_24dp);
+                            }
                         }
                     });
-                } else {
-                    editPostBtn.setVisibility(View.GONE);
+
+                    postFavoriteIcon.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            ////////////////////////////////////////////////
+                            String id = documentID;
+                            DocumentReference currentRecipeRef = postsRef.document(id);
+                            final CollectionReference currentRecipeSubCollection = currentRecipeRef.collection("UsersWhoFaved");
+
+                            DocumentReference currentUserRef = usersRef.document(currentUserID);
+
+
+                            if (post.getFavorite()) {
+                                currentUserRef.collection("FavoritePosts").document(id).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+                                        Log.d(TAG, "onSuccess: Deleted from user FAV posts");
+                                    }
+                                });
+                                post.setFavorite(false);
+                                postFavoriteIcon.setImageResource(R.drawable.ic_favorite_border_black_24dp);
+
+                                currentRecipeSubCollection.document(currentUserID).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+                                        Log.d(TAG, "onSuccess: deleted user from post users who faved");
+                                    }
+                                });
+                            } else {
+                                post.setFavorite(true);
+                                postFavoriteIcon.setImageResource(R.drawable.ic_favorite_red_24dp);
+                                UserWhoFaved userWhoFaved = new UserWhoFaved(currentUserID, mUser.getName(), mUser.getUserProfilePicUrl(), null);
+                                FavoritePost favoritePost = new FavoritePost(null);
+                                WriteBatch batch = db.batch();
+                                batch.set(currentRecipeSubCollection.document(currentUserID), userWhoFaved);
+                                batch.set(currentUserRef.collection("FavoritePosts").document(id), favoritePost);
+                                batch.commit().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+                                        Log.d(TAG, "onFavoriteClick: Added to favorites");
+                                    }
+                                });
+                            }
+                        }
+                    });
+
+                    recipeRef.document(post.getReferenced_recipe_docId()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                        @Override
+                        public void onSuccess(DocumentSnapshot documentSnapshot) {
+                            Recipe recipe = documentSnapshot.toObject(Recipe.class);
+                            recipeTitle.setText(recipe.getTitle());
+                            Glide.with(recipeImage).load(recipe.getImageUrls_list().get(0)).centerCrop().into(recipeImage);
+                        }
+                    });
+
+                    recipeLayout.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Navigation.findNavController(view).navigate(PostDetailedFragmentDirections.actionPostDetailedToRecipeDetailedFragment(post.getReferenced_recipe_docId()));
+                        }
+                    });
+
+                    if (FirebaseAuth.getInstance().getCurrentUser().getUid().equals(post.getCreatorId())) {
+                        editPostBtn.setVisibility(View.VISIBLE);
+                        editPostBtn.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                Intent intent = new Intent(getActivity(), EditPostActivity.class);
+                                intent.putExtra("post_id", documentID);
+                                intent.putExtra("post_imageUrl", post.getImageUrl());
+                                intent.putExtra("post_text", post.getText());
+                                intent.putExtra("post_privacy", post.getPrivacy());
+                                intent.putExtra("post_referencedRecipe", post.getReferenced_recipe_docId());
+                                startActivity(intent);
+                            }
+                        });
+                    } else {
+                        editPostBtn.setVisibility(View.GONE);
+                    }
                 }
-
-
             }
         });
     }

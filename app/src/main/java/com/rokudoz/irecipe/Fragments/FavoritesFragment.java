@@ -60,7 +60,7 @@ public class FavoritesFragment extends Fragment implements RecipeAdapter.OnItemC
     private CollectionReference recipeRef = db.collection("Recipes");
     private CollectionReference usersReference = db.collection("Users");
     private FirebaseStorage mStorageRef;
-    private ListenerRegistration favoriteRecipesListener, userDetailsListener, recipesListener,recipeLikesListener;
+    private ListenerRegistration favoriteRecipesListener, userDetailsListener, recipesListener, recipeLikesListener;
 
     private RecyclerView mRecyclerView;
     private RecipeAdapter mAdapter;
@@ -251,7 +251,7 @@ public class FavoritesFragment extends Fragment implements RecipeAdapter.OnItemC
 
                                 } else {
                                     mRecipeList.get(position).setFavorite(true);
-                                    UserWhoFaved userWhoFaved = new UserWhoFaved(mUser.getUser_id(), null);
+                                    UserWhoFaved userWhoFaved = new UserWhoFaved(mUser.getUser_id(), mUser.getName(), mUser.getUserProfilePicUrl(), null);
                                     currentRecipeSubCollection.document(mUser.getUser_id()).set(userWhoFaved);
                                     Toast.makeText(getContext(), "Added " + title + " to favorites", Toast.LENGTH_SHORT).show();
                                 }

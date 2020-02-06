@@ -6,12 +6,16 @@ import java.util.Date;
 
 public class Friend {
     private String friend_user_id;
+    private String friend_user_name;
+    private String friend_user_profilePic;
     private String friend_status;
     private @ServerTimestamp
     Date friendTimeStamp;
 
-    public Friend(String friend_user_id, String friend_status, Date friendTimeStamp) {
+    public Friend(String friend_user_id, String friend_user_name, String friend_user_profilePic, String friend_status, Date friendTimeStamp) {
         this.friend_user_id = friend_user_id;
+        this.friend_user_name = friend_user_name;
+        this.friend_user_profilePic = friend_user_profilePic;
         this.friend_status = friend_status;
         this.friendTimeStamp = friendTimeStamp;
     }
@@ -43,10 +47,28 @@ public class Friend {
         this.friendTimeStamp = friendTimeStamp;
     }
 
+    public String getFriend_user_name() {
+        return friend_user_name;
+    }
+
+    public void setFriend_user_name(String friend_user_name) {
+        this.friend_user_name = friend_user_name;
+    }
+
+    public String getFriend_user_profilePic() {
+        return friend_user_profilePic;
+    }
+
+    public void setFriend_user_profilePic(String friend_user_profilePic) {
+        this.friend_user_profilePic = friend_user_profilePic;
+    }
+
     @Override
     public String toString() {
         return "Friend{" +
                 "friend_user_id='" + friend_user_id + '\'' +
+                ", friend_user_name='" + friend_user_name + '\'' +
+                ", friend_user_profilePic='" + friend_user_profilePic + '\'' +
                 ", friend_status='" + friend_status + '\'' +
                 ", friendTimeStamp=" + friendTimeStamp +
                 '}';

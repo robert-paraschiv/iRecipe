@@ -82,22 +82,10 @@ public class ConversationAdapter extends RecyclerView.Adapter<ConversationAdapte
     public void onBindViewHolder(@NonNull final ConversationViewHolder holder, int position) {
         final Conversation currentItem = conversationList.get(position);
 
-        if (currentItem.getUserId() != null) {
-            FirebaseFirestore db = FirebaseFirestore.getInstance();
-            db.collection("Users").document(currentItem.getUserId()).addSnapshotListener(new EventListener<DocumentSnapshot>() {
-                @Override
-                public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
-                    if (documentSnapshot != null) {
-                        User user = documentSnapshot.toObject(User.class);
-                        holder.tvName.setText(user.getName());
-
-                        if (user.getUserProfilePicUrl() != null && !user.getUserProfilePicUrl().equals(""))
-                            Glide.with(holder.mImage).load(user.getUserProfilePicUrl()).centerCrop().into(holder.mImage);
-                    }
-                }
-            });
-        }
-
+        if (currentItem.getUser_name() != null)
+            holder.tvName.setText(currentItem.getUser_name());
+        if (currentItem.getUser_profilePic() != null && !currentItem.getUser_profilePic().equals(""))
+            Glide.with(holder.mImage).load(currentItem.getUser_profilePic()).centerCrop().into(holder.mImage);
 
         if (currentItem.getDate() != null) {
             Date date = currentItem.getDate();
@@ -115,8 +103,6 @@ public class ConversationAdapter extends RecyclerView.Adapter<ConversationAdapte
                 holder.tvMessage.setTextColor(textView.getCurrentTextColor());
             }
         }
-
-
     }
 
 

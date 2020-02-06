@@ -67,11 +67,12 @@ public class MessageFragment extends Fragment {
     private RecyclerView.LayoutManager mLayoutManager;
 
     private User userFriend = new User();
+    private User mUser = new User();
 
     //Firebase
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private CollectionReference usersReference = db.collection("Users");
-    private ListenerRegistration messagesListener,friendDetailsListener;
+    private ListenerRegistration messagesListener, friendDetailsListener;
 
     public MessageFragment() {
         // Required empty public constructor
@@ -113,6 +114,7 @@ public class MessageFragment extends Fragment {
                 sendMessage();
             }
         });
+
 
         return view;
     }
@@ -158,25 +160,25 @@ public class MessageFragment extends Fragment {
     private void getMessages() {
         messagesListener = usersReference.document(currentUserId).collection("Conversations").document(friendUserId)
                 .collection(friendUserId).orderBy("timestamp", Query.Direction.ASCENDING).addSnapshotListener(new EventListener<QuerySnapshot>() {
-            @Override
-            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
-                if (e != null) {
-                    Log.w(TAG, "onEvent: ", e);
-                    return;
-                }
-                for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
-                    Message message = documentSnapshot.toObject(Message.class);
-                    message.setDocumentId(documentSnapshot.getId());
-                    if (!messageList.contains(message)) {
-                        messageList.add(message);
-                    } else {
-                        messageList.set(messageList.indexOf(message), message);
+                    @Override
+                    public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                        if (e != null) {
+                            Log.w(TAG, "onEvent: ", e);
+                            return;
+                        }
+                        for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                            Message message = documentSnapshot.toObject(Message.class);
+                            message.setDocumentId(documentSnapshot.getId());
+                            if (!messageList.contains(message)) {
+                                messageList.add(message);
+                            } else {
+                                messageList.set(messageList.indexOf(message), message);
+                            }
+                            mAdapter.notifyDataSetChanged();
+                            mRecyclerView.scrollToPosition(messageList.size() - 1);
+                        }
                     }
-                    mAdapter.notifyDataSetChanged();
-                    mRecyclerView.scrollToPosition(messageList.size() - 1);
-                }
-            }
-        });
+                });
     }
 
     private void sendMessage() {
@@ -187,8 +189,8 @@ public class MessageFragment extends Fragment {
             final Message messageForCurrentUser = new Message(currentUserId, friendUserId, text, "message_sent", null, false);
             final Message messageForFriendUser = new Message(currentUserId, friendUserId, text, "message_received", null, false);
 
-            final Conversation conversationForCurrentUser = new Conversation(friendUserId, text, "message_sent", null,false);
-            final Conversation conversationForFriendUser = new Conversation(currentUserId, text, "message_received", null,false);
+            final Conversation conversationForCurrentUser = new Conversation(friendUserId, userFriend.getName(), userFriend.getUserProfilePicUrl(), text, "message_sent", null, false);
+            final Conversation conversationForFriendUser = new Conversation(currentUserId, mUser.getName(), mUser.getUserProfilePicUrl(), text, "message_received", null, false);
 
             textInputEditText.setText("");
 
@@ -216,6 +218,20 @@ public class MessageFragment extends Fragment {
     }
 
     private void getFriendDetails() {
+
+        usersReference.document(currentUserId).addSnapshotListener(new EventListener<DocumentSnapshot>() {
+            @Override
+            public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
+                if (e != null) {
+                    Log.w(TAG, "onEvent: ", e);
+                    return;
+                }
+                if (documentSnapshot != null) {
+                    mUser = documentSnapshot.toObject(User.class);
+                }
+            }
+        });
+
         friendDetailsListener = usersReference.document(friendUserId).addSnapshotListener(new EventListener<DocumentSnapshot>() {
             @Override
             public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {

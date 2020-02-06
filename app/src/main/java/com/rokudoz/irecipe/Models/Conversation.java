@@ -6,6 +6,8 @@ import java.util.Date;
 
 public class Conversation {
     private String userId;
+    private String user_name;
+    private String user_profilePic;
     private String text;
     private String type;
     private Boolean read;
@@ -14,8 +16,10 @@ public class Conversation {
     private
     Date date;
 
-    public Conversation(String userId, String text, String type, Date date, Boolean read) {
+    public Conversation(String userId, String user_name,String user_profilePic,String text, String type, Date date, Boolean read) {
         this.userId = userId;
+        this.user_name = user_name;
+        this.user_profilePic = user_profilePic;
         this.text = text;
         this.type = type;
         this.date = date;
@@ -23,6 +27,22 @@ public class Conversation {
     }
 
     public Conversation() {
+    }
+
+    public String getUser_name() {
+        return user_name;
+    }
+
+    public void setUser_name(String user_name) {
+        this.user_name = user_name;
+    }
+
+    public String getUser_profilePic() {
+        return user_profilePic;
+    }
+
+    public void setUser_profilePic(String user_profilePic) {
+        this.user_profilePic = user_profilePic;
     }
 
     public String getUserId() {
@@ -69,6 +89,8 @@ public class Conversation {
     public String toString() {
         return "Conversation{" +
                 "userId='" + userId + '\'' +
+                ", user_name='" + user_name + '\'' +
+                ", user_profilePic='" + user_profilePic + '\'' +
                 ", text='" + text + '\'' +
                 ", type='" + type + '\'' +
                 ", read=" + read +

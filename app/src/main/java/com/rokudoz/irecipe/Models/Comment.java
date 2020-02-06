@@ -9,15 +9,19 @@ public class Comment {
     private String documentID;
     private String recipe_documentID;
     private String user_id;
+    private String user_name;
+    private String user_profilePic;
     private String comment_text;
 
     private @ServerTimestamp
     Date comment_timeStamp;
 
 
-    public Comment(String recipe_documentID, String user_id, String comment_text, Date comment_timeStamp) {
+    public Comment(String recipe_documentID, String user_id, String user_name, String user_profilePic, String comment_text, Date comment_timeStamp) {
         this.recipe_documentID = recipe_documentID;
         this.user_id = user_id;
+        this.user_name = user_name;
+        this.user_profilePic = user_profilePic;
         this.comment_text = comment_text;
         this.comment_timeStamp = comment_timeStamp;
     }
@@ -40,6 +44,22 @@ public class Comment {
 
     public void setRecipe_documentID(String recipe_documentID) {
         this.recipe_documentID = recipe_documentID;
+    }
+
+    public String getUser_name() {
+        return user_name;
+    }
+
+    public void setUser_name(String user_name) {
+        this.user_name = user_name;
+    }
+
+    public String getUser_profilePic() {
+        return user_profilePic;
+    }
+
+    public void setUser_profilePic(String user_profilePic) {
+        this.user_profilePic = user_profilePic;
     }
 
     public String getUser_id() {
@@ -72,6 +92,8 @@ public class Comment {
                 "documentID='" + documentID + '\'' +
                 ", recipe_documentID='" + recipe_documentID + '\'' +
                 ", user_id='" + user_id + '\'' +
+                ", user_name='" + user_name + '\'' +
+                ", user_profilePic='" + user_profilePic + '\'' +
                 ", comment_text='" + comment_text + '\'' +
                 ", comment_timeStamp=" + comment_timeStamp +
                 '}';

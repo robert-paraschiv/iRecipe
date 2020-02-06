@@ -44,7 +44,6 @@ import com.rokudoz.irecipe.Models.User;
 import com.rokudoz.irecipe.Models.UserWhoFaved;
 import com.rokudoz.irecipe.R;
 import com.rokudoz.irecipe.Utils.Adapters.PostAdapter;
-import com.rokudoz.irecipe.Utils.Adapters.RecipeAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -57,6 +56,7 @@ public class UserProfileFragment extends Fragment implements PostAdapter.OnItemC
     private String documentID;
     private String userProfilePicUrl = "";
     private User mUser;
+    private User otherUser = new User();
     private TextView UserNameTv, UserUsernameTv, UserDescriptionTv;
     private MaterialButton mAddFriendButton, messageUser;
     private CircleImageView mProfileImage;
@@ -116,7 +116,7 @@ public class UserProfileFragment extends Fragment implements PostAdapter.OnItemC
         navBar.setVisibility(View.VISIBLE);
 
         UserProfileFragmentArgs userProfileFragmentArgs = UserProfileFragmentArgs.fromBundle(getArguments());
-        getRecipeArgsPassed(userProfileFragmentArgs);
+        getArgsPassed(userProfileFragmentArgs);
 
 
         buildRecyclerView();
@@ -174,7 +174,6 @@ public class UserProfileFragment extends Fragment implements PostAdapter.OnItemC
                     Log.w(TAG, "onEvent: ", e);
                     return;
                 }
-                List<Ingredient> userIngredient_list = new ArrayList<>();
                 final User user = documentSnapshot.toObject(User.class);
 
                 mUser = documentSnapshot.toObject(User.class);
@@ -333,8 +332,8 @@ public class UserProfileFragment extends Fragment implements PostAdapter.OnItemC
                             mAddFriendButton.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
-                                    Friend friendForCurrentUser = new Friend(documentID, "friends", null);
-                                    Friend friendForOtherUser = new Friend(FirebaseAuth.getInstance().getCurrentUser().getUid(), "friend_request_accepted", null);
+                                    Friend friendForCurrentUser = new Friend(documentID, otherUser.getName(), otherUser.getUserProfilePicUrl(), "friends", null);
+                                    Friend friendForOtherUser = new Friend(mUser.getUser_id(), mUser.getName(), mUser.getUserProfilePicUrl(), "friend_request_accepted", null);
                                     WriteBatch batch = db.batch();
                                     batch.set(usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).collection("FriendList")
                                             .document(documentID), friendForCurrentUser);
@@ -358,8 +357,8 @@ public class UserProfileFragment extends Fragment implements PostAdapter.OnItemC
                         mAddFriendButton.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                Friend friendForCurrentUser = new Friend(documentID, "friend_request_sent", null);
-                                Friend friendForOtherUser = new Friend(FirebaseAuth.getInstance().getCurrentUser().getUid(), "friend_request_received", null);
+                                Friend friendForCurrentUser = new Friend(documentID, otherUser.getName(), otherUser.getUserProfilePicUrl(), "friend_request_sent", null);
+                                Friend friendForOtherUser = new Friend(mUser.getUser_id(), mUser.getName(), mUser.getUserProfilePicUrl(), "friend_request_received", null);
                                 WriteBatch batch = db.batch();
                                 batch.set(usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).collection("FriendList")
                                         .document(documentID), friendForCurrentUser);
@@ -387,17 +386,18 @@ public class UserProfileFragment extends Fragment implements PostAdapter.OnItemC
 
     }
 
-    private void getRecipeArgsPassed(UserProfileFragmentArgs userProfileFragmentArgs) {
+    private void getArgsPassed(UserProfileFragmentArgs userProfileFragmentArgs) {
         documentID = userProfileFragmentArgs.getDocumentID();
         getCurrentUserDetails();
-        getCreatorInfo();
+        getFriendInfo();
     }
 
-    private void getCreatorInfo() {
+    private void getFriendInfo() {
         usersReference.document(documentID).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
             @Override
             public void onSuccess(DocumentSnapshot documentSnapshot) {
                 User user = documentSnapshot.toObject(User.class);
+                otherUser = documentSnapshot.toObject(User.class);
                 userProfilePicUrl = user.getUserProfilePicUrl();
 
                 UserNameTv.setText(user.getName());
@@ -469,20 +469,6 @@ public class UserProfileFragment extends Fragment implements PostAdapter.OnItemC
                                 post.setFavorite(fav);
                             }
                         });
-                        //Get post creator details
-                        usersReference.document(post.getCreatorId()).addSnapshotListener(new EventListener<DocumentSnapshot>() {
-                            @Override
-                            public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
-                                if (e != null) {
-                                    Log.w(TAG, "onEvent: ", e);
-                                    return;
-                                }
-                                User user = documentSnapshot.toObject(User.class);
-                                post.setCreator_name(user.getName());
-                                post.setCreator_imageUrl(user.getUserProfilePicUrl());
-                                mAdapter.notifyDataSetChanged();
-                            }
-                        });
                         //Get post comments number
                         postsRef.document(post.getDocumentId()).collection("Comments").addSnapshotListener(new EventListener<QuerySnapshot>() {
                             @Override
@@ -540,7 +526,7 @@ public class UserProfileFragment extends Fragment implements PostAdapter.OnItemC
                     Log.d(TAG, "onEvent: Querry result is null");
                 }
                 if (mPostList.isEmpty()) {
-                    mPostList.add(new Post("", "", "Add friends to see posts just like this one", ""
+                    mPostList.add(new Post("", "", "", "", "Add friends to see posts just like this one", ""
                             , false, "Everyone", null));
                     Log.d(TAG, "EMPTY: ");
                 }
@@ -586,7 +572,7 @@ public class UserProfileFragment extends Fragment implements PostAdapter.OnItemC
 
                 } else {
                     mPostList.get(position).setFavorite(true);
-                    UserWhoFaved userWhoFaved = new UserWhoFaved(mUser.getUser_id(), null);
+                    UserWhoFaved userWhoFaved = new UserWhoFaved(mUser.getUser_id(),mUser.getName(),mUser.getUserProfilePicUrl(), null);
                     FavoritePost favoritePost = new FavoritePost(null);
                     WriteBatch batch = db.batch();
                     batch.set(currentRecipeSubCollection.document(mUser.getUser_id()), userWhoFaved);
