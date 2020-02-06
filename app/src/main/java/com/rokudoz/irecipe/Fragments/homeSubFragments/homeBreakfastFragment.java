@@ -259,7 +259,6 @@ public class homeBreakfastFragment extends Fragment implements RecipeAdapter.OnI
                                                                 }
                                                             }
                                                             recipe.setFavorite(fav);
-                                                            recipe.setNrOfLikes(queryDocumentSnapshots.size());
                                                             mAdapter.notifyDataSetChanged();
                                                         }
                                                     }
@@ -281,6 +280,7 @@ public class homeBreakfastFragment extends Fragment implements RecipeAdapter.OnI
                                     });
 
                         } else {
+                            mRecipeList.set(mRecipeList.indexOf(recipe), recipe);
                             Log.d(TAG, "onEvent: Already Contains docID");
                         }
 
@@ -368,7 +368,6 @@ public class homeBreakfastFragment extends Fragment implements RecipeAdapter.OnI
                                                                 }
                                                             }
                                                             recipe.setFavorite(fav);
-                                                            recipe.setNrOfLikes(queryDocumentSnapshots.size());
                                                             mAdapter.notifyDataSetChanged();
                                                         }
                                                     }
@@ -402,6 +401,7 @@ public class homeBreakfastFragment extends Fragment implements RecipeAdapter.OnI
                                     });
 
                         } else {
+                            mRecipeList.set(mRecipeList.indexOf(recipe), recipe);
                             Log.d(TAG, "onEvent: Already Contains docID");
                         }
 

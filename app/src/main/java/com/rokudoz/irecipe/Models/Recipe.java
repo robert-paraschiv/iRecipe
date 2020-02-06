@@ -22,7 +22,7 @@ public class Recipe implements Comparable<Recipe> {
     private String privacy;
     private Integer nrOfMissingIngredients;
     private List<String> missingIngredients;
-    private Integer nrOfLikes;
+    private Integer number_of_likes;
     private Integer nrOfComments;
 
 
@@ -31,7 +31,7 @@ public class Recipe implements Comparable<Recipe> {
     }
 
     public Recipe(String title, String creator_docId, String creator_name, String creator_imageUrl, String category, String description, List<String> keywords
-            , List<String> imageUrls_list, String complexity, Float duration, String durationType, Float avg_rating, Boolean isFavorite, String privacy) {
+            , List<String> imageUrls_list, String complexity, Float duration, String durationType, Float avg_rating, Boolean isFavorite, String privacy, Integer number_of_likes) {
 
         if (title.trim().equals("")) {
             title = "No Title";
@@ -50,15 +50,15 @@ public class Recipe implements Comparable<Recipe> {
         this.avg_rating = avg_rating;
         this.isFavorite = isFavorite;
         this.privacy = privacy;
+        this.number_of_likes = number_of_likes;
     }
 
-    @Exclude
-    public Integer getNrOfLikes() {
-        return nrOfLikes;
+    public Integer getNumber_of_likes() {
+        return number_of_likes;
     }
 
-    public void setNrOfLikes(Integer nrOfLikes) {
-        this.nrOfLikes = nrOfLikes;
+    public void setNumber_of_likes(Integer number_of_likes) {
+        this.number_of_likes = number_of_likes;
     }
 
     @Exclude
@@ -229,7 +229,7 @@ public class Recipe implements Comparable<Recipe> {
                 ", privacy='" + privacy + '\'' +
                 ", nrOfMissingIngredients=" + nrOfMissingIngredients +
                 ", missingIngredients=" + missingIngredients +
-                ", nrOfLikes=" + nrOfLikes +
+                ", number_of_likes=" + number_of_likes +
                 ", nrOfComments=" + nrOfComments +
                 '}';
     }

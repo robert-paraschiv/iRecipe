@@ -259,7 +259,6 @@ public class homeDinnerFragment extends Fragment implements RecipeAdapter.OnItem
                                                                 }
                                                             }
                                                             recipe.setFavorite(fav);
-                                                            recipe.setNrOfLikes(queryDocumentSnapshots.size());
                                                             mAdapter.notifyDataSetChanged();
                                                         }
                                                     }
@@ -293,6 +292,7 @@ public class homeDinnerFragment extends Fragment implements RecipeAdapter.OnItem
                                         }
                                     });
                         } else {
+                            mRecipeList.set(mRecipeList.indexOf(recipe), recipe);
                             Log.d(TAG, "onEvent: Already Contains docID");
                         }
 
@@ -380,7 +380,6 @@ public class homeDinnerFragment extends Fragment implements RecipeAdapter.OnItem
                                                                 }
                                                             }
                                                             recipe.setFavorite(fav);
-                                                            recipe.setNrOfLikes(queryDocumentSnapshots.size());
                                                             mAdapter.notifyDataSetChanged();
                                                         }
                                                     }
@@ -401,6 +400,7 @@ public class homeDinnerFragment extends Fragment implements RecipeAdapter.OnItem
                                         }
                                     });
                         } else {
+                            mRecipeList.set(mRecipeList.indexOf(recipe), recipe);
                             Log.d(TAG, "onEvent: Already Contains docID");
                         }
 

@@ -41,7 +41,6 @@ import com.rokudoz.irecipe.Utils.Adapters.RecipeAdapter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -197,7 +196,7 @@ public class FavoritesFragment extends Fragment implements RecipeAdapter.OnItemC
                                                         fav = true;
                                                     }
                                                 }
-                                                recipe.setNrOfLikes(queryDocumentSnapshots.size());
+                                                recipe.setNumber_of_likes(queryDocumentSnapshots.size());
                                                 recipe.setFavorite(fav);
                                                 if (fav) {
                                                     if (!mRecipeList.contains(recipe)) {

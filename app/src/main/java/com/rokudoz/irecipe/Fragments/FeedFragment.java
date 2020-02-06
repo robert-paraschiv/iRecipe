@@ -426,18 +426,6 @@ public class FeedFragment extends Fragment implements FeedAdapter.OnItemClickLis
                                 mAdapter.notifyDataSetChanged();
                             }
                         });
-                        //Get post likes number
-                        postsRef.document(post.getDocumentId()).collection("UsersWhoFaved").addSnapshotListener(new EventListener<QuerySnapshot>() {
-                            @Override
-                            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
-                                if (e != null) {
-                                    Log.w(TAG, "onEvent: ", e);
-                                    return;
-                                }
-                                post.setNumber_of_likes(queryDocumentSnapshots.size());
-                                mAdapter.notifyDataSetChanged();
-                            }
-                        });
                         //Get post referenced Recipe details
                         recipesRef.document(post.getReferenced_recipe_docId()).addSnapshotListener(new EventListener<DocumentSnapshot>() {
                             @Override
@@ -464,11 +452,6 @@ public class FeedFragment extends Fragment implements FeedAdapter.OnItemClickLis
                             }
                             mAdapter.notifyDataSetChanged();
                         } else {
-                            nrPostsLoaded++;
-                            if (nrPostsLoaded >= 5) {
-                                insertAdsInRecyclerView();
-                                nrPostsLoaded = 0;
-                            }
                             mPostList.set(mPostList.indexOf(post), post);
                         }
                     }
@@ -482,7 +465,7 @@ public class FeedFragment extends Fragment implements FeedAdapter.OnItemClickLis
                     Log.d(TAG, "onEvent: Querry result is null");
                 }
                 if (mPostList.isEmpty()) {
-                    mPostList.add(new Post("", "", "", "", "Add friends to see posts just like this one", ""
+                    mPostList.add(new Post("", "", "", "", 0, "Add friends to see posts just like this one", ""
                             , false, "Everyone", null));
                     Log.d(TAG, "EMPTY: ");
                 }

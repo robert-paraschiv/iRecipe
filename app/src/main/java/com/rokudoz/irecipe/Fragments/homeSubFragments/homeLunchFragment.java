@@ -260,7 +260,6 @@ public class homeLunchFragment extends Fragment implements RecipeAdapter.OnItemC
                                                                 }
                                                             }
                                                             recipe.setFavorite(fav);
-                                                            recipe.setNrOfLikes(queryDocumentSnapshots.size());
                                                             mAdapter.notifyDataSetChanged();
                                                         }
                                                     }
@@ -293,6 +292,7 @@ public class homeLunchFragment extends Fragment implements RecipeAdapter.OnItemC
                                         }
                                     });
                         } else {
+                            mRecipeList.set(mRecipeList.indexOf(recipe), recipe);
                             Log.d(TAG, "onEvent: Already Contains docID");
                         }
 
@@ -382,7 +382,6 @@ public class homeLunchFragment extends Fragment implements RecipeAdapter.OnItemC
                                                                     }
                                                                 }
                                                                 recipe.setFavorite(fav);
-                                                                recipe.setNrOfLikes(queryDocumentSnapshots.size());
                                                                 mAdapter.notifyDataSetChanged();
                                                             }
                                                         }
@@ -404,7 +403,6 @@ public class homeLunchFragment extends Fragment implements RecipeAdapter.OnItemC
                                                                     }
                                                                 }
                                                                 recipe.setFavorite(fav);
-                                                                recipe.setNrOfLikes(queryDocumentSnapshots.size());
                                                                 mAdapter.notifyDataSetChanged();
                                                             }
                                                         }
@@ -419,6 +417,7 @@ public class homeLunchFragment extends Fragment implements RecipeAdapter.OnItemC
                                         }
                                     });
                         } else {
+                            mRecipeList.set(mRecipeList.indexOf(recipe), recipe);
                             Log.d(TAG, "onEvent: Already Contains docID");
                         }
 

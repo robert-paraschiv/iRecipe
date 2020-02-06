@@ -38,7 +38,6 @@ import com.rokudoz.irecipe.R;
 import com.rokudoz.irecipe.Utils.Adapters.RecipeAdapter;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class profileMyRecipesFragment extends Fragment implements RecipeAdapter.OnItemClickListener {
     private static final String TAG = "profileMyRecipesFragmen";
@@ -188,7 +187,7 @@ public class profileMyRecipesFragment extends Fragment implements RecipeAdapter.
                                             }
                                         }
                                         recipe.setFavorite(fav);
-                                        recipe.setNrOfLikes(queryDocumentSnapshots.size());
+                                        recipe.setNumber_of_likes(queryDocumentSnapshots.size());
                                         mAdapter.notifyDataSetChanged();
                                     }
                                 }
@@ -225,7 +224,7 @@ public class profileMyRecipesFragment extends Fragment implements RecipeAdapter.
                                             }
                                         }
                                         recipe.setFavorite(fav);
-                                        recipe.setNrOfLikes(queryDocumentSnapshots.size());
+                                        recipe.setNumber_of_likes(queryDocumentSnapshots.size());
                                         mAdapter.notifyDataSetChanged();
                                     }
                                 }

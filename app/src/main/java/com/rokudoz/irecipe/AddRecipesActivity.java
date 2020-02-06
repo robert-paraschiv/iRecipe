@@ -423,7 +423,7 @@ public class AddRecipesActivity extends AppCompatActivity {
 
 
         Recipe recipe = new Recipe(title, creator_docId, mUser.getName(), mUser.getUserProfilePicUrl(), category, description, keywords
-                , imageUrls_list, complexity, duration, durationType, 0f, isFavorite, privacy);
+                , imageUrls_list, complexity, duration, durationType, 0f, isFavorite, privacy, 0);
 
 //        // Sends recipe data to Firestore database
         recipesReference.add(recipe)

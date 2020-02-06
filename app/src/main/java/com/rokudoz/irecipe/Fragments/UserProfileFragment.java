@@ -481,18 +481,6 @@ public class UserProfileFragment extends Fragment implements PostAdapter.OnItemC
                                 mAdapter.notifyDataSetChanged();
                             }
                         });
-                        //Get post likes number
-                        postsRef.document(post.getDocumentId()).collection("UsersWhoFaved").addSnapshotListener(new EventListener<QuerySnapshot>() {
-                            @Override
-                            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
-                                if (e != null) {
-                                    Log.w(TAG, "onEvent: ", e);
-                                    return;
-                                }
-                                post.setNumber_of_likes(queryDocumentSnapshots.size());
-                                mAdapter.notifyDataSetChanged();
-                            }
-                        });
                         //Get post referenced Recipe details
                         recipesRef.document(post.getReferenced_recipe_docId()).addSnapshotListener(new EventListener<DocumentSnapshot>() {
                             @Override
@@ -526,7 +514,7 @@ public class UserProfileFragment extends Fragment implements PostAdapter.OnItemC
                     Log.d(TAG, "onEvent: Querry result is null");
                 }
                 if (mPostList.isEmpty()) {
-                    mPostList.add(new Post("", "", "", "", "Add friends to see posts just like this one", ""
+                    mPostList.add(new Post("", "", "", "", 0, "Add friends to see posts just like this one", ""
                             , false, "Everyone", null));
                     Log.d(TAG, "EMPTY: ");
                 }
@@ -572,7 +560,7 @@ public class UserProfileFragment extends Fragment implements PostAdapter.OnItemC
 
                 } else {
                     mPostList.get(position).setFavorite(true);
-                    UserWhoFaved userWhoFaved = new UserWhoFaved(mUser.getUser_id(),mUser.getName(),mUser.getUserProfilePicUrl(), null);
+                    UserWhoFaved userWhoFaved = new UserWhoFaved(mUser.getUser_id(), mUser.getName(), mUser.getUserProfilePicUrl(), null);
                     FavoritePost favoritePost = new FavoritePost(null);
                     WriteBatch batch = db.batch();
                     batch.set(currentRecipeSubCollection.document(mUser.getUser_id()), userWhoFaved);
