@@ -54,4 +54,13 @@ public class UserWhoFaved {
     public void setmFaveTimestamp(Date mFaveTimestamp) {
         this.mFaveTimestamp = mFaveTimestamp;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof UserWhoFaved))
+            return false;
+        if (obj == this)
+            return true;
+        return this.getUserID().equals(((UserWhoFaved) obj).getUserID());
+    }
 }

@@ -224,11 +224,18 @@
     </fragment>
     <fragment
         android:id="@+id/usersWhoLiked"
-        android:name="com.rokudoz.irecipe.Fragments.UsersWhoLiked"
+        android:name="com.rokudoz.irecipe.Fragments.UsersWhoLikedFragment"
         android:label="fragment_users_who_liked"
         tools:layout="@layout/fragment_users_who_liked" >
         <argument
             android:name="documentID"
+            app:argType="string" />
+        <action
+            android:id="@+id/action_usersWhoLiked_to_userProfileFragment2"
+            app:destination="@id/userProfileFragment2"
+            app:popUpTo="@+id/usersWhoLiked" />
+        <argument
+            android:name="category"
             app:argType="string" />
     </fragment>
 </navigation>

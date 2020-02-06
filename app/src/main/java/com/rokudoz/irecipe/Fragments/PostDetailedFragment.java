@@ -134,6 +134,12 @@ public class PostDetailedFragment extends Fragment {
                 }
                 int numberOfFav = queryDocumentSnapshots.size();
                 postFavoriteNumber.setText(Integer.toString(numberOfFav));
+                postFavoriteNumber.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Navigation.findNavController(view).navigate(PostDetailedFragmentDirections.actionPostDetailedToUsersWhoLiked(documentID,"Posts"));
+                    }
+                });
             }
         });
 

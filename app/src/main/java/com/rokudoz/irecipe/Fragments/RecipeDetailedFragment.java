@@ -244,6 +244,13 @@ public class RecipeDetailedFragment extends Fragment implements RecipeInstructio
                                         favText.append(user.getName());
                                     }
                                     mFavoriteNumber.setText(favText);
+                                    mFavoriteNumber.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View v) {
+                                            Navigation.findNavController(view).navigate(RecipeDetailedFragmentDirections
+                                                    .actionRecipeDetailedFragmentToUsersWhoLiked(documentID,"Recipes"));
+                                        }
+                                    });
                                 }
                             }
                         });
@@ -308,7 +315,8 @@ public class RecipeDetailedFragment extends Fragment implements RecipeInstructio
         String commentText = mCommentEditText.getText().toString();
 
 
-        final Comment comment = new Comment(documentID, FirebaseAuth.getInstance().getCurrentUser().getUid(), mUser.getName(), mUser.getUserProfilePicUrl(), commentText, null);
+        final Comment comment = new Comment(documentID, FirebaseAuth.getInstance().getCurrentUser().getUid(), mUser.getName(), mUser.getUserProfilePicUrl()
+                , commentText, null);
         DocumentReference currentRecipeRef = recipeRef.document(documentID);
         CollectionReference commentRef = currentRecipeRef.collection("Comments");
 
@@ -520,7 +528,8 @@ public class RecipeDetailedFragment extends Fragment implements RecipeInstructio
                         mDeleteRecipeBtn.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                MaterialAlertDialogBuilder materialAlertDialogBuilder = new MaterialAlertDialogBuilder(getActivity(), R.style.ThemeOverlay_MaterialComponents_MaterialAlertDialog_Centered);
+                                MaterialAlertDialogBuilder materialAlertDialogBuilder = new MaterialAlertDialogBuilder(getActivity()
+                                        , R.style.ThemeOverlay_MaterialComponents_MaterialAlertDialog_Centered);
                                 materialAlertDialogBuilder.setMessage("Are you sure you want to delete your recipe?");
                                 materialAlertDialogBuilder.setCancelable(true);
                                 materialAlertDialogBuilder.setPositiveButton(
@@ -647,7 +656,8 @@ public class RecipeDetailedFragment extends Fragment implements RecipeInstructio
                                 }
                             }
                             mAddMissingIngredientsFAB.hide();
-                            Toast.makeText(getActivity(), "Added " + nrOfMissingIngredients + " missing ingredients to your shopping list", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getActivity(), "Added " + nrOfMissingIngredients + " missing ingredients to your shopping list"
+                                    , Toast.LENGTH_SHORT).show();
                             showFab = false;
                             tvMissingIngredientsNumber.setVisibility(View.INVISIBLE);
                         }
