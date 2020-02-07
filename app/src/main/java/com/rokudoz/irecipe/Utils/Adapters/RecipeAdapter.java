@@ -118,8 +118,8 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
         if (currentItem.getFavorite() != null && currentItem.getFavorite()) {
             holder.imgFavorited.setImageResource(R.drawable.ic_favorite_red_24dp);
         }
-        if (currentItem.getNrOfComments() != null) {
-            holder.tvNumComments.setText("" + currentItem.getNrOfComments());
+        if (currentItem.getNumber_of_comments() != null) {
+            holder.tvNumComments.setText("" + currentItem.getNumber_of_comments());
         }
 
     }

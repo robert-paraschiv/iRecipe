@@ -23,7 +23,7 @@ public class Recipe implements Comparable<Recipe> {
     private Integer nrOfMissingIngredients;
     private List<String> missingIngredients;
     private Integer number_of_likes;
-    private Integer nrOfComments;
+    private Integer number_of_comments;
 
 
     public Recipe() {
@@ -31,7 +31,8 @@ public class Recipe implements Comparable<Recipe> {
     }
 
     public Recipe(String title, String creator_docId, String creator_name, String creator_imageUrl, String category, String description, List<String> keywords
-            , List<String> imageUrls_list, String complexity, Float duration, String durationType, Float avg_rating, Boolean isFavorite, String privacy, Integer number_of_likes) {
+            , List<String> imageUrls_list, String complexity, Float duration, String durationType, Float avg_rating, Boolean isFavorite, String privacy
+            , Integer number_of_likes, Integer number_of_comments) {
 
         if (title.trim().equals("")) {
             title = "No Title";
@@ -51,6 +52,7 @@ public class Recipe implements Comparable<Recipe> {
         this.isFavorite = isFavorite;
         this.privacy = privacy;
         this.number_of_likes = number_of_likes;
+        this.number_of_comments = number_of_comments;
     }
 
     public Integer getNumber_of_likes() {
@@ -61,13 +63,12 @@ public class Recipe implements Comparable<Recipe> {
         this.number_of_likes = number_of_likes;
     }
 
-    @Exclude
-    public Integer getNrOfComments() {
-        return nrOfComments;
+    public Integer getNumber_of_comments() {
+        return number_of_comments;
     }
 
-    public void setNrOfComments(Integer nrOfComments) {
-        this.nrOfComments = nrOfComments;
+    public void setNumber_of_comments(Integer number_of_comments) {
+        this.number_of_comments = number_of_comments;
     }
 
     @Exclude
@@ -230,7 +231,7 @@ public class Recipe implements Comparable<Recipe> {
                 ", nrOfMissingIngredients=" + nrOfMissingIngredients +
                 ", missingIngredients=" + missingIngredients +
                 ", number_of_likes=" + number_of_likes +
-                ", nrOfComments=" + nrOfComments +
+                ", number_of_comments=" + number_of_comments +
                 '}';
     }
 

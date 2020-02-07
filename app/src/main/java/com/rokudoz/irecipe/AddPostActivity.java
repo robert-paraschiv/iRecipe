@@ -226,7 +226,7 @@ public class AddPostActivity extends AppCompatActivity {
         String text = descriptionInputText.getText().toString();
         String privacy = privacySpinner.getSelectedItem().toString();
 
-        Post post = new Post(referencedRecipeDocID, creatorId, mUser.getName(), mUser.getUserProfilePicUrl(), 0, text, postPicUrl,
+        Post post = new Post(referencedRecipeDocID, creatorId, mUser.getName(), mUser.getUserProfilePicUrl(), 0, 0,text, postPicUrl,
                 false, privacy, null);
         if (postPicUrl.equals("")) {
             Toast.makeText(this, "Please select a photo for your post", Toast.LENGTH_SHORT).show();

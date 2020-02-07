@@ -387,7 +387,7 @@ public class FeedFragment extends Fragment implements FeedAdapter.OnItemClickLis
                         post.setDocumentId(document.getId());
 
                         //Check if current user liked the post or not
-                        postsRef.document(post.getDocumentId()).collection("UsersWhoFaved").document(mUser.getUser_id())
+                        postsRef.document(post.getDocumentId()).collection("UsersWhoFaved").document(FirebaseAuth.getInstance().getCurrentUser().getUid())
                                 .addSnapshotListener(new EventListener<DocumentSnapshot>() {
                                     @Override
                                     public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
@@ -409,18 +409,7 @@ public class FeedFragment extends Fragment implements FeedAdapter.OnItemClickLis
                                         }
                                     }
                                 });
-                        //Get post comments number
-                        postsRef.document(post.getDocumentId()).collection("Comments").addSnapshotListener(new EventListener<QuerySnapshot>() {
-                            @Override
-                            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
-                                if (e != null) {
-                                    Log.w(TAG, "onEvent: ", e);
-                                    return;
-                                }
-                                post.setNumber_of_comments(queryDocumentSnapshots.size());
-                                mAdapter.notifyDataSetChanged();
-                            }
-                        });
+
                         //Get post referenced Recipe details
                         recipesRef.document(post.getReferenced_recipe_docId()).addSnapshotListener(new EventListener<DocumentSnapshot>() {
                             @Override
@@ -460,7 +449,7 @@ public class FeedFragment extends Fragment implements FeedAdapter.OnItemClickLis
                     Log.d(TAG, "onEvent: Querry result is null");
                 }
                 if (mPostList.isEmpty()) {
-                    mPostList.add(new Post("", "", "", "", 0
+                    mPostList.add(new Post("", "", "", "", 0, 0
                             , "Add friends to see posts just like this one", ""
                             , false, "Everyone", null));
                     Log.d(TAG, "EMPTY: ");
@@ -479,7 +468,6 @@ public class FeedFragment extends Fragment implements FeedAdapter.OnItemClickLis
         Intent intent = new Intent(getContext(), SearchUserActivity.class);
         startActivity(intent);
     }
-
 
 
     @Override

@@ -24,13 +24,14 @@ public class Post {
     private @ServerTimestamp
     Date creation_date;
 
-    public Post(String referenced_recipe_docId, String creatorId, String creator_name, String creator_imageUrl, Integer number_of_likes, String text, String imageUrl, Boolean isFavorite, String privacy
+    public Post(String referenced_recipe_docId, String creatorId, String creator_name, String creator_imageUrl, Integer number_of_likes, Integer number_of_comments,String text, String imageUrl, Boolean isFavorite, String privacy
             , Date creation_date) {
         this.referenced_recipe_docId = referenced_recipe_docId;
         this.creatorId = creatorId;
         this.creator_name = creator_name;
         this.creator_imageUrl = creator_imageUrl;
         this.number_of_likes = number_of_likes;
+        this.number_of_comments = number_of_comments;
         this.text = text;
         this.imageUrl = imageUrl;
         this.isFavorite = isFavorite;
@@ -58,12 +59,10 @@ public class Post {
         this.creator_imageUrl = creator_imageUrl;
     }
 
-    @Exclude
     public Integer getNumber_of_comments() {
         return number_of_comments;
     }
 
-    @Exclude
     public void setNumber_of_comments(Integer number_of_comments) {
         this.number_of_comments = number_of_comments;
     }

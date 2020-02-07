@@ -217,7 +217,7 @@ public class FavoritesFragment extends Fragment implements RecipeAdapter.OnItemC
                                                     return;
                                                 }
                                                 if (queryDocumentSnapshots != null) {
-                                                    recipe.setNrOfComments(queryDocumentSnapshots.size());
+                                                    recipe.setNumber_of_comments(queryDocumentSnapshots.size());
                                                     mAdapter.notifyDataSetChanged();
                                                 }
                                             }

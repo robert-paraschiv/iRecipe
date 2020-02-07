@@ -58,7 +58,8 @@ public class homeLunchFragment extends Fragment implements RecipeAdapter.OnItemC
     private CollectionReference recipeRef = db.collection("Recipes");
     private CollectionReference usersReference = db.collection("Users");
     private FirebaseStorage mStorageRef;
-    private ListenerRegistration userDetailsListener, userIngredientsListener, recipesListener, recipesIngredientsListener, privateRecipesListener, privateRecipeIngredientsListener;
+    private ListenerRegistration userDetailsListener, userIngredientsListener, recipesListener, recipesIngredientsListener, privateRecipesListener
+            , privateRecipeIngredientsListener;
 
     private RecyclerView mRecyclerView;
     private RecipeAdapter mAdapter;
@@ -241,7 +242,8 @@ public class homeLunchFragment extends Fragment implements RecipeAdapter.OnItemC
                                         Log.d(TAG, "onEvent: " + recipe.getTitle() + " NR OF MISSING INGREDIENTS " + numberOfMissingIngredients);
                                         if (numberOfMissingIngredients < 3) {
                                             //Check if current user liked the post or not
-                                            recipeRef.document(recipe.getDocumentId()).collection("UsersWhoFaved").document(mUser.getUser_id())
+                                            recipeRef.document(recipe.getDocumentId()).collection("UsersWhoFaved")
+                                                    .document(FirebaseAuth.getInstance().getCurrentUser().getUid())
                                                     .addSnapshotListener(new EventListener<DocumentSnapshot>() {
                                                         @Override
                                                         public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
@@ -260,20 +262,6 @@ public class homeLunchFragment extends Fragment implements RecipeAdapter.OnItemC
                                                                 }
                                                             } else {
                                                                 Log.d(TAG, "onEvent: NULL");
-                                                            }
-                                                        }
-                                                    });
-                                            recipeRef.document(recipe.getDocumentId()).collection("Comments")
-                                                    .addSnapshotListener(new EventListener<QuerySnapshot>() {
-                                                        @Override
-                                                        public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
-                                                            if (e != null) {
-                                                                Log.w(TAG, "onEvent: ", e);
-                                                                return;
-                                                            }
-                                                            if (queryDocumentSnapshots != null) {
-                                                                recipe.setNrOfComments(queryDocumentSnapshots.size());
-                                                                mAdapter.notifyDataSetChanged();
                                                             }
                                                         }
                                                     });
@@ -358,7 +346,8 @@ public class homeLunchFragment extends Fragment implements RecipeAdapter.OnItemC
                                         Log.d(TAG, "onEvent: " + recipe.getTitle() + " NR OF MISSING INGREDIENTS " + numberOfMissingIngredients);
                                         if (numberOfMissingIngredients < 3) {
                                             //Check if current user liked the post or not
-                                            recipeRef.document(recipe.getDocumentId()).collection("UsersWhoFaved").document(mUser.getUser_id())
+                                            recipeRef.document(recipe.getDocumentId()).collection("UsersWhoFaved")
+                                                    .document(FirebaseAuth.getInstance().getCurrentUser().getUid())
                                                     .addSnapshotListener(new EventListener<DocumentSnapshot>() {
                                                         @Override
                                                         public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
@@ -377,20 +366,6 @@ public class homeLunchFragment extends Fragment implements RecipeAdapter.OnItemC
                                                                 }
                                                             } else {
                                                                 Log.d(TAG, "onEvent: NULL");
-                                                            }
-                                                        }
-                                                    });
-                                            recipeRef.document(recipe.getDocumentId()).collection("Comments")
-                                                    .addSnapshotListener(new EventListener<QuerySnapshot>() {
-                                                        @Override
-                                                        public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
-                                                            if (e != null) {
-                                                                Log.w(TAG, "onEvent: ", e);
-                                                                return;
-                                                            }
-                                                            if (queryDocumentSnapshots != null) {
-                                                                recipe.setNrOfComments(queryDocumentSnapshots.size());
-                                                                mAdapter.notifyDataSetChanged();
                                                             }
                                                         }
                                                     });
