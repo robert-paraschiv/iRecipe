@@ -170,10 +170,8 @@ public class FeedFragment extends Fragment implements FeedAdapter.OnItemClickLis
             }).build();
 
             adLoader.loadAds(new AdRequest.Builder()
-                    .addTestDevice("717A151EFF00FB99F1DBE6C94A2837BA")
-                    .addTestDevice("06562AD747A6C127AD23FE62AFCEF0E4")
-                    .addTestDevice("6BC23AEACA857DDF15F1B0BA94497105")
-                    .addTestDevice("7932C0283EF009F58EC1B834EE6472D1")
+                    .addTestDevice("2F1C484BD502BA7D51AC78D75751AFE0") // Mi 9T Pro
+                    .addTestDevice("7932C0283EF009F58EC1B834EE6472D1") // Redmi 5 Plus
                     .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
                     .build(), NUMBER_OF_ADS);
         }

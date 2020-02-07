@@ -145,58 +145,6 @@ public class PostDetailedFragment extends Fragment {
             }
         });
 
-        //Get post number of likes
-        numberofFavListener = currentRecipeSubCollection.orderBy("mFaveTimestamp", Query.Direction.DESCENDING)
-                .addSnapshotListener(new EventListener<QuerySnapshot>() {
-            @Override
-            public void onEvent(@javax.annotation.Nullable final QuerySnapshot queryDocumentSnapshots, @javax.annotation.Nullable FirebaseFirestoreException e) {
-                if (e != null) {
-                    return;
-                }
-                if (queryDocumentSnapshots != null) {
-                    if (queryDocumentSnapshots.size() > 0) {
-                        UserWhoFaved userWhoFaved = queryDocumentSnapshots.getDocuments().get(0).toObject(UserWhoFaved.class);
-                        usersRef.document(userWhoFaved.getUserID()).addSnapshotListener(new EventListener<DocumentSnapshot>() {
-                            @Override
-                            public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
-                                if (e != null) {
-                                    Log.w(TAG, "onEvent: ", e);
-                                    return;
-                                }
-                                if (documentSnapshot != null) {
-                                    User user = documentSnapshot.toObject(User.class);
-                                    StringBuilder favText = new StringBuilder();
-
-                                    if (queryDocumentSnapshots.size() == 1) {
-                                        favText.append(user.getName()).append(" likes this");
-                                    } else if (queryDocumentSnapshots.size() == 2) {
-                                        favText.append(user.getName());
-                                        favText.append(" and ").append(queryDocumentSnapshots.size() - 1).append(" other");
-                                    } else if (queryDocumentSnapshots.size() > 2) {
-                                        favText.append(user.getName());
-                                        favText.append(" and ").append(queryDocumentSnapshots.size() - 1).append(" others");
-                                    }
-                                    postFavoriteNumber.setText(favText);
-                                    postFavoriteNumber.setOnClickListener(new View.OnClickListener() {
-                                        @Override
-                                        public void onClick(View v) {
-                                            Navigation.findNavController(view).navigate(PostDetailedFragmentDirections
-                                                    .actionPostDetailedToUsersWhoLiked(documentID, "Posts"));
-                                        }
-                                    });
-                                }
-                            }
-                        });
-                    } else {
-                        postFavoriteNumber.setText("" + 0);
-                    }
-                } else {
-                    postFavoriteNumber.setText("" + 0);
-                }
-            }
-        });
-
-
         buildRecyclerView();
         getCommentsFromDb();
         getPostDetails();
@@ -342,25 +290,67 @@ public class PostDetailedFragment extends Fragment {
                             }
                         });
                     }
-                    postsRef.document(post.getDocumentId()).collection("UsersWhoFaved").addSnapshotListener(new EventListener<QuerySnapshot>() {
+                    //Check if current user liked the post or not
+                    postsRef.document(post.getDocumentId()).collection("UsersWhoFaved").document(mUser.getUser_id())
+                            .addSnapshotListener(new EventListener<DocumentSnapshot>() {
+                                @Override
+                                public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
+                                    if (e != null) {
+                                        Log.w(TAG, "onEvent: ", e);
+                                        return;
+                                    }
+                                    if (documentSnapshot != null) {
+                                        UserWhoFaved userWhoFaved = documentSnapshot.toObject(UserWhoFaved.class);
+                                        if (userWhoFaved != null && userWhoFaved.getUserID().equals(mUser.getUser_id())) {
+                                            post.setFavorite(true);
+                                            postFavoriteIcon.setImageResource(R.drawable.ic_favorite_red_24dp);
+                                            mAdapter.notifyDataSetChanged();
+                                        } else {
+                                            post.setFavorite(false);
+                                            postFavoriteIcon.setImageResource(R.drawable.ic_favorite_border_black_24dp);
+                                            mAdapter.notifyDataSetChanged();
+                                        }
+                                    } else {
+                                        Log.d(TAG, "onEvent: NULL");
+                                    }
+                                }
+                            });
+                    //Set nr of likes TextView
+                    postsRef.document(post.getDocumentId()).collection("UsersWhoFaved").orderBy("mFaveTimestamp", Query.Direction.DESCENDING)
+                            .limit(1).addSnapshotListener(new EventListener<QuerySnapshot>() {
                         @Override
                         public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
                             if (e != null) {
                                 Log.w(TAG, "onEvent: ", e);
                                 return;
                             }
-                            Boolean fav = false;
-                            for (QueryDocumentSnapshot documentSnapshot1 : queryDocumentSnapshots) {
-                                if (documentSnapshot1.getId().equals(currentUserID))
-                                    fav = true;
-                            }
-                            if (fav) {
-                                post.setFavorite(true);
-                                postFavoriteIcon.setImageResource(R.drawable.ic_favorite_red_24dp);
-                            } else {
-                                post.setFavorite(false);
-                                postFavoriteIcon.setImageResource(R.drawable.ic_favorite_border_black_24dp);
-                            }
+                            if (queryDocumentSnapshots != null && queryDocumentSnapshots.size() > 0) {
+                                UserWhoFaved userWhoFaved = queryDocumentSnapshots.getDocuments().get(0).toObject(UserWhoFaved.class);
+                                if (userWhoFaved != null) {
+                                    StringBuilder favText = new StringBuilder();
+
+                                    if (post.getNumber_of_likes() == 1) {
+                                        favText.append(userWhoFaved.getUser_name()).append(" likes this");
+                                    } else if (post.getNumber_of_likes() == 2) {
+                                        favText.append(userWhoFaved.getUser_name());
+                                        favText.append(" and ").append(post.getNumber_of_likes() - 1).append(" other");
+                                    } else if (post.getNumber_of_likes() > 2) {
+                                        favText.append(userWhoFaved.getUser_name());
+                                        favText.append(" and ").append(post.getNumber_of_likes() - 1).append(" others");
+                                    }
+                                    postFavoriteNumber.setText(favText);
+                                    postFavoriteNumber.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View v) {
+                                            Navigation.findNavController(view).navigate(PostDetailedFragmentDirections
+                                                    .actionPostDetailedToUsersWhoLiked(documentID, "Posts"));
+                                        }
+                                    });
+                                }
+                            } else if (queryDocumentSnapshots != null && queryDocumentSnapshots.size() == 0) {
+                                postFavoriteNumber.setText("0");
+                            } else
+                                Log.d(TAG, "onEvent: NULL");
                         }
                     });
 
