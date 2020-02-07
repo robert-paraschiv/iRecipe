@@ -460,22 +460,22 @@ public class RecipeDetailedFragment extends Fragment implements RecipeInstructio
                     //Check if the user liked the recipe or not
                     recipeRef.document(documentID).collection("UsersWhoFaved").document(mUser.getUser_id())
                             .addSnapshotListener(new EventListener<DocumentSnapshot>() {
-                        @Override
-                        public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
-                            if (e != null) {
-                                Log.w(TAG, "onEvent: ", e);
-                                return;
-                            }
-                            if (documentSnapshot != null) {
-                                UserWhoFaved userWhoFaved = documentSnapshot.toObject(UserWhoFaved.class);
-                                if (userWhoFaved != null && userWhoFaved.getUserID().equals(mUser.getUser_id())) {
-                                    setFavoriteIcon(true);
-                                } else {
-                                    setFavoriteIcon(false);
+                                @Override
+                                public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
+                                    if (e != null) {
+                                        Log.w(TAG, "onEvent: ", e);
+                                        return;
+                                    }
+                                    if (documentSnapshot != null) {
+                                        UserWhoFaved userWhoFaved = documentSnapshot.toObject(UserWhoFaved.class);
+                                        if (userWhoFaved != null && userWhoFaved.getUserID().equals(mUser.getUser_id())) {
+                                            setFavoriteIcon(true);
+                                        } else {
+                                            setFavoriteIcon(false);
+                                        }
+                                    }
                                 }
-                            }
-                        }
-                    });
+                            });
 
                     //Setup nr of likes TextView
                     recipeRef.document(documentID).collection("UsersWhoFaved").orderBy("mFaveTimestamp", Query.Direction.DESCENDING).limit(1)
@@ -492,12 +492,24 @@ public class RecipeDetailedFragment extends Fragment implements RecipeInstructio
                                             StringBuilder favText = new StringBuilder();
 
                                             if (recipe.getNumber_of_likes() == 1) {
-                                                favText.append(userWhoFaved.getUser_name()).append(" likes this");
+                                                if (userWhoFaved.getUserID().equals(mUser.getUser_id())) {
+                                                    favText.append("You like this");
+                                                } else {
+                                                    favText.append(userWhoFaved.getUser_name()).append(" likes this");
+                                                }
                                             } else if (recipe.getNumber_of_likes() == 2) {
-                                                favText.append(userWhoFaved.getUser_name());
+                                                if (userWhoFaved.getUserID().equals(mUser.getUser_id())) {
+                                                    favText.append("You");
+                                                } else {
+                                                    favText.append(userWhoFaved.getUser_name());
+                                                }
                                                 favText.append(" and ").append(recipe.getNumber_of_likes() - 1).append(" other");
                                             } else if (recipe.getNumber_of_likes() > 2) {
-                                                favText.append(userWhoFaved.getUser_name());
+                                                if (userWhoFaved.getUserID().equals(mUser.getUser_id())) {
+                                                    favText.append("You");
+                                                } else {
+                                                    favText.append(userWhoFaved.getUser_name());
+                                                }
                                                 favText.append(" and ").append(recipe.getNumber_of_likes() - 1).append(" others");
                                             }
                                             mFavoriteNumber.setText(favText);

@@ -430,7 +430,7 @@ public class FeedFragment extends Fragment implements FeedAdapter.OnItemClickLis
                         if (!mPostList.contains(post)) {
                             mPostList.add(post);
                             nrPostsLoaded++;
-                            if (nrPostsLoaded >= 5) {
+                            if (nrPostsLoaded >= 5 && !adLoader.isLoading()) {
                                 insertAdsInRecyclerView();
                                 nrPostsLoaded = 0;
                             }

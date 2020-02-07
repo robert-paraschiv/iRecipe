@@ -330,12 +330,24 @@ public class PostDetailedFragment extends Fragment {
                                     StringBuilder favText = new StringBuilder();
 
                                     if (post.getNumber_of_likes() == 1) {
-                                        favText.append(userWhoFaved.getUser_name()).append(" likes this");
+                                        if (userWhoFaved.getUserID().equals(mUser.getUser_id())) {
+                                            favText.append("You like this");
+                                        } else {
+                                            favText.append(userWhoFaved.getUser_name()).append(" likes this");
+                                        }
                                     } else if (post.getNumber_of_likes() == 2) {
-                                        favText.append(userWhoFaved.getUser_name());
+                                        if (userWhoFaved.getUserID().equals(mUser.getUser_id())) {
+                                            favText.append("You");
+                                        } else {
+                                            favText.append(userWhoFaved.getUser_name());
+                                        }
                                         favText.append(" and ").append(post.getNumber_of_likes() - 1).append(" other");
                                     } else if (post.getNumber_of_likes() > 2) {
-                                        favText.append(userWhoFaved.getUser_name());
+                                        if (userWhoFaved.getUserID().equals(mUser.getUser_id())) {
+                                            favText.append("You");
+                                        } else {
+                                            favText.append(userWhoFaved.getUser_name());
+                                        }
                                         favText.append(" and ").append(post.getNumber_of_likes() - 1).append(" others");
                                     }
                                     postFavoriteNumber.setText(favText);

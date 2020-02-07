@@ -12,7 +12,7 @@
             android:layout_width="match_parent"
             android:layout_height="40dp"
             android:id="@+id/selectFriend_toolbar"
-            app:title="Select a friend to open a conversation"
+            app:title="Select friend to message"
             />
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/selectFriend_recycler_view"

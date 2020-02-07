@@ -509,7 +509,7 @@ public class UserProfileFragment extends Fragment implements PostAdapter.OnItemC
                 }
                 if (mPostList.isEmpty()) {
                     mPostList.add(new Post("", "", "", "", 0, 0
-                            , "Add friends to see posts just like this one", ""
+                            , "This user hasn't posted anything yet :)", ""
                             , false, "Everyone", null));
                     Log.d(TAG, "EMPTY: ");
                 }
