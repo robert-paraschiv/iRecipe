@@ -61,6 +61,9 @@ public class profileMyIngredientsFragment extends Fragment {
     private List<Ingredient> userIngredientList;
     private List<Ingredient> allIngredientsList = new ArrayList<>();
 
+    private List<String> ingredient_categories = new ArrayList<>();
+    private String[] categories;
+
     private RecyclerView ingredientsRecyclerView;
     private MyIngredientsAdapter ingredientsAdapter;
     private RecyclerView.LayoutManager ingredientsLayoutManager;
@@ -159,7 +162,18 @@ public class profileMyIngredientsFragment extends Fragment {
                         if (e == null) {
                             User user = Objects.requireNonNull(documentSnapshot).toObject(User.class);
                             userDocId = Objects.requireNonNull(user).getUser_id();
-                            getUserIngredientList();
+                            ingredientsReference.document("ingredient_categories").addSnapshotListener(new EventListener<DocumentSnapshot>() {
+                                @Override
+                                public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
+                                    if (e == null && documentSnapshot != null) {
+                                        ingredient_categories = (List<String>) documentSnapshot.get("categories");
+                                        Log.d(TAG, "onEvent: " + ingredient_categories);
+                                        categories = ingredient_categories.toArray(new String[0]);
+                                        getUserIngredientList();
+                                    }
+                                }
+                            });
+
                         }
                     }
                 });
@@ -195,7 +209,7 @@ public class profileMyIngredientsFragment extends Fragment {
                             }
                             Collections.sort(ingredientList);
 
-                            List<String> categories = new ArrayList<>();
+                            final List<String> categories = new ArrayList<>();
                             for (Ingredient ing : ingredientList) {
                                 if (!categories.contains(ing.getCategory()))
                                     categories.add(ing.getCategory());
@@ -223,11 +237,9 @@ public class profileMyIngredientsFragment extends Fragment {
                                     linearLayout.setOrientation(LinearLayout.VERTICAL);
                                     final EditText input = new EditText(getActivity());
                                     final Spinner spinner = new Spinner(getActivity());
-                                    String[] items = new String[]{"Vegetables", "Fruits", "Meats", "Dairy", "Seafood", "Condiments"
-                                            , "Oils", "Flour/Grains/Cereals", "Batter/Breading/Pastas"};
                                     //create an adapter to describe how the items are displayed, adapters are used in several places in android.
                                     //There are multiple variations of this, but this is the basic variant.
-                                    ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_dropdown_item, items);
+                                    ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_dropdown_item, categories);
                                     //set the spinners adapter to the previously created one.
                                     spinner.setAdapter(adapter);
                                     input.setInputType(InputType.TYPE_TEXT_FLAG_CAP_WORDS);

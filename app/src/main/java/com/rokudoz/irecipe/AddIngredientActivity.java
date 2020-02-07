@@ -32,6 +32,9 @@ public class AddIngredientActivity extends AppCompatActivity {
 
     private static final String TAG = "AddIngredientActivity";
 
+    private List<String> ingredient_categories = new ArrayList<>();
+    private String[] categories;
+
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private CollectionReference ingredientsReference = db.collection("Ingredients");
 
@@ -47,8 +50,18 @@ public class AddIngredientActivity extends AppCompatActivity {
 
         textInputEditText = findViewById(R.id.textinput_ingredientName);
         MaterialButton addIngredientBtn = findViewById(R.id.materialBtn_addIngredientToDb);
+        ingredientsReference.document("ingredient_categories").addSnapshotListener(new EventListener<DocumentSnapshot>() {
+            @Override
+            public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
+                if (e == null && documentSnapshot != null) {
+                    ingredient_categories = (List<String>) documentSnapshot.get("categories");
+                    Log.d(TAG, "onEvent: " + ingredient_categories);
+                    categories = ingredient_categories.toArray(new String[0]);
+                    setUpCategorySpinner();
+                }
+            }
+        });
 
-        setUpCategorySpinner();
         addIngredientBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -108,11 +121,9 @@ public class AddIngredientActivity extends AppCompatActivity {
 
     private void setUpCategorySpinner() {
         Spinner dropdown = findViewById(R.id.spinner_ingredientCategory);
-        String[] items = new String[]{"Vegetables", "Fruits", "Meats", "Dairy", "Seafood", "Condiments"
-                , "Oils", "Flour/Grains/Cereals", "Batter/Breading/Pastas"};
         //create an adapter to describe how the items are displayed, adapters are used in several places in android.
         //There are multiple variations of this, but this is the basic variant.
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, items);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, categories);
         //set the spinners adapter to the previously created one.
         dropdown.setAdapter(adapter);
 
