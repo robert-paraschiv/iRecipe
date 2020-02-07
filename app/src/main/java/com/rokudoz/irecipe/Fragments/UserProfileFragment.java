@@ -439,7 +439,6 @@ public class UserProfileFragment extends Fragment implements PostAdapter.OnItemC
 //                                    .limit(3);
         }
         PerformMainQuery(postsQuery);
-        initializeRecyclerViewAdapterOnClicks();
     }
 
     private void PerformMainQuery(Query postsQuery) {
@@ -453,22 +452,29 @@ public class UserProfileFragment extends Fragment implements PostAdapter.OnItemC
                         final Post post = document.toObject(Post.class);
                         post.setDocumentId(document.getId());
 
-                        postsRef.document(post.getDocumentId()).collection("UsersWhoFaved").addSnapshotListener(new EventListener<QuerySnapshot>() {
-                            @Override
-                            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
-                                if (e != null) {
-                                    Log.w(TAG, "onEvent: ", e);
-                                    return;
-                                }
-                                Boolean fav = false;
-                                for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
-                                    if (documentSnapshot.getId().equals(mUser.getUser_id())) {
-                                        fav = true;
+                        //Check if current user liked the post or not
+                        postsRef.document(post.getDocumentId()).collection("UsersWhoFaved").document(mUser.getUser_id())
+                                .addSnapshotListener(new EventListener<DocumentSnapshot>() {
+                                    @Override
+                                    public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
+                                        if (e != null) {
+                                            Log.w(TAG, "onEvent: ", e);
+                                            return;
+                                        }
+                                        if (documentSnapshot != null) {
+                                            UserWhoFaved userWhoFaved = documentSnapshot.toObject(UserWhoFaved.class);
+                                            if (userWhoFaved != null && userWhoFaved.getUserID().equals(mUser.getUser_id())) {
+                                                post.setFavorite(true);
+                                                mAdapter.notifyDataSetChanged();
+                                            } else {
+                                                post.setFavorite(false);
+                                                mAdapter.notifyDataSetChanged();
+                                            }
+                                        } else {
+                                            Log.d(TAG, "onEvent: NULL");
+                                        }
                                     }
-                                }
-                                post.setFavorite(fav);
-                            }
-                        });
+                                });
                         //Get post comments number
                         postsRef.document(post.getDocumentId()).collection("Comments").addSnapshotListener(new EventListener<QuerySnapshot>() {
                             @Override
@@ -524,80 +530,57 @@ public class UserProfileFragment extends Fragment implements PostAdapter.OnItemC
         });
     }
 
-    private void initializeRecyclerViewAdapterOnClicks() {
-        mAdapter.setOnItemClickListener(new PostAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(int position) {
-                String id = mPostList.get(position).getDocumentId();
-                Navigation.findNavController(view).navigate(UserProfileFragmentDirections.actionUserProfileFragment2ToPostDetailed(id));
-            }
-
-            @Override
-            public void onFavoriteClick(final int position) {
-
-                ////////////////////////////////////////////////
-                final String id = mPostList.get(position).getDocumentId();
-                DocumentReference currentRecipeRef = postsRef.document(id);
-                final CollectionReference currentRecipeSubCollection = currentRecipeRef.collection("UsersWhoFaved");
-
-                DocumentReference currentUserRef = usersReference.document(loggedInUserDocumentId);
-
-                Log.d(TAG, "onFavoriteClick: " + mPostList.get(position).getDocumentId());
-
-                if (mPostList.get(position).getFavorite()) {
-                    WriteBatch batch = db.batch();
-                    batch.delete(currentUserRef.collection("FavoritePosts").document(id));
-                    batch.delete(currentRecipeSubCollection.document(mUser.getUser_id()));
-                    batch.commit().addOnSuccessListener(new OnSuccessListener<Void>() {
-                        @Override
-                        public void onSuccess(Void aVoid) {
-                            Log.d(TAG, "onSuccess: like deleted from db");
-                        }
-                    });
-                    userFavPostList.remove(id);
-                    mPostList.get(position).setFavorite(false);
-                    mAdapter.notifyDataSetChanged();
-
-                } else {
-                    mPostList.get(position).setFavorite(true);
-                    UserWhoFaved userWhoFaved = new UserWhoFaved(mUser.getUser_id(), mUser.getName(), mUser.getUserProfilePicUrl(), null);
-                    FavoritePost favoritePost = new FavoritePost(null);
-                    WriteBatch batch = db.batch();
-                    batch.set(currentRecipeSubCollection.document(mUser.getUser_id()), userWhoFaved);
-                    batch.set(currentUserRef.collection("FavoritePosts").document(id), favoritePost);
-                    batch.commit().addOnSuccessListener(new OnSuccessListener<Void>() {
-                        @Override
-                        public void onSuccess(Void aVoid) {
-                            Log.d(TAG, "onFavoriteClick: Added to favorites");
-                        }
-                    });
-                    mAdapter.notifyDataSetChanged();
-                }
-
-            }
-
-            @Override
-            public void onCommentClick(int position) {
-                String id = mPostList.get(position).getDocumentId();
-                Navigation.findNavController(view).navigate(UserProfileFragmentDirections.actionUserProfileFragment2ToPostComments(id));
-            }
-
-        });
-    }
-
-
     @Override
     public void onItemClick(int position) {
-
+        String id = mPostList.get(position).getDocumentId();
+        Navigation.findNavController(view).navigate(UserProfileFragmentDirections.actionUserProfileFragment2ToPostDetailed(id));
     }
 
     @Override
     public void onFavoriteClick(int position) {
+        ////////////////////////////////////////////////
+        final String id = mPostList.get(position).getDocumentId();
+        DocumentReference currentRecipeRef = postsRef.document(id);
+        final CollectionReference currentRecipeSubCollection = currentRecipeRef.collection("UsersWhoFaved");
 
+        DocumentReference currentUserRef = usersReference.document(loggedInUserDocumentId);
+
+        Log.d(TAG, "onFavoriteClick: " + mPostList.get(position).getDocumentId());
+
+        if (mPostList.get(position).getFavorite()) {
+            WriteBatch batch = db.batch();
+            batch.delete(currentUserRef.collection("FavoritePosts").document(id));
+            batch.delete(currentRecipeSubCollection.document(mUser.getUser_id()));
+            batch.commit().addOnSuccessListener(new OnSuccessListener<Void>() {
+                @Override
+                public void onSuccess(Void aVoid) {
+                    Log.d(TAG, "onSuccess: like deleted from db");
+                }
+            });
+            userFavPostList.remove(id);
+            mPostList.get(position).setFavorite(false);
+            mAdapter.notifyDataSetChanged();
+
+        } else {
+            mPostList.get(position).setFavorite(true);
+            UserWhoFaved userWhoFaved = new UserWhoFaved(mUser.getUser_id(), mUser.getName(), mUser.getUserProfilePicUrl(), null);
+            FavoritePost favoritePost = new FavoritePost(null);
+            WriteBatch batch = db.batch();
+            batch.set(currentRecipeSubCollection.document(mUser.getUser_id()), userWhoFaved);
+            batch.set(currentUserRef.collection("FavoritePosts").document(id), favoritePost);
+            batch.commit().addOnSuccessListener(new OnSuccessListener<Void>() {
+                @Override
+                public void onSuccess(Void aVoid) {
+                    Log.d(TAG, "onFavoriteClick: Added to favorites");
+                }
+            });
+            mAdapter.notifyDataSetChanged();
+        }
     }
 
     @Override
     public void onCommentClick(int position) {
-
+        String id = mPostList.get(position).getDocumentId();
+        Navigation.findNavController(view).navigate(UserProfileFragmentDirections.actionUserProfileFragment2ToPostComments(id));
     }
 }

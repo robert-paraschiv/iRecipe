@@ -107,14 +107,12 @@ public class FeedFragment extends Fragment implements FeedAdapter.OnItemClickLis
         return fragment;
     }
 
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         if (view == null) {
             view = inflater.inflate(R.layout.fragment_feed, container, false);
         }
-
 
         BottomNavigationView navBar = getActivity().findViewById(R.id.bottom_navigation);
         navBar.setVisibility(View.VISIBLE);
@@ -142,7 +140,6 @@ public class FeedFragment extends Fragment implements FeedAdapter.OnItemClickLis
                 navigateToSearchUser();
             }
         });
-
 
         fab.setVisibility(View.INVISIBLE);
         buildRecyclerView();
@@ -179,8 +176,6 @@ public class FeedFragment extends Fragment implements FeedAdapter.OnItemClickLis
                     .addTestDevice("7932C0283EF009F58EC1B834EE6472D1")
                     .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
                     .build(), NUMBER_OF_ADS);
-
-
         }
     }
 
@@ -267,7 +262,6 @@ public class FeedFragment extends Fragment implements FeedAdapter.OnItemClickLis
 
         mAdapter.setOnItemClickListener(FeedFragment.this);
 
-
         mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
@@ -341,10 +335,8 @@ public class FeedFragment extends Fragment implements FeedAdapter.OnItemClickLis
                                 performQuery();
                             }
                         });
-
             }
         });
-
     }
 
     private void getUnreadConversationNr() {
@@ -383,13 +375,9 @@ public class FeedFragment extends Fragment implements FeedAdapter.OnItemClickLis
         }
         PerformMainQuery(postsQuery);
         pbLoading.setVisibility(View.INVISIBLE);
-
-        initializeRecyclerViewAdapterOnClicks();
-
     }
 
     private void PerformMainQuery(Query postsQuery) {
-
 
         postsQuery.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
@@ -400,22 +388,29 @@ public class FeedFragment extends Fragment implements FeedAdapter.OnItemClickLis
                         final Post post = document.toObject(Post.class);
                         post.setDocumentId(document.getId());
 
-                        postsRef.document(post.getDocumentId()).collection("UsersWhoFaved").addSnapshotListener(new EventListener<QuerySnapshot>() {
-                            @Override
-                            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
-                                if (e != null) {
-                                    Log.w(TAG, "onEvent: ", e);
-                                    return;
-                                }
-                                Boolean fav = false;
-                                for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
-                                    if (documentSnapshot.getId().equals(mUser.getUser_id())) {
-                                        fav = true;
+                        //Check if current user liked the post or not
+                        postsRef.document(post.getDocumentId()).collection("UsersWhoFaved").document(mUser.getUser_id())
+                                .addSnapshotListener(new EventListener<DocumentSnapshot>() {
+                                    @Override
+                                    public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
+                                        if (e != null) {
+                                            Log.w(TAG, "onEvent: ", e);
+                                            return;
+                                        }
+                                        if (documentSnapshot != null) {
+                                            UserWhoFaved userWhoFaved = documentSnapshot.toObject(UserWhoFaved.class);
+                                            if (userWhoFaved != null && userWhoFaved.getUserID().equals(mUser.getUser_id())) {
+                                                post.setFavorite(true);
+                                                mAdapter.notifyDataSetChanged();
+                                            } else {
+                                                post.setFavorite(false);
+                                                mAdapter.notifyDataSetChanged();
+                                            }
+                                        } else {
+                                            Log.d(TAG, "onEvent: NULL");
+                                        }
                                     }
-                                }
-                                post.setFavorite(fav);
-                            }
-                        });
+                                });
                         //Get post comments number
                         postsRef.document(post.getDocumentId()).collection("Comments").addSnapshotListener(new EventListener<QuerySnapshot>() {
                             @Override
@@ -467,7 +462,8 @@ public class FeedFragment extends Fragment implements FeedAdapter.OnItemClickLis
                     Log.d(TAG, "onEvent: Querry result is null");
                 }
                 if (mPostList.isEmpty()) {
-                    mPostList.add(new Post("", "", "", "", 0, "Add friends to see posts just like this one", ""
+                    mPostList.add(new Post("", "", "", "", 0
+                            , "Add friends to see posts just like this one", ""
                             , false, "Everyone", null));
                     Log.d(TAG, "EMPTY: ");
                 }
@@ -475,87 +471,6 @@ public class FeedFragment extends Fragment implements FeedAdapter.OnItemClickLis
             }
         });
     }
-
-    private void initializeRecyclerViewAdapterOnClicks() {
-        mAdapter.setOnItemClickListener(new FeedAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(int position) {
-                Post post = (Post) mPostList.get(position);
-                String id = post.getDocumentId();
-                if (id != null && !id.equals("")) {
-                    Navigation.findNavController(view).navigate(FeedFragmentDirections.actionFeedFragmentToPostDetailed(id));
-                } else {
-                    if (getActivity() != null)
-                        Toast.makeText(getActivity(), "This is just a demo card, add a post or add friends", Toast.LENGTH_SHORT).show();
-                }
-            }
-
-            @Override
-            public void onFavoriteClick(final int position) {
-                ////////////////////////////////////////////////
-                Post post = (Post) mPostList.get(position);
-                final String id = post.getDocumentId();
-                if (id != null && !id.equals("")) {
-                    DocumentReference currentRecipeRef = postsRef.document(id);
-                    final CollectionReference currentRecipeSubCollection = currentRecipeRef.collection("UsersWhoFaved");
-
-                    DocumentReference currentUserRef = usersReference.document(loggedInUserDocumentId);
-
-                    Log.d(TAG, "onFavoriteClick: " + post.getDocumentId());
-
-                    if (post.getFavorite()) {
-                        WriteBatch batch = db.batch();
-                        batch.delete(currentUserRef.collection("FavoritePosts").document(id));
-                        batch.delete(currentRecipeSubCollection.document(mUser.getUser_id()));
-                        batch.commit().addOnSuccessListener(new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void aVoid) {
-                                Log.d(TAG, "onSuccess: like deleted from db");
-                            }
-                        });
-                        userFavPostList.remove(id);
-                        post.setFavorite(false);
-                        mAdapter.notifyDataSetChanged();
-
-                    } else {
-                        post.setFavorite(true);
-                        UserWhoFaved userWhoFaved = new UserWhoFaved(mUser.getUser_id(), mUser.getName(), mUser.getUserProfilePicUrl(), null);
-                        FavoritePost favoritePost = new FavoritePost(null);
-
-                        WriteBatch batch = db.batch();
-                        batch.set(currentRecipeSubCollection.document(mUser.getUser_id()), userWhoFaved);
-                        batch.set(currentUserRef.collection("FavoritePosts").document(id), favoritePost);
-                        batch.commit().addOnSuccessListener(new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void aVoid) {
-                                Log.d(TAG, "onFavoriteClick: Added to favorites");
-                            }
-                        });
-
-                        mAdapter.notifyDataSetChanged();
-                    }
-                } else {
-                    if (getActivity() != null)
-                        Toast.makeText(getActivity(), "This is just a demo card, add a post or add friends", Toast.LENGTH_SHORT).show();
-                }
-
-            }
-
-            @Override
-            public void onCommentClick(int position) {
-                Post post = (Post) mPostList.get(position);
-                String id = post.getDocumentId();
-                if (id != null && !id.equals("")) {
-                    Navigation.findNavController(view).navigate(FeedFragmentDirections.actionFeedFragmentToPostComments(id));
-                } else {
-                    if (getActivity() != null)
-                        Toast.makeText(getActivity(), "This is just a demo card, add a post or add friends", Toast.LENGTH_SHORT).show();
-                }
-            }
-
-        });
-    }
-
 
     private void navigateToAddPost() {
         Intent intent = new Intent(getContext(), AddPostActivity.class);
@@ -566,6 +481,84 @@ public class FeedFragment extends Fragment implements FeedAdapter.OnItemClickLis
         Intent intent = new Intent(getContext(), SearchUserActivity.class);
         startActivity(intent);
     }
+
+
+
+    @Override
+    public void onItemClick(int position) {
+        Post post = (Post) mPostList.get(position);
+        String id = post.getDocumentId();
+        if (id != null && !id.equals("")) {
+            Navigation.findNavController(view).navigate(FeedFragmentDirections.actionFeedFragmentToPostDetailed(id));
+        } else {
+            if (getActivity() != null)
+                Toast.makeText(getActivity(), "This is just a demo card, add a post or add friends", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    public void onFavoriteClick(int position) {
+        ////////////////////////////////////////////////
+        Post post = (Post) mPostList.get(position);
+        final String id = post.getDocumentId();
+        if (id != null && !id.equals("")) {
+            DocumentReference currentRecipeRef = postsRef.document(id);
+            final CollectionReference currentRecipeSubCollection = currentRecipeRef.collection("UsersWhoFaved");
+
+            DocumentReference currentUserRef = usersReference.document(loggedInUserDocumentId);
+
+            Log.d(TAG, "onFavoriteClick: " + post.getDocumentId());
+
+            if (post.getFavorite()) {
+                WriteBatch batch = db.batch();
+                batch.delete(currentUserRef.collection("FavoritePosts").document(id));
+                batch.delete(currentRecipeSubCollection.document(mUser.getUser_id()));
+                batch.commit().addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Log.d(TAG, "onSuccess: like deleted from db");
+                    }
+                });
+                userFavPostList.remove(id);
+                post.setFavorite(false);
+                mAdapter.notifyDataSetChanged();
+
+            } else {
+                post.setFavorite(true);
+                UserWhoFaved userWhoFaved = new UserWhoFaved(mUser.getUser_id(), mUser.getName(), mUser.getUserProfilePicUrl(), null);
+                FavoritePost favoritePost = new FavoritePost(null);
+
+                WriteBatch batch = db.batch();
+                batch.set(currentRecipeSubCollection.document(mUser.getUser_id()), userWhoFaved);
+                batch.set(currentUserRef.collection("FavoritePosts").document(id), favoritePost);
+                batch.commit().addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Log.d(TAG, "onFavoriteClick: Added to favorites");
+                    }
+                });
+
+                mAdapter.notifyDataSetChanged();
+            }
+        } else {
+            if (getActivity() != null)
+                Toast.makeText(getActivity(), "This is just a demo card, add a post or add friends", Toast.LENGTH_SHORT).show();
+        }
+
+    }
+
+    @Override
+    public void onCommentClick(int position) {
+        Post post = (Post) mPostList.get(position);
+        String id = post.getDocumentId();
+        if (id != null && !id.equals("")) {
+            Navigation.findNavController(view).navigate(FeedFragmentDirections.actionFeedFragmentToPostComments(id));
+        } else {
+            if (getActivity() != null)
+                Toast.makeText(getActivity(), "This is just a demo card, add a post or add friends", Toast.LENGTH_SHORT).show();
+        }
+    }
+
 
     /*
         ----------------------------- Firebase setup ---------------------------------
@@ -611,20 +604,5 @@ public class FeedFragment extends Fragment implements FeedAdapter.OnItemClickLis
                 // ...
             }
         };
-    }
-
-    @Override
-    public void onItemClick(int position) {
-
-    }
-
-    @Override
-    public void onFavoriteClick(int position) {
-
-    }
-
-    @Override
-    public void onCommentClick(int position) {
-
     }
 }

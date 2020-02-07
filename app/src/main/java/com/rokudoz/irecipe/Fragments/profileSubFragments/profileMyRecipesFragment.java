@@ -31,6 +31,7 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.rokudoz.irecipe.Fragments.ProfileFragmentDirections;
+import com.rokudoz.irecipe.Models.Ingredient;
 import com.rokudoz.irecipe.Models.Recipe;
 import com.rokudoz.irecipe.Models.User;
 import com.rokudoz.irecipe.Models.UserWhoFaved;
@@ -38,6 +39,8 @@ import com.rokudoz.irecipe.R;
 import com.rokudoz.irecipe.Utils.Adapters.RecipeAdapter;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class profileMyRecipesFragment extends Fragment implements RecipeAdapter.OnItemClickListener {
     private static final String TAG = "profileMyRecipesFragmen";
@@ -154,12 +157,11 @@ public class profileMyRecipesFragment extends Fragment implements RecipeAdapter.
         }
         PerformMainQuery(recipesQuery);
         pbLoading.setVisibility(View.INVISIBLE);
-        initializeRecyclerViewAdapterOnClicks();
     }
 
     private void PerformMainQuery(Query recipesQuery) {
 
-        recipesListener = recipesQuery.addSnapshotListener(new EventListener<QuerySnapshot>() {
+        recipesQuery.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
                 if (e != null) {
@@ -171,79 +173,50 @@ public class profileMyRecipesFragment extends Fragment implements RecipeAdapter.
                         final Recipe recipe = document.toObject(Recipe.class);
                         recipe.setDocumentId(document.getId());
 
-                        if (!mRecipeList.contains(recipe)) {
-                            recipeRef.document(recipe.getDocumentId()).collection("UsersWhoFaved").addSnapshotListener(new EventListener<QuerySnapshot>() {
-                                @Override
-                                public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
-                                    if (e != null) {
-                                        Log.w(TAG, "onEvent: ", e);
-                                        return;
-                                    }
-                                    if (queryDocumentSnapshots != null) {
-                                        Boolean fav = false;
-                                        for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
-                                            if (documentSnapshot.getId().equals(mUser.getUser_id())) {
-                                                fav = true;
-                                            }
-                                        }
-                                        recipe.setFavorite(fav);
-                                        recipe.setNumber_of_likes(queryDocumentSnapshots.size());
-                                        mAdapter.notifyDataSetChanged();
-                                    }
-                                }
-                            });
-                            recipeRef.document(recipe.getDocumentId()).collection("Comments").addSnapshotListener(new EventListener<QuerySnapshot>() {
-                                @Override
-                                public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
-                                    if (e != null) {
-                                        Log.w(TAG, "onEvent: ", e);
-                                        return;
-                                    }
-                                    if (queryDocumentSnapshots != null) {
-                                        recipe.setNrOfComments(queryDocumentSnapshots.size());
-                                        mAdapter.notifyDataSetChanged();
-                                    }
-                                }
-                            });
-                            ////////////////////////////////////////////////////////// LOGIC TO GET RECIPES HERE
+                        ////////////////////////////////////////////////////////// LOGIC TO GET RECIPES HERE
 
+                        //Check if current user liked the post or not
+                        recipeRef.document(recipe.getDocumentId()).collection("UsersWhoFaved").document(mUser.getUser_id())
+                                .addSnapshotListener(new EventListener<DocumentSnapshot>() {
+                                    @Override
+                                    public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
+                                        if (e != null) {
+                                            Log.w(TAG, "onEvent: ", e);
+                                            return;
+                                        }
+                                        if (documentSnapshot != null) {
+                                            UserWhoFaved userWhoFaved = documentSnapshot.toObject(UserWhoFaved.class);
+                                            if (userWhoFaved != null && userWhoFaved.getUserID().equals(mUser.getUser_id())) {
+                                                recipe.setFavorite(true);
+                                                mAdapter.notifyDataSetChanged();
+                                            } else {
+                                                recipe.setFavorite(false);
+                                                mAdapter.notifyDataSetChanged();
+                                            }
+                                        } else {
+                                            Log.d(TAG, "onEvent: NULL");
+                                        }
+                                    }
+                                });
+                        recipeRef.document(recipe.getDocumentId()).collection("Comments").addSnapshotListener(new EventListener<QuerySnapshot>() {
+                            @Override
+                            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                                if (e != null) {
+                                    Log.w(TAG, "onEvent: ", e);
+                                    return;
+                                }
+                                if (queryDocumentSnapshots != null) {
+                                    recipe.setNrOfComments(queryDocumentSnapshots.size());
+                                    mAdapter.notifyDataSetChanged();
+                                }
+                            }
+                        });
+                        if (!mRecipeList.contains(recipe)) {
                             mRecipeList.add(recipe);
                         } else {
-                            recipeRef.document(recipe.getDocumentId()).collection("UsersWhoFaved").addSnapshotListener(new EventListener<QuerySnapshot>() {
-                                @Override
-                                public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
-                                    if (e != null) {
-                                        Log.w(TAG, "onEvent: ", e);
-                                        return;
-                                    }
-                                    if (queryDocumentSnapshots != null) {
-                                        Boolean fav = false;
-                                        for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
-                                            if (documentSnapshot.getId().equals(mUser.getUser_id())) {
-                                                fav = true;
-                                            }
-                                        }
-                                        recipe.setFavorite(fav);
-                                        recipe.setNumber_of_likes(queryDocumentSnapshots.size());
-                                        mAdapter.notifyDataSetChanged();
-                                    }
-                                }
-                            });
-                            recipeRef.document(recipe.getDocumentId()).collection("Comments").addSnapshotListener(new EventListener<QuerySnapshot>() {
-                                @Override
-                                public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
-                                    if (e != null) {
-                                        Log.w(TAG, "onEvent: ", e);
-                                        return;
-                                    }
-                                    if (queryDocumentSnapshots != null) {
-                                        recipe.setNrOfComments(queryDocumentSnapshots.size());
-                                        mAdapter.notifyDataSetChanged();
-                                    }
-                                }
-                            });
-                            Log.d(TAG, "onEvent: Already Contains docID");
+                            mRecipeList.set(mRecipeList.indexOf(recipe), recipe);
                         }
+                        mAdapter.notifyDataSetChanged();
 
                     }
 
@@ -259,60 +232,43 @@ public class profileMyRecipesFragment extends Fragment implements RecipeAdapter.
         });
     }
 
-    private void initializeRecyclerViewAdapterOnClicks() {
-        mAdapter.setOnItemClickListener(new RecipeAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(int position) {
-                String id = mRecipeList.get(position).getDocumentId();
-                String title = mRecipeList.get(position).getTitle();
-                Log.d(TAG, "onItemClick: CLICKED " + title + " id " + id);
-
-                Navigation.findNavController(view).navigate(ProfileFragmentDirections.actionProfileFragmentToRecipeDetailedFragment(id));
-
-            }
-
-            @Override
-            public void onFavoriteClick(final int position) {
-                String id = mRecipeList.get(position).getDocumentId();
-                String title = mRecipeList.get(position).getTitle();
-                DocumentReference currentRecipeRef = recipeRef.document(id);
-                final CollectionReference currentRecipeSubCollection = currentRecipeRef.collection("UsersWhoFaved");
-
-                DocumentReference favRecipesRef = usersReference.document(mUser.getUser_id());
-
-                Log.d(TAG, "onFavoriteClick: " + mRecipeList.get(position).getDocumentId());
-
-                if (mRecipeList.get(position).getFavorite()) {
-                    mRecipeList.get(position).setFavorite(false);
-
-                    currentRecipeSubCollection.document(mUser.getUser_id()).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
-                        @Override
-                        public void onSuccess(Void aVoid) {
-                            Toast.makeText(getContext(), "Removed from favorites", Toast.LENGTH_SHORT).show();
-                        }
-                    });
-
-                } else {
-                    mRecipeList.get(position).setFavorite(true);
-                    UserWhoFaved userWhoFaved = new UserWhoFaved(mUser.getUser_id(), mUser.getName(), mUser.getUserProfilePicUrl(), null);
-                    currentRecipeSubCollection.document(mUser.getUser_id()).set(userWhoFaved);
-                    Toast.makeText(getContext(), "Added " + title + " to favorites", Toast.LENGTH_SHORT).show();
-                }
-
-                mAdapter.notifyDataSetChanged();
-            }
-
-        });
-    }
-
-
     @Override
     public void onItemClick(int position) {
+        String id = mRecipeList.get(position).getDocumentId();
+        String title = mRecipeList.get(position).getTitle();
+        Log.d(TAG, "onItemClick: CLICKED " + title + " id " + id);
 
+        Navigation.findNavController(view).navigate(ProfileFragmentDirections.actionProfileFragmentToRecipeDetailedFragment(id));
     }
 
     @Override
     public void onFavoriteClick(int position) {
+        String id = mRecipeList.get(position).getDocumentId();
+        String title = mRecipeList.get(position).getTitle();
+        DocumentReference currentRecipeRef = recipeRef.document(id);
+        final CollectionReference currentRecipeSubCollection = currentRecipeRef.collection("UsersWhoFaved");
 
+        DocumentReference favRecipesRef = usersReference.document(mUser.getUser_id());
+
+        Log.d(TAG, "onFavoriteClick: " + mRecipeList.get(position).getDocumentId());
+
+        if (mRecipeList.get(position).getFavorite()) {
+            mRecipeList.get(position).setFavorite(false);
+
+            currentRecipeSubCollection.document(mUser.getUser_id()).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                @Override
+                public void onSuccess(Void aVoid) {
+                    Toast.makeText(getContext(), "Removed from favorites", Toast.LENGTH_SHORT).show();
+                }
+            });
+
+        } else {
+            mRecipeList.get(position).setFavorite(true);
+            UserWhoFaved userWhoFaved = new UserWhoFaved(mUser.getUser_id(), mUser.getName(), mUser.getUserProfilePicUrl(), null);
+            currentRecipeSubCollection.document(mUser.getUser_id()).set(userWhoFaved);
+            Toast.makeText(getContext(), "Added " + title + " to favorites", Toast.LENGTH_SHORT).show();
+        }
+
+        mAdapter.notifyDataSetChanged();
     }
 }
