@@ -12,6 +12,8 @@ public class Recipe implements Comparable<Recipe> {
     private String creator_imageUrl;
     private String category;
     private String description;
+    private List<Ingredient> ingredient_list;
+    private List<Instruction> instruction_list;
     private List<String> keywords;
     private List<String> imageUrls_list;
     private String complexity;
@@ -30,9 +32,9 @@ public class Recipe implements Comparable<Recipe> {
         //public no-arg constructor needed
     }
 
-    public Recipe(String title, String creator_docId, String creator_name, String creator_imageUrl, String category, String description, List<String> keywords
-            , List<String> imageUrls_list, String complexity, Float duration, String durationType, Float avg_rating, Boolean isFavorite, String privacy
-            , Integer number_of_likes, Integer number_of_comments) {
+    public Recipe(String title, String creator_docId, String creator_name, String creator_imageUrl, String category, String description
+            , List<Ingredient> ingredient_list, List<Instruction> instruction_list, List<String> keywords, List<String> imageUrls_list, String complexity
+            , Float duration, String durationType, Float avg_rating, Boolean isFavorite, String privacy, Integer number_of_likes, Integer number_of_comments) {
 
         if (title.trim().equals("")) {
             title = "No Title";
@@ -43,6 +45,8 @@ public class Recipe implements Comparable<Recipe> {
         this.creator_imageUrl = creator_imageUrl;
         this.category = category;
         this.description = description;
+        this.ingredient_list = ingredient_list;
+        this.instruction_list = instruction_list;
         this.keywords = keywords;
         this.imageUrls_list = imageUrls_list;
         this.complexity = complexity;
@@ -176,6 +180,22 @@ public class Recipe implements Comparable<Recipe> {
 
     public void setKeywords(List<String> keywords) {
         this.keywords = keywords;
+    }
+
+    public List<Ingredient> getIngredient_list() {
+        return ingredient_list;
+    }
+
+    public void setIngredient_list(List<Ingredient> ingredient_list) {
+        this.ingredient_list = ingredient_list;
+    }
+
+    public List<Instruction> getInstruction_list() {
+        return instruction_list;
+    }
+
+    public void setInstruction_list(List<Instruction> instruction_list) {
+        this.instruction_list = instruction_list;
     }
 
     public List<String> getImageUrls_list() {

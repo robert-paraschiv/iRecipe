@@ -197,7 +197,6 @@ public class homeBreakfastFragment extends Fragment implements RecipeAdapter.OnI
     }
 
     private void PerformMainQuery(Query recipesQuery) {
-
         recipesQuery.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@javax.annotation.Nullable QuerySnapshot queryDocumentSnapshots,
@@ -209,77 +208,63 @@ public class homeBreakfastFragment extends Fragment implements RecipeAdapter.OnI
 
 
                         ////////////////////////////////////////////////////////// LOGIC TO GET RECIPES HERE
-                        final List<Ingredient> recipeIngredientList = new ArrayList<>();
+                        List<Ingredient> recipeIngredientList = new ArrayList<>();
+                        if (recipe.getIngredient_list() != null)
+                            recipeIngredientList = recipe.getIngredient_list();
+
                         final List<String> missingIngredients = new ArrayList<>();
 
-                        recipeRef.document(recipe.getDocumentId()).collection("RecipeIngredients")
-                                .addSnapshotListener(new EventListener<QuerySnapshot>() {
-                                    @Override
-                                    public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
-                                        if (e != null) {
-                                            Log.w(TAG, "onEvent: ", e);
-                                            return;
-                                        }
-                                        for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
-                                            Ingredient ingredient = documentSnapshot.toObject(Ingredient.class);
-                                            ingredient.setDocumentId(documentSnapshot.getId());
-                                            if (!recipeIngredientList.contains(ingredient)) {
-                                                recipeIngredientList.add(ingredient);
+                        int numberOfMissingIngredients = 0;
+                        for (Ingredient ingredient : recipeIngredientList) {
+                            if (userIngredientList.contains(ingredient)) {
+                                if (!userIngredientList.get(userIngredientList.indexOf(ingredient)).getOwned()) {
+                                    numberOfMissingIngredients++;
+                                    missingIngredients.add(ingredient.getName());
+                                }
+
+                            } else {
+                                missingIngredients.add(ingredient.getName());
+                                numberOfMissingIngredients++;
+                            }
+                        }
+                        Log.d(TAG, "onEvent: " + recipe.getTitle() + " NR OF MISSING INGREDIENTS " + numberOfMissingIngredients);
+                        if (numberOfMissingIngredients <= 3) {
+                            //Check if the recipe is favorite or not
+                            recipeRef.document(recipe.getDocumentId()).collection("UsersWhoFaved").document(mUser.getUser_id())
+                                    .addSnapshotListener(new EventListener<DocumentSnapshot>() {
+                                        @Override
+                                        public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
+                                            if (e != null) {
+                                                Log.w(TAG, "onEvent: ", e);
+                                                return;
                                             }
-                                        }
-                                        int numberOfMissingIngredients = 0;
-                                        for (Ingredient ingredient : recipeIngredientList) {
-                                            if (userIngredientList.contains(ingredient)) {
-                                                if (!userIngredientList.get(userIngredientList.indexOf(ingredient)).getOwned()) {
-                                                    numberOfMissingIngredients++;
-                                                    missingIngredients.add(ingredient.getName());
+                                            if (documentSnapshot != null) {
+                                                UserWhoFaved userWhoFaved = documentSnapshot.toObject(UserWhoFaved.class);
+                                                if (userWhoFaved != null && userWhoFaved.getUserID().equals(mUser.getUser_id())) {
+                                                    recipe.setFavorite(true);
+                                                    mAdapter.notifyDataSetChanged();
+                                                } else {
+                                                    recipe.setFavorite(false);
+                                                    mAdapter.notifyDataSetChanged();
                                                 }
-
                                             } else {
-                                                missingIngredients.add(ingredient.getName());
-                                                numberOfMissingIngredients++;
+                                                Log.d(TAG, "onEvent: NULL");
                                             }
                                         }
-                                        Log.d(TAG, "onEvent: " + recipe.getTitle() + " NR OF MISSING INGREDIENTS " + numberOfMissingIngredients);
-                                        if (numberOfMissingIngredients < 3) {
-                                            //Check if the recipe is favorite or not
-                                            recipeRef.document(recipe.getDocumentId()).collection("UsersWhoFaved").document(mUser.getUser_id())
-                                                    .addSnapshotListener(new EventListener<DocumentSnapshot>() {
-                                                        @Override
-                                                        public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
-                                                            if (e != null) {
-                                                                Log.w(TAG, "onEvent: ", e);
-                                                                return;
-                                                            }
-                                                            if (documentSnapshot != null) {
-                                                                UserWhoFaved userWhoFaved = documentSnapshot.toObject(UserWhoFaved.class);
-                                                                if (userWhoFaved != null && userWhoFaved.getUserID().equals(mUser.getUser_id())) {
-                                                                    recipe.setFavorite(true);
-                                                                    mAdapter.notifyDataSetChanged();
-                                                                } else {
-                                                                    recipe.setFavorite(false);
-                                                                    mAdapter.notifyDataSetChanged();
-                                                                }
-                                                            } else {
-                                                                Log.d(TAG, "onEvent: NULL");
-                                                            }
-                                                        }
-                                                    });
-                                            if (!mRecipeList.contains(recipe)) {
-                                                recipe.setNrOfMissingIngredients(numberOfMissingIngredients);
-                                                recipe.setMissingIngredients(missingIngredients);
+                                    });
+                            if (!mRecipeList.contains(recipe)) {
+                                recipe.setNrOfMissingIngredients(numberOfMissingIngredients);
+                                recipe.setMissingIngredients(missingIngredients);
 
-                                                mRecipeList.add(recipe);
-                                            } else {
-                                                recipe.setNrOfMissingIngredients(numberOfMissingIngredients);
-                                                recipe.setMissingIngredients(missingIngredients);
-                                                mRecipeList.set(mRecipeList.indexOf(recipe), recipe);
-                                            }
-                                            Collections.sort(mRecipeList);
-                                            mAdapter.notifyDataSetChanged();
-                                        }
-                                    }
-                                });
+                                mRecipeList.add(recipe);
+                            } else {
+                                recipe.setNrOfMissingIngredients(numberOfMissingIngredients);
+                                recipe.setMissingIngredients(missingIngredients);
+                                mRecipeList.set(mRecipeList.indexOf(recipe), recipe);
+                            }
+                            Collections.sort(mRecipeList);
+                            mAdapter.notifyDataSetChanged();
+                        }
                     }
                     if (queryDocumentSnapshots.getDocuments().size() != 0) {
                         mLastQueriedDocument = queryDocumentSnapshots.getDocuments()
@@ -314,76 +299,61 @@ public class homeBreakfastFragment extends Fragment implements RecipeAdapter.OnI
 
                         ////////////////////////////////////////////////////////// LOGIC TO GET RECIPES HERE
 
-                        final List<Ingredient> recipeIngredientList = new ArrayList<>();
+                        List<Ingredient> recipeIngredientList = new ArrayList<>();
+                        if (recipe.getIngredient_list() != null)
+                            recipeIngredientList = recipe.getIngredient_list();
                         final List<String> missingIngredients = new ArrayList<>();
 
-                        recipeRef.document(recipe.getDocumentId()).collection("RecipeIngredients")
-                                .addSnapshotListener(new EventListener<QuerySnapshot>() {
-                                    @Override
-                                    public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
-                                        if (e != null) {
-                                            Log.w(TAG, "onEvent: ", e);
-                                            return;
-                                        }
-                                        for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
-                                            Ingredient ingredient = documentSnapshot.toObject(Ingredient.class);
-                                            ingredient.setDocumentId(documentSnapshot.getId());
-                                            if (!recipeIngredientList.contains(ingredient)) {
-                                                recipeIngredientList.add(ingredient);
-                                            }
-                                        }
-                                        int numberOfMissingIngredients = 0;
-                                        for (Ingredient ingredient : recipeIngredientList) {
-                                            if (userIngredientList.contains(ingredient)) {
-                                                if (!userIngredientList.get(userIngredientList.indexOf(ingredient)).getOwned()) {
-                                                    numberOfMissingIngredients++;
-                                                    missingIngredients.add(ingredient.getName());
-                                                }
+                        int numberOfMissingIngredients = 0;
+                        for (Ingredient ingredient : recipeIngredientList) {
+                            if (userIngredientList.contains(ingredient)) {
+                                if (!userIngredientList.get(userIngredientList.indexOf(ingredient)).getOwned()) {
+                                    numberOfMissingIngredients++;
+                                    missingIngredients.add(ingredient.getName());
+                                }
 
+                            } else {
+                                missingIngredients.add(ingredient.getName());
+                                numberOfMissingIngredients++;
+                            }
+                        }
+                        Log.d(TAG, "onEvent: " + recipe.getTitle() + " NR OF MISSING INGREDIENTS " + numberOfMissingIngredients);
+                        if (numberOfMissingIngredients <= 3) {
+                            //Check if current user liked the post or not
+                            recipeRef.document(recipe.getDocumentId()).collection("UsersWhoFaved").document(mUser.getUser_id())
+                                    .addSnapshotListener(new EventListener<DocumentSnapshot>() {
+                                        @Override
+                                        public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
+                                            if (e != null) {
+                                                Log.w(TAG, "onEvent: ", e);
+                                                return;
+                                            }
+                                            if (documentSnapshot != null) {
+                                                UserWhoFaved userWhoFaved = documentSnapshot.toObject(UserWhoFaved.class);
+                                                if (userWhoFaved != null && userWhoFaved.getUserID().equals(mUser.getUser_id())) {
+                                                    recipe.setFavorite(true);
+                                                    mAdapter.notifyDataSetChanged();
+                                                } else {
+                                                    recipe.setFavorite(false);
+                                                    mAdapter.notifyDataSetChanged();
+                                                }
                                             } else {
-                                                missingIngredients.add(ingredient.getName());
-                                                numberOfMissingIngredients++;
+                                                Log.d(TAG, "onEvent: NULL");
                                             }
                                         }
-                                        Log.d(TAG, "onEvent: " + recipe.getTitle() + " NR OF MISSING INGREDIENTS " + numberOfMissingIngredients);
-                                        if (numberOfMissingIngredients < 3) {
-                                            //Check if current user liked the post or not
-                                            recipeRef.document(recipe.getDocumentId()).collection("UsersWhoFaved").document(mUser.getUser_id())
-                                                    .addSnapshotListener(new EventListener<DocumentSnapshot>() {
-                                                        @Override
-                                                        public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
-                                                            if (e != null) {
-                                                                Log.w(TAG, "onEvent: ", e);
-                                                                return;
-                                                            }
-                                                            if (documentSnapshot != null) {
-                                                                UserWhoFaved userWhoFaved = documentSnapshot.toObject(UserWhoFaved.class);
-                                                                if (userWhoFaved != null && userWhoFaved.getUserID().equals(mUser.getUser_id())) {
-                                                                    recipe.setFavorite(true);
-                                                                    mAdapter.notifyDataSetChanged();
-                                                                } else {
-                                                                    recipe.setFavorite(false);
-                                                                    mAdapter.notifyDataSetChanged();
-                                                                }
-                                                            } else {
-                                                                Log.d(TAG, "onEvent: NULL");
-                                                            }
-                                                        }
-                                                    });
-                                            if (!mRecipeList.contains(recipe)) {
-                                                recipe.setNrOfMissingIngredients(numberOfMissingIngredients);
-                                                recipe.setMissingIngredients(missingIngredients);
-                                                mRecipeList.add(recipe);
-                                            } else {
-                                                recipe.setNrOfMissingIngredients(numberOfMissingIngredients);
-                                                recipe.setMissingIngredients(missingIngredients);
-                                                mRecipeList.set(mRecipeList.indexOf(recipe), recipe);
-                                            }
-                                            Collections.sort(mRecipeList);
-                                            mAdapter.notifyDataSetChanged();
-                                        }
-                                    }
-                                });
+                                    });
+                            if (!mRecipeList.contains(recipe)) {
+                                recipe.setNrOfMissingIngredients(numberOfMissingIngredients);
+                                recipe.setMissingIngredients(missingIngredients);
+                                mRecipeList.add(recipe);
+                            } else {
+                                recipe.setNrOfMissingIngredients(numberOfMissingIngredients);
+                                recipe.setMissingIngredients(missingIngredients);
+                                mRecipeList.set(mRecipeList.indexOf(recipe), recipe);
+                            }
+                            Collections.sort(mRecipeList);
+                            mAdapter.notifyDataSetChanged();
+                        }
 
 
                     }

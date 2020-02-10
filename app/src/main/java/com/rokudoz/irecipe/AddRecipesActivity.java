@@ -53,6 +53,7 @@ import com.rokudoz.irecipe.Models.Ingredient;
 import com.rokudoz.irecipe.Models.Instruction;
 import com.rokudoz.irecipe.Models.Recipe;
 import com.rokudoz.irecipe.Models.User;
+import com.rokudoz.irecipe.Utils.RotateBitmap;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -278,7 +279,8 @@ public class AddRecipesActivity extends AppCompatActivity {
                 //Compress Image
                 Bitmap bitmap = null;
                 try {
-                    bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), mInstructionStepImageUriList.get(position));
+                    RotateBitmap rotateBitmap = new RotateBitmap();
+                    bitmap = rotateBitmap.HandleSamplingAndRotationBitmap(this,mInstructionStepImageUriList.get(position));
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -321,7 +323,8 @@ public class AddRecipesActivity extends AppCompatActivity {
             //Compress Image
             Bitmap bitmap = null;
             try {
-                bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), mRecipeImageUriArray[position]);
+                RotateBitmap rotateBitmap = new RotateBitmap();
+                bitmap = rotateBitmap.HandleSamplingAndRotationBitmap(this,mRecipeImageUriArray[position]);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -422,8 +425,8 @@ public class AddRecipesActivity extends AppCompatActivity {
         }
 
 
-        Recipe recipe = new Recipe(title, creator_docId, mUser.getName(), mUser.getUserProfilePicUrl(), category, description, keywords
-                , imageUrls_list, complexity, duration, durationType, 0f, isFavorite, privacy, 0,0);
+        Recipe recipe = new Recipe(title, creator_docId, mUser.getName(), mUser.getUserProfilePicUrl(), category, description, ingredients_list, instructions_list
+                , keywords, imageUrls_list, complexity, duration, durationType, 0f, isFavorite, privacy, 0, 0);
 
 //        // Sends recipe data to Firestore database
         recipesReference.add(recipe)
@@ -431,24 +434,6 @@ public class AddRecipesActivity extends AppCompatActivity {
                     @Override
                     public void onSuccess(DocumentReference documentReference) {
                         Toast.makeText(AddRecipesActivity.this, "Succesfully added " + title + " to the recipes list", Toast.LENGTH_SHORT).show();
-                        for (Ingredient ingredient : ingredients_list) {
-                            recipesReference.document(documentReference.getId()).collection("RecipeIngredients")
-                                    .add(ingredient).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                                @Override
-                                public void onSuccess(DocumentReference documentReference) {
-
-                                }
-                            });
-                        }
-                        for (Instruction instruction : instructions_list) {
-                            recipesReference.document(documentReference.getId()).collection("RecipeInstructions").
-                                    add(instruction).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                                @Override
-                                public void onSuccess(DocumentReference documentReference) {
-
-                                }
-                            });
-                        }
                         Log.d(TAG, "onSuccess: doc id " + documentReference.getId());
                         Intent intent = new Intent(AddRecipesActivity.this, MainActivity.class);
                         intent.putExtra("recipe_id", documentReference.getId());

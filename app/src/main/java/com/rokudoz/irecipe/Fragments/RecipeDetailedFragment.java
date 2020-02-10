@@ -454,6 +454,25 @@ public class RecipeDetailedFragment extends Fragment implements RecipeInstructio
                     if (recipe.getImageUrls_list() != null) {
                         imageUrls = recipe.getImageUrls_list();
                     }
+                    if (recipe.getIngredient_list() != null) {
+                        List<Ingredient> ingredientList = recipe.getIngredient_list();
+                        for (Ingredient ingredient : ingredientList) {
+                            if (!recipeIngredientList.contains(ingredient)) {
+                                recipeIngredientList.add(ingredient);
+                                ingredientsAdapter.notifyDataSetChanged();
+                            }
+                        }
+                    }
+                    if (recipe.getInstruction_list() != null) {
+                        List<Instruction> instructionList = recipe.getInstruction_list();
+                        for (Instruction instruction : instructionList) {
+                            if (!recipeInstructionList.contains(instruction)) {
+                                recipeInstructionList.add(instruction);
+                                instructionsAdapter.notifyDataSetChanged();
+                            }
+                        }
+                    }
+
                     if (recipeDetailedViewPagerAdapter != null) {
                         recipeDetailedViewPagerAdapter.notifyDataSetChanged();
                     }
@@ -584,7 +603,7 @@ public class RecipeDetailedFragment extends Fragment implements RecipeInstructio
                         });
                     }
 
-                    getRecipeIngredients();
+                    getMissingRecipeIngredients();
 
                     setupViewPager(view);
                 }
@@ -595,115 +614,80 @@ public class RecipeDetailedFragment extends Fragment implements RecipeInstructio
     }
 
 
-    private void getRecipeIngredients() {
+    private void getMissingRecipeIngredients() {
 
         final List<Ingredient> recipeIngredientsToAddToShoppingList = new ArrayList<>();
-        //Get recipe Ingredients from RecipeIngredients Collection
-        recipeRef.document(documentID).collection("RecipeIngredients").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-            @Override
-            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                for (QueryDocumentSnapshot queryDocumentSnapshot : queryDocumentSnapshots) {
-                    Ingredient ingredient = queryDocumentSnapshot.toObject(Ingredient.class);
-                    if (!recipeIngredientList.contains(ingredient)) {
-                        recipeIngredientList.add(ingredient);
-                        //
-                        ingredientsAdapter.notifyDataSetChanged();
-                    }
 
-                }
+        for (Ingredient ing : recipeIngredientList) {
+            if (userIngredientList.contains(ing)) {
+                if (!userIngredientList.get(userIngredientList.indexOf(ing)).getOwned()) {
+                    if (!recipeIngredientsToAddToShoppingList.contains(ing)) {
+                        if (userShoppingIngredientList.contains(ing)) {
+                            // If user has the ingredient in shopping list and it is checked as true, set it as owned
+                            if (userShoppingIngredientList.get(userShoppingIngredientList.indexOf(ing)).getOwned())
+                                ing.setOwned(true);
 
-                for (Ingredient ing : recipeIngredientList) {
-                    if (userIngredientList.contains(ing)) {
-                        if (!userIngredientList.get(userIngredientList.indexOf(ing)).getOwned()) {
-                            if (!recipeIngredientsToAddToShoppingList.contains(ing)) {
-                                if (userShoppingIngredientList.contains(ing)) {
-                                    // If user has the ingredient in shopping list and it is checked as true, set it as owned
-                                    if (userShoppingIngredientList.get(userShoppingIngredientList.indexOf(ing)).getOwned())
-                                        ing.setOwned(true);
-
-                                }
-                                recipeIngredientsToAddToShoppingList.add(ing);
-                                nrOfMissingIngredients++;
-
-                                Log.d(TAG, "onEvent: INGREDIENT NOT IN COMMON " + ing.toString());
-                            }
                         }
-
-                    } else {
                         recipeIngredientsToAddToShoppingList.add(ing);
                         nrOfMissingIngredients++;
+
+                        Log.d(TAG, "onEvent: INGREDIENT NOT IN COMMON " + ing.toString());
                     }
                 }
 
-                if (nrOfMissingIngredients > 0 && !userShoppingIngredientList.containsAll(recipeIngredientsToAddToShoppingList)) {
+            } else {
+                recipeIngredientsToAddToShoppingList.add(ing);
+                nrOfMissingIngredients++;
+            }
+        }
+
+        if (nrOfMissingIngredients > 0 && !userShoppingIngredientList.containsAll(recipeIngredientsToAddToShoppingList)) {
+            tvMissingIngredientsNumber.setVisibility(View.VISIBLE);
+            if (nrOfMissingIngredients == 1) {
+                tvMissingIngredientsNumber.setText("Missing " + nrOfMissingIngredients + " ingredient");
+            } else {
+                tvMissingIngredientsNumber.setText("Missing " + nrOfMissingIngredients + " ingredients");
+            }
+            mAddMissingIngredientsFAB.setText("+" + nrOfMissingIngredients);
+            showFab = true;
+            mAddMissingIngredientsFAB.show();
+            mAddMissingIngredientsFAB.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    // HERE WE IMPLEMENTS
+                    for (final Ingredient ingredient : recipeIngredientsToAddToShoppingList) {
+                        if (!userShoppingIngredientList.contains(ingredient)) {
+                            usersRef.document(loggedInUserDocumentId).collection("ShoppingList")
+                                    .add(ingredient).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                                @Override
+                                public void onSuccess(DocumentReference documentReference) {
+                                    Log.d(TAG, "onSuccess: ADDED TO SHOPPING LIST " + ingredient.toString());
+                                    userShoppingIngredientList.add(ingredient);
+                                }
+                            });
+                        }
+                    }
+                    mAddMissingIngredientsFAB.hide();
+                    Toast.makeText(getActivity(), "Added " + nrOfMissingIngredients + " missing ingredients to your shopping list"
+                            , Toast.LENGTH_SHORT).show();
+                    showFab = false;
+                    tvMissingIngredientsNumber.setVisibility(View.INVISIBLE);
+                }
+            });
+        }
+        // If the user has the missing ingredients in the shopping list, don't show button, but show message that they are in the list
+        else if (nrOfMissingIngredients > 0 && userShoppingIngredientList.containsAll(recipeIngredientsToAddToShoppingList)) {
+            for (Ingredient ing : recipeIngredientsToAddToShoppingList) {
+                if (!recipeIngredientsToAddToShoppingList.get(recipeIngredientsToAddToShoppingList.indexOf(ing)).getOwned()) {
                     tvMissingIngredientsNumber.setVisibility(View.VISIBLE);
                     if (nrOfMissingIngredients == 1) {
-                        tvMissingIngredientsNumber.setText("Missing " + nrOfMissingIngredients + " ingredient");
+                        tvMissingIngredientsNumber.setText(nrOfMissingIngredients + " missing ingredient is in your shopping list");
                     } else {
-                        tvMissingIngredientsNumber.setText("Missing " + nrOfMissingIngredients + " ingredients");
-                    }
-                    mAddMissingIngredientsFAB.setText("+" + nrOfMissingIngredients);
-                    showFab = true;
-                    mAddMissingIngredientsFAB.show();
-                    mAddMissingIngredientsFAB.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            // HERE WE IMPLEMENTS
-                            for (final Ingredient ingredient : recipeIngredientsToAddToShoppingList) {
-                                if (!userShoppingIngredientList.contains(ingredient)) {
-                                    usersRef.document(loggedInUserDocumentId).collection("ShoppingList")
-                                            .add(ingredient).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                                        @Override
-                                        public void onSuccess(DocumentReference documentReference) {
-                                            Log.d(TAG, "onSuccess: ADDED TO SHOPPING LIST " + ingredient.toString());
-                                            userShoppingIngredientList.add(ingredient);
-                                        }
-                                    });
-                                }
-                            }
-                            mAddMissingIngredientsFAB.hide();
-                            Toast.makeText(getActivity(), "Added " + nrOfMissingIngredients + " missing ingredients to your shopping list"
-                                    , Toast.LENGTH_SHORT).show();
-                            showFab = false;
-                            tvMissingIngredientsNumber.setVisibility(View.INVISIBLE);
-                        }
-                    });
-                }
-                // If the user has the missing ingredients in the shopping list, don't show button, but show message that they are in the list
-                else if (nrOfMissingIngredients > 0 && userShoppingIngredientList.containsAll(recipeIngredientsToAddToShoppingList)) {
-                    for (Ingredient ing : recipeIngredientsToAddToShoppingList) {
-                        if (!recipeIngredientsToAddToShoppingList.get(recipeIngredientsToAddToShoppingList.indexOf(ing)).getOwned()) {
-                            tvMissingIngredientsNumber.setVisibility(View.VISIBLE);
-                            if (nrOfMissingIngredients == 1) {
-                                tvMissingIngredientsNumber.setText(nrOfMissingIngredients + " missing ingredient is in your shopping list");
-                            } else {
-                                tvMissingIngredientsNumber.setText(nrOfMissingIngredients + " missing ingredients are in your shopping list");
-                            }
-                        }
+                        tvMissingIngredientsNumber.setText(nrOfMissingIngredients + " missing ingredients are in your shopping list");
                     }
                 }
-
-                getRecipeInstructions(documentID);
             }
-        });
-    }
-
-    private void getRecipeInstructions(String documentID) {
-
-        recipeRef.document(documentID).collection("RecipeInstructions").orderBy("stepNumber").get()
-                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-                    @Override
-                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                        for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
-                            Instruction instruction = documentSnapshot.toObject(Instruction.class);
-                            if (!recipeInstructionList.contains(instruction)) {
-                                recipeInstructionList.add(instruction);
-                                instructionsAdapter.notifyDataSetChanged();
-                            }
-                        }
-//                        initializeRecyclerViewAdapterOnClicks();
-                    }
-                });
+        }
     }
 
     private void zoomImageFromThumb(final View imageButton, String imageUrl) {

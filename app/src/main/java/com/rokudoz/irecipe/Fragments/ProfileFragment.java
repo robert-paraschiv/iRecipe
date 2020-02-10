@@ -114,18 +114,17 @@ public class ProfileFragment extends Fragment {
         mSignOutBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                WriteBatch batch = db.batch();
-                batch.update(usersReference.document(userDocumentID), "user_tokenID", "");
-                batch.commit().addOnSuccessListener(new OnSuccessListener<Void>() {
+                usersReference.document(userDocumentID).update("user_tokenID","").addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
+                        Log.d(TAG, "onSuccess: updated token to null");
                         FirebaseAuth.getInstance().signOut();
                         Intent intent = new Intent(getActivity(), LoginActivity.class);
                         startActivity(intent);
                         getActivity().finish();
                     }
                 });
+
             }
         });
         userDetailsLayout.setOnClickListener(new View.OnClickListener() {
