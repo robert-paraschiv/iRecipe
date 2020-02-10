@@ -11,6 +11,7 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
@@ -648,6 +649,23 @@ public class RecipeDetailedFragment extends Fragment implements RecipeInstructio
             } else {
                 tvMissingIngredientsNumber.setText("Missing " + nrOfMissingIngredients + " ingredients");
             }
+            tvMissingIngredientsNumber.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    AlertDialog.Builder alert = new AlertDialog.Builder(getActivity());
+                    alert.setTitle("Missing ingredients");
+                    // Create TextView
+                    final TextView textView = new TextView(getActivity());
+                    StringBuilder missing = new StringBuilder();
+                    for (Ingredient ingredient : recipeIngredientsToAddToShoppingList) {
+                        missing.append("         ").append(ingredient.getName()).append("\n");
+                    }
+                    textView.setText(missing);
+                    alert.setView(textView);
+
+                    alert.show();
+                }
+            });
             mAddMissingIngredientsFAB.setText("+" + nrOfMissingIngredients);
             showFab = true;
             mAddMissingIngredientsFAB.show();
