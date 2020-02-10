@@ -321,6 +321,24 @@ public class profileMyIngredientsFragment extends Fragment {
 
             usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).collection("Ingredients")
                     .document(ingredient.getDocumentId()).update("owned", false);
+            usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).collection("ShoppingList")
+                    .whereEqualTo("name", ingredient.getName()).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                @Override
+                public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                    if (queryDocumentSnapshots != null && queryDocumentSnapshots.size() != 0) {
+                        Ingredient ingredient1 = queryDocumentSnapshots.getDocuments().get(0).toObject(Ingredient.class);
+                        ingredient1.setOwned(false);
+                        ingredient1.setDocumentId(queryDocumentSnapshots.getDocuments().get(0).getId());
+                        usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).collection("ShoppingList")
+                                .document(ingredient1.getDocumentId()).set(ingredient1).addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                Log.d(TAG, "onSuccess: Updated as owned-false in shopping list");
+                            }
+                        });
+                    }
+                }
+            });
             Snackbar snackbar = Snackbar.make(view.findViewById(R.id.profileFragmentMyIngredients_relativelayout), ingredient.getName() + " removed",
                     Snackbar.LENGTH_SHORT)
                     .setAction("Undo", new View.OnClickListener() {

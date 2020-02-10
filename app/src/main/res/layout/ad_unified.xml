@@ -17,7 +17,8 @@
 
         <RelativeLayout
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:padding="4dp">
 
             <TextView
                 android:id="@+id/ad_attribution"
@@ -120,6 +121,7 @@
                 android:layout_height="35dp"
                 tools:text="Button text"
                 android:layout_below="@id/pricecard"
+                android:layout_marginBottom="4dp"
                 android:layout_centerHorizontal="true"/>
             <ImageView
                 android:layout_width="30dp"

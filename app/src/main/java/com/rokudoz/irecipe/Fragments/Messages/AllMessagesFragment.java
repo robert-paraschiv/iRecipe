@@ -25,6 +25,7 @@ import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.ListenerRegistration;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.rokudoz.irecipe.Models.Conversation;
@@ -138,7 +139,8 @@ public class AllMessagesFragment extends Fragment implements ConversationAdapter
 
     private void performQuery() {
         initializeRecyclerViewAdapterOnClicks();
-        userConversationsListener = usersReference.document(mUser.getUser_id()).collection("Conversations").addSnapshotListener(new EventListener<QuerySnapshot>() {
+        userConversationsListener = usersReference.document(mUser.getUser_id()).collection("Conversations").orderBy("date", Query.Direction.DESCENDING)
+                .addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
                 if (e != null) {

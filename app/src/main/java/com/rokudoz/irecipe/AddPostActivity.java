@@ -166,6 +166,7 @@ public class AddPostActivity extends AppCompatActivity {
                 RotateBitmap rotateBitmap = new RotateBitmap();
                 imageBitmap = rotateBitmap.HandleSamplingAndRotationBitmap(this, mImageUri);
                 imageView.setImageBitmap(imageBitmap);
+                searchRecipeBtn.setEnabled(false);
                 uploadPostPic();
             } catch (IOException e) {
                 e.printStackTrace();
@@ -203,7 +204,7 @@ public class AddPostActivity extends AppCompatActivity {
                                     postPicUrl = imageUrl;
                                     //
 
-
+                                    searchRecipeBtn.setEnabled(true);
                                 }
                             });
                             Log.d(TAG, "onSuccess: Upload Succesfull");
@@ -213,11 +214,13 @@ public class AddPostActivity extends AppCompatActivity {
                         @Override
                         public void onFailure(@NonNull Exception e) {
                             Toast.makeText(AddPostActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                            searchRecipeBtn.setEnabled(true);
                         }
                     });
 
         } else {
             Toast.makeText(AddPostActivity.this, "No file selected", Toast.LENGTH_SHORT).show();
+            searchRecipeBtn.setEnabled(true);
         }
     }
 
@@ -237,6 +240,7 @@ public class AddPostActivity extends AppCompatActivity {
                     Toast.makeText(AddPostActivity.this, "Successfully published your post", Toast.LENGTH_SHORT).show();
 
                     Intent intent = new Intent(AddPostActivity.this, MainActivity.class);
+                    intent.putExtra("post_id",documentReference.getId());
                     startActivity(intent);
                     finish();
                 }
