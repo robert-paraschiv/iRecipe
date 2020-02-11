@@ -209,12 +209,12 @@ public class profileMyIngredientsFragment extends Fragment {
                             }
                             Collections.sort(ingredientList);
 
-                            final List<String> categories = new ArrayList<>();
+                            final List<String> categorylist = new ArrayList<>();
                             for (Ingredient ing : ingredientList) {
-                                if (!categories.contains(ing.getCategory()))
-                                    categories.add(ing.getCategory());
+                                if (!categorylist.contains(ing.getCategory()))
+                                    categorylist.add(ing.getCategory());
                             }
-                            for (String categoryName : categories) {
+                            for (String categoryName : categorylist) {
                                 Ingredient ingg = new Ingredient();
                                 ingg.setName(categoryName);
                                 ingg.setCategory_name(categoryName);

@@ -179,6 +179,7 @@ public class profileEditProfile extends Fragment {
         } else {
 
             final User user = new User(mUser.getUser_id(), name, userName, email, description, gender, nationality, mUser.getUserProfilePicUrl());
+            user.setUser_tokenID(mUser.getUser_tokenID());
 
             progressDialog = new ProgressDialog(getActivity());
             progressDialog.setMessage("Updating, please wait...");
@@ -467,10 +468,10 @@ public class profileEditProfile extends Fragment {
     }
 
     private void getCurrentUserDetails() {
-        userDetailsListener = usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).addSnapshotListener(new EventListener<DocumentSnapshot>() {
+        usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).addSnapshotListener(new EventListener<DocumentSnapshot>() {
             @Override
             public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
-                if (documentSnapshot != null) {
+                if (e == null && documentSnapshot != null) {
                     mUser = documentSnapshot.toObject(User.class);
 
                     userProfilePicUrl = mUser.getUserProfilePicUrl();
@@ -573,14 +574,20 @@ public class profileEditProfile extends Fragment {
                                         finalOldPicReference.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
                                             @Override
                                             public void onSuccess(Void aVoid) {
-                                                Toast.makeText(getContext(), "deleted oldfile", Toast.LENGTH_SHORT).show();
+                                                Log.d(TAG, "onSuccess: Deleted old file");
                                                 updateUserProfilePicUrl(imageUrl);
                                             }
                                         });
                                     } else {
+                                        Log.d(TAG, "onSuccess: Old pic was null / empty/ default from google");
                                         updateUserProfilePicUrl(imageUrl);
                                     }
 
+                                }
+                            }).addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    Log.d(TAG, "onFailure: Failed to get download link");
                                 }
                             });
                             if (getContext() != null) {
@@ -592,6 +599,7 @@ public class profileEditProfile extends Fragment {
                     .addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception e) {
+                            Log.d(TAG, "onFailure: Failed to upload image");
                             Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
                         }
                     });

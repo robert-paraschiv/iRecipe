@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -19,6 +20,7 @@ import com.google.android.gms.ads.formats.UnifiedNativeAd;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -69,6 +71,7 @@ public class FeedFragment extends Fragment implements FeedAdapter.OnItemClickLis
 
     public View view;
     private TextView unreadMessagesTv;
+    private MaterialCardView messagesCardView;
 
     private ProgressBar pbLoading;
     private FloatingActionButton fab;
@@ -123,11 +126,19 @@ public class FeedFragment extends Fragment implements FeedAdapter.OnItemClickLis
         mRecyclerView = view.findViewById(R.id.recycler_view);
         MaterialButton messagesBtn = view.findViewById(R.id.feedFragment_messages_MaterialBtn);
         MaterialButton searchUserBtn = view.findViewById(R.id.feedFragment_searchUser_MaterialBtn);
+        RelativeLayout messagesLayout = view.findViewById(R.id.feedFragment_messages_relativeLayout);
         unreadMessagesTv = view.findViewById(R.id.feedFragment_messages_UnreadText);
+        messagesCardView = view.findViewById(R.id.feedFragment_messages_materialCard);
 
         pbLoading.setVisibility(View.VISIBLE);
         mStorageRef = FirebaseStorage.getInstance();
 
+        messagesLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Navigation.findNavController(view).navigate(FeedFragmentDirections.actionFeedFragmentToAllMessagesFragment());
+            }
+        });
         messagesBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -350,10 +361,12 @@ public class FeedFragment extends Fragment implements FeedAdapter.OnItemClickLis
                     String number = "";
                     number = "" + queryDocumentSnapshots.size();
                     unreadMessagesTv.setText(number);
+                    messagesCardView.setVisibility(View.VISIBLE);
 
                 }
                 if (queryDocumentSnapshots != null && queryDocumentSnapshots.size() == 0) {
                     unreadMessagesTv.setText("");
+                    messagesCardView.setVisibility(View.GONE);
                 }
             }
         });
