@@ -54,6 +54,7 @@ import com.rokudoz.irecipe.Models.Recipe;
 import com.rokudoz.irecipe.Models.User;
 import com.rokudoz.irecipe.Models.UserWhoFaved;
 import com.rokudoz.irecipe.R;
+import com.rokudoz.irecipe.Utils.RotateBitmap;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -282,12 +283,13 @@ public class profileEditProfile extends Fragment {
             //Compress Image
             Bitmap bitmap = null;
             try {
-                bitmap = MediaStore.Images.Media.getBitmap(getContext().getContentResolver(), mImageUri);
+                RotateBitmap rotateBitmap = new RotateBitmap();
+                bitmap = rotateBitmap.HandleSamplingAndRotationBitmap(getActivity(), mImageUri);
             } catch (IOException e) {
                 e.printStackTrace();
             }
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 25, baos);
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 75, baos);
             byte[] data = baos.toByteArray();
 
             //Upload image to FireStore Storage
