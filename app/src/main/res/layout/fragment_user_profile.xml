@@ -1,146 +1,177 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".Fragments.UserProfileFragment">
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
 
-    <com.google.android.material.appbar.MaterialToolbar
-        android:id="@+id/toolbar"
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/userFragmentAppBarLayout"
         android:layout_width="match_parent"
-        android:layout_height="40dp"
-        app:title="User Profile" />
+        android:layout_height="wrap_content">
 
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/userprofileFragment_userDetails_MaterialCard"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/toolbar"
-        android:layout_centerHorizontal="true"
-        android:layout_margin="8dp"
-        app:cardCornerRadius="18dp">
-
-        <RelativeLayout
+        <com.google.android.material.appbar.CollapsingToolbarLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="8dp">
-
-            <de.hdodenhof.circleimageview.CircleImageView
-                android:id="@+id/userprofileFragment_profileImage"
-                android:layout_width="120dp"
-                android:layout_height="120dp"
-                android:layout_alignParentStart="true"
-                app:civ_border_color="#FF000000"
-                app:civ_border_width="0.5dp"
-                tools:src="@drawable/ic_launcher_background" />
+            android:layout_height="match_parent"
+            android:background="?colorSurface"
+            android:fitsSystemWindows="true"
+            app:expandedTitleGravity="top"
+            app:expandedTitleMarginEnd="64dp"
+            app:expandedTitleMarginStart="48dp"
+            app:layout_scrollFlags="scroll|exitUntilCollapsed|snap">
 
             <RelativeLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerHorizontal="true"
-                android:layout_toEndOf="@id/userprofileFragment_profileImage">
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
 
-                <TextView
-                    android:id="@+id/userprofileFragment_user_name_TextView"
-                    style="@style/TextAppearance.MaterialComponents.Headline6"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="30dp"
-                    android:textSize="16sp"
-                    tools:text="Name" />
+                <com.google.android.material.appbar.MaterialToolbar
+                    android:id="@+id/toolbar"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp">
 
-                <TextView
-                    android:id="@+id/userprofileFragment_userName_TextView"
-                    style="@style/TextAppearance.MaterialComponents.Caption"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@id/userprofileFragment_user_name_TextView"
-                    android:layout_marginStart="30dp"
-                    android:textSize="15sp"
-                    tools:text="UserName" />
+                    <TextView
+                        style="@style/TextAppearance.MaterialComponents.Headline6"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:text="User Profile"/>
+                </com.google.android.material.appbar.MaterialToolbar>
 
-                <TextView
-                    android:id="@+id/userprofileFragment_user_description_TextView"
-                    style="@style/TextAppearance.MaterialComponents.Headline2"
-                    android:layout_width="wrap_content"
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/userprofileFragment_userDetails_MaterialCard"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_below="@id/userprofileFragment_userName_TextView"
-                    android:layout_alignParentStart="true"
-                    android:layout_marginStart="30dp"
-                    android:layout_marginTop="8dp"
-                    android:textSize="14sp"
-                    tools:text="Description" />
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/userprofile_addFriend_MaterialButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Add friend"
-                    android:layout_below="@id/userprofileFragment_user_description_TextView"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                    android:layout_alignParentStart="true"
-                    android:layout_marginStart="30dp"
-                    android:layout_marginTop="8dp"
-                    android:textSize="14sp"
-                    android:visibility="invisible"
-                    tools:visibility="visible"
-                    />
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/userprofile_messageUser_MaterialButton"
+                    android:layout_below="@id/toolbar"
                     android:layout_centerHorizontal="true"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Send a message"
-                    android:layout_below="@id/userprofile_addFriend_MaterialButton"
-                    style="@style/Widget.MaterialComponents.Button.TextButton"
-                    android:layout_marginTop="8dp"
-                    android:textSize="14sp"
-                    android:visibility="gone"
-                    tools:visibility="visible"
-                    />
+                    android:layout_margin="8dp"
+                    app:cardCornerRadius="18dp">
 
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="8dp">
+
+                        <de.hdodenhof.circleimageview.CircleImageView
+                            android:id="@+id/userprofileFragment_profileImage"
+                            android:layout_width="120dp"
+                            android:layout_height="120dp"
+                            android:layout_alignParentStart="true"
+                            app:civ_border_color="#FF000000"
+                            app:civ_border_width="0.5dp"
+                            tools:src="@drawable/ic_launcher_background" />
+
+                        <RelativeLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerHorizontal="true"
+                            android:layout_toEndOf="@id/userprofileFragment_profileImage">
+
+                            <TextView
+                                android:id="@+id/userprofileFragment_user_name_TextView"
+                                style="@style/TextAppearance.MaterialComponents.Headline6"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="30dp"
+                                android:textSize="16sp"
+                                tools:text="Name" />
+
+                            <TextView
+                                android:id="@+id/userprofileFragment_userName_TextView"
+                                style="@style/TextAppearance.MaterialComponents.Caption"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_below="@id/userprofileFragment_user_name_TextView"
+                                android:layout_marginStart="30dp"
+                                android:textSize="15sp"
+                                tools:text="UserName" />
+
+                            <TextView
+                                android:id="@+id/userprofileFragment_user_description_TextView"
+                                style="@style/TextAppearance.MaterialComponents.Headline2"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_below="@id/userprofileFragment_userName_TextView"
+                                android:layout_alignParentStart="true"
+                                android:layout_marginStart="30dp"
+                                android:layout_marginTop="8dp"
+                                android:textSize="14sp"
+                                tools:text="Description" />
+
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/userprofile_addFriend_MaterialButton"
+                                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_below="@id/userprofileFragment_user_description_TextView"
+                                android:layout_alignParentStart="true"
+                                android:layout_marginStart="30dp"
+                                android:layout_marginTop="8dp"
+                                android:text="Add friend"
+                                android:textSize="14sp"
+                                android:visibility="invisible"
+                                tools:visibility="visible" />
+
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/userprofile_messageUser_MaterialButton"
+                                style="@style/Widget.MaterialComponents.Button.TextButton"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_below="@id/userprofile_addFriend_MaterialButton"
+                                android:layout_centerHorizontal="true"
+                                android:layout_marginTop="8dp"
+                                android:text="Send a message"
+                                android:textSize="14sp"
+                                android:visibility="gone"
+                                tools:visibility="visible" />
+
+                        </RelativeLayout>
+                    </RelativeLayout>
+                </com.google.android.material.card.MaterialCardView>
             </RelativeLayout>
+        </com.google.android.material.appbar.CollapsingToolbarLayout>
+    </com.google.android.material.appbar.AppBarLayout>
 
 
-        </RelativeLayout>
-    </com.google.android.material.card.MaterialCardView>
-
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/userprofile_MaterialCard"
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/userprofileFragment_userDetails_MaterialCard"
-        android:layout_margin="4dp"
-        app:cardCornerRadius="18dp">
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        >
 
-        <RelativeLayout
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/userprofile_MaterialCard"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
-            <TextView
-                android:id="@+id/userprofile_textview"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:layout_marginBottom="4dp"
-                android:text="Posts"
-                android:textSize="16sp"
-                style="@style/TextAppearance.MaterialComponents.Caption"
-                android:layout_centerHorizontal="true"
-                />
-            <androidx.recyclerview.widget.RecyclerView
-                android:layout_below="@id/userprofile_textview"
-                android:id="@+id/userprofile_recycler_view"
+            android:layout_height="wrap_content"
+            android:layout_margin="4dp"
+            app:cardCornerRadius="18dp">
+
+            <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_alignParentStart="true"
-                android:layout_marginTop="2dp"
-                android:transitionName="example_transition" />
-        </RelativeLayout>
+                android:layout_height="match_parent">
 
+                <TextView
+                    android:id="@+id/userprofile_textview"
+                    style="@style/TextAppearance.MaterialComponents.Subtitle1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginBottom="4dp"
+                    android:text="Posts"
+                    android:textSize="16sp" />
+            </RelativeLayout>
+        </com.google.android.material.card.MaterialCardView>
 
-    </com.google.android.material.card.MaterialCardView>
-</RelativeLayout>
-</androidx.core.widget.NestedScrollView>
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/userprofile_recycler_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/userprofile_MaterialCard"
+            android:layout_alignParentStart="true"
+            android:layout_margin="4dp"
+            android:layout_marginTop="2dp"
+            android:transitionName="example_transition" />
+    </RelativeLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
