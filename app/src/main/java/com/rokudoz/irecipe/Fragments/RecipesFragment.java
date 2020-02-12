@@ -17,14 +17,14 @@ import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.rokudoz.irecipe.AddIngredientActivity;
 import com.rokudoz.irecipe.AddRecipesActivity;
-import com.rokudoz.irecipe.Fragments.homeSubFragments.homeBreakfastFragment;
-import com.rokudoz.irecipe.Fragments.homeSubFragments.homeDinnerFragment;
-import com.rokudoz.irecipe.Fragments.homeSubFragments.homeLunchFragment;
+import com.rokudoz.irecipe.Fragments.recipesSubFragments.recipesBreakfastFragment;
+import com.rokudoz.irecipe.Fragments.recipesSubFragments.recipesDinnerFragment;
+import com.rokudoz.irecipe.Fragments.recipesSubFragments.recipesLunchFragment;
 import com.rokudoz.irecipe.R;
 import com.rokudoz.irecipe.Utils.Adapters.SectionsPagerAdapter;
 
-public class HomeFragment extends Fragment {
-    private static final String TAG = "HomeFragment";
+public class RecipesFragment extends Fragment {
+    private static final String TAG = "RecipesFragment";
 
     public View view;
     private FloatingActionButton fab_addRecipes;
@@ -34,8 +34,8 @@ public class HomeFragment extends Fragment {
     private SectionsPagerAdapter sectionsPagerAdapter;
     private ViewPager viewPager;
 
-    public static HomeFragment newInstance() {
-        HomeFragment fragment = new HomeFragment();
+    public static RecipesFragment newInstance() {
+        RecipesFragment fragment = new RecipesFragment();
         return fragment;
     }
 
@@ -44,7 +44,7 @@ public class HomeFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         if (view == null) {
-            view = inflater.inflate(R.layout.fragment_home, container, false);
+            view = inflater.inflate(R.layout.fragment_recipes, container, false);
         }
         fab_addRecipes = view.findViewById(R.id.fab_add_recipe);
         fab_addIngredient = view.findViewById(R.id.fab_add_ingredient);
@@ -91,9 +91,9 @@ public class HomeFragment extends Fragment {
 
     private void setupViewPager(ViewPager viewPager) {
         SectionsPagerAdapter adapter = new SectionsPagerAdapter(getChildFragmentManager(), FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
-        adapter.addFragment(new homeBreakfastFragment(), "Breakfast");
-        adapter.addFragment(new homeLunchFragment(), "Lunch");
-        adapter.addFragment(new homeDinnerFragment(), "Dinner");
+        adapter.addFragment(new recipesBreakfastFragment(), "Breakfast");
+        adapter.addFragment(new recipesLunchFragment(), "Lunch");
+        adapter.addFragment(new recipesDinnerFragment(), "Dinner");
         viewPager.setAdapter(adapter);
     }
 

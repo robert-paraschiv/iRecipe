@@ -8,7 +8,7 @@
         app:showAsAction="ifRoom"
         android:title="Feed"/>
     <item
-        android:id="@+id/homeFragment"
+        android:id="@+id/recipesFragment"
         android:icon="@drawable/ic_kitchen_black_24dp"
         app:showAsAction="ifRoom"
         android:title="Home"/>

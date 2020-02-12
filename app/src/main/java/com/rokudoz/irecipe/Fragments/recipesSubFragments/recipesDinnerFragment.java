@@ -1,4 +1,4 @@
-package com.rokudoz.irecipe.Fragments.homeSubFragments;
+package com.rokudoz.irecipe.Fragments.recipesSubFragments;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -32,7 +32,7 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.rokudoz.irecipe.AddRecipesActivity;
-import com.rokudoz.irecipe.Fragments.HomeFragmentDirections;
+import com.rokudoz.irecipe.Fragments.RecipesFragmentDirections;
 import com.rokudoz.irecipe.Models.Ingredient;
 import com.rokudoz.irecipe.Models.Recipe;
 import com.rokudoz.irecipe.Models.User;
@@ -44,8 +44,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class homeDinnerFragment extends Fragment implements RecipeAdapter.OnItemClickListener {
-    private static final String TAG = "homeDinnerFragment";
+public class recipesDinnerFragment extends Fragment implements RecipeAdapter.OnItemClickListener {
+    private static final String TAG = "recipesDinnerFragment";
 
     public View view;
 
@@ -72,8 +72,8 @@ public class homeDinnerFragment extends Fragment implements RecipeAdapter.OnItem
 
     private DocumentSnapshot mLastQueriedDocument;
 
-    public static homeDinnerFragment newInstance() {
-        homeDinnerFragment fragment = new homeDinnerFragment();
+    public static recipesDinnerFragment newInstance() {
+        recipesDinnerFragment fragment = new recipesDinnerFragment();
         return fragment;
     }
 
@@ -162,7 +162,7 @@ public class homeDinnerFragment extends Fragment implements RecipeAdapter.OnItem
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setAdapter(mAdapter);
 
-        mAdapter.setOnItemClickListener(homeDinnerFragment.this);
+        mAdapter.setOnItemClickListener(recipesDinnerFragment.this);
     }
 
 
@@ -388,7 +388,7 @@ public class homeDinnerFragment extends Fragment implements RecipeAdapter.OnItem
         String title = mRecipeList.get(position).getTitle();
 
         Log.d(TAG, "onItemClick: CLICKED " + title + " id " + id);
-        Navigation.findNavController(view).navigate(HomeFragmentDirections.actionHomeFragmentToRecipeDetailedFragment(id));
+        Navigation.findNavController(view).navigate(RecipesFragmentDirections.actionRecipesFragmentToRecipeDetailedFragment(id));
     }
 
     @Override

@@ -1,6 +1,5 @@
-package com.rokudoz.irecipe.Fragments.homeSubFragments;
+package com.rokudoz.irecipe.Fragments.recipesSubFragments;
 
-import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -31,8 +30,7 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
-import com.rokudoz.irecipe.AddRecipesActivity;
-import com.rokudoz.irecipe.Fragments.HomeFragmentDirections;
+import com.rokudoz.irecipe.Fragments.RecipesFragmentDirections;
 import com.rokudoz.irecipe.Models.Ingredient;
 import com.rokudoz.irecipe.Models.Recipe;
 import com.rokudoz.irecipe.Models.User;
@@ -44,8 +42,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class homeLunchFragment extends Fragment implements RecipeAdapter.OnItemClickListener {
-    private static final String TAG = "homeLunchFragment";
+public class recipesBreakfastFragment extends Fragment implements RecipeAdapter.OnItemClickListener {
+    private static final String TAG = "recipesBreakfastFragment";
 
     public View view;
 
@@ -58,8 +56,7 @@ public class homeLunchFragment extends Fragment implements RecipeAdapter.OnItemC
     private CollectionReference recipeRef = db.collection("Recipes");
     private CollectionReference usersReference = db.collection("Users");
     private FirebaseStorage mStorageRef;
-    private ListenerRegistration userDetailsListener, userIngredientsListener, recipesListener, recipesIngredientsListener, privateRecipesListener
-            , privateRecipeIngredientsListener;
+    private ListenerRegistration userDetailsListener, userIngredientsListener, recipesListener, privateRecipesListener, privateRecipeIngredientsListener, recipesIngredientsListener;
 
     private RecyclerView mRecyclerView;
     private RecipeAdapter mAdapter;
@@ -72,8 +69,8 @@ public class homeLunchFragment extends Fragment implements RecipeAdapter.OnItemC
 
     private DocumentSnapshot mLastQueriedDocument;
 
-    public static homeLunchFragment newInstance() {
-        homeLunchFragment fragment = new homeLunchFragment();
+    public static recipesBreakfastFragment newInstance() {
+        recipesBreakfastFragment fragment = new recipesBreakfastFragment();
         return fragment;
     }
 
@@ -82,7 +79,7 @@ public class homeLunchFragment extends Fragment implements RecipeAdapter.OnItemC
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         if (view == null) {
-            view = inflater.inflate(R.layout.fragment_home_lunch, container, false);
+            view = inflater.inflate(R.layout.fragment_home_breakfast, container, false);
         }
         mUser = new User();
         pbLoading = view.findViewById(R.id.homeFragment_pbLoading);
@@ -90,6 +87,7 @@ public class homeLunchFragment extends Fragment implements RecipeAdapter.OnItemC
 
         pbLoading.setVisibility(View.VISIBLE);
         mStorageRef = FirebaseStorage.getInstance();
+
         buildRecyclerView();
         getUserIngredients();
 
@@ -162,7 +160,7 @@ public class homeLunchFragment extends Fragment implements RecipeAdapter.OnItemC
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setAdapter(mAdapter);
 
-        mAdapter.setOnItemClickListener(homeLunchFragment.this);
+        mAdapter.setOnItemClickListener(recipesBreakfastFragment.this);
     }
 
 
@@ -175,16 +173,18 @@ public class homeLunchFragment extends Fragment implements RecipeAdapter.OnItemC
                             Log.w(TAG, "onEvent: ", e);
                             return;
                         }
+
+
                         mUser = documentSnapshot.toObject(User.class);
                         loggedInUserDocumentId = documentSnapshot.getId();
 
                         Query recipesQuery = null;
                         if (mLastQueriedDocument != null) {
-                            recipesQuery = recipeRef.whereEqualTo("category", "lunch").whereEqualTo("privacy", "Everyone")
+                            recipesQuery = recipeRef.whereEqualTo("category", "breakfast").whereEqualTo("privacy", "Everyone")
                                     .startAfter(mLastQueriedDocument); // Necessary so we don't have the same results multiple times
 //                                    .limit(3);
                         } else {
-                            recipesQuery = recipeRef.whereEqualTo("category", "lunch").whereEqualTo("privacy", "Everyone");
+                            recipesQuery = recipeRef.whereEqualTo("category", "breakfast").whereEqualTo("privacy", "Everyone");
 //                                    .limit(3);
                         }
 
@@ -282,11 +282,11 @@ public class homeLunchFragment extends Fragment implements RecipeAdapter.OnItemC
         //Get Recipes where the recipes created by the logged in user are private
         Query privateRecipesQuery = null;
         if (mLastQueriedDocument != null) {
-            privateRecipesQuery = recipeRef.whereEqualTo("category", "lunch").whereEqualTo("creator_docId", loggedInUserDocumentId)
+            privateRecipesQuery = recipeRef.whereEqualTo("category", "breakfast").whereEqualTo("creator_docId", loggedInUserDocumentId)
                     .startAfter(mLastQueriedDocument); // Necessary so we don't have the same results multiple times
 //                                    .limit(3);
         } else {
-            privateRecipesQuery = recipeRef.whereEqualTo("category", "lunch").whereEqualTo("creator_docId", loggedInUserDocumentId);
+            privateRecipesQuery = recipeRef.whereEqualTo("category", "breakfast").whereEqualTo("creator_docId", loggedInUserDocumentId);
 //                                    .limit(3);
         }
         privateRecipesQuery.addSnapshotListener(new EventListener<QuerySnapshot>() {
@@ -371,11 +371,6 @@ public class homeLunchFragment extends Fragment implements RecipeAdapter.OnItemC
 
     }
 
-    public void navigateToAddRecipes() {
-        Intent intent = new Intent(getContext(), AddRecipesActivity.class);
-        startActivity(intent);
-    }
-
 
     @Override
     public void onItemClick(int position) {
@@ -383,7 +378,7 @@ public class homeLunchFragment extends Fragment implements RecipeAdapter.OnItemC
         String title = mRecipeList.get(position).getTitle();
         Log.d(TAG, "onItemClick: CLICKED " + title + " id " + id);
 
-        Navigation.findNavController(view).navigate(HomeFragmentDirections.actionHomeFragmentToRecipeDetailedFragment(id));
+        Navigation.findNavController(view).navigate(RecipesFragmentDirections.actionRecipesFragmentToRecipeDetailedFragment(id));
     }
 
     @Override
@@ -404,13 +399,13 @@ public class homeLunchFragment extends Fragment implements RecipeAdapter.OnItemC
                     Toast.makeText(getContext(), "Removed from favorites", Toast.LENGTH_SHORT).show();
                 }
             });
+
         } else {
             mRecipeList.get(position).setFavorite(true);
             UserWhoFaved userWhoFaved = new UserWhoFaved(mUser.getUser_id(), mUser.getName(), mUser.getUserProfilePicUrl(), null);
             currentRecipeSubCollection.document(mUser.getUser_id()).set(userWhoFaved);
             Toast.makeText(getContext(), "Added " + title + " to favorites", Toast.LENGTH_SHORT).show();
         }
-
         mAdapter.notifyDataSetChanged();
     }
 

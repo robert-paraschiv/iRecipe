@@ -6,28 +6,28 @@
     app:startDestination="@id/feedFragment">
 
     <fragment
-        android:id="@+id/homeFragment"
-        android:name="com.rokudoz.irecipe.Fragments.HomeFragment"
-        android:label="fragment_home"
-        tools:layout="@layout/fragment_home" >
+        android:id="@+id/recipesFragment"
+        android:name="com.rokudoz.irecipe.Fragments.RecipesFragment"
+        android:label="fragment_recipes"
+        tools:layout="@layout/fragment_recipes" >
         <action
-            android:id="@+id/action_homeFragment_to_searchFragment"
+            android:id="@+id/action_recipesFragment_to_searchFragment"
             app:destination="@id/feedFragment"
              />
         <action
-            android:id="@+id/action_homeFragment_to_recipeDetailedFragment"
+            android:id="@+id/action_recipesFragment_to_recipeDetailedFragment"
             app:destination="@id/recipeDetailedFragment"
             />
         <action
-            android:id="@+id/action_homeFragment_to_favoritesFragment"
+            android:id="@+id/action_recipesFragment_to_favoritesFragment"
             app:destination="@id/favoritesFragment"
             />
         <action
-            android:id="@+id/action_homeFragment_to_profileFragment"
+            android:id="@+id/action_recipesFragment_to_profileFragment"
             app:destination="@id/profileFragment"
             />
         <action
-            android:id="@+id/action_homeFragment_to_shoppingListFragment2"
+            android:id="@+id/action_recipesFragment_to_shoppingListFragment2"
             app:destination="@id/shoppingListFragment" />
     </fragment>
     <fragment
