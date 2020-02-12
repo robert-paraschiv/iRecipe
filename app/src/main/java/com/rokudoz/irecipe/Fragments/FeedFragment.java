@@ -68,6 +68,7 @@ public class FeedFragment extends Fragment implements FeedAdapter.OnItemClickLis
     private static final int NUMBER_OF_ADS = 5;
     private int nrPostsLoaded = 0;
     private int nrOfAdsLoaded = 0;
+    private int indexOfAdToLoad = 0;
 
     public View view;
     private TextView unreadMessagesTv;
@@ -194,10 +195,17 @@ public class FeedFragment extends Fragment implements FeedAdapter.OnItemClickLis
         }
         nrOfAdsLoaded++;
 
-        Random rand = new Random();
-        int index = rand.nextInt(nativeAds.size());
-        mPostList.add(mPostList.size(), nativeAds.get(index));
-        mAdapter.notifyDataSetChanged();
+
+        if (indexOfAdToLoad < nativeAds.size()) {
+            mPostList.add(mPostList.size(), nativeAds.get(indexOfAdToLoad));
+            mAdapter.notifyDataSetChanged();
+            indexOfAdToLoad++;
+        } else {
+            indexOfAdToLoad = 0;
+            mPostList.add(mPostList.size(), nativeAds.get(indexOfAdToLoad));
+            mAdapter.notifyDataSetChanged();
+        }
+
 
         if (nrOfAdsLoaded == 5) {
             nativeAds = new ArrayList<>();

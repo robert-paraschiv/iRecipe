@@ -73,11 +73,11 @@ public class SearchUserActivity extends AppCompatActivity implements SearchUserA
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search_user);
 
-        MaterialToolbar myToolbar = (MaterialToolbar) findViewById(R.id.searchUserActivity_my_toolbar);
-        myToolbar.setTitle("Search User");
-        setSupportActionBar(myToolbar);
+//        MaterialToolbar myToolbar = (MaterialToolbar) findViewById(R.id.searchUserActivity_my_toolbar);
+//        myToolbar.setTitle("Search User");
+//        setSupportActionBar(myToolbar);
 
-
+        setupSearchView();
         getCurrentUserDetails();
     }
 
@@ -109,7 +109,7 @@ public class SearchUserActivity extends AppCompatActivity implements SearchUserA
                             if (!friends_userID_list.contains(friend.getFriend_user_id()))
                                 friends_userID_list.add(friend.getFriend_user_id());
                         }
-                        performQuery();
+                        buildRecyclerView();
 
                     }
                 });
@@ -117,28 +117,56 @@ public class SearchUserActivity extends AppCompatActivity implements SearchUserA
         });
     }
 
-
-    private void performQuery() {
-
-        usersReference.addSnapshotListener(new EventListener<QuerySnapshot>() {
-            @Override
-            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
-                if (e != null) {
-                    Log.w(TAG, "onEvent: ", e);
-                    return;
-                }
-                for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
-                    User user = document.toObject(User.class);
-                    if (!usersList.contains(user)) {
-                        usersList.add(user);
+    private void searchDb(String filter) {
+        if (filter.trim().equals("")) {
+            usersList.clear();
+            mAdapter.notifyDataSetChanged();
+        } else {
+            Query query = usersReference.orderBy("name").startAfter(filter).endAt(filter + "\uf8ff");
+            query.addSnapshotListener(new EventListener<QuerySnapshot>() {
+                @Override
+                public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                    if (e == null && queryDocumentSnapshots != null && queryDocumentSnapshots.size() > 0) {
+                        usersList.clear();
+                        for (QueryDocumentSnapshot queryDocumentSnapshot : queryDocumentSnapshots) {
+                            User user = queryDocumentSnapshot.toObject(User.class);
+                            if (!usersList.contains(user)) {
+                                usersList.add(user);
+                                mAdapter.notifyDataSetChanged();
+                            }
+                        }
                     }
                 }
-                if (queryDocumentSnapshots.getDocuments().size() != 0) {
-                    mLastQueriedDocument = queryDocumentSnapshots.getDocuments()
-                            .get(queryDocumentSnapshots.getDocuments().size() - 1);
+            });
+        }
+
+    }
+
+    private void setupSearchView(){
+        SearchView searchView = findViewById(R.id.searchUser_SearchView);
+        searchView.setIconified(false);
+        searchView.requestFocus();
+        searchView.setImeOptions(EditorInfo.IME_ACTION_DONE);
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                searchDb(newText);
+                return false;
+            }
+
+        });
+
+        searchView.setOnQueryTextFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (hasFocus) {
+                    showInputMethod(v.findFocus());
                 }
-                buildRecyclerView();
-                mAdapter.notifyDataSetChanged();
             }
         });
     }
@@ -154,42 +182,6 @@ public class SearchUserActivity extends AppCompatActivity implements SearchUserA
         mRecyclerView.setAdapter(mAdapter);
 
         mAdapter.setOnItemClickListener(this);
-
-        initializeRecyclerViewAdapterOnClicks();
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater menuInflater = getMenuInflater();
-        menuInflater.inflate(R.menu.search_recipe_menu, menu);
-
-        MenuItem searchItem = menu.findItem(R.id.action_search);
-        SearchView searchView = (SearchView) searchItem.getActionView();
-        searchView.setImeOptions(EditorInfo.IME_ACTION_DONE);
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                return false;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                mAdapter.getFilter().filter(newText);
-                return false;
-            }
-
-        });
-
-        searchView.setOnQueryTextFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                if (hasFocus) {
-                    showInputMethod(v.findFocus());
-                }
-            }
-        });
-
-        return true;
     }
 
     private void showInputMethod(View view) {
@@ -199,23 +191,14 @@ public class SearchUserActivity extends AppCompatActivity implements SearchUserA
         }
     }
 
-    private void initializeRecyclerViewAdapterOnClicks() {
-        mAdapter.setOnItemClickListener(new SearchUserAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(int position) {
-                String id = usersList.get(position).getUser_id();
-                Log.d(TAG, "onItemClick: CLICKED " + " id " + id);
-
-                Intent intent = new Intent(SearchUserActivity.this,MainActivity.class);
-                intent.putExtra("user_id",id);
-                startActivity(intent);
-                finish();
-            }
-        });
-    }
-
     @Override
     public void onItemClick(int position) {
+        String id = usersList.get(position).getUser_id();
+        Log.d(TAG, "onItemClick: CLICKED " + " id " + id);
 
+        Intent intent = new Intent(SearchUserActivity.this, MainActivity.class);
+        intent.putExtra("user_id", id);
+        startActivity(intent);
+        finish();
     }
 }
