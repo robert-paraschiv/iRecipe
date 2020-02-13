@@ -11,7 +11,7 @@
         android:id="@+id/recipesFragment"
         android:icon="@drawable/ic_kitchen_black_24dp"
         app:showAsAction="ifRoom"
-        android:title="Home"/>
+        android:title="Recipes"/>
     <item
         android:id="@+id/favoritesFragment"
         android:icon="@drawable/ic_favorite_red_24dp"

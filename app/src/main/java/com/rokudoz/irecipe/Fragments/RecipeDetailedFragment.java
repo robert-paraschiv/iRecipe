@@ -478,7 +478,7 @@ public class RecipeDetailedFragment extends Fragment implements RecipeInstructio
                         recipeDetailedViewPagerAdapter.notifyDataSetChanged();
                     }
                     //Check if the user liked the recipe or not
-                    recipeRef.document(documentID).collection("UsersWhoFaved").document(mUser.getUser_id())
+                    recipeRef.document(documentID).collection("UsersWhoFaved").document(FirebaseAuth.getInstance().getCurrentUser().getUid())
                             .addSnapshotListener(new EventListener<DocumentSnapshot>() {
                                 @Override
                                 public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
@@ -488,9 +488,11 @@ public class RecipeDetailedFragment extends Fragment implements RecipeInstructio
                                     }
                                     if (documentSnapshot != null) {
                                         UserWhoFaved userWhoFaved = documentSnapshot.toObject(UserWhoFaved.class);
-                                        if (userWhoFaved != null && userWhoFaved.getUserID().equals(mUser.getUser_id())) {
+                                        if (userWhoFaved != null && userWhoFaved.getUserID().equals(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
+                                            isRecipeFavorite = true;
                                             setFavoriteIcon(true);
                                         } else {
+                                            isRecipeFavorite = false;
                                             setFavoriteIcon(false);
                                         }
                                     }

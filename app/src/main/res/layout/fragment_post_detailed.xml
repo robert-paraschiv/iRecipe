@@ -68,7 +68,7 @@
                 <ImageView
                     android:id="@+id/postDetailed_ImageView"
                     android:layout_width="match_parent"
-                    android:layout_height="500dp"
+                    android:layout_height="550dp"
                     tools:src="@color/colorPrimaryDark" />
             </com.google.android.material.card.MaterialCardView>
 
