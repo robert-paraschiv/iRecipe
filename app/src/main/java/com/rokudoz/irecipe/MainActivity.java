@@ -63,6 +63,8 @@ public class MainActivity extends AppCompatActivity {
         public void onReceive(Context context, Intent intent) {
 
             if (intent.hasExtra("friend_id") && !navController.getCurrentDestination().getLabel().equals("fragment_message")) {
+
+                Log.d(TAG, "onReceive: current destinationLabel" + navController.getCurrentDestination().getLabel());
                 createNotificationChannel();
 
                 Log.d(TAG, "onReceive: messageLabel " + navController.getCurrentDestination().getLabel());

@@ -1,10 +1,21 @@
 package com.rokudoz.irecipe.Fragments.Messages;
 
 
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.Nullable;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 import androidx.fragment.app.Fragment;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -36,6 +47,7 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.WriteBatch;
+import com.rokudoz.irecipe.MainActivity;
 import com.rokudoz.irecipe.Models.Conversation;
 import com.rokudoz.irecipe.Models.Message;
 import com.rokudoz.irecipe.Models.User;
@@ -45,6 +57,7 @@ import com.rokudoz.irecipe.Utils.Adapters.MessageAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -122,6 +135,9 @@ public class MessageFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
+        LocalBroadcastManager.getInstance(getActivity()).registerReceiver((mMessageReceiver),
+                new IntentFilter("MessageNotification")
+        );
         getMessages();
     }
 
@@ -129,6 +145,59 @@ public class MessageFragment extends Fragment {
     public void onStop() {
         super.onStop();
         DetachFireStoreListeners();
+    }
+
+    private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent.hasExtra("friend_id")) {
+                String friend_id = intent.getStringExtra("friend_id");
+                Log.d(TAG, "onReceive: friendUserId: "+friendUserId + " friend_id " + friend_id);
+                if (!friend_id.equals(friendUserId)) {
+                    createNotificationChannel();
+
+                    String click_action = intent.getStringExtra("click_action");
+                    String messageBody = intent.getStringExtra("messageBody");
+                    String messageTitle = intent.getStringExtra("messageTitle");
+
+                    Intent resultIntent = new Intent(click_action);
+                    resultIntent.putExtra("friend_id", friend_id);
+                    NotificationCompat.Builder builder = new NotificationCompat.Builder(getActivity(), getString(R.string.default_notification_channel_id))
+                            .setSmallIcon(R.mipmap.ic_launcher)
+                            .setContentTitle(messageTitle)
+                            .setContentText(messageBody)
+                            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                            .setAutoCancel(true);
+
+                    PendingIntent resultPendingIntent = PendingIntent.getActivity(getContext(), 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+                    builder.setContentIntent(resultPendingIntent);
+
+
+                    int mNotificationId = (int) System.currentTimeMillis();
+
+                    NotificationManagerCompat notificationManager = NotificationManagerCompat.from(getActivity());
+                    notificationManager.notify(mNotificationId, builder.build());
+                }
+            }
+        }
+    };
+
+    private void createNotificationChannel() {
+        // Create the NotificationChannel, but only on API 26+ because
+        // the NotificationChannel class is new and not in the support library
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            CharSequence name = "Foodify";
+            String description = "For friend requests";
+            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+            NotificationChannel channel = new NotificationChannel(getString(R.string.default_notification_channel_id), name,
+                    importance);
+            channel.setDescription(description);
+            // Register the channel with the system; you can't change the importance
+            // or other notification behaviours after this
+            NotificationManager notificationManager =
+                    Objects.requireNonNull(getActivity()).getSystemService(NotificationManager.class);
+            Objects.requireNonNull(notificationManager).createNotificationChannel(channel);
+        }
     }
 
     private void DetachFireStoreListeners() {
