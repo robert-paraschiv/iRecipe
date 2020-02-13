@@ -74,6 +74,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
 
             holder.readStatus.setVisibility(View.VISIBLE);
             if (currentItem.getRead() != null && currentItem.getRead()) {
+                holder.readStatus.setImageResource(R.drawable.ic_pngwave);
                 holder.readStatus.setColorFilter(holder.readStatus.getResources().getColor(R.color.grey));
             } else if (currentItem.getRead() != null && !currentItem.getRead()) {
                 ImageView imageView = new ImageView(holder.readStatus.getContext());

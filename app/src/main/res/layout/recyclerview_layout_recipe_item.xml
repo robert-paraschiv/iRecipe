@@ -13,20 +13,32 @@
         android:layout_height="match_parent"
         android:padding="4dp">
 
-        <TextView
-            android:id="@+id/text_view_title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:maxLines="1"
-            android:text="Title"
-            android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6" />
+        <RelativeLayout
+            android:id="@+id/relLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/text_view_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_alignParentStart="true"
+                android:layout_marginEnd="4dp"
+                android:layout_marginStart="8dp"
+                android:maxLines="1"
+                tools:text="Title"
+                android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6" />
+
+
+        </RelativeLayout>
+
 
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/recycler_view_recipeItem_Image_CardView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/text_view_title"
+            android:layout_below="@id/relLayout"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="4dp"
             app:cardCornerRadius="18dp">
@@ -61,6 +73,33 @@
             android:contentDescription="Recipe Image"
             android:elevation="4dp"
             android:src="@drawable/ic_favorite_border_black_24dp" />
+
+        <RelativeLayout
+            android:id="@+id/creatorLayout"
+            android:layout_below="@id/recycler_view_recipeItem_Image_CardView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="12dp">
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/recipeItem_creator_image"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                tools:src="@color/colorPrimaryDark" />
+
+            <TextView
+                android:id="@+id/recipeItem_creator_name_textView"
+                style="@style/TextAppearance.MaterialComponents.Caption"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="4dp"
+                android:layout_toEndOf="@id/recipeItem_creator_image"
+                tools:text="Creator Name" />
+        </RelativeLayout>
+
+
 
 
         <TextView

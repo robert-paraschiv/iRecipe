@@ -15,6 +15,8 @@ import com.rokudoz.irecipe.R;
 
 import java.util.List;
 
+import de.hdodenhof.circleimageview.CircleImageView;
+
 
 public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeViewHolder> {
     private List<Recipe> mRecipeList;
@@ -31,8 +33,9 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
     }
 
     public class RecipeViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        TextView tvTitle, tvDescription, tvNrOfFaves, tvNumMissingIngredients, tvNumComments;
+        TextView tvTitle, tvDescription, tvNrOfFaves, tvNumMissingIngredients, tvNumComments, tvCreatorName;
         ImageView mImageView, imgFavorited, imgPrivacy;
+        CircleImageView imgCreatorPic;
 
         public RecipeViewHolder(View itemView) {
             super(itemView);
@@ -44,6 +47,8 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
             imgPrivacy = itemView.findViewById(R.id.recycler_view_privacy);
             tvNumMissingIngredients = itemView.findViewById(R.id.recycler_view_recipeItem_missingIngredients);
             tvNumComments = itemView.findViewById(R.id.recycler_view_recipeItem_nrOfComments_textView);
+            tvCreatorName = itemView.findViewById(R.id.recipeItem_creator_name_textView);
+            imgCreatorPic = itemView.findViewById(R.id.recipeItem_creator_image);
 
             itemView.setOnClickListener(this);
 
@@ -87,6 +92,13 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
 
         holder.tvTitle.setText(currentItem.getTitle());
         holder.tvDescription.setText(currentItem.getDescription());
+
+        if (currentItem.getCreator_name() != null) {
+            holder.tvCreatorName.setText(currentItem.getCreator_name());
+        }
+        if (currentItem.getCreator_imageUrl() != null && !currentItem.getCreator_imageUrl().equals("")) {
+            Glide.with(holder.imgCreatorPic).load(currentItem.getCreator_imageUrl()).centerCrop().into(holder.imgCreatorPic);
+        }
 
         Glide.with(holder.mImageView).load(currentItem.getImageUrls_list().get(0)).centerCrop().into(holder.mImageView);
 
