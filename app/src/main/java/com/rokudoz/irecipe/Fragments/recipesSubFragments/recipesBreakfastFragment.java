@@ -137,27 +137,19 @@ public class recipesBreakfastFragment extends Fragment implements RecipeAdapter.
 
     private void insertAdsInRecyclerView() {
         if (nativeAds.size() <= 0) {
-            Log.d(TAG, "insertAdsInRecyclerView: No ads loaded yet");
             return;
         }
         nrOfAdsLoaded++;
 
 
         if (indexOfAdToLoad < nativeAds.size()) {
-            if (mRecipeList.size() >= indexToAd) {
-                mRecipeList.add(indexToAd, nativeAds.get(indexOfAdToLoad));
-                mAdapter.notifyDataSetChanged();
-                indexOfAdToLoad++;
-                indexToAd += 3;
-            }
+            mRecipeList.add(mRecipeList.size(), nativeAds.get(indexOfAdToLoad));
+            mAdapter.notifyDataSetChanged();
+            indexOfAdToLoad++;
         } else {
-            if (mRecipeList.size() >= indexToAd) {
-                indexOfAdToLoad = 0;
-                mRecipeList.add(indexToAd, nativeAds.get(indexOfAdToLoad));
-                indexToAd += 3;
-                mAdapter.notifyDataSetChanged();
-            }
-
+            indexOfAdToLoad = 0;
+            mRecipeList.add(mRecipeList.size(), nativeAds.get(indexOfAdToLoad));
+            mAdapter.notifyDataSetChanged();
         }
 
 
@@ -234,6 +226,19 @@ public class recipesBreakfastFragment extends Fragment implements RecipeAdapter.
         mRecyclerView.setAdapter(mAdapter);
 
         mAdapter.setOnItemClickListener(recipesBreakfastFragment.this);
+
+        mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+
+                if (!recyclerView.canScrollVertically(1)) {
+                    performQuery();
+                } else if (!recyclerView.canScrollVertically(0)) {
+                    performQuery();
+                }
+            }
+        });
     }
 
 
@@ -254,11 +259,9 @@ public class recipesBreakfastFragment extends Fragment implements RecipeAdapter.
                         Query recipesQuery = null;
                         if (mLastQueriedDocument != null) {
                             recipesQuery = recipeRef.whereEqualTo("category", "breakfast").whereEqualTo("privacy", "Everyone")
-                                    .startAfter(mLastQueriedDocument); // Necessary so we don't have the same results multiple times
-//                                    .limit(3);
+                                    .startAfter(mLastQueriedDocument).limit(10);
                         } else {
-                            recipesQuery = recipeRef.whereEqualTo("category", "breakfast").whereEqualTo("privacy", "Everyone");
-//                                    .limit(3);
+                            recipesQuery = recipeRef.whereEqualTo("category", "breakfast").whereEqualTo("privacy", "Everyone").limit(10);
                         }
 
                         PerformMainQuery(recipesQuery);

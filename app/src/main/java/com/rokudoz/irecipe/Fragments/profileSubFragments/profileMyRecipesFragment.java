@@ -3,6 +3,7 @@ package com.rokudoz.irecipe.Fragments.profileSubFragments;
 
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
@@ -146,27 +147,19 @@ public class profileMyRecipesFragment extends Fragment implements RecipeAdapter.
 
     private void insertAdsInRecyclerView() {
         if (nativeAds.size() <= 0) {
-            Log.d(TAG, "insertAdsInRecyclerView: No ads loaded yet");
             return;
         }
         nrOfAdsLoaded++;
 
 
         if (indexOfAdToLoad < nativeAds.size()) {
-            if (mRecipeList.size() >= indexToAd) {
-                mRecipeList.add(indexToAd, nativeAds.get(indexOfAdToLoad));
-                mAdapter.notifyDataSetChanged();
-                indexOfAdToLoad++;
-                indexToAd += 3;
-            }
+            mRecipeList.add(mRecipeList.size(), nativeAds.get(indexOfAdToLoad));
+            mAdapter.notifyDataSetChanged();
+            indexOfAdToLoad++;
         } else {
-            if (mRecipeList.size() >= indexToAd) {
-                indexOfAdToLoad = 0;
-                mRecipeList.add(indexToAd, nativeAds.get(indexOfAdToLoad));
-                indexToAd += 3;
-                mAdapter.notifyDataSetChanged();
-            }
-
+            indexOfAdToLoad = 0;
+            mRecipeList.add(mRecipeList.size(), nativeAds.get(indexOfAdToLoad));
+            mAdapter.notifyDataSetChanged();
         }
 
 
@@ -205,6 +198,19 @@ public class profileMyRecipesFragment extends Fragment implements RecipeAdapter.
         mRecyclerView.setAdapter(mAdapter);
 
         mAdapter.setOnItemClickListener(profileMyRecipesFragment.this);
+
+        mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+
+                if (!recyclerView.canScrollVertically(1)) {
+                    performQuery();
+                } else if (!recyclerView.canScrollVertically(0)) {
+                    performQuery();
+                }
+            }
+        });
     }
 
     private void getCurrentUserDetails() {
