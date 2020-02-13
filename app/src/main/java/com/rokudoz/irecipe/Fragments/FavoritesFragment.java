@@ -17,6 +17,10 @@ import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.AdLoader;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.formats.UnifiedNativeAd;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -41,6 +45,7 @@ import com.rokudoz.irecipe.Utils.Adapters.RecipeAdapter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -51,6 +56,16 @@ public class FavoritesFragment extends Fragment implements RecipeAdapter.OnItemC
 
     private ProgressBar pbLoading;
     private Boolean hasBeenActiveBefore = false;
+
+    //Ads
+    AdLoader adLoader;
+    List<UnifiedNativeAd> nativeAds = new ArrayList<>();
+    private static final int NUMBER_OF_ADS = 5;
+    private int nrRecipesLoaded = 0;
+    private int nrOfAdsLoaded = 0;
+    private int indexOfAdToLoad = 0;
+    private int indexToAd = 3;
+
 
     //Firebase
     private FirebaseAuth.AuthStateListener mAuthListener;
@@ -65,7 +80,7 @@ public class FavoritesFragment extends Fragment implements RecipeAdapter.OnItemC
     private RecipeAdapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
 
-    private ArrayList<Recipe> mRecipeList = new ArrayList<>();
+    private ArrayList<Object> mRecipeList = new ArrayList<>();
 
     private DocumentSnapshot mLastQueriedDocument;
 
@@ -90,8 +105,68 @@ public class FavoritesFragment extends Fragment implements RecipeAdapter.OnItemC
 
         buildRecyclerView();
         setupFirebaseAuth();
-
+        loadNativeAds();
         return view; // HAS TO BE THE LAST ONE ---------------------------------
+    }
+
+
+    private void loadNativeAds() {
+        if (getActivity() != null) {
+            AdLoader.Builder builder = new AdLoader.Builder(Objects.requireNonNull(getActivity()), getResources().getString(R.string.admob_unit_id));
+            adLoader = builder.forUnifiedNativeAd(new UnifiedNativeAd.OnUnifiedNativeAdLoadedListener() {
+                @Override
+                public void onUnifiedNativeAdLoaded(UnifiedNativeAd unifiedNativeAd) {
+                    nativeAds.add(unifiedNativeAd);
+                    if (!adLoader.isLoading()) {
+                    }
+                }
+            }).withAdListener(new AdListener() {
+                @Override
+                public void onAdFailedToLoad(int i) {
+                    super.onAdFailedToLoad(i);
+                    Log.d(TAG, "onAdFailedToLoad: " + i);
+
+                }
+            }).build();
+
+            adLoader.loadAds(new AdRequest.Builder()
+                    .addTestDevice("2F1C484BD502BA7D51AC78D75751AFE0") // Mi 9T Pro
+                    .addTestDevice("B141CB779F883EF84EA9A32A7D068B76") // Redmi 5 Plus
+                    .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
+                    .build(), NUMBER_OF_ADS);
+        }
+    }
+
+    private void insertAdsInRecyclerView() {
+        if (nativeAds.size() <= 0) {
+            Log.d(TAG, "insertAdsInRecyclerView: No ads loaded yet");
+            return;
+        }
+        nrOfAdsLoaded++;
+
+
+        if (indexOfAdToLoad < nativeAds.size()) {
+            if (mRecipeList.size() >= indexToAd) {
+                mRecipeList.add(indexToAd, nativeAds.get(indexOfAdToLoad));
+                mAdapter.notifyDataSetChanged();
+                indexOfAdToLoad++;
+                indexToAd += 3;
+            }
+        } else {
+            if (mRecipeList.size() >= indexToAd) {
+                indexOfAdToLoad = 0;
+                mRecipeList.add(indexToAd, nativeAds.get(indexOfAdToLoad));
+                indexToAd += 3;
+                mAdapter.notifyDataSetChanged();
+            }
+
+        }
+
+
+        if (nrOfAdsLoaded == 5) {
+            nativeAds = new ArrayList<>();
+            loadNativeAds();
+        }
     }
 
 
@@ -200,8 +275,13 @@ public class FavoritesFragment extends Fragment implements RecipeAdapter.OnItemC
                                                 recipe.setFavorite(fav);
                                                 if (fav) {
                                                     if (!mRecipeList.contains(recipe)) {
+                                                        nrRecipesLoaded++;
+
                                                         mRecipeList.add(recipe);
-                                                        mAdapter.notifyDataSetChanged();
+                                                        if (nrRecipesLoaded >= 3) {
+                                                            insertAdsInRecyclerView();
+                                                            nrRecipesLoaded = 0;
+                                                        }
                                                     } else {
                                                         mRecipeList.set(mRecipeList.indexOf(recipe), recipe);
                                                         mAdapter.notifyDataSetChanged();
@@ -237,20 +317,22 @@ public class FavoritesFragment extends Fragment implements RecipeAdapter.OnItemC
                         mAdapter.setOnItemClickListener(new RecipeAdapter.OnItemClickListener() {
                             @Override
                             public void onItemClick(int position) {
-                                String id = mRecipeList.get(position).getDocumentId();
+                                Recipe recipe = (Recipe) mRecipeList.get(position);
+                                String id = recipe.getDocumentId();
                                 Navigation.findNavController(view).navigate(FavoritesFragmentDirections.actionFavoritesFragmentToRecipeDetailedFragment(id));
 
                             }
 
                             @Override
                             public void onFavoriteClick(final int position) {
-                                final String id = mRecipeList.get(position).getDocumentId();
-                                String title = mRecipeList.get(position).getTitle();
+                                Recipe recipe = (Recipe) mRecipeList.get(position);
+                                final String id = recipe.getDocumentId();
+                                String title = recipe.getTitle();
                                 DocumentReference currentRecipeRef = recipeRef.document(id);
                                 final CollectionReference currentRecipeSubCollection = currentRecipeRef.collection("UsersWhoFaved");
 
-                                if (mRecipeList.get(position).getFavorite()) {
-                                    mRecipeList.get(position).setFavorite(false);
+                                if (recipe.getFavorite()) {
+                                    recipe.setFavorite(false);
                                     mRecipeList.remove(position);
                                     currentRecipeSubCollection.document(mUser.getUser_id()).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
                                         @Override
@@ -262,7 +344,7 @@ public class FavoritesFragment extends Fragment implements RecipeAdapter.OnItemC
                                     });
 
                                 } else {
-                                    mRecipeList.get(position).setFavorite(true);
+                                    recipe.setFavorite(true);
                                     UserWhoFaved userWhoFaved = new UserWhoFaved(mUser.getUser_id(), mUser.getName(), mUser.getUserProfilePicUrl(), null);
                                     currentRecipeSubCollection.document(mUser.getUser_id()).set(userWhoFaved);
                                     Toast.makeText(getContext(), "Added " + title + " to favorites", Toast.LENGTH_SHORT).show();

@@ -7,9 +7,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RatingBar;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.google.android.gms.ads.formats.MediaView;
+import com.google.android.gms.ads.formats.NativeAd;
+import com.google.android.gms.ads.formats.UnifiedNativeAd;
+import com.google.android.gms.ads.formats.UnifiedNativeAdView;
 import com.rokudoz.irecipe.Models.Recipe;
 import com.rokudoz.irecipe.R;
 
@@ -18,8 +23,10 @@ import java.util.List;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 
-public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeViewHolder> {
-    private List<Recipe> mRecipeList;
+public class RecipeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+    private final int RECIPE_ITEM_VIEW_TYPE = 0;
+    private final int UNIFIED_NATIVE_AD_VIEW_TYPE = 1;
+    private List<Object> itemList;
     private OnItemClickListener mListener;
 
     public interface OnItemClickListener {
@@ -76,68 +83,161 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
         }
     }
 
-    public RecipeAdapter(List<Recipe> recipeList) {
-        mRecipeList = recipeList;
+    public RecipeAdapter(List<Object> itemList) {
+        this.itemList = itemList;
     }
 
     @Override
-    public RecipeViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.recyclerview_layout_recipe_item, parent, false);
-        return new RecipeViewHolder(v);
+    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        switch (viewType) {
+            case UNIFIED_NATIVE_AD_VIEW_TYPE:
+                View unifiedNativeLayoutView = LayoutInflater.from(parent.getContext()).inflate(R.layout.ad_unified, parent, false);
+                return new UnifiedNativeAdViewHolder(unifiedNativeLayoutView);
+            case RECIPE_ITEM_VIEW_TYPE:
+
+            default:
+                View postItemLayoutView = LayoutInflater.from(parent.getContext()).inflate(R.layout.recyclerview_layout_recipe_item, parent, false);
+                return new RecipeViewHolder(postItemLayoutView);
+        }
     }
 
     @Override
-    public void onBindViewHolder(@NonNull final RecipeViewHolder holder, int position) {
-        final Recipe currentItem = mRecipeList.get(position);
-
-        holder.tvTitle.setText(currentItem.getTitle());
-        holder.tvDescription.setText(currentItem.getDescription());
-
-        if (currentItem.getCreator_name() != null) {
-            holder.tvCreatorName.setText(currentItem.getCreator_name());
+    public int getItemViewType(int position) {
+        if (itemList.get(position) instanceof Recipe) {
+            return RECIPE_ITEM_VIEW_TYPE;
+        } else {
+            return UNIFIED_NATIVE_AD_VIEW_TYPE;
         }
-        if (currentItem.getCreator_imageUrl() != null && !currentItem.getCreator_imageUrl().equals("")) {
-            Glide.with(holder.imgCreatorPic).load(currentItem.getCreator_imageUrl()).centerCrop().into(holder.imgCreatorPic);
-        }
+    }
 
-        Glide.with(holder.mImageView).load(currentItem.getImageUrls_list().get(0)).centerCrop().into(holder.mImageView);
+    @Override
+    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
+        int viewType = getItemViewType(position);
+        switch (viewType) {
+            case UNIFIED_NATIVE_AD_VIEW_TYPE:
+                UnifiedNativeAd unifiedNativeAd = (UnifiedNativeAd) itemList.get(position);
+                populateNativeAdView(unifiedNativeAd, ((UnifiedNativeAdViewHolder) holder).getAdView());
+                break;
+            case RECIPE_ITEM_VIEW_TYPE:
+                RecipeViewHolder recipeViewHolder = (RecipeViewHolder) holder;
+                Recipe currentItem = (Recipe) itemList.get(position);
 
-        if (currentItem.getNumber_of_likes() != null) {
-            holder.tvNrOfFaves.setText("" + currentItem.getNumber_of_likes());
-        }
-        if (currentItem.getMissingIngredients() != null) {
-            if (currentItem.getNrOfMissingIngredients() == 0) {
-                holder.tvNumMissingIngredients.setVisibility(View.GONE);
-            } else {
-                StringBuilder missingIngredients = new StringBuilder("Missing ingredients: ");
-                for (int i = 0; i < currentItem.getMissingIngredients().size(); i++) {
-                    if (i == currentItem.getMissingIngredients().size() - 1) {
-                        missingIngredients.append(currentItem.getMissingIngredients().get(i));
-                    } else
-                        missingIngredients.append(currentItem.getMissingIngredients().get(i)).append(", ");
+                recipeViewHolder.tvTitle.setText(currentItem.getTitle());
+                recipeViewHolder.tvDescription.setText(currentItem.getDescription());
+
+                if (currentItem.getCreator_name() != null) {
+                    recipeViewHolder.tvCreatorName.setText(currentItem.getCreator_name());
                 }
-                holder.tvNumMissingIngredients.setVisibility(View.VISIBLE);
-                holder.tvNumMissingIngredients.setText(missingIngredients.toString());
-            }
-        } else
-            holder.tvNumMissingIngredients.setVisibility(View.GONE);
+                if (currentItem.getCreator_imageUrl() != null && !currentItem.getCreator_imageUrl().equals("")) {
+                    Glide.with(recipeViewHolder.imgCreatorPic).load(currentItem.getCreator_imageUrl()).centerCrop().into(recipeViewHolder.imgCreatorPic);
+                }
 
-        if (mRecipeList.get(position).getPrivacy().equals("Everyone")) {
-            holder.imgPrivacy.setVisibility(View.GONE);
+                Glide.with(recipeViewHolder.mImageView).load(currentItem.getImageUrls_list().get(0)).centerCrop().into(recipeViewHolder.mImageView);
+
+                if (currentItem.getNumber_of_likes() != null) {
+                    recipeViewHolder.tvNrOfFaves.setText("" + currentItem.getNumber_of_likes());
+                }
+                if (currentItem.getMissingIngredients() != null) {
+                    if (currentItem.getNrOfMissingIngredients() == 0) {
+                        recipeViewHolder.tvNumMissingIngredients.setVisibility(View.GONE);
+                    } else {
+                        StringBuilder missingIngredients = new StringBuilder("Missing ingredients: ");
+                        for (int i = 0; i < currentItem.getMissingIngredients().size(); i++) {
+                            if (i == currentItem.getMissingIngredients().size() - 1) {
+                                missingIngredients.append(currentItem.getMissingIngredients().get(i));
+                            } else
+                                missingIngredients.append(currentItem.getMissingIngredients().get(i)).append(", ");
+                        }
+                        recipeViewHolder.tvNumMissingIngredients.setVisibility(View.VISIBLE);
+                        recipeViewHolder.tvNumMissingIngredients.setText(missingIngredients.toString());
+                    }
+                } else
+                    recipeViewHolder.tvNumMissingIngredients.setVisibility(View.GONE);
+
+                if (currentItem.getPrivacy().equals("Everyone")) {
+                    recipeViewHolder.imgPrivacy.setVisibility(View.GONE);
+                }
+
+                recipeViewHolder.imgFavorited.setImageResource(R.drawable.ic_favorite_border_black_24dp);
+                if (currentItem.getFavorite() != null && currentItem.getFavorite()) {
+                    recipeViewHolder.imgFavorited.setImageResource(R.drawable.ic_favorite_red_24dp);
+                }
+                if (currentItem.getNumber_of_comments() != null) {
+                    recipeViewHolder.tvNumComments.setText("" + currentItem.getNumber_of_comments());
+                }
         }
 
-        holder.imgFavorited.setImageResource(R.drawable.ic_favorite_border_black_24dp);
-        if (currentItem.getFavorite() != null && currentItem.getFavorite()) {
-            holder.imgFavorited.setImageResource(R.drawable.ic_favorite_red_24dp);
+
+
+    }
+
+    private void populateNativeAdView(UnifiedNativeAd unifiedNativeAd, UnifiedNativeAdView adView) {
+        ((TextView) adView.getHeadlineView()).setText(unifiedNativeAd.getHeadline());
+        ((TextView) adView.getBodyView()).setText(unifiedNativeAd.getBody());
+        ((TextView) adView.getCallToActionView()).setText(unifiedNativeAd.getCallToAction());
+
+        NativeAd.Image icon = unifiedNativeAd.getIcon();
+        if (icon == null) {
+            adView.getIconView().setVisibility(View.GONE);
+        } else {
+            ((CircleImageView) adView.getIconView()).setImageDrawable(icon.getDrawable());
+            adView.getIconView().setVisibility(View.VISIBLE);
         }
-        if (currentItem.getNumber_of_comments() != null) {
-            holder.tvNumComments.setText("" + currentItem.getNumber_of_comments());
+        if (unifiedNativeAd.getPrice() == null) {
+            adView.getPriceView().setVisibility(View.GONE);
+        } else {
+            ((TextView) adView.getPriceView()).setText(unifiedNativeAd.getPrice());
+            adView.getPriceView().setVisibility(View.VISIBLE);
+        }
+        if (unifiedNativeAd.getStore() == null) {
+            adView.getStoreView().setVisibility(View.GONE);
+        } else {
+            ((TextView) adView.getStoreView()).setText(unifiedNativeAd.getStore());
+            adView.getStoreView().setVisibility(View.VISIBLE);
+        }
+        if (unifiedNativeAd.getStarRating() == null) {
+            adView.getStarRatingView().setVisibility(View.GONE);
+        } else {
+            ((RatingBar) adView.getStarRatingView()).setRating(unifiedNativeAd.getStarRating().floatValue());
+            adView.getStarRatingView().setVisibility(View.VISIBLE);
+        }
+        if (unifiedNativeAd.getAdvertiser() == null) {
+            adView.getAdvertiserView().setVisibility(View.GONE);
+        } else {
+            ((TextView) adView.getAdvertiserView()).setText(unifiedNativeAd.getAdvertiser());
+            adView.getAdvertiserView().setVisibility(View.VISIBLE);
         }
 
+        adView.setNativeAd(unifiedNativeAd);
+
+    }
+
+    private class UnifiedNativeAdViewHolder extends RecyclerView.ViewHolder {
+        private UnifiedNativeAdView adView;
+
+        public UnifiedNativeAdView getAdView() {
+            return adView;
+        }
+
+        public UnifiedNativeAdViewHolder(@NonNull View itemView) {
+            super(itemView);
+            adView = itemView.findViewById(R.id.ad_native);
+
+            adView.setMediaView((MediaView) adView.findViewById(R.id.ad_media));
+            adView.setHeadlineView(adView.findViewById(R.id.ad_headline));
+            adView.setBodyView(adView.findViewById(R.id.ad_body));
+            adView.setCallToActionView(adView.findViewById(R.id.ad_call_to_action));
+            adView.setIconView(adView.findViewById(R.id.ad_icon));
+            adView.setPriceView(adView.findViewById(R.id.ad_price));
+            adView.setStarRatingView(adView.findViewById(R.id.ad_stars));
+            adView.setStoreView(adView.findViewById(R.id.ad_store));
+            adView.setAdvertiserView(adView.findViewById(R.id.ad_advertiser));
+
+        }
     }
 
     @Override
     public int getItemCount() {
-        return mRecipeList.size();
+        return itemList.size();
     }
 }
