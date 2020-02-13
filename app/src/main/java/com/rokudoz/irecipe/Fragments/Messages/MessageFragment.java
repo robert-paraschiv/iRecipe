@@ -135,9 +135,10 @@ public class MessageFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-        LocalBroadcastManager.getInstance(getActivity()).registerReceiver((mMessageReceiver),
-                new IntentFilter("MessageNotification")
-        );
+        if (getActivity() != null)
+            LocalBroadcastManager.getInstance(getActivity()).registerReceiver((mMessageReceiver),
+                    new IntentFilter("MessageNotification")
+            );
         getMessages();
     }
 
@@ -145,40 +146,43 @@ public class MessageFragment extends Fragment {
     public void onStop() {
         super.onStop();
         DetachFireStoreListeners();
+        if (getActivity() != null)
+            LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mMessageReceiver);
     }
 
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (intent.hasExtra("friend_id")) {
-                String friend_id = intent.getStringExtra("friend_id");
-                Log.d(TAG, "onReceive: friendUserId: "+friendUserId + " friend_id " + friend_id);
-                if (!friend_id.equals(friendUserId)) {
-                    createNotificationChannel();
+            if (getActivity() != null)
+                if (intent.hasExtra("friend_id")) {
+                    String friend_id = intent.getStringExtra("friend_id");
+                    Log.d(TAG, "onReceive: friendUserId: " + friendUserId + " friend_id " + friend_id);
+                    if (!friend_id.equals(friendUserId)) {
+                        createNotificationChannel();
 
-                    String click_action = intent.getStringExtra("click_action");
-                    String messageBody = intent.getStringExtra("messageBody");
-                    String messageTitle = intent.getStringExtra("messageTitle");
+                        String click_action = intent.getStringExtra("click_action");
+                        String messageBody = intent.getStringExtra("messageBody");
+                        String messageTitle = intent.getStringExtra("messageTitle");
 
-                    Intent resultIntent = new Intent(click_action);
-                    resultIntent.putExtra("friend_id", friend_id);
-                    NotificationCompat.Builder builder = new NotificationCompat.Builder(getActivity(), getString(R.string.default_notification_channel_id))
-                            .setSmallIcon(R.mipmap.ic_launcher)
-                            .setContentTitle(messageTitle)
-                            .setContentText(messageBody)
-                            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                            .setAutoCancel(true);
+                        Intent resultIntent = new Intent(click_action);
+                        resultIntent.putExtra("friend_id", friend_id);
+                        NotificationCompat.Builder builder = new NotificationCompat.Builder(getActivity(), getString(R.string.default_notification_channel_id))
+                                .setSmallIcon(R.mipmap.ic_launcher)
+                                .setContentTitle(messageTitle)
+                                .setContentText(messageBody)
+                                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                                .setAutoCancel(true);
 
-                    PendingIntent resultPendingIntent = PendingIntent.getActivity(getContext(), 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-                    builder.setContentIntent(resultPendingIntent);
+                        PendingIntent resultPendingIntent = PendingIntent.getActivity(getContext(), 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+                        builder.setContentIntent(resultPendingIntent);
 
 
-                    int mNotificationId = (int) System.currentTimeMillis();
+                        int mNotificationId = (int) System.currentTimeMillis();
 
-                    NotificationManagerCompat notificationManager = NotificationManagerCompat.from(getActivity());
-                    notificationManager.notify(mNotificationId, builder.build());
+                        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(getActivity());
+                        notificationManager.notify(mNotificationId, builder.build());
+                    }
                 }
-            }
         }
     };
 

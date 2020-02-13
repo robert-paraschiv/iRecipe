@@ -62,35 +62,36 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
 
-            if (intent.hasExtra("friend_id") && !navController.getCurrentDestination().getLabel().equals("fragment_message")) {
+            if (navController.getCurrentDestination() != null && navController.getCurrentDestination().getLabel() != null)
+                if (intent.hasExtra("friend_id") && !navController.getCurrentDestination().getLabel().equals("fragment_message")) {
 
-                Log.d(TAG, "onReceive: current destinationLabel" + navController.getCurrentDestination().getLabel());
-                createNotificationChannel();
+                    Log.d(TAG, "onReceive: current destinationLabel" + navController.getCurrentDestination().getLabel());
+                    createNotificationChannel();
 
-                Log.d(TAG, "onReceive: messageLabel " + navController.getCurrentDestination().getLabel());
-                String click_action = intent.getStringExtra("click_action");
-                String friend_id = intent.getStringExtra("friend_id");
-                String messageBody = intent.getStringExtra("messageBody");
-                String messageTitle = intent.getStringExtra("messageTitle");
+                    Log.d(TAG, "onReceive: messageLabel " + navController.getCurrentDestination().getLabel());
+                    String click_action = intent.getStringExtra("click_action");
+                    String friend_id = intent.getStringExtra("friend_id");
+                    String messageBody = intent.getStringExtra("messageBody");
+                    String messageTitle = intent.getStringExtra("messageTitle");
 
-                Intent resultIntent = new Intent(click_action);
-                resultIntent.putExtra("friend_id", friend_id);
-                NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext(), getString(R.string.default_notification_channel_id))
-                        .setSmallIcon(R.mipmap.ic_launcher)
-                        .setContentTitle(messageTitle)
-                        .setContentText(messageBody)
-                        .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                        .setAutoCancel(true);
+                    Intent resultIntent = new Intent(click_action);
+                    resultIntent.putExtra("friend_id", friend_id);
+                    NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext(), getString(R.string.default_notification_channel_id))
+                            .setSmallIcon(R.mipmap.ic_launcher)
+                            .setContentTitle(messageTitle)
+                            .setContentText(messageBody)
+                            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                            .setAutoCancel(true);
 
-                PendingIntent resultPendingIntent = PendingIntent.getActivity(MainActivity.this, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-                builder.setContentIntent(resultPendingIntent);
+                    PendingIntent resultPendingIntent = PendingIntent.getActivity(MainActivity.this, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+                    builder.setContentIntent(resultPendingIntent);
 
 
-                int mNotificationId = (int) System.currentTimeMillis();
+                    int mNotificationId = (int) System.currentTimeMillis();
 
-                NotificationManagerCompat notificationManager = NotificationManagerCompat.from(getApplicationContext());
-                notificationManager.notify(mNotificationId, builder.build());
-            }
+                    NotificationManagerCompat notificationManager = NotificationManagerCompat.from(getApplicationContext());
+                    notificationManager.notify(mNotificationId, builder.build());
+                }
         }
     };
 
@@ -108,14 +109,18 @@ public class MainActivity extends AppCompatActivity {
             // or other notification behaviours after this
             NotificationManager notificationManager =
                     getSystemService(NotificationManager.class);
-            notificationManager.createNotificationChannel(channel);
+            if (notificationManager != null) {
+                notificationManager.createNotificationChannel(channel);
+            }
         }
     }
 
     private void setUpNavigation() {
         bottomNavigationView = findViewById(R.id.bottom_navigation);
         NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
-        navController = navHostFragment.getNavController();
+        if (navHostFragment != null) {
+            navController = navHostFragment.getNavController();
+        }
         NavigationUI.setupWithNavController(bottomNavigationView, navController);
 
         if (getIntent() != null && getIntent().getStringExtra("friend_id") != null) {
