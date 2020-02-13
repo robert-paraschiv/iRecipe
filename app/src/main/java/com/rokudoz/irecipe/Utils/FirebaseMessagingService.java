@@ -11,12 +11,20 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.google.firebase.messaging.RemoteMessage;
 import com.rokudoz.irecipe.R;
 
 public class FirebaseMessagingService extends com.google.firebase.messaging.FirebaseMessagingService {
     private static final String TAG = "FirebaseMessagingServic";
+
+    private LocalBroadcastManager broadcaster;
+
+    @Override
+    public void onCreate() {
+        broadcaster = LocalBroadcastManager.getInstance(this);
+    }
 
     @Override
     public void onMessageReceived(@NonNull RemoteMessage remoteMessage) {
@@ -45,22 +53,27 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
 
         Intent resultIntent = new Intent(click_action);
         if (click_action != null && click_action.equals("com.rokudoz.foodify.MessageNotification")) {
-            resultIntent.putExtra("friend_id", friend_id);
+            Intent intent = new Intent("MessageNotification");
+            intent.putExtra("click_action", click_action);
+            intent.putExtra("friend_id", friend_id);
+            intent.putExtra("messageTitle", messageTitle);
+            intent.putExtra("messageBody", messageBody);
+            broadcaster.sendBroadcast(intent);
         }
         if (click_action != null && click_action.equals("com.rokudoz.foodify.FriendRequestNotification")) {
             resultIntent.putExtra("user_id", user_id);
             resultIntent.putExtra("friend_status", friend_status);
         }
-        if (click_action != null && click_action.equals("com.rokudoz.foodify.RecipeLikeNotification")){
+        if (click_action != null && click_action.equals("com.rokudoz.foodify.RecipeLikeNotification")) {
             resultIntent.putExtra("recipe_id", recipe_id);
         }
-        if (click_action != null && click_action.equals("com.rokudoz.foodify.RecipeCommentNotification")){
+        if (click_action != null && click_action.equals("com.rokudoz.foodify.RecipeCommentNotification")) {
             resultIntent.putExtra("recipe_id", recipe_id);
         }
-        if (click_action != null && click_action.equals("com.rokudoz.foodify.PostLikeNotification")){
+        if (click_action != null && click_action.equals("com.rokudoz.foodify.PostLikeNotification")) {
             resultIntent.putExtra("post_id", post_id);
         }
-        if (click_action != null && click_action.equals("com.rokudoz.foodify.PostCommentNotification")){
+        if (click_action != null && click_action.equals("com.rokudoz.foodify.PostCommentNotification")) {
             resultIntent.putExtra("post_id", post_id);
         }
 
