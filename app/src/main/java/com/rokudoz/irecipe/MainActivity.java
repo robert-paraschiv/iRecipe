@@ -4,10 +4,12 @@ import com.google.android.gms.ads.MobileAds;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.rokudoz.irecipe.Fragments.FeedFragmentDirections;
 import com.rokudoz.irecipe.Fragments.Messages.MessageFragment;
+import com.rokudoz.irecipe.Utils.DirectReplyReceiver;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
+import androidx.core.app.Person;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
@@ -21,10 +23,13 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
+
+import static com.rokudoz.irecipe.Fragments.Messages.MessageFragment.messagingStyle;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -64,56 +69,59 @@ public class MainActivity extends AppCompatActivity {
 
             if (navController.getCurrentDestination() != null && navController.getCurrentDestination().getLabel() != null)
                 if (intent.hasExtra("friend_id") && !navController.getCurrentDestination().getLabel().equals("fragment_message")) {
-
-                    Log.d(TAG, "onReceive: current destinationLabel" + navController.getCurrentDestination().getLabel());
-                    createNotificationChannel();
-
-                    Log.d(TAG, "onReceive: messageLabel " + navController.getCurrentDestination().getLabel());
                     String click_action = intent.getStringExtra("click_action");
                     String friend_id = intent.getStringExtra("friend_id");
-                    String messageBody = intent.getStringExtra("messageBody");
-                    String messageTitle = intent.getStringExtra("messageTitle");
 
-                    Intent resultIntent = new Intent(click_action);
-                    resultIntent.putExtra("friend_id", friend_id);
-                    NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext(), getString(R.string.default_notification_channel_id))
-                            .setSmallIcon(R.mipmap.ic_launcher)
-                            .setContentTitle(messageTitle)
-                            .setContentText(messageBody)
-                            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                            .setAutoCancel(true);
-
-                    PendingIntent resultPendingIntent = PendingIntent.getActivity(MainActivity.this, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-                    builder.setContentIntent(resultPendingIntent);
-
-
-                    int mNotificationId = (int) System.currentTimeMillis();
-
-                    NotificationManagerCompat notificationManager = NotificationManagerCompat.from(getApplicationContext());
-                    notificationManager.notify(mNotificationId, builder.build());
+                    sendNotification(context,intent, friend_id);
                 }
         }
     };
 
-    private void createNotificationChannel() {
-        // Create the NotificationChannel, but only on API 26+ because
-        // the NotificationChannel class is new and not in the support library
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            CharSequence name = "Foodify";
-            String description = "For friend requests";
-            int importance = NotificationManager.IMPORTANCE_DEFAULT;
-            NotificationChannel channel = new NotificationChannel(getString(R.string.default_notification_channel_id), name,
-                    importance);
-            channel.setDescription(description);
-            // Register the channel with the system; you can't change the importance
-            // or other notification behaviours after this
-            NotificationManager notificationManager =
-                    getSystemService(NotificationManager.class);
-            if (notificationManager != null) {
-                notificationManager.createNotificationChannel(channel);
-            }
-        }
+    public static void sendNotification(Context context,Intent intent, String friend_id) {
+        String click_action = intent.getStringExtra("click_action");
+        String messageBody = intent.getStringExtra("messageBody");
+        String messageTitle = intent.getStringExtra("messageTitle");
+
+        androidx.core.app.RemoteInput remoteInput = new androidx.core.app.RemoteInput.Builder("key_text_reply")
+                .setLabel("Send message").build();
+        Intent replyIntent = new Intent(context, DirectReplyReceiver.class);
+        replyIntent.putExtra("friend_id", friend_id);
+        PendingIntent replyPendingIntent = PendingIntent.getBroadcast(context, 0, replyIntent, 0);
+
+        NotificationCompat.Action replyAction = new NotificationCompat.Action.Builder(
+                R.drawable.ic_send_black_24dp,
+                "Reply",
+                replyPendingIntent
+        ).addRemoteInput(remoteInput).build();
+        Person user = new Person.Builder().setName(messageTitle).build();
+        messagingStyle = new NotificationCompat.MessagingStyle(user);
+        messagingStyle.setConversationTitle("Chat");
+
+        NotificationCompat.MessagingStyle.Message message =
+                new NotificationCompat.MessagingStyle.Message(messageBody, System.currentTimeMillis(), user);
+        messagingStyle.addMessage(message);
+
+        Intent resultIntent = new Intent(click_action);
+        resultIntent.putExtra("friend_id", friend_id);
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, App.CHANNEL_MESSAGES)
+                .setSmallIcon(R.mipmap.ic_launcher_foreground)
+                .setStyle(messagingStyle)
+                .addAction(replyAction)
+                .setColor(Color.BLUE)
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setCategory(NotificationCompat.CATEGORY_MESSAGE)
+                .setAutoCancel(true);
+
+        PendingIntent resultPendingIntent = PendingIntent.getActivity(context, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        builder.setContentIntent(resultPendingIntent);
+
+
+        int mNotificationId = (int) System.currentTimeMillis();
+
+        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
+        notificationManager.notify(1, builder.build());
     }
+
 
     private void setUpNavigation() {
         bottomNavigationView = findViewById(R.id.bottom_navigation);

@@ -5,6 +5,7 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Build;
 import android.util.Log;
 
@@ -13,7 +14,9 @@ import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
+import com.google.firebase.Timestamp;
 import com.google.firebase.messaging.RemoteMessage;
+import com.rokudoz.irecipe.App;
 import com.rokudoz.irecipe.R;
 
 public class FirebaseMessagingService extends com.google.firebase.messaging.FirebaseMessagingService {
@@ -29,7 +32,6 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
     @Override
     public void onMessageReceived(@NonNull RemoteMessage remoteMessage) {
         super.onMessageReceived(remoteMessage);
-        createNotificationChannel();
 
         String messageTitle = remoteMessage.getNotification().getTitle();
         String messageBody = remoteMessage.getNotification().getBody();
@@ -39,12 +41,17 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
         String friend_status = remoteMessage.getData().get("friend_status");
         String post_id = remoteMessage.getData().get("post_id");
         String recipe_id = remoteMessage.getData().get("recipe_id");
+        String name = remoteMessage.getData().get("name");
+        String user_profilePic = remoteMessage.getData().get("user_profilePic");
+        String timestamp = remoteMessage.getData().get("timestamp");
 
 
-        Log.d(TAG, "onMessageReceived: " + messageTitle + " " + messageBody + click_action);
 
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext(), getString(R.string.default_notification_channel_id))
-                .setSmallIcon(R.mipmap.ic_launcher)
+        Log.d(TAG, "onMessageReceived: " + messageTitle + " " + messageBody +" "+ click_action);
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext(), App.CHANNEL_COMMENTS)
+                .setSmallIcon(R.mipmap.ic_launcher_foreground)
+                .setColor(Color.BLUE)
                 .setContentTitle(messageTitle)
                 .setContentText(messageBody)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
@@ -58,6 +65,9 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
             intent.putExtra("friend_id", friend_id);
             intent.putExtra("messageTitle", messageTitle);
             intent.putExtra("messageBody", messageBody);
+            intent.putExtra("timestamp", timestamp);
+            intent.putExtra("name", name);
+            intent.putExtra("user_profilePic", user_profilePic);
             broadcaster.sendBroadcast(intent);
         }
         if (click_action != null && click_action.equals("com.rokudoz.foodify.FriendRequestNotification")) {
@@ -87,23 +97,5 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
         if (!click_action.equals("com.rokudoz.foodify.MessageNotification"))
             notificationManager.notify(mNotificationId, builder.build());
 
-    }
-
-    private void createNotificationChannel() {
-        // Create the NotificationChannel, but only on API 26+ because
-        // the NotificationChannel class is new and not in the support library
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            CharSequence name = "Foodify";
-            String description = "For friend requests";
-            int importance = NotificationManager.IMPORTANCE_DEFAULT;
-            NotificationChannel channel = new NotificationChannel(getString(R.string.default_notification_channel_id), name,
-                    importance);
-            channel.setDescription(description);
-            // Register the channel with the system; you can't change the importance
-            // or other notification behaviours after this
-            NotificationManager notificationManager =
-                    getSystemService(NotificationManager.class);
-            notificationManager.createNotificationChannel(channel);
-        }
     }
 }

@@ -5,6 +5,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
+        android:name=".App"
         android:allowBackup="true"
         android:fullBackupContent="true"
         android:icon="@mipmap/ic_launcher"
@@ -97,6 +98,11 @@
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_color"
             android:resource="@color/black" />
+
+        <receiver
+            android:name=".Utils.DirectReplyReceiver"
+            android:enabled="true"
+            android:exported="false" />
     </application>
 
 

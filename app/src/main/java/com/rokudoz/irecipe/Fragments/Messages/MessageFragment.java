@@ -1,19 +1,26 @@
 package com.rokudoz.irecipe.Fragments.Messages;
 
 
+import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.app.RemoteInput;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.graphics.drawable.Icon;
 import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
+import androidx.core.app.Person;
+import androidx.core.graphics.drawable.IconCompat;
 import androidx.fragment.app.Fragment;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.navigation.Navigation;
@@ -29,6 +36,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.SimpleTarget;
+import com.bumptech.glide.request.transition.Transition;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.appbar.MaterialToolbar;
@@ -47,6 +56,7 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.WriteBatch;
+import com.rokudoz.irecipe.App;
 import com.rokudoz.irecipe.MainActivity;
 import com.rokudoz.irecipe.Models.Conversation;
 import com.rokudoz.irecipe.Models.Message;
@@ -54,10 +64,12 @@ import com.rokudoz.irecipe.Models.User;
 import com.rokudoz.irecipe.R;
 import com.rokudoz.irecipe.Utils.Adapters.ConversationAdapter;
 import com.rokudoz.irecipe.Utils.Adapters.MessageAdapter;
+import com.rokudoz.irecipe.Utils.DirectReplyReceiver;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.ExecutionException;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -75,6 +87,7 @@ public class MessageFragment extends Fragment {
 
     private List<Message> messageList = new ArrayList<>();
 
+    public static NotificationCompat.MessagingStyle messagingStyle;
     private RecyclerView mRecyclerView;
     private MessageAdapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
@@ -158,50 +171,57 @@ public class MessageFragment extends Fragment {
                     String friend_id = intent.getStringExtra("friend_id");
                     Log.d(TAG, "onReceive: friendUserId: " + friendUserId + " friend_id " + friend_id);
                     if (!friend_id.equals(friendUserId)) {
-                        createNotificationChannel();
 
-                        String click_action = intent.getStringExtra("click_action");
-                        String messageBody = intent.getStringExtra("messageBody");
-                        String messageTitle = intent.getStringExtra("messageTitle");
-
-                        Intent resultIntent = new Intent(click_action);
-                        resultIntent.putExtra("friend_id", friend_id);
-                        NotificationCompat.Builder builder = new NotificationCompat.Builder(getActivity(), getString(R.string.default_notification_channel_id))
-                                .setSmallIcon(R.mipmap.ic_launcher)
-                                .setContentTitle(messageTitle)
-                                .setContentText(messageBody)
-                                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                                .setAutoCancel(true);
-
-                        PendingIntent resultPendingIntent = PendingIntent.getActivity(getContext(), 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-                        builder.setContentIntent(resultPendingIntent);
-
-
-                        int mNotificationId = (int) System.currentTimeMillis();
-
-                        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(getActivity());
-                        notificationManager.notify(mNotificationId, builder.build());
+                        sendNotification(intent, friend_id);
                     }
                 }
         }
     };
 
-    private void createNotificationChannel() {
-        // Create the NotificationChannel, but only on API 26+ because
-        // the NotificationChannel class is new and not in the support library
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            CharSequence name = "Foodify";
-            String description = "For friend requests";
-            int importance = NotificationManager.IMPORTANCE_DEFAULT;
-            NotificationChannel channel = new NotificationChannel(getString(R.string.default_notification_channel_id), name,
-                    importance);
-            channel.setDescription(description);
-            // Register the channel with the system; you can't change the importance
-            // or other notification behaviours after this
-            NotificationManager notificationManager =
-                    Objects.requireNonNull(getActivity()).getSystemService(NotificationManager.class);
-            Objects.requireNonNull(notificationManager).createNotificationChannel(channel);
-        }
+    private void sendNotification(Intent intent, String friend_id) {
+        String click_action = intent.getStringExtra("click_action");
+        String messageBody = intent.getStringExtra("messageBody");
+        String messageTitle = intent.getStringExtra("messageTitle");
+
+        androidx.core.app.RemoteInput remoteInput = new androidx.core.app.RemoteInput.Builder("key_text_reply")
+                .setLabel("Send message").build();
+        Intent replyIntent = new Intent(getActivity(), DirectReplyReceiver.class);
+        replyIntent.putExtra("friend_id", friend_id);
+        PendingIntent replyPendingIntent = PendingIntent.getBroadcast(getActivity(), 0, replyIntent, 0);
+
+        NotificationCompat.Action replyAction = new NotificationCompat.Action.Builder(
+                R.drawable.ic_send_black_24dp,
+                "Reply",
+                replyPendingIntent
+        ).addRemoteInput(remoteInput).build();
+
+        Person user = new Person.Builder().setName(messageTitle).build();
+        messagingStyle = new NotificationCompat.MessagingStyle(user);
+        messagingStyle.setConversationTitle("Chat");
+
+        NotificationCompat.MessagingStyle.Message message =
+                new NotificationCompat.MessagingStyle.Message(messageBody, System.currentTimeMillis(), user);
+        messagingStyle.addMessage(message);
+
+        Intent resultIntent = new Intent(click_action);
+        resultIntent.putExtra("friend_id", friend_id);
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(getActivity(), App.CHANNEL_MESSAGES)
+                .setSmallIcon(R.mipmap.ic_launcher_foreground)
+                .setStyle(messagingStyle)
+                .addAction(replyAction)
+                .setColor(Color.BLUE)
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setCategory(NotificationCompat.CATEGORY_MESSAGE)
+                .setAutoCancel(true);
+
+        PendingIntent resultPendingIntent = PendingIntent.getActivity(getContext(), 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        builder.setContentIntent(resultPendingIntent);
+
+
+        int mNotificationId = (int) System.currentTimeMillis();
+
+        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(getActivity());
+        notificationManager.notify(1, builder.build());
     }
 
     private void DetachFireStoreListeners() {
@@ -262,21 +282,26 @@ public class MessageFragment extends Fragment {
             final Message messageForCurrentUser = new Message(currentUserId, friendUserId, text, "message_sent", null, false);
             final Message messageForFriendUser = new Message(currentUserId, friendUserId, text, "message_received", null, false);
 
-            final Conversation conversationForCurrentUser = new Conversation(friendUserId, userFriend.getName(), userFriend.getUserProfilePicUrl(), text, "message_sent", null, false);
-            final Conversation conversationForFriendUser = new Conversation(currentUserId, mUser.getName(), mUser.getUserProfilePicUrl(), text, "message_received", null, false);
+            final Conversation conversationForCurrentUser = new Conversation(friendUserId, userFriend.getName(), userFriend.getUserProfilePicUrl(), text
+                    , "message_sent", null, false);
+            final Conversation conversationForFriendUser = new Conversation(currentUserId, mUser.getName(), mUser.getUserProfilePicUrl(), text
+                    , "message_received", null, false);
 
             textInputEditText.setText("");
 
 
             //Send message to db in batch
             WriteBatch batch = db.batch();
-            String messageID = usersReference.document(currentUserId).collection("Conversations").document(friendUserId).collection(friendUserId).document().getId();
+            String messageID = usersReference.document(currentUserId).collection("Conversations").document(friendUserId).collection(friendUserId)
+                    .document().getId();
             Log.d(TAG, "sendMessage: " + messageID);
             batch.set(usersReference.document(currentUserId).collection("Conversations").document(friendUserId), conversationForCurrentUser);
             batch.set(usersReference.document(friendUserId).collection("Conversations").document(currentUserId), conversationForFriendUser);
-            batch.set(usersReference.document(currentUserId).collection("Conversations").document(friendUserId).collection(friendUserId).document(messageID)
+            batch.set(usersReference.document(currentUserId).collection("Conversations").document(friendUserId).collection(friendUserId)
+                            .document(messageID)
                     , messageForCurrentUser);
-            batch.set(usersReference.document(friendUserId).collection("Conversations").document(currentUserId).collection(currentUserId).document(messageID)
+            batch.set(usersReference.document(friendUserId).collection("Conversations").document(currentUserId).collection(currentUserId)
+                            .document(messageID)
                     , messageForFriendUser);
 
             batch.commit().addOnSuccessListener(new OnSuccessListener<Void>() {
