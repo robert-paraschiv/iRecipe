@@ -46,8 +46,7 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
         String timestamp = remoteMessage.getData().get("timestamp");
 
 
-
-        Log.d(TAG, "onMessageReceived: " + messageTitle + " " + messageBody +" "+ click_action);
+        Log.d(TAG, "onMessageReceived: " + messageTitle + " " + messageBody + " " + click_action);
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext(), App.CHANNEL_COMMENTS)
                 .setSmallIcon(R.mipmap.ic_launcher_foreground)
@@ -61,6 +60,7 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
         Intent resultIntent = new Intent(click_action);
         if (click_action != null && click_action.equals("com.rokudoz.foodify.MessageNotification")) {
             Intent intent = new Intent("MessageNotification");
+            intent.putExtra("coming_from","FirebaseMessagingService");
             intent.putExtra("click_action", click_action);
             intent.putExtra("friend_id", friend_id);
             intent.putExtra("messageTitle", messageTitle);
@@ -68,6 +68,7 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
             intent.putExtra("timestamp", timestamp);
             intent.putExtra("name", name);
             intent.putExtra("user_profilePic", user_profilePic);
+            Log.d(TAG, "onMessageReceived: +" + friend_id);
             broadcaster.sendBroadcast(intent);
         }
         if (click_action != null && click_action.equals("com.rokudoz.foodify.FriendRequestNotification")) {

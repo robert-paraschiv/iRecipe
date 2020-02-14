@@ -185,9 +185,10 @@ public class MessageFragment extends Fragment {
 
         androidx.core.app.RemoteInput remoteInput = new androidx.core.app.RemoteInput.Builder("key_text_reply")
                 .setLabel("Send message").build();
-        Intent replyIntent = new Intent(getActivity(), DirectReplyReceiver.class);
-        replyIntent.putExtra("friend_id", friend_id);
-        PendingIntent replyPendingIntent = PendingIntent.getBroadcast(getActivity(), 0, replyIntent, 0);
+        Intent replyIntent = new Intent(getContext(), DirectReplyReceiver.class);
+        replyIntent.putExtra("friend_id_messageFragment", friend_id);
+        replyIntent.putExtra("coming_from","MessageFragment");
+        PendingIntent replyPendingIntent = PendingIntent.getBroadcast(getContext(), 0, replyIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         NotificationCompat.Action replyAction = new NotificationCompat.Action.Builder(
                 R.drawable.ic_send_black_24dp,
@@ -203,9 +204,7 @@ public class MessageFragment extends Fragment {
                 new NotificationCompat.MessagingStyle.Message(messageBody, System.currentTimeMillis(), user);
         messagingStyle.addMessage(message);
 
-        Intent resultIntent = new Intent(click_action);
-        resultIntent.putExtra("friend_id", friend_id);
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(getActivity(), App.CHANNEL_MESSAGES)
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(getContext(), App.CHANNEL_MESSAGES)
                 .setSmallIcon(R.mipmap.ic_launcher_foreground)
                 .setStyle(messagingStyle)
                 .addAction(replyAction)
@@ -214,13 +213,16 @@ public class MessageFragment extends Fragment {
                 .setCategory(NotificationCompat.CATEGORY_MESSAGE)
                 .setAutoCancel(true);
 
+        Intent resultIntent = new Intent(click_action);
+        resultIntent.putExtra("friend_id", friend_id);
+        resultIntent.putExtra("coming_from","MessageFragment");
         PendingIntent resultPendingIntent = PendingIntent.getActivity(getContext(), 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         builder.setContentIntent(resultPendingIntent);
 
 
         int mNotificationId = (int) System.currentTimeMillis();
 
-        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(getActivity());
+        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(getContext());
         notificationManager.notify(1, builder.build());
     }
 

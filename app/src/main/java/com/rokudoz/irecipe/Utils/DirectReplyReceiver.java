@@ -41,7 +41,7 @@ public class DirectReplyReceiver extends BroadcastReceiver {
 
     private User userFriend = new User();
     private User mUser = new User();
-
+    String friend_id = "";
     //Firebase
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private CollectionReference usersReference = db.collection("Users");
@@ -53,9 +53,18 @@ public class DirectReplyReceiver extends BroadcastReceiver {
         if (remoteInput != null) {
             final CharSequence replyText = remoteInput.getCharSequence("key_text_reply");
             final String text = Objects.requireNonNull(replyText).toString();
-            if (intent.hasExtra("friend_id")) {
-                final String friend_id = intent.getStringExtra("friend_id");
-                Log.d(TAG, "onReceive: message: " + replyText + " friend id:" + friend_id);
+
+
+            if (intent.hasExtra("coming_from")) {
+                String comingFrom = intent.getStringExtra("coming_from");
+
+                if (comingFrom.equals("MessageFragment")) {
+                    friend_id = intent.getStringExtra("friend_id_messageFragment");
+                } else if (comingFrom.equals("MainActivity")) {
+                    friend_id = intent.getStringExtra("friend_id_mainActivity");
+                }
+                Log.d(TAG, "onReceive: friend id " + friend_id + "coming from " + comingFrom);
+
 
                 if (!text.trim().equals(""))
                     usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).addSnapshotListener(new EventListener<DocumentSnapshot>() {
@@ -64,7 +73,6 @@ public class DirectReplyReceiver extends BroadcastReceiver {
                             if (e == null && documentSnapshot != null) {
                                 mUser = documentSnapshot.toObject(User.class);
                                 final String currentUserId = mUser.getUser_id();
-                                final String friendUserId = friend_id;
 
                                 usersReference.document(friend_id).addSnapshotListener(new EventListener<DocumentSnapshot>() {
                                     @Override
@@ -72,27 +80,27 @@ public class DirectReplyReceiver extends BroadcastReceiver {
                                         if (e == null && documentSnapshot != null) {
                                             userFriend = documentSnapshot.toObject(User.class);
 
-                                            final com.rokudoz.irecipe.Models.Message messageForCurrentUser = new com.rokudoz.irecipe.Models.Message(currentUserId, friendUserId, text
+                                            final com.rokudoz.irecipe.Models.Message messageForCurrentUser = new com.rokudoz.irecipe.Models.Message(currentUserId, friend_id, text
                                                     , "message_sent", null, false);
-                                            final com.rokudoz.irecipe.Models.Message messageForFriendUser = new Message(currentUserId, friendUserId, text, "message_received"
+                                            final com.rokudoz.irecipe.Models.Message messageForFriendUser = new Message(currentUserId, friend_id, text, "message_received"
                                                     , null, false);
 
-                                            final Conversation conversationForCurrentUser = new Conversation(friendUserId, userFriend.getName(), userFriend.getUserProfilePicUrl(), text
+                                            final Conversation conversationForCurrentUser = new Conversation(friend_id, userFriend.getName(), userFriend.getUserProfilePicUrl(), text
                                                     , "message_sent", null, false);
                                             final Conversation conversationForFriendUser = new Conversation(currentUserId, mUser.getName(), mUser.getUserProfilePicUrl(), text
                                                     , "message_received", null, false);
 
                                             //Send message to db in batch
                                             WriteBatch batch = db.batch();
-                                            String messageID = usersReference.document(currentUserId).collection("Conversations").document(friendUserId).collection(friendUserId)
+                                            String messageID = usersReference.document(currentUserId).collection("Conversations").document(friend_id).collection(friend_id)
                                                     .document().getId();
                                             Log.d(TAG, "sendMessage: " + messageID);
-                                            batch.set(usersReference.document(currentUserId).collection("Conversations").document(friendUserId), conversationForCurrentUser);
-                                            batch.set(usersReference.document(friendUserId).collection("Conversations").document(currentUserId), conversationForFriendUser);
-                                            batch.set(usersReference.document(currentUserId).collection("Conversations").document(friendUserId).collection(friendUserId)
+                                            batch.set(usersReference.document(currentUserId).collection("Conversations").document(friend_id), conversationForCurrentUser);
+                                            batch.set(usersReference.document(friend_id).collection("Conversations").document(currentUserId), conversationForFriendUser);
+                                            batch.set(usersReference.document(currentUserId).collection("Conversations").document(friend_id).collection(friend_id)
                                                             .document(messageID)
                                                     , messageForCurrentUser);
-                                            batch.set(usersReference.document(friendUserId).collection("Conversations").document(currentUserId).collection(currentUserId)
+                                            batch.set(usersReference.document(friend_id).collection("Conversations").document(currentUserId).collection(currentUserId)
                                                             .document(messageID)
                                                     , messageForFriendUser);
 
@@ -113,10 +121,10 @@ public class DirectReplyReceiver extends BroadcastReceiver {
                         }
                     });
 
-
-            } else {
-                Log.d(TAG, "onReceive: message: " + replyText + " friend id: NULL");
+            }else {
+                Log.d(TAG, "onReceive: NO COMING FROM  " + intent.getExtras().toString());
             }
+
 
         }
     }

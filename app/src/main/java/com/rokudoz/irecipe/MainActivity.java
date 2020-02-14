@@ -72,21 +72,24 @@ public class MainActivity extends AppCompatActivity {
                     String click_action = intent.getStringExtra("click_action");
                     String friend_id = intent.getStringExtra("friend_id");
 
-                    sendNotification(context,intent, friend_id);
+
+                    sendNotification(intent, friend_id);
                 }
         }
     };
 
-    public static void sendNotification(Context context,Intent intent, String friend_id) {
-        String click_action = intent.getStringExtra("click_action");
-        String messageBody = intent.getStringExtra("messageBody");
-        String messageTitle = intent.getStringExtra("messageTitle");
-
+    private void sendNotification(Intent intents, String friend_id) {
+        String click_action = intents.getStringExtra("click_action");
+        String messageBody = intents.getStringExtra("messageBody");
+        String messageTitle = intents.getStringExtra("messageTitle");
+        Log.d(TAG, "onReceive: " + friend_id);
         androidx.core.app.RemoteInput remoteInput = new androidx.core.app.RemoteInput.Builder("key_text_reply")
                 .setLabel("Send message").build();
-        Intent replyIntent = new Intent(context, DirectReplyReceiver.class);
-        replyIntent.putExtra("friend_id", friend_id);
-        PendingIntent replyPendingIntent = PendingIntent.getBroadcast(context, 0, replyIntent, 0);
+
+        Intent replyIntent = new Intent(this, DirectReplyReceiver.class);
+        replyIntent.putExtra("coming_from","MainActivity");
+        replyIntent.putExtra("friend_id_mainActivity", friend_id);
+        PendingIntent replyPendingIntent = PendingIntent.getBroadcast(this, 0, replyIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         NotificationCompat.Action replyAction = new NotificationCompat.Action.Builder(
                 R.drawable.ic_send_black_24dp,
@@ -101,9 +104,8 @@ public class MainActivity extends AppCompatActivity {
                 new NotificationCompat.MessagingStyle.Message(messageBody, System.currentTimeMillis(), user);
         messagingStyle.addMessage(message);
 
-        Intent resultIntent = new Intent(click_action);
-        resultIntent.putExtra("friend_id", friend_id);
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, App.CHANNEL_MESSAGES)
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, App.CHANNEL_MESSAGES)
                 .setSmallIcon(R.mipmap.ic_launcher_foreground)
                 .setStyle(messagingStyle)
                 .addAction(replyAction)
@@ -112,13 +114,16 @@ public class MainActivity extends AppCompatActivity {
                 .setCategory(NotificationCompat.CATEGORY_MESSAGE)
                 .setAutoCancel(true);
 
-        PendingIntent resultPendingIntent = PendingIntent.getActivity(context, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        Intent resultIntent = new Intent(click_action);
+        resultIntent.putExtra("friend_id", friend_id);
+        resultIntent.putExtra("coming_from","MainActivity");
+        PendingIntent resultPendingIntent = PendingIntent.getActivity(this, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         builder.setContentIntent(resultPendingIntent);
 
 
         int mNotificationId = (int) System.currentTimeMillis();
 
-        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
+        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
         notificationManager.notify(1, builder.build());
     }
 
