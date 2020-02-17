@@ -22,6 +22,7 @@ import com.rokudoz.irecipe.Models.Ingredient;
 import com.rokudoz.irecipe.Models.Instruction;
 import com.rokudoz.irecipe.Models.Message;
 import com.rokudoz.irecipe.R;
+import com.rokudoz.irecipe.Utils.TimeAgo;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -125,13 +126,17 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
 
         if (currentItem.getTimestamp() != null) {
             Date date = currentItem.getTimestamp();
-            DateFormat dateFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
-            String creationDate = dateFormat.format(date);
-            holder.tvMessageTimeStamp.setText(creationDate);
+            DateFormat dateFormat = new SimpleDateFormat("HH:mm, MMM d", Locale.getDefault());
+            long time = date.getTime();
+            if (currentItem.getTimestamp() != null && !currentItem.getTimestamp().equals("")) {
+                TimeAgo timeAgo = new TimeAgo();
+                holder.tvMessageTimeStamp.setText(timeAgo.getTimeAgo(time));
+
+            }
         }
-
-
     }
+
+
 
     @Override
     public int getItemCount() {

@@ -302,9 +302,9 @@ public class FeedFragment extends Fragment implements FeedAdapter.OnItemClickLis
             public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
                 super.onScrollStateChanged(recyclerView, newState);
 
-                if (!recyclerView.canScrollVertically(1)) {
+                if (!recyclerView.canScrollVertically(1)) { //Down
                     performQuery();
-                } else if (!recyclerView.canScrollVertically(0)) {
+                } else if (!recyclerView.canScrollVertically(-1)) { //Up
                     performQuery();
                 }
             }
