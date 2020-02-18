@@ -15,6 +15,7 @@ import android.view.InflateException;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -58,7 +59,8 @@ public class UserProfileFragment extends Fragment implements PostAdapter.OnItemC
     private User mUser;
     private User otherUser = new User();
     private TextView UserNameTv, UserUsernameTv, UserDescriptionTv;
-    private MaterialButton mAddFriendButton, messageUser;
+    private MaterialButton mAddFriendButton, mAcceptFriendReqButton, mDeclineFriendReqButton, messageUser;
+    private RelativeLayout acceptDeclineLayout;
     private CircleImageView mProfileImage;
     private View view;
     private ArrayList<Post> mPostList = new ArrayList<>();
@@ -78,8 +80,6 @@ public class UserProfileFragment extends Fragment implements PostAdapter.OnItemC
     private CollectionReference usersReference = db.collection("Users");
     private CollectionReference postsRef = db.collection("Posts");
     private CollectionReference recipesRef = db.collection("Recipes");
-    private ListenerRegistration userDetailsListener, userFriendListListener, userFavoritePostsListener, userFriendListener, postsListener,
-            postCreatorDetailsListener, postCommentsNumberListener, postLikesNumberListener;
 
     public UserProfileFragment() {
         // Required empty public constructor
@@ -109,11 +109,14 @@ public class UserProfileFragment extends Fragment implements PostAdapter.OnItemC
         mRecyclerView = view.findViewById(R.id.userprofile_recycler_view);
         mAddFriendButton = view.findViewById(R.id.userprofile_addFriend_MaterialButton);
         messageUser = view.findViewById(R.id.userprofile_messageUser_MaterialButton);
+        mDeclineFriendReqButton = view.findViewById(R.id.userprofile_declineFriendReq_MaterialButton);
+        mAcceptFriendReqButton = view.findViewById(R.id.userprofile_acceptFriend_MaterialButton);
+        acceptDeclineLayout = view.findViewById(R.id.accept_decline_layout);
 
         mUser = new User();
 
         BottomNavigationView navBar = getActivity().findViewById(R.id.bottom_navigation);
-        navBar.setVisibility(View.VISIBLE);
+        navBar.setVisibility(View.GONE);
 
         UserProfileFragmentArgs userProfileFragmentArgs = UserProfileFragmentArgs.fromBundle(getArguments());
         getArgsPassed(userProfileFragmentArgs);
@@ -127,47 +130,10 @@ public class UserProfileFragment extends Fragment implements PostAdapter.OnItemC
     @Override
     public void onStop() {
         super.onStop();
-        DetachFirestoneListeners();
-    }
-
-    private void DetachFirestoneListeners() {
-        if (postsListener != null) {
-            postsListener.remove();
-            postsListener = null;
-        }
-        if (userDetailsListener != null) {
-            userDetailsListener.remove();
-            userDetailsListener = null;
-        }
-        if (userFavoritePostsListener != null) {
-            userFavoritePostsListener.remove();
-            userFavoritePostsListener = null;
-        }
-        if (userFriendListListener != null) {
-            userFriendListListener.remove();
-            userFriendListListener = null;
-        }
-        if (userFriendListener != null) {
-            userFriendListener.remove();
-            userFriendListener = null;
-        }
-        if (postCreatorDetailsListener != null) {
-            postCreatorDetailsListener.remove();
-            postCreatorDetailsListener = null;
-        }
-        if (postCommentsNumberListener != null) {
-            postCommentsNumberListener.remove();
-            postCommentsNumberListener = null;
-        }
-        if (postLikesNumberListener != null) {
-            postLikesNumberListener.remove();
-            postLikesNumberListener = null;
-        }
     }
 
     private void getCurrentUserDetails() {
-
-        userDetailsListener = usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).addSnapshotListener(new EventListener<DocumentSnapshot>() {
+        usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).addSnapshotListener(new EventListener<DocumentSnapshot>() {
             @Override
             public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
                 if (e != null) {
@@ -184,7 +150,7 @@ public class UserProfileFragment extends Fragment implements PostAdapter.OnItemC
                     friends_userID_list.add(FirebaseAuth.getInstance().getCurrentUser().getUid());
                 }
 
-                userFriendListListener = usersReference.document(user.getUser_id()).collection("FriendList").addSnapshotListener(new EventListener<QuerySnapshot>() {
+                usersReference.document(user.getUser_id()).collection("FriendList").addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
                     public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
                         if (e != null) {
@@ -202,7 +168,7 @@ public class UserProfileFragment extends Fragment implements PostAdapter.OnItemC
                             if (!friends_userID_list.contains(friend.getFriend_user_id()))
                                 friends_userID_list.add(friend.getFriend_user_id());
                         }
-                        userFavoritePostsListener = usersReference.document(user.getUser_id()).collection("FavoritePosts").addSnapshotListener(new EventListener<QuerySnapshot>() {
+                        usersReference.document(user.getUser_id()).collection("FavoritePosts").addSnapshotListener(new EventListener<QuerySnapshot>() {
                             @Override
                             public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
                                 if (e != null) {
@@ -215,23 +181,18 @@ public class UserProfileFragment extends Fragment implements PostAdapter.OnItemC
                                         if (!userFavPostList.contains(favPostID))
                                             userFavPostList.add(favPostID);
                                     }
-
                                     performQuery();
                                 }
-
                             }
                         });
-
                     }
                 });
-
-
             }
         });
 
         // ADD TO FRIEND LIST
         if (!documentID.equals(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
-            userFriendListener = usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).collection("FriendList").document(documentID).addSnapshotListener(new EventListener<DocumentSnapshot>() {
+            usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).collection("FriendList").document(documentID).addSnapshotListener(new EventListener<DocumentSnapshot>() {
                 @Override
                 public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
                     if (e != null) {
@@ -244,18 +205,15 @@ public class UserProfileFragment extends Fragment implements PostAdapter.OnItemC
                             Log.d(TAG, "onSuccess: WE FRIENDS ALREADY");
                             mAddFriendButton.setText("Unfriend");
                             mAddFriendButton.setVisibility(View.VISIBLE);
+                            acceptDeclineLayout.setVisibility(View.GONE);
 
-                            if (documentID.equals(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
-                                messageUser.setVisibility(View.GONE);
-                            } else {
-                                messageUser.setVisibility(View.VISIBLE);
-                                messageUser.setOnClickListener(new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-                                        Navigation.findNavController(view).navigate(UserProfileFragmentDirections.actionUserProfileFragment2ToMessageFragment(documentID));
-                                    }
-                                });
-                            }
+                            messageUser.setVisibility(View.VISIBLE);
+                            messageUser.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    Navigation.findNavController(view).navigate(UserProfileFragmentDirections.actionUserProfileFragment2ToMessageFragment(documentID));
+                                }
+                            });
 
                             mAddFriendButton.setOnClickListener(new View.OnClickListener() {
                                 @Override
@@ -280,6 +238,7 @@ public class UserProfileFragment extends Fragment implements PostAdapter.OnItemC
                                                             if (getActivity() != null)
                                                                 Toast.makeText(getActivity(), "Removed from friend list", Toast.LENGTH_SHORT).show();
                                                             mAddFriendButton.setText("Add Friend");
+                                                            acceptDeclineLayout.setVisibility(View.GONE);
                                                             mAddFriendButton.setEnabled(true);
                                                         }
                                                     });
@@ -302,7 +261,7 @@ public class UserProfileFragment extends Fragment implements PostAdapter.OnItemC
                         } else if (friend.getFriend_status().equals("friend_request_sent")) {
                             mAddFriendButton.setText("Cancel Friend request");
                             mAddFriendButton.setVisibility(View.VISIBLE);
-
+                            acceptDeclineLayout.setVisibility(View.GONE);
                             messageUser.setVisibility(View.GONE);
 
                             mAddFriendButton.setOnClickListener(new View.OnClickListener() {
@@ -326,10 +285,11 @@ public class UserProfileFragment extends Fragment implements PostAdapter.OnItemC
                                 }
                             });
                         } else if (friend.getFriend_status().equals("friend_request_received")) {
-                            mAddFriendButton.setText("Accept Friend request");
-                            mAddFriendButton.setVisibility(View.VISIBLE);
+                            mAddFriendButton.setVisibility(View.GONE);
+                            acceptDeclineLayout.setVisibility(View.VISIBLE);
                             messageUser.setVisibility(View.GONE);
-                            mAddFriendButton.setOnClickListener(new View.OnClickListener() {
+
+                            mAcceptFriendReqButton.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
                                     Friend friendForCurrentUser = new Friend(documentID, otherUser.getName(), otherUser.getUserProfilePicUrl(), "friends", null);
@@ -348,12 +308,58 @@ public class UserProfileFragment extends Fragment implements PostAdapter.OnItemC
                                     });
                                 }
                             });
+
+                            mDeclineFriendReqButton.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    Friend friendForCurrentUser = new Friend(documentID, otherUser.getName(), otherUser.getUserProfilePicUrl(), "friend_request_declined", null);
+                                    Friend friendForOtherUser = new Friend(mUser.getUser_id(), mUser.getName(), mUser.getUserProfilePicUrl(), "friend_request_declined", null);
+                                    WriteBatch batch = db.batch();
+                                    batch.set(usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).collection("FriendList")
+                                            .document(documentID), friendForCurrentUser);
+                                    batch.set(usersReference.document(documentID).collection("FriendList")
+                                            .document(FirebaseAuth.getInstance().getCurrentUser().getUid()), friendForOtherUser);
+                                    batch.commit().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void aVoid) {
+                                            if (getActivity() != null)
+                                                Toast.makeText(getActivity(), "Declined friend request", Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
+                                }
+                            });
+                        } else if (friend.getFriend_status().equals("friend_request_declined")) {
+                            mAddFriendButton.setText("Add friend");
+                            mAddFriendButton.setVisibility(View.VISIBLE);
+                            messageUser.setVisibility(View.GONE);
+                            acceptDeclineLayout.setVisibility(View.GONE);
+                            mAddFriendButton.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    Friend friendForCurrentUser = new Friend(documentID, otherUser.getName(), otherUser.getUserProfilePicUrl(), "friend_request_sent", null);
+                                    Friend friendForOtherUser = new Friend(mUser.getUser_id(), mUser.getName(), mUser.getUserProfilePicUrl(), "friend_request_received", null);
+                                    WriteBatch batch = db.batch();
+                                    batch.set(usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).collection("FriendList")
+                                            .document(documentID), friendForCurrentUser);
+                                    batch.set(usersReference.document(documentID).collection("FriendList")
+                                            .document(FirebaseAuth.getInstance().getCurrentUser().getUid()), friendForOtherUser);
+                                    batch.commit().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void aVoid) {
+                                            if (getActivity() != null)
+                                                Toast.makeText(getActivity(), "Sent friend request", Toast.LENGTH_SHORT).show();
+                                            mAddFriendButton.setText("Cancel Friend request");
+                                        }
+                                    });
+                                }
+                            });
                         }
                         Log.d(TAG, "onSuccess: FOUND IN FRIEND LIST " + friend.toString());
                     } else {
                         mAddFriendButton.setText("Add friend");
                         mAddFriendButton.setVisibility(View.VISIBLE);
                         messageUser.setVisibility(View.GONE);
+                        acceptDeclineLayout.setVisibility(View.GONE);
                         mAddFriendButton.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
@@ -442,8 +448,7 @@ public class UserProfileFragment extends Fragment implements PostAdapter.OnItemC
     }
 
     private void PerformMainQuery(Query postsQuery) {
-
-        postsListener = postsQuery.addSnapshotListener(new EventListener<QuerySnapshot>() {
+        postsQuery.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@javax.annotation.Nullable QuerySnapshot queryDocumentSnapshots,
                                 @javax.annotation.Nullable FirebaseFirestoreException e) {

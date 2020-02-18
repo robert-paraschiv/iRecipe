@@ -110,6 +110,9 @@
         <action
             android:id="@+id/action_recipeDetailedFragment_to_usersWhoLiked"
             app:destination="@id/usersWhoLiked" />
+        <action
+            android:id="@+id/action_recipeDetailedFragment_to_profileFragment"
+            app:destination="@id/profileFragment" />
 
 
     </fragment>
@@ -174,6 +177,9 @@
         <action
             android:id="@+id/action_postDetailed_to_usersWhoLiked"
             app:destination="@id/usersWhoLiked" />
+        <action
+            android:id="@+id/action_postDetailed_to_profileFragment"
+            app:destination="@id/profileFragment" />
     </fragment>
     <fragment
         android:id="@+id/allMessagesFragment"

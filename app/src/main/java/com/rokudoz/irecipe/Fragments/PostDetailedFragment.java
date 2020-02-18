@@ -24,6 +24,7 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.card.MaterialCardView;
 import com.google.firebase.auth.FirebaseAuth;
@@ -121,6 +122,8 @@ public class PostDetailedFragment extends Fragment {
         PostDetailedFragmentArgs postDetailedFragmentArgs = PostDetailedFragmentArgs.fromBundle(getArguments());
         documentID = postDetailedFragmentArgs.getDocumentID();
 
+        BottomNavigationView navBar = getActivity().findViewById(R.id.bottom_navigation);
+        navBar.setVisibility(View.VISIBLE);
 
         DocumentReference currentRecipeRef = postsRef.document(documentID);
         final CollectionReference currentRecipeSubCollection = currentRecipeRef.collection("UsersWhoFaved");
@@ -250,7 +253,7 @@ public class PostDetailedFragment extends Fragment {
 
         postsRef.document(documentID).addSnapshotListener(new EventListener<DocumentSnapshot>() {
             @Override
-            public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
+            public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable final FirebaseFirestoreException e) {
                 if (e != null) {
                     Log.w(TAG, "onEvent: ", e);
                     return;
@@ -285,8 +288,13 @@ public class PostDetailedFragment extends Fragment {
                         creatorImage.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                Navigation.findNavController(view).navigate(PostDetailedFragmentDirections
-                                        .actionPostDetailedToUserProfileFragment2(post.getCreatorId()));
+                                if (post.getCreatorId().equals(mUser.getUser_id())) {
+                                    Navigation.findNavController(view).navigate(PostDetailedFragmentDirections
+                                            .actionPostDetailedToProfileFragment());
+                                } else {
+                                    Navigation.findNavController(view).navigate(PostDetailedFragmentDirections
+                                            .actionPostDetailedToUserProfileFragment2(post.getCreatorId()));
+                                }
                             }
                         });
                     }

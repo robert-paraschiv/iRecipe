@@ -34,6 +34,7 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
@@ -161,6 +162,9 @@ public class RecipeDetailedFragment extends Fragment implements RecipeInstructio
 
         RecipeDetailedFragmentArgs recipeDetailedFragmentArgs = RecipeDetailedFragmentArgs.fromBundle(getArguments());
         getRecipeArgsPassed(recipeDetailedFragmentArgs);
+
+        BottomNavigationView navBar = getActivity().findViewById(R.id.bottom_navigation);
+        navBar.setVisibility(View.VISIBLE);
 
         DocumentReference currentRecipeRef = recipeRef.document(documentID);
         final CollectionReference currentRecipeSubCollection = currentRecipeRef.collection("UsersWhoFaved");
@@ -431,7 +435,7 @@ public class RecipeDetailedFragment extends Fragment implements RecipeInstructio
     private void getRecipeDocument(final View view) {
         recipeRef.document(documentID).addSnapshotListener(new EventListener<DocumentSnapshot>() {
             @Override
-            public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
+            public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable final FirebaseFirestoreException e) {
                 if (e != null) {
                     Log.w(TAG, "onEvent: ", e);
                     return;
@@ -593,15 +597,23 @@ public class RecipeDetailedFragment extends Fragment implements RecipeInstructio
                         tvCreatorName.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                Navigation.findNavController(view).navigate(RecipeDetailedFragmentDirections
-                                        .actionRecipeDetailedFragmentToUserProfileFragment2(recipe.getCreator_docId()));
+                                if (recipe.getCreator_docId().equals(mUser.getUser_id())) {
+                                    Navigation.findNavController(view).navigate(RecipeDetailedFragmentDirections.actionRecipeDetailedFragmentToProfileFragment());
+                                } else {
+                                    Navigation.findNavController(view).navigate(RecipeDetailedFragmentDirections
+                                            .actionRecipeDetailedFragmentToUserProfileFragment2(recipe.getCreator_docId()));
+                                }
                             }
                         });
                         mCreatorImage.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                Navigation.findNavController(view).navigate(RecipeDetailedFragmentDirections
-                                        .actionRecipeDetailedFragmentToUserProfileFragment2(recipe.getCreator_docId()));
+                                if (recipe.getCreator_docId().equals(mUser.getUser_id())) {
+                                    Navigation.findNavController(view).navigate(RecipeDetailedFragmentDirections.actionRecipeDetailedFragmentToProfileFragment());
+                                } else {
+                                    Navigation.findNavController(view).navigate(RecipeDetailedFragmentDirections
+                                            .actionRecipeDetailedFragmentToUserProfileFragment2(recipe.getCreator_docId()));
+                                }
                             }
                         });
                     }

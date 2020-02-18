@@ -21,9 +21,10 @@
             app:expandedTitleMarginStart="48dp"
             app:layout_scrollFlags="scroll|exitUntilCollapsed|snap">
 
-            <RelativeLayout
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
 
                 <com.google.android.material.appbar.MaterialToolbar
                     android:id="@+id/toolbar"
@@ -35,15 +36,13 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
-                        android:text="User Profile"/>
+                        android:text="User Profile" />
                 </com.google.android.material.appbar.MaterialToolbar>
 
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/userprofileFragment_userDetails_MaterialCard"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_below="@id/toolbar"
-                    android:layout_centerHorizontal="true"
                     android:layout_margin="8dp"
                     app:cardCornerRadius="18dp">
 
@@ -62,7 +61,7 @@
                             tools:src="@drawable/ic_launcher_background" />
 
                         <RelativeLayout
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_centerHorizontal="true"
                             android:layout_toEndOf="@id/userprofileFragment_profileImage">
@@ -109,26 +108,68 @@
                                 android:layout_marginTop="8dp"
                                 android:text="Add friend"
                                 android:textSize="14sp"
-                                android:visibility="invisible"
-                                tools:visibility="visible" />
-
-                            <com.google.android.material.button.MaterialButton
-                                android:id="@+id/userprofile_messageUser_MaterialButton"
-                                style="@style/Widget.MaterialComponents.Button.TextButton"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_below="@id/userprofile_addFriend_MaterialButton"
-                                android:layout_centerHorizontal="true"
-                                android:layout_marginTop="8dp"
-                                android:text="Send a message"
-                                android:textSize="14sp"
                                 android:visibility="gone"
                                 tools:visibility="visible" />
-
                         </RelativeLayout>
+
+                        <RelativeLayout
+                            android:id="@+id/accept_decline_layout"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@id/userprofileFragment_profileImage"
+                            android:layout_centerHorizontal="true"
+                            android:visibility="gone"
+                            tools:visibility="visible">
+
+                            <TextView
+                                android:id="@+id/userProfileFragment_sentYouAFriendReq"
+                                style="@style/TextAppearance.MaterialComponents.Headline3"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_centerHorizontal="true"
+                                android:layout_marginTop="8dp"
+                                android:textSize="15sp"
+                                android:text="Sent you a friend request"/>
+
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/userprofile_acceptFriend_MaterialButton"
+                                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_below="@id/userProfileFragment_sentYouAFriendReq"
+                                android:layout_alignParentStart="true"
+                                android:layout_marginTop="8dp"
+                                android:text="Accept"
+                                android:textSize="14sp"/>
+
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/userprofile_declineFriendReq_MaterialButton"
+                                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_below="@id/userProfileFragment_sentYouAFriendReq"
+                                android:layout_marginStart="30dp"
+                                android:layout_marginTop="8dp"
+                                android:layout_toEndOf="@id/userprofile_acceptFriend_MaterialButton"
+                                android:text="Decline"
+                                android:textSize="14sp" />
+                        </RelativeLayout>
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/userprofile_messageUser_MaterialButton"
+                            style="@style/Widget.MaterialComponents.Button.TextButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@id/accept_decline_layout"
+                            android:layout_centerHorizontal="true"
+                            android:layout_marginTop="8dp"
+                            android:text="Send a message"
+                            android:textSize="14sp"
+                            android:visibility="gone"
+                            tools:visibility="visible" />
                     </RelativeLayout>
                 </com.google.android.material.card.MaterialCardView>
-            </RelativeLayout>
+            </LinearLayout>
         </com.google.android.material.appbar.CollapsingToolbarLayout>
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -137,8 +178,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/userprofileFragment_userDetails_MaterialCard"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        >
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/userprofile_MaterialCard"
