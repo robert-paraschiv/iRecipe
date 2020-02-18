@@ -42,13 +42,14 @@ import com.rokudoz.irecipe.Models.User;
 import com.rokudoz.irecipe.Models.UserWhoFaved;
 import com.rokudoz.irecipe.R;
 import com.rokudoz.irecipe.Utils.Adapters.RecipeAdapter;
+import com.rokudoz.irecipe.Utils.Adapters.RecipeWithAdsAdapter;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-public class profileMyRecipesFragment extends Fragment implements RecipeAdapter.OnItemClickListener {
+public class profileMyRecipesFragment extends Fragment implements RecipeWithAdsAdapter.OnItemClickListener {
     private static final String TAG = "profileMyRecipesFragmen";
 
     private View view;
@@ -65,7 +66,7 @@ public class profileMyRecipesFragment extends Fragment implements RecipeAdapter.
 
 
     private RecyclerView mRecyclerView;
-    private RecipeAdapter mAdapter;
+    private RecipeWithAdsAdapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
 
     //FireBase
@@ -192,7 +193,7 @@ public class profileMyRecipesFragment extends Fragment implements RecipeAdapter.
         mRecyclerView.setHasFixedSize(true);
         mLayoutManager = new LinearLayoutManager(getContext());
 
-        mAdapter = new RecipeAdapter(mRecipeList);
+        mAdapter = new RecipeWithAdsAdapter(mRecipeList);
 
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setAdapter(mAdapter);

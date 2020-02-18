@@ -42,6 +42,7 @@ import com.rokudoz.irecipe.Models.User;
 import com.rokudoz.irecipe.Models.UserWhoFaved;
 import com.rokudoz.irecipe.R;
 import com.rokudoz.irecipe.Utils.Adapters.RecipeAdapter;
+import com.rokudoz.irecipe.Utils.Adapters.RecipeWithAdsAdapter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -49,7 +50,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-public class FavoritesFragment extends Fragment implements RecipeAdapter.OnItemClickListener {
+public class FavoritesFragment extends Fragment implements RecipeWithAdsAdapter.OnItemClickListener {
     private static final String TAG = "FavoritesFragment";
 
     public View view;
@@ -77,7 +78,7 @@ public class FavoritesFragment extends Fragment implements RecipeAdapter.OnItemC
     private ListenerRegistration favoriteRecipesListener, userDetailsListener, recipesListener, recipeLikesListener;
 
     private RecyclerView mRecyclerView;
-    private RecipeAdapter mAdapter;
+    private RecipeWithAdsAdapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
 
     private ArrayList<Object> mRecipeList = new ArrayList<>();
@@ -205,7 +206,7 @@ public class FavoritesFragment extends Fragment implements RecipeAdapter.OnItemC
         mRecyclerView.setHasFixedSize(true);
         mLayoutManager = new LinearLayoutManager(getContext());
 
-        mAdapter = new RecipeAdapter(mRecipeList);
+        mAdapter = new RecipeWithAdsAdapter(mRecipeList);
 
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setAdapter(mAdapter);
@@ -317,7 +318,7 @@ public class FavoritesFragment extends Fragment implements RecipeAdapter.OnItemC
                         });
 
                         pbLoading.setVisibility(View.INVISIBLE);
-                        mAdapter.setOnItemClickListener(new RecipeAdapter.OnItemClickListener() {
+                        mAdapter.setOnItemClickListener(new RecipeWithAdsAdapter.OnItemClickListener() {
                             @Override
                             public void onItemClick(int position) {
                                 Recipe recipe = (Recipe) mRecipeList.get(position);

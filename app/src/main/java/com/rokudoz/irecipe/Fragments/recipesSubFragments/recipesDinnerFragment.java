@@ -79,7 +79,7 @@ public class recipesDinnerFragment extends Fragment implements RecipeAdapter.OnI
     private RecipeAdapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
 
-    private List<Object> mRecipeList = new ArrayList<>();
+    private List<Recipe> mRecipeList = new ArrayList<>();
     private List<Ingredient> userIngredientList = new ArrayList<>();
     private String loggedInUserDocumentId = "";
     private String userFavDocId = "";
@@ -107,60 +107,7 @@ public class recipesDinnerFragment extends Fragment implements RecipeAdapter.OnI
 
         buildRecyclerView();
         getUserIngredients();
-        loadNativeAds();
         return view; // HAS TO BE THE LAST ONE ---------------------------------
-    }
-
-
-    private void loadNativeAds() {
-        if (getActivity() != null) {
-            AdLoader.Builder builder = new AdLoader.Builder(Objects.requireNonNull(getActivity()), getResources().getString(R.string.admob_unit_id));
-            adLoader = builder.forUnifiedNativeAd(new UnifiedNativeAd.OnUnifiedNativeAdLoadedListener() {
-                @Override
-                public void onUnifiedNativeAdLoaded(UnifiedNativeAd unifiedNativeAd) {
-                    nativeAds.add(unifiedNativeAd);
-                    if (!adLoader.isLoading()) {
-                    }
-                }
-            }).withAdListener(new AdListener() {
-                @Override
-                public void onAdFailedToLoad(int i) {
-                    super.onAdFailedToLoad(i);
-                    Log.d(TAG, "onAdFailedToLoad: " + i);
-
-                }
-            }).build();
-
-            adLoader.loadAds(new AdRequest.Builder()
-                    .addTestDevice("2F1C484BD502BA7D51AC78D75751AFE0") // Mi 9T Pro
-                    .addTestDevice("B141CB779F883EF84EA9A32A7D068B76") // Redmi 5 Plus
-                    .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
-                    .build(), NUMBER_OF_ADS);
-        }
-    }
-
-    private void insertAdsInRecyclerView() {
-        if (nativeAds.size() <= 0) {
-            return;
-        }
-        nrOfAdsLoaded++;
-
-
-        if (indexOfAdToLoad < nativeAds.size()) {
-            mRecipeList.add(mRecipeList.size(), nativeAds.get(indexOfAdToLoad));
-            mAdapter.notifyDataSetChanged();
-            indexOfAdToLoad++;
-        } else {
-            indexOfAdToLoad = 0;
-            mRecipeList.add(mRecipeList.size(), nativeAds.get(indexOfAdToLoad));
-            mAdapter.notifyDataSetChanged();
-        }
-
-
-        if (nrOfAdsLoaded == 5) {
-            nativeAds = new ArrayList<>();
-            loadNativeAds();
-        }
     }
 
 
@@ -336,16 +283,12 @@ public class recipesDinnerFragment extends Fragment implements RecipeAdapter.OnI
                                 recipe.setMissingIngredients(missingIngredients);
 
                                 mRecipeList.add(recipe);
-                                if (nrRecipesLoaded >= 3) {
-                                    insertAdsInRecyclerView();
-                                    nrRecipesLoaded = 0;
-                                }
                             } else {
                                 recipe.setNrOfMissingIngredients(numberOfMissingIngredients);
                                 recipe.setMissingIngredients(missingIngredients);
                                 mRecipeList.set(mRecipeList.indexOf(recipe), recipe);
                             }
-//                            Collections.sort(mRecipeList);
+                            Collections.sort(mRecipeList);
                             mAdapter.notifyDataSetChanged();
                         }
                     }
@@ -431,16 +374,12 @@ public class recipesDinnerFragment extends Fragment implements RecipeAdapter.OnI
                                 recipe.setMissingIngredients(missingIngredients);
 
                                 mRecipeList.add(recipe);
-                                if (nrRecipesLoaded >= 3) {
-                                    insertAdsInRecyclerView();
-                                    nrRecipesLoaded = 0;
-                                }
                             } else {
                                 recipe.setNrOfMissingIngredients(numberOfMissingIngredients);
                                 recipe.setMissingIngredients(missingIngredients);
                                 mRecipeList.set(mRecipeList.indexOf(recipe), recipe);
                             }
-//                            Collections.sort(mRecipeList);
+                            Collections.sort(mRecipeList);
                             mAdapter.notifyDataSetChanged();
                         }
 
