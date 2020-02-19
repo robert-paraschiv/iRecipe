@@ -34,6 +34,8 @@ import com.rokudoz.irecipe.R;
 import com.rokudoz.irecipe.Utils.Adapters.ConversationAdapter;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -134,23 +136,34 @@ public class AllMessagesFragment extends Fragment implements ConversationAdapter
         initializeRecyclerViewAdapterOnClicks();
         usersReference.document(mUser.getUser_id()).collection("Conversations").orderBy("date", Query.Direction.DESCENDING)
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
-            @Override
-            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
-                if (e != null) {
-                    Log.w(TAG, "onEvent: ", e);
-                    return;
-                }
-                for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
-                    Conversation conversation = documentSnapshot.toObject(Conversation.class);
-                    if (!conversationList.contains(conversation)) {
-                        conversationList.add(conversation);
-                    } else {
-                        conversationList.set(conversationList.indexOf(conversation), conversation);
+                    @Override
+                    public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                        if (e != null) {
+                            Log.w(TAG, "onEvent: ", e);
+                            return;
+                        }
+                        if (queryDocumentSnapshots != null) {
+                            for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                                Conversation conversation = documentSnapshot.toObject(Conversation.class);
+                                if (!conversationList.contains(conversation)) {
+                                    conversationList.add(conversation);
+                                } else {
+                                    conversationList.set(conversationList.indexOf(conversation), conversation);
+                                }
+                            }
+                        }
+                        //Sort conversations by date, desc
+                        Collections.sort(conversationList, new Comparator<Conversation>() {
+                            @Override
+                            public int compare(Conversation o1, Conversation o2) {
+                                if (o1.getDate() == null || o2.getDate() == null)
+                                    return 0;
+                                return o2.getDate().compareTo(o1.getDate());
+                            }
+                        });
+                        mAdapter.notifyDataSetChanged();
                     }
-                }
-                mAdapter.notifyDataSetChanged();
-            }
-        });
+                });
 
     }
 
