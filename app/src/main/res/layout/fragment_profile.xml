@@ -40,13 +40,13 @@
                             android:text="My Profile" />
 
                         <com.google.android.material.button.MaterialButton
-                            android:id="@+id/profileFragment_signOut_materialButton"
+                            android:id="@+id/profileFragment_settings_materialButton"
                             style="@style/Widget.MaterialComponents.Button.TextButton"
-                            android:layout_width="25dp"
+                            android:layout_width="35dp"
                             android:layout_height="35dp"
                             android:layout_alignParentEnd="true"
                             android:layout_marginEnd="4dp"
-                            android:text="x"
+                            app:icon="@drawable/ic_settings_applications_black_24dp"
                             android:textSize="12sp" />
 
                     </RelativeLayout>

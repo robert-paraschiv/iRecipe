@@ -4,12 +4,19 @@ import android.app.Application;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.content.SharedPreferences;
 import android.os.Build;
+
+import androidx.appcompat.app.AppCompatDelegate;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class App extends Application {
+    private static final String TAG = "App";
+
+    public static final String SETTINGS_PREFS_NAME = "SettingsPrefs";
+
     public static final String CHANNEL_MESSAGES = "Channel_Messages";
     public static final String CHANNEL_LIKES = "Channel_Likes";
     public static final String CHANNEL_FRIEND_REQUEST = "Channel_Friend_Request";
@@ -19,12 +26,25 @@ public class App extends Application {
     public void onCreate() {
         super.onCreate();
         createNotificationChannels();
+        applyNightModeFromPrefs();
+    }
+
+    private void applyNightModeFromPrefs(){
+        SharedPreferences sharedPreferences = getSharedPreferences(SETTINGS_PREFS_NAME, MODE_PRIVATE);
+        int mode = sharedPreferences.getInt("NightMode", AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
+
+        if (mode == AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM) {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
+        } else if (mode == AppCompatDelegate.MODE_NIGHT_NO) {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+        } else if (mode == AppCompatDelegate.MODE_NIGHT_YES) {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+        }
     }
 
     private void createNotificationChannels() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             List<NotificationChannel> notificationChannelList = new ArrayList<>();
-
 
             //Messages Channel
             NotificationChannel channel_messages = new NotificationChannel(

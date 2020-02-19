@@ -8,13 +8,11 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.navigation.Navigation;
 import androidx.viewpager.widget.ViewPager;
 
-import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -36,7 +34,6 @@ import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.ListenerRegistration;
-import com.google.firebase.firestore.WriteBatch;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.StorageTask;
@@ -67,7 +64,7 @@ public class ProfileFragment extends Fragment {
     private TextView UserUsernameTv;
     private TextView UserDescriptionTv;
     private CircleImageView mProfileImage;
-    private MaterialButton mSignOutBtn, mEditProfileBtn, mAddPhotoBtn;
+    private MaterialButton mSettingsBtn, mEditProfileBtn, mAddPhotoBtn;
     private RelativeLayout userDetailsLayout;
 
     private ViewPager viewPager;
@@ -98,7 +95,7 @@ public class ProfileFragment extends Fragment {
         UserUsernameTv = view.findViewById(R.id.profileFragment_userName_TextView);
         UserDescriptionTv = view.findViewById(R.id.profileFragment_user_description_TextView);
         mProfileImage = view.findViewById(R.id.profileFragment_profileImage);
-        mSignOutBtn = view.findViewById(R.id.profileFragment_signOut_materialButton);
+        mSettingsBtn = view.findViewById(R.id.profileFragment_settings_materialButton);
         mEditProfileBtn = view.findViewById(R.id.profileFragment_editProfile_materialButton);
         mAddPhotoBtn = view.findViewById(R.id.profileFragment_changePic_Btn);
         userDetailsLayout = view.findViewById(R.id.profileFragment_userDetailsLayout);
@@ -111,20 +108,10 @@ public class ProfileFragment extends Fragment {
 
         getUserInfo();
 
-        mSignOutBtn.setOnClickListener(new View.OnClickListener() {
+        mSettingsBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                usersReference.document(userDocumentID).update("user_tokenID","").addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        Log.d(TAG, "onSuccess: updated token to null");
-                        FirebaseAuth.getInstance().signOut();
-                        Intent intent = new Intent(getActivity(), LoginActivity.class);
-                        startActivity(intent);
-                        getActivity().finish();
-                    }
-                });
-
+                Navigation.findNavController(view).navigate(ProfileFragmentDirections.actionProfileFragmentToSettingsFragment());
             }
         });
         userDetailsLayout.setOnClickListener(new View.OnClickListener() {

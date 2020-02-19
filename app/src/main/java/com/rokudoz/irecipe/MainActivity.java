@@ -7,6 +7,7 @@ import com.rokudoz.irecipe.Fragments.Messages.MessageFragment;
 import com.rokudoz.irecipe.Utils.DirectReplyReceiver;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.core.app.Person;
@@ -23,17 +24,20 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
+import static com.rokudoz.irecipe.App.SETTINGS_PREFS_NAME;
 import static com.rokudoz.irecipe.Fragments.Messages.MessageFragment.messagingStyle;
 
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
+
 
     NavController navController;
 
@@ -46,7 +50,6 @@ public class MainActivity extends AppCompatActivity {
         MobileAds.initialize(this, getResources().getString(R.string.admob_app_id));
 
         setUpNavigation();
-
     }
 
     @Override
@@ -87,7 +90,7 @@ public class MainActivity extends AppCompatActivity {
                 .setLabel("Send message").build();
 
         Intent replyIntent = new Intent(this, DirectReplyReceiver.class);
-        replyIntent.putExtra("coming_from","MainActivity");
+        replyIntent.putExtra("coming_from", "MainActivity");
         replyIntent.putExtra("friend_id_mainActivity", friend_id);
         PendingIntent replyPendingIntent = PendingIntent.getBroadcast(this, 0, replyIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
@@ -116,7 +119,7 @@ public class MainActivity extends AppCompatActivity {
 
         Intent resultIntent = new Intent(click_action);
         resultIntent.putExtra("friend_id", friend_id);
-        resultIntent.putExtra("coming_from","MainActivity");
+        resultIntent.putExtra("coming_from", "MainActivity");
         PendingIntent resultPendingIntent = PendingIntent.getActivity(this, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         builder.setContentIntent(resultPendingIntent);
 

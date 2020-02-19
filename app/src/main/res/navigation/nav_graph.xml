@@ -94,6 +94,9 @@
         <action
             android:id="@+id/action_profileFragment_to_userProfileFragment2"
             app:destination="@id/userProfileFragment2"/>
+        <action
+            android:id="@+id/action_profileFragment_to_settingsFragment"
+            app:destination="@id/settingsFragment" />
     </fragment>
     <fragment
         android:id="@+id/recipeDetailedFragment"
@@ -244,4 +247,9 @@
             android:name="category"
             app:argType="string" />
     </fragment>
+    <fragment
+        android:id="@+id/settingsFragment"
+        android:name="com.rokudoz.irecipe.Fragments.SettingsFragment"
+        android:label="fragment_settings"
+        tools:layout="@layout/fragment_settings" />
 </navigation>

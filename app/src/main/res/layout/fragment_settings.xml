@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".Fragments.SettingsFragment">
+
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/settingsToolbar"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        app:title="Settings" />
+
+    <TextView
+        android:id="@+id/selectAppTheme"
+        style="@android:style/TextAppearance.Material.Medium"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/settingsToolbar"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:text="Select app theme" />
+
+    <RadioGroup
+        android:id="@+id/settings_appTheme_radioGroup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/selectAppTheme">
+
+        <RadioButton
+            android:id="@+id/dark_mode_follow_system"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Follow system theme" />
+
+        <RadioButton
+            android:id="@+id/dark_mode_light"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Light mode" />
+
+        <RadioButton
+            android:id="@+id/dark_mode_dark"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Dark Mode" />
+    </RadioGroup>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/settings_logOut"
+        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/settings_appTheme_radioGroup"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="8dp"
+        android:text="Sign out"
+        android:textAllCaps="false" />
+
+
+</RelativeLayout>
