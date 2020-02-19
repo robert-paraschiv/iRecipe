@@ -113,15 +113,8 @@ public class AllMessagesFragment extends Fragment implements ConversationAdapter
     @Override
     public void onStop() {
         super.onStop();
-        DetachFireStoreListeners();
     }
 
-    private void DetachFireStoreListeners() {
-        if (userConversationsListener != null) {
-            userConversationsListener.remove();
-            userConversationsListener = null;
-        }
-    }
 
     private void buildRecyclerView() {
         Log.d(TAG, "buildRecyclerView: ");
@@ -139,7 +132,7 @@ public class AllMessagesFragment extends Fragment implements ConversationAdapter
 
     private void performQuery() {
         initializeRecyclerViewAdapterOnClicks();
-        userConversationsListener = usersReference.document(mUser.getUser_id()).collection("Conversations").orderBy("date", Query.Direction.DESCENDING)
+        usersReference.document(mUser.getUser_id()).collection("Conversations").orderBy("date", Query.Direction.DESCENDING)
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
