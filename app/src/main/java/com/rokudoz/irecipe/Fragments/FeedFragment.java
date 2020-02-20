@@ -76,7 +76,6 @@ public class FeedFragment extends Fragment implements FeedAdapter.OnItemClickLis
 
     private ProgressBar pbLoading;
     private FloatingActionButton fab;
-    private int oldScrollYPosition = 0;
 
     //FireBase
     private FirebaseAuth.AuthStateListener mAuthListener;
@@ -85,30 +84,24 @@ public class FeedFragment extends Fragment implements FeedAdapter.OnItemClickLis
     private CollectionReference postsRef = db.collection("Posts");
     private CollectionReference usersReference = db.collection("Users");
     private CollectionReference recipesRef = db.collection("Recipes");
-    private FirebaseStorage mStorageRef;
-    private ListenerRegistration userDetailsListener, userFriendListListener, postLikesListener, userUnreadConversationsListener, postsListener,
-            postCreatorDetailsListener, postCommentsNumberListener, postLikesNumberListener;
 
     //Ads
-    AdLoader adLoader;
-    List<UnifiedNativeAd> nativeAds = new ArrayList<>();
+    private AdLoader adLoader;
+    private List<UnifiedNativeAd> nativeAds = new ArrayList<>();
 
     private RecyclerView mRecyclerView;
     private FeedAdapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
 
     private ArrayList<Object> mPostList = new ArrayList<>();
-    private List<String> userFavPostList = new ArrayList<>();
     private List<String> friends_userID_list = new ArrayList<>();
     private List<Friend> friendList = new ArrayList<>();
     private String loggedInUserDocumentId = "";
-    private String userFavDocId = "";
 
     private DocumentSnapshot mLastQueriedDocument;
 
     public static FeedFragment newInstance() {
-        FeedFragment fragment = new FeedFragment();
-        return fragment;
+        return new FeedFragment();
     }
 
     @Nullable
@@ -132,7 +125,6 @@ public class FeedFragment extends Fragment implements FeedAdapter.OnItemClickLis
         messagesCardView = view.findViewById(R.id.feedFragment_messages_materialCard);
 
         pbLoading.setVisibility(View.VISIBLE);
-        mStorageRef = FirebaseStorage.getInstance();
 
         messagesLayout.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -154,9 +146,9 @@ public class FeedFragment extends Fragment implements FeedAdapter.OnItemClickLis
         });
 
         fab.setVisibility(View.INVISIBLE);
+        loadNativeAds();
         buildRecyclerView();
         setupFirebaseAuth();
-        loadNativeAds();
 
         return view; // HAS TO BE THE LAST ONE ---------------------------------
     }
@@ -170,6 +162,7 @@ public class FeedFragment extends Fragment implements FeedAdapter.OnItemClickLis
                 public void onUnifiedNativeAdLoaded(UnifiedNativeAd unifiedNativeAd) {
                     nativeAds.add(unifiedNativeAd);
                     if (!adLoader.isLoading()) {
+                        Log.d(TAG, "onUnifiedNativeAdLoaded: Finished loading ad, size: " + nativeAds.size());
                     }
                 }
             }).withAdListener(new AdListener() {
@@ -183,9 +176,11 @@ public class FeedFragment extends Fragment implements FeedAdapter.OnItemClickLis
 
             adLoader.loadAds(new AdRequest.Builder()
                     .addTestDevice("2F1C484BD502BA7D51AC78D75751AFE0") // Mi 9T Pro
-                    .addTestDevice("B141CB779F883EF84EA9A32A7D068B76") // Redmi 5 Plus
+                    .addTestDevice("B141CB779F883EF84EA9A32A7D068B76") // RedMi 5 Plus
                     .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
                     .build(), NUMBER_OF_ADS);
+
+
         }
     }
 
@@ -228,42 +223,6 @@ public class FeedFragment extends Fragment implements FeedAdapter.OnItemClickLis
         super.onStop();
         if (mAuthListener != null) {
             FirebaseAuth.getInstance().removeAuthStateListener(mAuthListener);
-        }
-        DetachFireStoreListeners();
-    }
-
-    private void DetachFireStoreListeners() {
-        if (userDetailsListener != null) {
-            userDetailsListener.remove();
-            userDetailsListener = null;
-        }
-        if (postsListener != null) {
-            postsListener.remove();
-            postsListener = null;
-        }
-        if (userFriendListListener != null) {
-            userFriendListListener.remove();
-            userFriendListListener = null;
-        }
-        if (postLikesListener != null) {
-            postLikesListener.remove();
-            postLikesListener = null;
-        }
-        if (userUnreadConversationsListener != null) {
-            userUnreadConversationsListener.remove();
-            userUnreadConversationsListener = null;
-        }
-        if (postCreatorDetailsListener != null) {
-            postCreatorDetailsListener.remove();
-            postCreatorDetailsListener = null;
-        }
-        if (postCommentsNumberListener != null) {
-            postCommentsNumberListener.remove();
-            postCommentsNumberListener = null;
-        }
-        if (postLikesNumberListener != null) {
-            postLikesNumberListener.remove();
-            postLikesNumberListener = null;
         }
     }
 
@@ -324,7 +283,6 @@ public class FeedFragment extends Fragment implements FeedAdapter.OnItemClickLis
 
                 mUser = documentSnapshot.toObject(User.class);
                 loggedInUserDocumentId = documentSnapshot.getId();
-                userFavPostList = new ArrayList<>();
 
                 if (!friends_userID_list.contains(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
                     friends_userID_list.add(FirebaseAuth.getInstance().getCurrentUser().getUid());
@@ -526,7 +484,6 @@ public class FeedFragment extends Fragment implements FeedAdapter.OnItemClickLis
                         Log.d(TAG, "onSuccess: like deleted from db");
                     }
                 });
-                userFavPostList.remove(id);
                 post.setFavorite(false);
                 mAdapter.notifyDataSetChanged();
 
