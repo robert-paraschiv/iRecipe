@@ -266,15 +266,19 @@ public class MessageFragment extends Fragment {
                     if (!messageList.contains(message)) {
                         if (messageList.size() >= 15) {
                             messageList.add(message);
+                            mAdapter.notifyItemInserted(messageList.size() - 1);
                             messagesDocumentSnapshots.add(documentSnapshot);
                         } else {
                             messageList.add(0, message);
                             messagesDocumentSnapshots.add(0, documentSnapshot);
+                            mAdapter.notifyItemInserted(0);
                         }
                     } else {
                         messageList.set(messageList.indexOf(message), message);
+                        mAdapter.notifyDataSetChanged();
+//                        mAdapter.notifyItemChanged(messageList.indexOf(message));
                     }
-                    mAdapter.notifyDataSetChanged();
+
                     mRecyclerView.scrollToPosition(messageList.size() - 1);
 
                     if (queryDocumentSnapshots.getDocuments().size() != 0) {
@@ -310,12 +314,11 @@ public class MessageFragment extends Fragment {
                         }
                         mAdapter.notifyDataSetChanged();
 
-
                         if (queryDocumentSnapshots.getDocuments().size() != 0) {
                             mLastQueriedDocument = messagesDocumentSnapshots.get(0);
                         }
                     }
-                    mRecyclerView.scrollToPosition(queryDocumentSnapshots.size() + 1);
+                    mRecyclerView.scrollToPosition(queryDocumentSnapshots.size() );
                 }
             }
         });
