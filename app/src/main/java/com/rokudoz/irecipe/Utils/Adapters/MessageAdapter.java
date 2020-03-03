@@ -143,14 +143,14 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
                     if (timeAgo.equals("just now") || timeAgo.equals("a minute ago") || timeAgo.contains("hours ago") || timeAgo.equals("an hour ago")) {
                         holder.tvMessageTimeStamp.setText(getTimeAgo(time));
                     } else if (timeAgo.equals("yesterday")) {
-
                         holder.tvMessageTimeStamp.setText(String.format("yesterday, %s", timeString));
+                    } else if (timeAgo.contains("minutes ago")) {
+                        holder.tvMessageTimeStamp.setText(getTimeAgo(time));
                     } else
                         holder.tvMessageTimeStamp.setText(String.format("%s, %s", timeAgo, timeString));
-                }else {
+                } else {
                     holder.tvMessageTimeStamp.setText("");
                 }
-
             }
         } else {
             holder.tvMessageTimeStamp.setText("");

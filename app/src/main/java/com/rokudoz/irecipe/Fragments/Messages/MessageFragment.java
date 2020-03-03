@@ -101,6 +101,7 @@ public class MessageFragment extends Fragment {
     private CollectionReference usersReference = db.collection("Users");
     private List<DocumentSnapshot> messagesDocumentSnapshots = new ArrayList<>();
     private DocumentSnapshot mLastQueriedDocument;
+    private boolean gotMessagesFirstTime = false;
 
     public MessageFragment() {
         // Required empty public constructor
@@ -244,7 +245,8 @@ public class MessageFragment extends Fragment {
             public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
                 super.onScrollStateChanged(recyclerView, newState);
                 if (!recyclerView.canScrollVertically(-1)) { //Up
-                    getMessagesAgain();
+                    if (gotMessagesFirstTime)
+                        getMessagesAgain();
                 }
             }
         });
@@ -264,7 +266,7 @@ public class MessageFragment extends Fragment {
                     Message message = documentSnapshot.toObject(Message.class);
                     message.setDocumentId(documentSnapshot.getId());
                     if (!messageList.contains(message)) {
-                        if (messageList.size() >= 15) {
+                        if (gotMessagesFirstTime) {
                             messageList.add(message);
                             mAdapter.notifyItemInserted(messageList.size() - 1);
                             messagesDocumentSnapshots.add(documentSnapshot);
@@ -285,6 +287,7 @@ public class MessageFragment extends Fragment {
                         mLastQueriedDocument = messagesDocumentSnapshots.get(0);
                     }
                 }
+                gotMessagesFirstTime = true;
             }
         });
     }
@@ -318,7 +321,7 @@ public class MessageFragment extends Fragment {
                             mLastQueriedDocument = messagesDocumentSnapshots.get(0);
                         }
                     }
-                    mRecyclerView.scrollToPosition(queryDocumentSnapshots.size() );
+                    mRecyclerView.scrollToPosition(queryDocumentSnapshots.size());
                 }
             }
         });
