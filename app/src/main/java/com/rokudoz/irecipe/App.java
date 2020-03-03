@@ -53,7 +53,7 @@ public class App extends Application {
                     NotificationManager.IMPORTANCE_HIGH
             );
             channel_messages.setDescription("This is the channel used for messages");
-            channel_messages.setLockscreenVisibility(Notification.VISIBILITY_PRIVATE);
+            channel_messages.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
             notificationChannelList.add(channel_messages);
 
             //Likes Channel
