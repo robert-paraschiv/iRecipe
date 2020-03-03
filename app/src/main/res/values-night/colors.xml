@@ -9,4 +9,5 @@
     <color name="background">#fafafa</color>
     <color name="message_unread_red">#fc0303</color>
 
+    <color name="toolbar_color">#212121</color>
 </resources>

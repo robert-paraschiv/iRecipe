@@ -3,6 +3,7 @@ package com.rokudoz.irecipe;
 import android.animation.LayoutTransition;
 import android.app.Activity;
 import android.content.ContentResolver;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -28,12 +29,14 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
@@ -91,7 +94,8 @@ public class AddRecipesActivity extends AppCompatActivity {
     private ArrayList<EditText> ingredientQuantityEtList;
     private ArrayList<Spinner> ingredientQuantityTypeSpinnerList;
     private List<Ingredient> allIngredientsList;
-
+    private List<String> ingredient_categories = new ArrayList<>();
+    private String[] categories;
     //Instruction
     private LinearLayout instructionsLinearLayout;
     private ArrayList<EditText> instructionTextEtList;
@@ -262,10 +266,19 @@ public class AddRecipesActivity extends AppCompatActivity {
                         Ingredient ingredient = queryDocumentSnapshot.toObject(Ingredient.class);
                         allIngredientsList.add(ingredient);
                     }
+                    ingredientsReference.document("ingredient_categories").addSnapshotListener(new EventListener<DocumentSnapshot>() {
+                        @Override
+                        public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
+                            if (e == null && documentSnapshot != null) {
+                                ingredient_categories = (List<String>) documentSnapshot.get("categories");
+                                Log.d(TAG, "onEvent: " + ingredient_categories);
+                                categories = ingredient_categories.toArray(new String[0]);
 
-                    getRecipePhotoUploadCount();
+                                getRecipePhotoUploadCount();
+                            }
+                        }
+                    });
                 }
-
             }
         });
     }
@@ -280,7 +293,7 @@ public class AddRecipesActivity extends AppCompatActivity {
                 Bitmap bitmap = null;
                 try {
                     RotateBitmap rotateBitmap = new RotateBitmap();
-                    bitmap = rotateBitmap.HandleSamplingAndRotationBitmap(this,mInstructionStepImageUriList.get(position));
+                    bitmap = rotateBitmap.HandleSamplingAndRotationBitmap(this, mInstructionStepImageUriList.get(position));
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -324,7 +337,7 @@ public class AddRecipesActivity extends AppCompatActivity {
             Bitmap bitmap = null;
             try {
                 RotateBitmap rotateBitmap = new RotateBitmap();
-                bitmap = rotateBitmap.HandleSamplingAndRotationBitmap(this,mRecipeImageUriArray[position]);
+                bitmap = rotateBitmap.HandleSamplingAndRotationBitmap(this, mRecipeImageUriArray[position]);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -388,11 +401,14 @@ public class AddRecipesActivity extends AppCompatActivity {
         final List<String> imageUrls_list = Arrays.asList(recipeImageUrlArray);
         final String category = recipeCategorySpinner.getSelectedItem().toString();
         final List<Ingredient> ingredients_list = new ArrayList<>();
+        final List<Ingredient> ingredients_without_category = new ArrayList<>();
         final List<Instruction> instructions_list = new ArrayList<>();
         final Boolean isFavorite = false;
         final String privacy = privacySpinner.getSelectedItem().toString();
         final String complexity = complexitySpinner.getSelectedItem().toString();
-        final Float duration = Float.parseFloat(durationEditText.getText().toString());
+        Float duration = 0f;
+        if (!durationEditText.getText().toString().trim().equals(""))
+            duration = Float.parseFloat(durationEditText.getText().toString());
         final String durationType = durationTypeSpinner.getSelectedItem().toString();
         Log.d(TAG, "addRecipe: " + creator_docId);
 
@@ -403,52 +419,127 @@ public class AddRecipesActivity extends AppCompatActivity {
         //Get ingredients list items from edit texts
         for (int i = 0; i < ingredientNameEtList.size(); i++) {
             if (!ingredientNameEtList.get(i).getText().toString().equals("") && !ingredientQuantityEtList.get(i).getText().toString().equals("")) {
-                Ingredient ingredientToAdd = new Ingredient(ingredientNameEtList.get(i).getText().toString(), ""
+                final Ingredient ingredientToAdd = new Ingredient(ingredientNameEtList.get(i).getText().toString(), ""
                         , Float.parseFloat(ingredientQuantityEtList.get(i).getText().toString())
                         , ingredientQuantityTypeSpinnerList.get(i).getSelectedItem().toString(), false);
                 if (allIngredientsList.contains(ingredientToAdd)) {
                     ingredientToAdd.setCategory(allIngredientsList.get(allIngredientsList.indexOf(ingredientToAdd)).getCategory());
                     ingredients_list.add(ingredientToAdd);
+                } else {
+                    ingredients_without_category.add(ingredientToAdd);
                 }
             } else {
                 Toast.makeText(this, "Make sure ingredient boxes are not empty", Toast.LENGTH_SHORT).show();
             }
+
         }
 
-        for (int j = 0; j < instructionTextEtList.size(); j++) {
-            String url = "";
-            if (!mInstructionStepImageUriList.get(j).toString().equals("")) {
-                url = instructionStepImageUrlArray[j];
-            }
-            Instruction instruction = new Instruction(j + 1, instructionTextEtList.get(j).getText().toString(), url);
-            instructions_list.add(instruction);
+        //
+
+        final LinearLayout linearLayout = new LinearLayout(AddRecipesActivity.this);
+        linearLayout.setOrientation(LinearLayout.VERTICAL);
+        final List<Spinner> category_spinner_list = new ArrayList<>();
+        //create an adapter to describe how the items are displayed, adapters are used in several places in android.
+        //There are multiple variations of this, but this is the basic variant.
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(AddRecipesActivity.this, android.R.layout.simple_spinner_dropdown_item, categories);
+        //set the spinners adapter to the previously created one.
+        for (Ingredient ingredient : ingredients_without_category) {
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT);
+
+            params.setMargins(convertDpToPixel(16),
+                    convertDpToPixel(16),
+                    convertDpToPixel(16),
+                    0
+            );
+            Spinner spinner = new Spinner(AddRecipesActivity.this);
+            TextView textView = new TextView(AddRecipesActivity.this);
+            spinner.setLayoutParams(params);
+            spinner.setAdapter(adapter);
+            textView.setText(ingredient.getName());
+            textView.setLayoutParams(params);
+            category_spinner_list.add(spinner);
+            linearLayout.addView(textView);
+            linearLayout.addView(spinner);
         }
 
 
-        Recipe recipe = new Recipe(title, creator_docId, mUser.getName(), mUser.getUserProfilePicUrl(), category, description, ingredients_list, instructions_list
-                , keywords, imageUrls_list, complexity, duration, durationType, 0f, isFavorite, privacy, 0, 0);
+        MaterialAlertDialogBuilder materialAlertDialogBuilder = new MaterialAlertDialogBuilder(AddRecipesActivity.this, R.style.ThemeOverlay_MaterialComponents_MaterialAlertDialog_Centered);
+        materialAlertDialogBuilder.setView(linearLayout);
+        materialAlertDialogBuilder.setMessage("This ingredient isn't in our Database yet, please specify the category");
+        materialAlertDialogBuilder.setCancelable(true);
+        final Float finalDuration = duration;
+        materialAlertDialogBuilder.setPositiveButton(
+                "Confirm",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        //
+                        for (int i = 0; i < category_spinner_list.size(); i++) {
+                            ingredients_without_category.get(i).setCategory(category_spinner_list.get(i).getSelectedItem().toString());
+                            ingredients_without_category.get(i).setQuantity(0f);
+                            ingredients_without_category.get(i).setQuantity_type("g");
+                            ingredients_list.add(ingredients_without_category.get(i));
 
-//        // Sends recipe data to Firestore database
-        recipesReference.add(recipe)
-                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                    @Override
-                    public void onSuccess(DocumentReference documentReference) {
-                        Toast.makeText(AddRecipesActivity.this, "Succesfully added " + title + " to the recipes list", Toast.LENGTH_SHORT).show();
-                        Log.d(TAG, "onSuccess: doc id " + documentReference.getId());
-                        Intent intent = new Intent(AddRecipesActivity.this, MainActivity.class);
-                        intent.putExtra("recipe_id", documentReference.getId());
-                        startActivity(intent);
-                        finish();
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(AddRecipesActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                            ingredientsReference.add(ingredients_without_category.get(i)).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                                @Override
+                                public void onSuccess(DocumentReference documentReference) {
+                                    Log.d(TAG, "onSuccess: added ingredient to db");
+                                }
+                            });
+
+                        }
+
+                        //
+
+                        for (int j = 0; j < instructionTextEtList.size(); j++) {
+                            String url = "";
+                            if (!mInstructionStepImageUriList.get(j).toString().equals("")) {
+                                url = instructionStepImageUrlArray[j];
+                            }
+                            Instruction instruction = new Instruction(j + 1, instructionTextEtList.get(j).getText().toString(), url);
+                            instructions_list.add(instruction);
+                        }
+
+
+                        Recipe recipe = new Recipe(title, creator_docId, mUser.getName(), mUser.getUserProfilePicUrl(), category, description, ingredients_list, instructions_list
+                                , keywords, imageUrls_list, complexity, finalDuration, durationType, 0f, isFavorite, privacy, 0, 0);
+
+                        Log.d(TAG, "addRecipe: " + recipe.toString());
+
+                        // Sends recipe data to Firestore database
+                        recipesReference.add(recipe)
+                                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                                    @Override
+                                    public void onSuccess(DocumentReference documentReference) {
+                                        Toast.makeText(AddRecipesActivity.this, "Succesfully added " + title + " to the recipes list", Toast.LENGTH_SHORT).show();
+                                        Log.d(TAG, "onSuccess: doc id " + documentReference.getId());
+                                        Intent intent = new Intent(AddRecipesActivity.this, MainActivity.class);
+                                        intent.putExtra("recipe_id", documentReference.getId());
+                                        startActivity(intent);
+                                        finish();
+                                    }
+                                })
+                                .addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        Toast.makeText(AddRecipesActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+
+                        dialog.cancel();
                     }
                 });
 
+        materialAlertDialogBuilder.setNegativeButton(
+                "Cancel",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.cancel();
+                    }
+                });
 
+        materialAlertDialogBuilder.show();
     }
 
     private void addIngredientLayout() {

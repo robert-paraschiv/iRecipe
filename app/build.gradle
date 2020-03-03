@@ -5,7 +5,7 @@ apply plugin: 'io.fabric'
 android {
     signingConfigs {
         config {
-            storeFile file('C:\\Users\\Rokudo\\Documents\\iRecipe\\keystore\\keystore.jks')
+            storeFile file(var)
             storePassword 'Rokudo271997'
             keyAlias = 'key0'
             keyPassword 'Rokudo271997'
@@ -19,6 +19,7 @@ android {
         versionCode 12
         versionName "1.4"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        signingConfig signingConfigs.config
     }
     buildTypes {
         release {

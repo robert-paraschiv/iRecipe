@@ -240,6 +240,8 @@ public class Recipe implements Comparable<Recipe> {
                 ", creator_imageUrl='" + creator_imageUrl + '\'' +
                 ", category='" + category + '\'' +
                 ", description='" + description + '\'' +
+                ", ingredient_list=" + ingredient_list +
+                ", instruction_list=" + instruction_list +
                 ", keywords=" + keywords +
                 ", imageUrls_list=" + imageUrls_list +
                 ", complexity='" + complexity + '\'' +
