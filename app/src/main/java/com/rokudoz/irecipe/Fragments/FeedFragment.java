@@ -274,42 +274,41 @@ public class FeedFragment extends Fragment implements FeedAdapter.OnItemClickLis
         usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).addSnapshotListener(new EventListener<DocumentSnapshot>() {
             @Override
             public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
-                if (e != null) {
-                    Log.w(TAG, "onEvent: ", e);
-                    return;
-                }
-                List<Ingredient> userIngredient_list = new ArrayList<>();
-                final User user = documentSnapshot.toObject(User.class);
+                if (e == null && documentSnapshot != null) {
 
-                mUser = documentSnapshot.toObject(User.class);
-                loggedInUserDocumentId = documentSnapshot.getId();
+                    List<Ingredient> userIngredient_list = new ArrayList<>();
+                    final User user = documentSnapshot.toObject(User.class);
 
-                if (!friends_userID_list.contains(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
-                    friends_userID_list.add(FirebaseAuth.getInstance().getCurrentUser().getUid());
-                }
+                    mUser = documentSnapshot.toObject(User.class);
+                    loggedInUserDocumentId = documentSnapshot.getId();
 
-                usersReference.document(user.getUser_id()).collection("FriendList")
-                        .addSnapshotListener(new EventListener<QuerySnapshot>() {
-                            @Override
-                            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
-                                if (e != null) {
-                                    Log.w(TAG, "onEvent: ", e);
-                                    return;
-                                }
-                                for (QueryDocumentSnapshot queryDocumentSnapshot : queryDocumentSnapshots) {
-                                    Friend friend = queryDocumentSnapshot.toObject(Friend.class);
-                                    if (!friendList.contains(friend)) {
-                                        if (friend.getFriend_status().equals("friends") || friend.getFriend_status().equals("friend_request_accepted"))
-                                            friendList.add(friend);
+                    if (!friends_userID_list.contains(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
+                        friends_userID_list.add(FirebaseAuth.getInstance().getCurrentUser().getUid());
+                    }
+
+                    usersReference.document(user.getUser_id()).collection("FriendList")
+                            .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                                @Override
+                                public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                                    if (e != null) {
+                                        Log.w(TAG, "onEvent: ", e);
+                                        return;
                                     }
+                                    for (QueryDocumentSnapshot queryDocumentSnapshot : queryDocumentSnapshots) {
+                                        Friend friend = queryDocumentSnapshot.toObject(Friend.class);
+                                        if (!friendList.contains(friend)) {
+                                            if (friend.getFriend_status().equals("friends") || friend.getFriend_status().equals("friend_request_accepted"))
+                                                friendList.add(friend);
+                                        }
+                                    }
+                                    for (Friend friend : friendList) {
+                                        if (!friends_userID_list.contains(friend.getFriend_user_id()))
+                                            friends_userID_list.add(friend.getFriend_user_id());
+                                    }
+                                    performQuery();
                                 }
-                                for (Friend friend : friendList) {
-                                    if (!friends_userID_list.contains(friend.getFriend_user_id()))
-                                        friends_userID_list.add(friend.getFriend_user_id());
-                                }
-                                performQuery();
-                            }
-                        });
+                            });
+                }
             }
         });
     }

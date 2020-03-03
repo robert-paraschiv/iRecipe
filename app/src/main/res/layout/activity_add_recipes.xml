@@ -40,7 +40,7 @@
                     android:layout_height="200dp"
                     android:layout_centerHorizontal="true"
                     android:scaleType="centerCrop"
-                    tools:src="@drawable/ic_launcher_background" />
+                    android:src="@drawable/ic_image_black_24dp" />
             </com.google.android.material.card.MaterialCardView>
 
             <com.google.android.material.button.MaterialButton
@@ -70,7 +70,7 @@
                 android:id="@+id/addRecipes_category_tv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="4dp"
+                android:layout_marginStart="14dp"
                 android:layout_marginTop="8dp"
                 android:text="Category"
                 android:textSize="18sp"
@@ -180,56 +180,58 @@
             </com.google.android.material.card.MaterialCardView>
 
             <TextView
-                android:layout_marginTop="8dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:textSize="18sp"
-                android:textStyle="bold"
+                android:layout_marginTop="14dp"
                 android:text="How much does it take to make this ?"
-                />
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
                 android:layout_marginTop="4dp"
-                >
+                android:orientation="horizontal">
+
                 <EditText
                     android:id="@+id/addRecipe_duration_editText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:hint="Duration"
                     android:inputType="number"
-                    android:hint="Duration"/>
+                    android:maxWidth="150dp" />
+
                 <androidx.appcompat.widget.AppCompatSpinner
+                    android:id="@+id/addRecipe_durationType_Spinner"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:id="@+id/addRecipe_durationType_Spinner"
                     android:entries="@array/DurationType"
-                    android:spinnerMode="dropdown"/>
+                    android:spinnerMode="dropdown" />
             </LinearLayout>
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:textSize="18sp"
-                android:textStyle="bold"
+                android:layout_marginTop="14dp"
                 android:text="How hard do you think it is to make this ?"
-                />
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
             <androidx.appcompat.widget.AppCompatSpinner
-                android:layout_marginTop="4dp"
+                android:id="@+id/addRecipe_complexity_Spinner"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/addRecipe_complexity_Spinner"
+                android:layout_marginTop="4dp"
                 android:entries="@array/Complexity"
-                android:spinnerMode="dropdown"/>
+                android:spinnerMode="dropdown" />
 
 
             <com.google.android.material.textfield.TextInputLayout
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
-                android:layout_marginTop="4dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
                 android:hint="Keywords">
 
                 <com.google.android.material.textfield.TextInputEditText
@@ -242,8 +244,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="4dp"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="14dp"
                 android:layout_marginBottom="8dp"
                 android:text="Who can see this recipe"
                 android:textSize="18sp"
@@ -261,7 +262,7 @@
                 style="@style/Base.Widget.AppCompat.ProgressBar.Horizontal"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
+                android:layout_marginTop="14dp"
                 android:padding="4dp" />
 
             <com.google.android.material.button.MaterialButton

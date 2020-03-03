@@ -610,7 +610,7 @@ public class AddRecipesActivity extends AppCompatActivity {
         imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
         imageView.setLayoutParams(params);
         linearLayout.addView(imageView);
-        imageView.setVisibility(View.INVISIBLE);
+        imageView.setVisibility(View.GONE);
 
         final MaterialButton button = new MaterialButton(this, null, R.attr.materialButtonOutlinedStyle);
         button.setText("Add photo to this step");
@@ -622,6 +622,7 @@ public class AddRecipesActivity extends AppCompatActivity {
             public void onClick(View v) {
                 openFileChooser(INSTRUCTION_PICTURE + instructionTextEtList.indexOf(editText));
                 button.setVisibility(View.GONE);
+                imageView.setImageResource(R.drawable.ic_image_black_24dp);
                 imageView.setVisibility(View.VISIBLE);
                 instructionStepImageViewList.add(imageView);
             }

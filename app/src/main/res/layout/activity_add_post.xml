@@ -39,7 +39,7 @@
                     android:layout_height="200dp"
                     android:layout_centerHorizontal="true"
                     android:scaleType="centerCrop"
-                    tools:src="@drawable/ic_launcher_background" />
+                    android:src="@drawable/ic_image_black_24dp" />
             </com.google.android.material.card.MaterialCardView>
 
             <com.google.android.material.button.MaterialButton
