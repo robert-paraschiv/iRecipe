@@ -38,6 +38,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.transition.Transition;
@@ -224,51 +225,72 @@ public class MessageFragment extends Fragment {
         for (Character c : chars) {
             notificationID += c - 'a' + 1;
         }
-        String click_action = intent.getStringExtra("click_action");
-        String messageBody = intent.getStringExtra("messageBody");
-        String messageTitle = intent.getStringExtra("messageTitle");
+        final int finalNotificationID = notificationID;
+        usersReference.document(friend_id).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+            @Override
+            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                if (documentSnapshot != null) {
+                    User user = documentSnapshot.toObject(User.class);
+                    if (user != null) {
+                        Glide.with(getActivity()).asBitmap().load(user.getUserProfilePicUrl()).apply(RequestOptions.circleCropTransform()).into(new CustomTarget<Bitmap>() {
+                            @Override
+                            public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+                                String click_action = intent.getStringExtra("click_action");
+                                String messageBody = intent.getStringExtra("messageBody");
+                                String messageTitle = intent.getStringExtra("messageTitle");
 
-        androidx.core.app.RemoteInput remoteInput = new androidx.core.app.RemoteInput.Builder("key_text_reply")
-                .setLabel("Send message").build();
-        Intent replyIntent = new Intent(getContext(), DirectReplyReceiver.class);
-        replyIntent.putExtra("friend_id_messageFragment", friend_id);
-        replyIntent.putExtra("coming_from", "MessageFragment");
-        replyIntent.putExtra("notification_id", notificationID);
-        PendingIntent replyPendingIntent = PendingIntent.getBroadcast(getContext(), notificationID, replyIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+                                androidx.core.app.RemoteInput remoteInput = new androidx.core.app.RemoteInput.Builder("key_text_reply")
+                                        .setLabel("Send message").build();
+                                Intent replyIntent = new Intent(getContext(), DirectReplyReceiver.class);
+                                replyIntent.putExtra("friend_id_messageFragment", friend_id);
+                                replyIntent.putExtra("coming_from", "MessageFragment");
+                                replyIntent.putExtra("notification_id", finalNotificationID);
+                                PendingIntent replyPendingIntent = PendingIntent.getBroadcast(getContext(), finalNotificationID, replyIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-        NotificationCompat.Action replyAction = new NotificationCompat.Action.Builder(
-                R.drawable.ic_send_black_24dp,
-                "Reply",
-                replyPendingIntent
-        ).addRemoteInput(remoteInput).build();
+                                NotificationCompat.Action replyAction = new NotificationCompat.Action.Builder(
+                                        R.drawable.ic_send_black_24dp,
+                                        "Reply",
+                                        replyPendingIntent
+                                ).addRemoteInput(remoteInput).build();
 
-        Person user = new Person.Builder().setName(messageTitle).build();
-        messagingStyle = new NotificationCompat.MessagingStyle(user);
-        messagingStyle.setConversationTitle("Chat");
+                                Person user = new Person.Builder().setName(messageTitle).setIcon(IconCompat.createWithBitmap(resource)).build();
+                                messagingStyle = new NotificationCompat.MessagingStyle(user);
+                                messagingStyle.setConversationTitle("Chat");
 
-        NotificationCompat.MessagingStyle.Message message =
-                new NotificationCompat.MessagingStyle.Message(messageBody, System.currentTimeMillis(), user);
-        messagingStyle.addMessage(message);
+                                NotificationCompat.MessagingStyle.Message message =
+                                        new NotificationCompat.MessagingStyle.Message(messageBody, System.currentTimeMillis(), user);
+                                messagingStyle.addMessage(message);
 
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(getContext(), App.CHANNEL_MESSAGES)
-                .setSmallIcon(R.mipmap.ic_launcher_foreground)
-                .setStyle(messagingStyle)
-                .addAction(replyAction)
-                .setColor(Color.BLUE)
-                .setPriority(NotificationCompat.PRIORITY_HIGH)
-                .setCategory(NotificationCompat.CATEGORY_MESSAGE)
-                .setAutoCancel(true);
+                                NotificationCompat.Builder builder = new NotificationCompat.Builder(getContext(), App.CHANNEL_MESSAGES)
+                                        .setSmallIcon(R.mipmap.ic_launcher_foreground)
+                                        .setStyle(messagingStyle)
+                                        .addAction(replyAction)
+                                        .setColor(Color.BLUE)
+                                        .setPriority(NotificationCompat.PRIORITY_HIGH)
+                                        .setCategory(NotificationCompat.CATEGORY_MESSAGE)
+                                        .setAutoCancel(true);
 
-        Intent resultIntent = new Intent(click_action);
-        resultIntent.putExtra("friend_id", friend_id);
-        resultIntent.putExtra("coming_from", "MessageFragment");
-        resultIntent.putExtra("notification_id", notificationID);
-        PendingIntent resultPendingIntent = PendingIntent.getActivity(getContext(), notificationID, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-        builder.setContentIntent(resultPendingIntent);
+                                Intent resultIntent = new Intent(click_action);
+                                resultIntent.putExtra("friend_id", friend_id);
+                                resultIntent.putExtra("coming_from", "MessageFragment");
+                                resultIntent.putExtra("notification_id", finalNotificationID);
+                                PendingIntent resultPendingIntent = PendingIntent.getActivity(getContext(), finalNotificationID, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+                                builder.setContentIntent(resultPendingIntent);
 
 
-        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(getContext());
-        notificationManager.notify(notificationID, builder.build());
+                                NotificationManagerCompat notificationManager = NotificationManagerCompat.from(getContext());
+                                notificationManager.notify(finalNotificationID, builder.build());
+                            }
+
+                            @Override
+                            public void onLoadCleared(@Nullable Drawable placeholder) {
+
+                            }
+                        });
+                    }
+                }
+            }
+        });
     }
 
     private void buildRecyclerView() {

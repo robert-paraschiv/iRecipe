@@ -6,16 +6,24 @@ import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.core.app.Person;
 import androidx.core.app.RemoteInput;
+import androidx.core.graphics.drawable.IconCompat;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
+import com.bumptech.glide.request.target.CustomTarget;
+import com.bumptech.glide.request.transition.Transition;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
@@ -42,6 +50,7 @@ public class DirectReplyReceiver extends BroadcastReceiver {
     private User userFriend = new User();
     private User mUser = new User();
     String friend_id = "";
+
     //Firebase
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private CollectionReference usersReference = db.collection("Users");
@@ -65,20 +74,20 @@ public class DirectReplyReceiver extends BroadcastReceiver {
                 }
                 final int notificationID = intent.getIntExtra("notification_id", 0);
 
-                Log.d(TAG, "onReceive: friend id " + friend_id + "coming from " + comingFrom + " notification id "+ notificationID);
+                Log.d(TAG, "onReceive: friend id " + friend_id + "coming from " + comingFrom + " notification id " + notificationID);
 
                 if (!text.trim().equals(""))
-                    usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).addSnapshotListener(new EventListener<DocumentSnapshot>() {
+                    usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                         @Override
-                        public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
-                            if (e == null && documentSnapshot != null) {
+                        public void onSuccess(DocumentSnapshot documentSnapshot) {
+                            if (documentSnapshot != null) {
                                 mUser = documentSnapshot.toObject(User.class);
                                 final String currentUserId = mUser.getUser_id();
 
-                                usersReference.document(friend_id).addSnapshotListener(new EventListener<DocumentSnapshot>() {
+                                usersReference.document(friend_id).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                                     @Override
-                                    public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
-                                        if (e == null && documentSnapshot != null) {
+                                    public void onSuccess(DocumentSnapshot documentSnapshot) {
+                                        if (documentSnapshot != null) {
                                             userFriend = documentSnapshot.toObject(User.class);
 
                                             final com.rokudoz.irecipe.Models.Message messageForCurrentUser = new com.rokudoz.irecipe.Models.Message(currentUserId, friend_id, text
@@ -110,28 +119,40 @@ public class DirectReplyReceiver extends BroadcastReceiver {
                                                 public void onSuccess(Void aVoid) {
                                                     Log.d(TAG, "onSuccess: added message");
 
-                                                    NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-                                                    if (notificationManager != null) {
-                                                        Person person = new Person.Builder().setName("Me").build();
-                                                        NotificationCompat.MessagingStyle messagingStyle = new NotificationCompat.MessagingStyle(person);
-                                                        messagingStyle.setConversationTitle("Chat");
-                                                        NotificationCompat.MessagingStyle.Message message =
-                                                                new NotificationCompat.MessagingStyle.Message(text, System.currentTimeMillis(), person);
-                                                        messagingStyle.addMessage(message);
-                                                        // Build a new notification, which informs the user that the system
-                                                        // handled their interaction with the previous notification.
-                                                        Notification repliedNotification = new NotificationCompat.Builder(context, App.CHANNEL_MESSAGES)
-                                                                .setSmallIcon(R.mipmap.ic_launcher_foreground)
-                                                                .setStyle(messagingStyle)
-                                                                .setContentText(text)
-                                                                .setColor(Color.BLUE)
-                                                                .setAutoCancel(true)
-                                                                .setTimeoutAfter(100)
-                                                                .build();
+                                                    //Get user profile pic and send notification
+                                                    Glide.with(context).asBitmap().load(mUser.getUserProfilePicUrl()).apply(RequestOptions.circleCropTransform())
+                                                            .into(new CustomTarget<Bitmap>() {
+                                                                @Override
+                                                                public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+                                                                    NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+                                                                    if (notificationManager != null) {
+                                                                        Person person = new Person.Builder().setName("Me").setIcon(IconCompat.createWithBitmap(resource)).build();
+                                                                        NotificationCompat.MessagingStyle messagingStyle = new NotificationCompat.MessagingStyle(person);
+                                                                        messagingStyle.setConversationTitle("Chat");
+                                                                        NotificationCompat.MessagingStyle.Message message =
+                                                                                new NotificationCompat.MessagingStyle.Message(text, System.currentTimeMillis(), person);
+                                                                        messagingStyle.addMessage(message);
+                                                                        // Build a new notification, which informs the user that the system
+                                                                        // handled their interaction with the previous notification.
+                                                                        Notification repliedNotification = new NotificationCompat.Builder(context, App.CHANNEL_MESSAGES)
+                                                                                .setSmallIcon(R.mipmap.ic_launcher_foreground)
+                                                                                .setStyle(messagingStyle)
+                                                                                .setContentText(text)
+                                                                                .setColor(Color.BLUE)
+                                                                                .setAutoCancel(true)
+                                                                                .setTimeoutAfter(100)
+                                                                                .build();
 
-                                                        // Issue the new notification.
-                                                        notificationManager.notify(notificationID, repliedNotification);
-                                                    }
+                                                                        // Issue the new notification.
+                                                                        notificationManager.notify(notificationID, repliedNotification);
+                                                                    }
+                                                                }
+
+                                                                @Override
+                                                                public void onLoadCleared(@Nullable Drawable placeholder) {
+
+                                                                }
+                                                            });
                                                 }
                                             });
                                         }
@@ -144,8 +165,6 @@ public class DirectReplyReceiver extends BroadcastReceiver {
             } else {
                 Log.d(TAG, "onReceive: NO COMING FROM  " + intent.getExtras().toString());
             }
-
         }
     }
-
 }
