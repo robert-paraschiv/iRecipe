@@ -1,8 +1,6 @@
 package com.rokudoz.irecipe.Utils.Adapters;
 
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;
-
+import android.content.Context;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,26 +9,25 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.google.android.gms.tasks.OnFailureListener;
+import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.card.MaterialCardView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.WriteBatch;
-import com.rokudoz.irecipe.Models.Ingredient;
-import com.rokudoz.irecipe.Models.Instruction;
 import com.rokudoz.irecipe.Models.Message;
 import com.rokudoz.irecipe.R;
-import com.rokudoz.irecipe.Utils.TimeAgo;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
+import java.util.Objects;
 
 
 public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageViewHolder> {
@@ -40,18 +37,18 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
     private static final int HOUR_MILLIS = 60 * MINUTE_MILLIS;
     private static final int DAY_MILLIS = 24 * HOUR_MILLIS;
 
-    private List<Message> messageList = new ArrayList<>();
+    private Context context;
+    private List<Message> messageList;
     private static final String TAG = "MessageAdapter";
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
-    private CollectionReference postsRef = db.collection("Posts");
     private CollectionReference usersReference = db.collection("Users");
 
-    public class MessageViewHolder extends RecyclerView.ViewHolder {
+    static class MessageViewHolder extends RecyclerView.ViewHolder {
         TextView tvMessageText, tvMessageTimeStamp;
         MaterialCardView materialCardView;
         ImageView readStatus;
 
-        public MessageViewHolder(View itemView) {
+        MessageViewHolder(View itemView) {
             super(itemView);
             tvMessageText = itemView.findViewById(R.id.recycler_view_messageItem_Text);
             tvMessageTimeStamp = itemView.findViewById(R.id.recycler_view_messageItem_MessageTimeStamp);
@@ -61,10 +58,12 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
 
     }
 
-    public MessageAdapter(List<Message> messageList) {
+    public MessageAdapter(List<Message> messageList, Context context) {
         this.messageList = messageList;
+        this.context = context;
     }
 
+    @NonNull
     @Override
     public MessageViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.recyclerview_layout_message_item, parent, false);
@@ -75,14 +74,14 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
     public void onBindViewHolder(@NonNull final MessageViewHolder holder, int position) {
         final Message currentItem = messageList.get(position);
 
-        String currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        String currentUserId = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
 
         if (currentItem.getType() != null && currentItem.getType().equals("message_sent")) {
 
             holder.readStatus.setVisibility(View.VISIBLE);
             if (currentItem.getRead() != null && currentItem.getRead()) {
                 holder.readStatus.setImageResource(R.drawable.ic_pngwave);
-                holder.readStatus.setColorFilter(holder.readStatus.getResources().getColor(R.color.grey));
+                holder.readStatus.setColorFilter(R.color.grey);
             } else if (currentItem.getRead() != null && !currentItem.getRead()) {
                 ImageView imageView = new ImageView(holder.readStatus.getContext());
                 holder.readStatus.setColorFilter(imageView.getColorFilter());
@@ -92,7 +91,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
             RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
             params.addRule(RelativeLayout.ALIGN_PARENT_END);
             holder.materialCardView.setLayoutParams(params);
-            holder.materialCardView.setCardBackgroundColor(holder.materialCardView.getResources().getColor(R.color.colorPrimary));
+            holder.materialCardView.setCardBackgroundColor(ContextCompat.getColor(context, R.color.colorPrimary));
 
 
         } else if (currentItem.getType() != null && currentItem.getType().equals("message_received")) {
@@ -132,10 +131,9 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
 
         if (currentItem.getTimestamp() != null) {
             Date date = currentItem.getTimestamp();
-            DateFormat dateFormat = new SimpleDateFormat("HH:mm, dd MM YYYY", Locale.getDefault());
             long time = date.getTime();
             String timeAgo = getTimeAgo(time);
-            if (currentItem.getTimestamp() != null && !currentItem.getTimestamp().equals("")) {
+            if (currentItem.getTimestamp() != null && !currentItem.getTimestamp().toString().equals("")) {
                 DateFormat smallDateFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
                 String timeString = smallDateFormat.format(date);
                 Log.d(TAG, "onBindViewHolder: TIME AGO" + timeAgo);

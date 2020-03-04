@@ -168,7 +168,8 @@ public class profileMyIngredientsFragment extends Fragment {
                                     if (e == null && documentSnapshot != null) {
                                         ingredient_categories = (List<String>) documentSnapshot.get("categories");
                                         Log.d(TAG, "onEvent: " + ingredient_categories);
-                                        categories = ingredient_categories.toArray(new String[0]);
+                                        if (ingredient_categories != null)
+                                            categories = ingredient_categories.toArray(new String[0]);
                                         getUserIngredientList();
                                     }
                                 }

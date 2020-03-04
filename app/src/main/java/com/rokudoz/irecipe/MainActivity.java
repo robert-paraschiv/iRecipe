@@ -2,6 +2,9 @@ package com.rokudoz.irecipe;
 
 import com.google.android.gms.ads.MobileAds;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.rokudoz.irecipe.Fragments.FeedFragmentDirections;
 import com.rokudoz.irecipe.Fragments.Messages.MessageFragment;
 import com.rokudoz.irecipe.Utils.DirectReplyReceiver;
@@ -39,6 +42,11 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
 
 
+    //Firebase RealTime db
+    //Firebase RealTime db
+    FirebaseDatabase database = FirebaseDatabase.getInstance();
+    DatabaseReference usersRef = database.getReference("Users").child(FirebaseAuth.getInstance().getCurrentUser().getUid());
+
     NavController navController;
 
     BottomNavigationView bottomNavigationView;
@@ -58,12 +66,15 @@ public class MainActivity extends AppCompatActivity {
         LocalBroadcastManager.getInstance(this).registerReceiver((mMessageReceiver),
                 new IntentFilter("MessageNotification")
         );
+        if (FirebaseAuth.getInstance().getCurrentUser() != null)
+            usersRef.child("online").setValue(true);
     }
 
     @Override
     protected void onStop() {
         super.onStop();
         LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReceiver);
+        usersRef.child("online").setValue(false);
     }
 
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {

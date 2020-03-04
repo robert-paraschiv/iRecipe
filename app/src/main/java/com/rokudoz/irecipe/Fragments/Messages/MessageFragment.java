@@ -46,6 +46,11 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -77,8 +82,13 @@ import java.util.concurrent.ExecutionException;
  */
 public class MessageFragment extends Fragment {
     private static final String TAG = "MessageFragment";
+
+    //Firebase RealTime db
+    FirebaseDatabase database = FirebaseDatabase.getInstance();
+    DatabaseReference usersRef = database.getReference("Users");
+
     private ImageView friendImage;
-    private TextView friendName;
+    private TextView friendName, friendOnlineStatus;
     private TextInputEditText textInputEditText;
     private MaterialButton sendButton;
 
@@ -114,6 +124,7 @@ public class MessageFragment extends Fragment {
         view = inflater.inflate(R.layout.fragment_message, container, false);
 
         friendImage = view.findViewById(R.id.message_friendImage_ImageView);
+        friendOnlineStatus = view.findViewById(R.id.fragment_message_onlineStatus);
         friendName = view.findViewById(R.id.message_friendName_TextView);
         textInputEditText = view.findViewById(R.id.message_input_TextInput);
         sendButton = view.findViewById(R.id.message_send_MaterialBtn);
@@ -144,6 +155,29 @@ public class MessageFragment extends Fragment {
             }
         });
 
+
+        //Friend Online Status
+        usersRef.child(friendUserId).child("online").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.getValue(Boolean.class) != null) {
+                    boolean online = dataSnapshot.getValue(Boolean.class);
+                    if (online) {
+                        friendOnlineStatus.setText("Online");
+                    } else {
+                        friendOnlineStatus.setText("Offline");
+                    }
+                    Log.d(TAG, "onDataChange: online= " + online);
+                }else {
+                    friendOnlineStatus.setText("Offline");
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Log.w(TAG, "Failed to read value.", databaseError.toException());
+            }
+        });
 
         return view;
     }
@@ -235,7 +269,7 @@ public class MessageFragment extends Fragment {
         final LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
         linearLayoutManager.setStackFromEnd(true);
 
-        mAdapter = new MessageAdapter(messageList);
+        mAdapter = new MessageAdapter(messageList, getActivity());
 
         mRecyclerView.setLayoutManager(linearLayoutManager);
         mRecyclerView.setAdapter(mAdapter);

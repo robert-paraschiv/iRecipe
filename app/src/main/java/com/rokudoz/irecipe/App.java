@@ -6,14 +6,29 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.SharedPreferences;
 import android.os.Build;
+import android.util.Log;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatDelegate;
+
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class App extends Application {
     private static final String TAG = "App";
+
+    //Firebase RealTime DB
+
+    FirebaseDatabase database;
+    DatabaseReference userRef;
 
     public static final String SETTINGS_PREFS_NAME = "SettingsPrefs";
 
@@ -25,11 +40,30 @@ public class App extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        FirebaseApp.initializeApp(this);
+        database = FirebaseDatabase.getInstance();
+        database.setPersistenceEnabled(true);
+        userRef = database.getReference("Users").child(FirebaseAuth.getInstance().getCurrentUser().getUid());
         createNotificationChannels();
         applyNightModeFromPrefs();
+
+
+        userRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot != null){
+                    userRef.child("online").onDisconnect().setValue(false);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
     }
 
-    private void applyNightModeFromPrefs(){
+    private void applyNightModeFromPrefs() {
         SharedPreferences sharedPreferences = getSharedPreferences(SETTINGS_PREFS_NAME, MODE_PRIVATE);
         int mode = sharedPreferences.getInt("NightMode", AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
 
@@ -87,7 +121,9 @@ public class App extends Application {
             notificationChannelList.add(channel_friend_req);
 
             NotificationManager notificationManager = getSystemService(NotificationManager.class);
-            notificationManager.createNotificationChannels(notificationChannelList);
+            if (notificationManager != null) {
+                notificationManager.createNotificationChannels(notificationChannelList);
+            }
         }
     }
 }
