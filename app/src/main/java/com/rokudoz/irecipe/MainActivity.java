@@ -93,10 +93,14 @@ public class MainActivity extends AppCompatActivity {
     };
 
     private void sendNotification(Intent intents, String friend_id) {
+        int  notificationID = 0;
+        char[] chars = friend_id.toCharArray();
+        for (Character c : chars) {
+            notificationID += c - 'a' + 1;
+        }
         String click_action = intents.getStringExtra("click_action");
         String messageBody = intents.getStringExtra("messageBody");
         String messageTitle = intents.getStringExtra("messageTitle");
-        int mNotificationId = (int) System.currentTimeMillis();
         Log.d(TAG, "onReceive: " + friend_id);
         androidx.core.app.RemoteInput remoteInput = new androidx.core.app.RemoteInput.Builder("key_text_reply")
                 .setLabel("Send message").build();
@@ -104,8 +108,8 @@ public class MainActivity extends AppCompatActivity {
         Intent replyIntent = new Intent(this, DirectReplyReceiver.class);
         replyIntent.putExtra("coming_from", "MainActivity");
         replyIntent.putExtra("friend_id_mainActivity", friend_id);
-        replyIntent.putExtra("notification_id", mNotificationId);
-        PendingIntent replyPendingIntent = PendingIntent.getBroadcast(this, mNotificationId, replyIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        replyIntent.putExtra("notification_id", notificationID);
+        PendingIntent replyPendingIntent = PendingIntent.getBroadcast(this, notificationID, replyIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         NotificationCompat.Action replyAction = new NotificationCompat.Action.Builder(
                 R.drawable.ic_send_black_24dp,
@@ -133,13 +137,13 @@ public class MainActivity extends AppCompatActivity {
         Intent resultIntent = new Intent(click_action);
         resultIntent.putExtra("friend_id", friend_id);
         resultIntent.putExtra("coming_from", "MainActivity");
-        resultIntent.putExtra("notification_id", mNotificationId);
-        PendingIntent resultPendingIntent = PendingIntent.getActivity(this, mNotificationId, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        resultIntent.putExtra("notification_id", notificationID);
+        PendingIntent resultPendingIntent = PendingIntent.getActivity(this, notificationID, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         builder.setContentIntent(resultPendingIntent);
 
 
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
-        notificationManager.notify(mNotificationId, builder.build());
+        notificationManager.notify(notificationID, builder.build());
     }
 
 

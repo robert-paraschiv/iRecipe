@@ -217,8 +217,11 @@ public class MessageFragment extends Fragment {
     };
 
     private void sendNotification(final Intent intent, final String friend_id) {
-
-        int mNotificationId = (int) System.currentTimeMillis();
+        int  notificationID = 0;
+        char[] chars = friend_id.toCharArray();
+        for (Character c : chars) {
+            notificationID += c - 'a' + 1;
+        }
         String click_action = intent.getStringExtra("click_action");
         String messageBody = intent.getStringExtra("messageBody");
         String messageTitle = intent.getStringExtra("messageTitle");
@@ -228,8 +231,8 @@ public class MessageFragment extends Fragment {
         Intent replyIntent = new Intent(getContext(), DirectReplyReceiver.class);
         replyIntent.putExtra("friend_id_messageFragment", friend_id);
         replyIntent.putExtra("coming_from", "MessageFragment");
-        replyIntent.putExtra("notification_id", mNotificationId);
-        PendingIntent replyPendingIntent = PendingIntent.getBroadcast(getContext(), mNotificationId, replyIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        replyIntent.putExtra("notification_id", notificationID);
+        PendingIntent replyPendingIntent = PendingIntent.getBroadcast(getContext(), notificationID, replyIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         NotificationCompat.Action replyAction = new NotificationCompat.Action.Builder(
                 R.drawable.ic_send_black_24dp,
@@ -257,13 +260,13 @@ public class MessageFragment extends Fragment {
         Intent resultIntent = new Intent(click_action);
         resultIntent.putExtra("friend_id", friend_id);
         resultIntent.putExtra("coming_from", "MessageFragment");
-        resultIntent.putExtra("notification_id", mNotificationId);
-        PendingIntent resultPendingIntent = PendingIntent.getActivity(getContext(), mNotificationId, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        resultIntent.putExtra("notification_id", notificationID);
+        PendingIntent resultPendingIntent = PendingIntent.getActivity(getContext(), notificationID, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         builder.setContentIntent(resultPendingIntent);
 
 
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(getContext());
-        notificationManager.notify(mNotificationId, builder.build());
+        notificationManager.notify(notificationID, builder.build());
     }
 
     private void buildRecyclerView() {

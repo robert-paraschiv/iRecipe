@@ -63,9 +63,9 @@ public class DirectReplyReceiver extends BroadcastReceiver {
                 } else if (comingFrom.equals("MainActivity")) {
                     friend_id = intent.getStringExtra("friend_id_mainActivity");
                 }
-                final int mNotificationId = intent.getIntExtra("notification_id", 0);
+                final int notificationID = intent.getIntExtra("notification_id", 0);
 
-                Log.d(TAG, "onReceive: friend id " + friend_id + "coming from " + comingFrom + " notification id "+ mNotificationId);
+                Log.d(TAG, "onReceive: friend id " + friend_id + "coming from " + comingFrom + " notification id "+ notificationID);
 
                 if (!text.trim().equals(""))
                     usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).addSnapshotListener(new EventListener<DocumentSnapshot>() {
@@ -123,7 +123,7 @@ public class DirectReplyReceiver extends BroadcastReceiver {
                                                                 .build();
 
                                                         // Issue the new notification.
-                                                        notificationManager.notify(mNotificationId, repliedNotification);
+                                                        notificationManager.notify(notificationID, repliedNotification);
                                                     }
                                                 }
                                             });
