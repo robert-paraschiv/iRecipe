@@ -73,6 +73,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
     @Override
     public void onBindViewHolder(@NonNull final MessageViewHolder holder, int position) {
         final Message currentItem = messageList.get(position);
+        Log.d(TAG, "onBindViewHolder: " + messageList.get(position).toString());
 
         String currentUserId = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
 
@@ -80,11 +81,12 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
 
             holder.readStatus.setVisibility(View.VISIBLE);
             if (currentItem.getRead() != null && currentItem.getRead()) {
-                holder.readStatus.setImageResource(R.drawable.ic_pngwave);
-                holder.readStatus.setColorFilter(R.color.grey);
+                Log.d(TAG, "onBindViewHolder: is read");
+                holder.readStatus.setImageResource(R.drawable.ic_message_read_status);
             } else if (currentItem.getRead() != null && !currentItem.getRead()) {
-                ImageView imageView = new ImageView(holder.readStatus.getContext());
-                holder.readStatus.setColorFilter(imageView.getColorFilter());
+                holder.readStatus.setImageResource(R.drawable.ic_pngwave);
+            } else if (currentItem.getRead() == null) {
+                holder.readStatus.setImageResource(R.drawable.ic_check_black_24dp);
             }
 
             //Set params for message sent
@@ -136,7 +138,6 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
             if (currentItem.getTimestamp() != null && !currentItem.getTimestamp().toString().equals("")) {
                 DateFormat smallDateFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
                 String timeString = smallDateFormat.format(date);
-                Log.d(TAG, "onBindViewHolder: TIME AGO" + timeAgo);
                 if (timeAgo != null) {
                     if (timeAgo.equals("just now") || timeAgo.equals("a minute ago") || timeAgo.contains("hours ago") || timeAgo.equals("an hour ago")) {
                         holder.tvMessageTimeStamp.setText(getTimeAgo(time));

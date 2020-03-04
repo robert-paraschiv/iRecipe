@@ -112,10 +112,17 @@ public class DirectReplyReceiver extends BroadcastReceiver {
 
                                                     NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
                                                     if (notificationManager != null) {
+                                                        Person person = new Person.Builder().setName("Me").build();
+                                                        NotificationCompat.MessagingStyle messagingStyle = new NotificationCompat.MessagingStyle(person);
+                                                        messagingStyle.setConversationTitle("Chat");
+                                                        NotificationCompat.MessagingStyle.Message message =
+                                                                new NotificationCompat.MessagingStyle.Message(text, System.currentTimeMillis(), person);
+                                                        messagingStyle.addMessage(message);
                                                         // Build a new notification, which informs the user that the system
                                                         // handled their interaction with the previous notification.
                                                         Notification repliedNotification = new NotificationCompat.Builder(context, App.CHANNEL_MESSAGES)
                                                                 .setSmallIcon(R.mipmap.ic_launcher_foreground)
+                                                                .setStyle(messagingStyle)
                                                                 .setContentText(text)
                                                                 .setColor(Color.BLUE)
                                                                 .setAutoCancel(true)

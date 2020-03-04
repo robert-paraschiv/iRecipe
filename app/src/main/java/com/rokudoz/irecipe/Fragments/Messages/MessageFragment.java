@@ -125,6 +125,8 @@ public class MessageFragment extends Fragment {
         // Inflate the layout for this fragment
         view = inflater.inflate(R.layout.fragment_message, container, false);
 
+        gotMessagesFirstTime = false;
+
         friendImage = view.findViewById(R.id.message_friendImage_ImageView);
         friendOnlineStatus = view.findViewById(R.id.fragment_message_onlineStatus);
         friendName = view.findViewById(R.id.message_friendName_TextView);
@@ -217,7 +219,7 @@ public class MessageFragment extends Fragment {
     };
 
     private void sendNotification(final Intent intent, final String friend_id) {
-        int  notificationID = 0;
+        int notificationID = 0;
         char[] chars = friend_id.toCharArray();
         for (Character c : chars) {
             notificationID += c - 'a' + 1;
@@ -295,6 +297,9 @@ public class MessageFragment extends Fragment {
 
 
     private void getMessages() {
+        messageList.clear();
+        messagesDocumentSnapshots.clear();
+        gotMessagesFirstTime = false;
         usersReference.document(currentUserId).collection("Conversations").document(friendUserId)
                 .collection(friendUserId).orderBy("timestamp", Query.Direction.DESCENDING).limit(15).addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
