@@ -40,27 +40,28 @@ public class App extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        FirebaseApp.initializeApp(this);
-        database = FirebaseDatabase.getInstance();
-        database.setPersistenceEnabled(true);
-        userRef = database.getReference("Users").child(FirebaseAuth.getInstance().getCurrentUser().getUid());
         createNotificationChannels();
         applyNightModeFromPrefs();
+        if (FirebaseAuth.getInstance().getCurrentUser() != null) {
+            FirebaseApp.initializeApp(this);
+            database = FirebaseDatabase.getInstance();
+            database.setPersistenceEnabled(true);
+            userRef = database.getReference("Users").child(FirebaseAuth.getInstance().getCurrentUser().getUid());
 
-
-        userRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if (dataSnapshot != null){
-                    userRef.child("online").onDisconnect().setValue(false);
+            userRef.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    if (dataSnapshot != null) {
+                        userRef.child("online").onDisconnect().setValue(false);
+                    }
                 }
-            }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
 
-            }
-        });
+                }
+            });
+        }
     }
 
     private void applyNightModeFromPrefs() {

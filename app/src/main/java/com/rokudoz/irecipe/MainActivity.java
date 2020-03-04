@@ -60,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
 
     //Firebase RealTime db
     FirebaseDatabase database = FirebaseDatabase.getInstance();
-    DatabaseReference usersRef = database.getReference("Users").child(FirebaseAuth.getInstance().getCurrentUser().getUid());
+    DatabaseReference usersRef;
 
     //Firebase
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -85,15 +85,18 @@ public class MainActivity extends AppCompatActivity {
         LocalBroadcastManager.getInstance(this).registerReceiver((mMessageReceiver),
                 new IntentFilter("MessageNotification")
         );
-        if (FirebaseAuth.getInstance().getCurrentUser() != null)
+        if (FirebaseAuth.getInstance().getCurrentUser() != null) {
+            usersRef = database.getReference("Users").child(FirebaseAuth.getInstance().getCurrentUser().getUid());
             usersRef.child("online").setValue(true);
+        }
     }
 
     @Override
     protected void onStop() {
         super.onStop();
         LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReceiver);
-        usersRef.child("online").setValue(false);
+        if (FirebaseAuth.getInstance().getCurrentUser() != null)
+            usersRef.child("online").setValue(false);
     }
 
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
