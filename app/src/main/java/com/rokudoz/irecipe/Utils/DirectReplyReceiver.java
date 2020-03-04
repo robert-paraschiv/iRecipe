@@ -63,8 +63,9 @@ public class DirectReplyReceiver extends BroadcastReceiver {
                 } else if (comingFrom.equals("MainActivity")) {
                     friend_id = intent.getStringExtra("friend_id_mainActivity");
                 }
-                Log.d(TAG, "onReceive: friend id " + friend_id + "coming from " + comingFrom);
+                final int mNotificationId = intent.getIntExtra("notification_id", 0);
 
+                Log.d(TAG, "onReceive: friend id " + friend_id + "coming from " + comingFrom + " notification id "+ mNotificationId);
 
                 if (!text.trim().equals(""))
                     usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).addSnapshotListener(new EventListener<DocumentSnapshot>() {
@@ -110,21 +111,32 @@ public class DirectReplyReceiver extends BroadcastReceiver {
                                                     Log.d(TAG, "onSuccess: added message");
 
                                                     NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-                                                    notificationManager.cancel(1);
+                                                    if (notificationManager != null) {
+                                                        // Build a new notification, which informs the user that the system
+                                                        // handled their interaction with the previous notification.
+                                                        Notification repliedNotification = new NotificationCompat.Builder(context, App.CHANNEL_MESSAGES)
+                                                                .setSmallIcon(R.mipmap.ic_launcher_foreground)
+                                                                .setContentText(text)
+                                                                .setColor(Color.BLUE)
+                                                                .setAutoCancel(true)
+                                                                .setTimeoutAfter(100)
+                                                                .build();
+
+                                                        // Issue the new notification.
+                                                        notificationManager.notify(mNotificationId, repliedNotification);
+                                                    }
                                                 }
                                             });
                                         }
                                     }
                                 });
-
                             }
                         }
                     });
 
-            }else {
+            } else {
                 Log.d(TAG, "onReceive: NO COMING FROM  " + intent.getExtras().toString());
             }
-
 
         }
     }

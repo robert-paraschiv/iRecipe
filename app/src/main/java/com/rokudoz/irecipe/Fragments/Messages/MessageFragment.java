@@ -12,6 +12,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.graphics.drawable.Icon;
 import android.os.Build;
 import android.os.Bundle;
@@ -37,6 +38,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -168,7 +170,7 @@ public class MessageFragment extends Fragment {
                         friendOnlineStatus.setText("Offline");
                     }
                     Log.d(TAG, "onDataChange: online= " + online);
-                }else {
+                } else {
                     friendOnlineStatus.setText("Offline");
                 }
             }
@@ -214,7 +216,9 @@ public class MessageFragment extends Fragment {
         }
     };
 
-    private void sendNotification(Intent intent, String friend_id) {
+    private void sendNotification(final Intent intent, final String friend_id) {
+
+        int mNotificationId = (int) System.currentTimeMillis();
         String click_action = intent.getStringExtra("click_action");
         String messageBody = intent.getStringExtra("messageBody");
         String messageTitle = intent.getStringExtra("messageTitle");
@@ -224,7 +228,8 @@ public class MessageFragment extends Fragment {
         Intent replyIntent = new Intent(getContext(), DirectReplyReceiver.class);
         replyIntent.putExtra("friend_id_messageFragment", friend_id);
         replyIntent.putExtra("coming_from", "MessageFragment");
-        PendingIntent replyPendingIntent = PendingIntent.getBroadcast(getContext(), 0, replyIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        replyIntent.putExtra("notification_id", mNotificationId);
+        PendingIntent replyPendingIntent = PendingIntent.getBroadcast(getContext(), mNotificationId, replyIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         NotificationCompat.Action replyAction = new NotificationCompat.Action.Builder(
                 R.drawable.ic_send_black_24dp,
@@ -252,14 +257,13 @@ public class MessageFragment extends Fragment {
         Intent resultIntent = new Intent(click_action);
         resultIntent.putExtra("friend_id", friend_id);
         resultIntent.putExtra("coming_from", "MessageFragment");
-        PendingIntent resultPendingIntent = PendingIntent.getActivity(getContext(), 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        resultIntent.putExtra("notification_id", mNotificationId);
+        PendingIntent resultPendingIntent = PendingIntent.getActivity(getContext(), mNotificationId, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         builder.setContentIntent(resultPendingIntent);
 
 
-        int mNotificationId = (int) System.currentTimeMillis();
-
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(getContext());
-        notificationManager.notify(1, builder.build());
+        notificationManager.notify(mNotificationId, builder.build());
     }
 
     private void buildRecyclerView() {

@@ -96,6 +96,7 @@ public class MainActivity extends AppCompatActivity {
         String click_action = intents.getStringExtra("click_action");
         String messageBody = intents.getStringExtra("messageBody");
         String messageTitle = intents.getStringExtra("messageTitle");
+        int mNotificationId = (int) System.currentTimeMillis();
         Log.d(TAG, "onReceive: " + friend_id);
         androidx.core.app.RemoteInput remoteInput = new androidx.core.app.RemoteInput.Builder("key_text_reply")
                 .setLabel("Send message").build();
@@ -103,7 +104,8 @@ public class MainActivity extends AppCompatActivity {
         Intent replyIntent = new Intent(this, DirectReplyReceiver.class);
         replyIntent.putExtra("coming_from", "MainActivity");
         replyIntent.putExtra("friend_id_mainActivity", friend_id);
-        PendingIntent replyPendingIntent = PendingIntent.getBroadcast(this, 0, replyIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        replyIntent.putExtra("notification_id", mNotificationId);
+        PendingIntent replyPendingIntent = PendingIntent.getBroadcast(this, mNotificationId, replyIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         NotificationCompat.Action replyAction = new NotificationCompat.Action.Builder(
                 R.drawable.ic_send_black_24dp,
@@ -131,14 +133,13 @@ public class MainActivity extends AppCompatActivity {
         Intent resultIntent = new Intent(click_action);
         resultIntent.putExtra("friend_id", friend_id);
         resultIntent.putExtra("coming_from", "MainActivity");
-        PendingIntent resultPendingIntent = PendingIntent.getActivity(this, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        resultIntent.putExtra("notification_id", mNotificationId);
+        PendingIntent resultPendingIntent = PendingIntent.getActivity(this, mNotificationId, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         builder.setContentIntent(resultPendingIntent);
 
 
-        int mNotificationId = (int) System.currentTimeMillis();
-
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
-        notificationManager.notify(1, builder.build());
+        notificationManager.notify(mNotificationId, builder.build());
     }
 
 

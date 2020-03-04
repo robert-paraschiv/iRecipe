@@ -113,7 +113,8 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
                     Intent replyIntent = new Intent(this, DirectReplyReceiver.class);
                     replyIntent.putExtra("friend_id_messageFragment", friend_id);
                     replyIntent.putExtra("coming_from", "MessageFragment");
-                    PendingIntent replyPendingIntent = PendingIntent.getBroadcast(this, 0, replyIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+                    replyIntent.putExtra("notification_id", mNotificationId);
+                    PendingIntent replyPendingIntent = PendingIntent.getBroadcast(this, mNotificationId, replyIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
                     NotificationCompat.Action replyAction = new NotificationCompat.Action.Builder(
                             R.drawable.ic_send_black_24dp,
@@ -141,11 +142,12 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
                     Intent resultIntent2 = new Intent(click_action);
                     resultIntent2.putExtra("friend_id", friend_id);
                     resultIntent2.putExtra("coming_from", "MessageFragment");
-                    PendingIntent resultPendingIntent2 = PendingIntent.getActivity(this, 0, resultIntent2, PendingIntent.FLAG_UPDATE_CURRENT);
+                    resultIntent2.putExtra("notification_id", mNotificationId);
+                    PendingIntent resultPendingIntent2 = PendingIntent.getActivity(this, mNotificationId, resultIntent2, PendingIntent.FLAG_UPDATE_CURRENT);
                     builder2.setContentIntent(resultPendingIntent2);
 
                     NotificationManagerCompat notificationManager2 = NotificationManagerCompat.from(this);
-                    notificationManager2.notify(1, builder2.build());
+                    notificationManager2.notify(mNotificationId, builder2.build());
                 }
             }
 

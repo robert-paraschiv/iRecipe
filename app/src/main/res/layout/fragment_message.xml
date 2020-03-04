@@ -42,7 +42,7 @@
                     tools:text="Friend name" />
 
                 <TextView
-                    style="@style/TextAppearance.MaterialComponents.Caption"
+                    android:textSize="12sp"
                     android:id="@+id/fragment_message_onlineStatus"
                     android:layout_marginStart="18dp"
                     android:layout_width="wrap_content"
