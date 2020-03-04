@@ -1,6 +1,7 @@
 package com.rokudoz.irecipe.Utils.Adapters;
 
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -94,7 +95,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
             params.addRule(RelativeLayout.ALIGN_PARENT_END);
             holder.materialCardView.setLayoutParams(params);
             holder.materialCardView.setCardBackgroundColor(ContextCompat.getColor(context, R.color.colorPrimary));
-
+            holder.tvMessageText.setTextColor(holder.tvMessageText.getResources().getColor(R.color.black));
 
         } else if (currentItem.getType() != null && currentItem.getType().equals("message_received")) {
             holder.readStatus.setVisibility(View.GONE);
@@ -124,8 +125,8 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
             RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
             params.addRule(RelativeLayout.ALIGN_PARENT_START);
             holder.materialCardView.setLayoutParams(params);
-            MaterialCardView materialCardView = new MaterialCardView(holder.materialCardView.getContext());
-            holder.materialCardView.setCardBackgroundColor(materialCardView.getCardBackgroundColor());
+            holder.materialCardView.setCardBackgroundColor(holder.materialCardView.getResources().getColor(R.color.color_message_friend_background));
+            holder.tvMessageText.setTextColor(holder.tvMessageText.getResources().getColor(R.color.color_message_friend_text));
         }
 
         if (currentItem.getText() != null)

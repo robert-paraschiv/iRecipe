@@ -9,6 +9,7 @@
         android:layout_height="match_parent"
         >
         <com.google.android.material.appbar.MaterialToolbar
+            android:elevation="4dp"
             android:background="@color/toolbar_color"
             android:layout_width="match_parent"
             android:layout_height="40dp"
