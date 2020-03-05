@@ -64,6 +64,7 @@ public class ShoppingListFragment extends Fragment {
     private FloatingActionButton addIngredientToListFab;
     private LinearLayout ingredientsCheckBoxLinearLayout;
 
+
     private String userDocumentID = "";
     private List<Ingredient> shoppingListIngredients = new ArrayList<>();
     private List<Ingredient> userIngredientList = new ArrayList<>();
@@ -215,21 +216,31 @@ public class ShoppingListFragment extends Fragment {
                 addIngredientToListFab.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-
+                        String[] ingredientQuantitySpinnerItems = getResources().getStringArray(R.array.ingredient_quantity_type);
                         final LinearLayout linearLayout = new LinearLayout(getActivity());
                         linearLayout.setOrientation(LinearLayout.VERTICAL);
                         final EditText input = new EditText(getActivity());
-                        final Spinner spinner = new Spinner(getActivity());
+                        input.setHint("Ingredient name");
+                        final EditText inputQuantity = new EditText(getActivity());
+                        inputQuantity.setHint("Quantity");
+                        final Spinner categorySpinner = new Spinner(getActivity());
+                        final Spinner quantityTypeSpinner = new Spinner(getActivity());
 
                         //create an adapter to describe how the items are displayed, adapters are used in several places in android.
                         //There are multiple variations of this, but this is the basic variant.
                         ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_dropdown_item, categories);
+                        ArrayAdapter<String> quantityAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_dropdown_item, ingredientQuantitySpinnerItems);
                         //set the spinners adapter to the previously created one.
-                        spinner.setAdapter(adapter);
+                        categorySpinner.setAdapter(adapter);
+                        quantityTypeSpinner.setAdapter(quantityAdapter);
                         input.setInputType(InputType.TYPE_TEXT_FLAG_CAP_WORDS);
+                        inputQuantity.setInputType(InputType.TYPE_CLASS_NUMBER);
                         MaterialAlertDialogBuilder materialAlertDialogBuilder = new MaterialAlertDialogBuilder(getActivity(), R.style.ThemeOverlay_MaterialComponents_MaterialAlertDialog_Centered);
+
                         linearLayout.addView(input);
-                        linearLayout.addView(spinner);
+                        linearLayout.addView(categorySpinner);
+                        linearLayout.addView(inputQuantity);
+                        linearLayout.addView(quantityTypeSpinner);
                         materialAlertDialogBuilder.setView(linearLayout);
                         materialAlertDialogBuilder.setMessage("Add ingredient to shopping list");
                         materialAlertDialogBuilder.setCancelable(true);
@@ -238,7 +249,9 @@ public class ShoppingListFragment extends Fragment {
                                 new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int id) {
                                         //
-                                        Ingredient ingredient = new Ingredient(input.getText().toString(), spinner.getSelectedItem().toString(), 0f, "g", false);
+                                        int quantity = Integer.parseInt(inputQuantity.getText().toString());
+                                        Ingredient ingredient = new Ingredient(input.getText().toString(), categorySpinner.getSelectedItem().toString(),
+                                                (float) quantity, quantityTypeSpinner.getSelectedItem().toString(), false);
 
                                         if (input.getText().toString().trim().equals("")) {
                                             Toast.makeText(getActivity(), "You need to write the name of what you want to add to the shopping list", Toast.LENGTH_SHORT).show();
@@ -309,6 +322,10 @@ public class ShoppingListFragment extends Fragment {
     private void addIngredientCheckBox(final Ingredient ingredient, LinearLayout linearLayout) {
         if (getActivity() != null) {
 
+            final LinearLayout localLinearLayout = new LinearLayout(getActivity());
+            localLinearLayout.setOrientation(LinearLayout.HORIZONTAL);
+//            localLinearLayout.setLayoutParams(params);
+
             final MaterialCheckBox materialCheckBox = new MaterialCheckBox(getActivity());
             materialCheckBox.setText(ingredient.getName());
             materialCheckBox.setChecked(ingredient.getOwned());
@@ -338,7 +355,14 @@ public class ShoppingListFragment extends Fragment {
                     }
                 }
             });
-            linearLayout.addView(materialCheckBox);
+            TextView textView = new TextView(getContext());
+            textView.setPadding(8, 1, 0, 0);
+            textView.setText(String.format("%s %s", ingredient.getQuantity(), ingredient.getQuantity_type()));
+            localLinearLayout.addView(materialCheckBox);
+            localLinearLayout.addView(textView);
+
+            linearLayout.addView(localLinearLayout);
+
             ingredientCheckBoxList.add(materialCheckBox);
         }
     }

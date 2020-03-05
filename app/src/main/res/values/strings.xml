@@ -23,6 +23,13 @@
         <item>Medium</item>
         <item>Hard</item>
     </string-array>
+    <string-array name="ingredient_quantity_type">
+        <item>g</item>
+        <item>kg</item>
+        <item>ml</item>
+        <item>l</item>
+        <item>pieces</item>
+    </string-array>
     <!--    <string name="admob_app_id">ca-app-pub-3940256099942544~3347511713</string>-->
     <!--    <string name="admob_unit_id">ca-app-pub-3940256099942544/2247696110</string>-->
 

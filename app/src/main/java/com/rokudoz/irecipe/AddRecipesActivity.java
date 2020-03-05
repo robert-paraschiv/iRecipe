@@ -67,7 +67,6 @@ public class AddRecipesActivity extends AppCompatActivity {
 
     private static final String TAG = "AddRecipesActivity";
 
-    private String[] ingredientSpinnerItems = {"g", "kg", "pieces"};
 
     //FireBase refs
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -565,6 +564,7 @@ public class AddRecipesActivity extends AppCompatActivity {
         final Spinner spinner = new Spinner(this);
 
         linearLayout.addView(spinner);
+        String[] ingredientSpinnerItems = getResources().getStringArray(R.array.ingredient_quantity_type);
         setUpIngredientQuantitySpinner(spinner, ingredientSpinnerItems);
         ingredientQuantityTypeSpinnerList.add(spinner);
 
