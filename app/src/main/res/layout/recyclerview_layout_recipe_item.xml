@@ -9,138 +9,152 @@
     app:cardCornerRadius="18dp">
 
     <RelativeLayout
+        android:layout_margin="4dp"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="4dp">
+        android:padding="8dp">
 
         <RelativeLayout
-            android:id="@+id/relLayout"
+            android:id="@+id/recipe_image_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            >
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/recycler_view_recipeItem_Image_CardView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="18dp">
+
+                <ImageView
+                    android:id="@+id/recipeItem_image"
+                    android:layout_width="170dp"
+                    android:layout_height="150dp"
+                    tools:src="@color/colorPrimary" />
+            </com.google.android.material.card.MaterialCardView>
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_marginStart="4dp"
+            android:id="@+id/relLayoutPic_Title"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@id/recipe_image_layout">
 
             <TextView
                 android:id="@+id/text_view_title"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_alignParentStart="true"
-                android:layout_marginEnd="4dp"
                 android:layout_marginStart="8dp"
                 android:maxLines="1"
-                tools:text="Title"
-                android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6" />
+                android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
+                tools:text="Title" />
 
-
-        </RelativeLayout>
-
-
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/recycler_view_recipeItem_Image_CardView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/relLayout"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="4dp"
-            app:cardCornerRadius="18dp">
-
-            <ImageView
-                android:id="@+id/recipeItem_image"
-                android:layout_width="match_parent"
-                android:layout_height="440dp"
-                tools:src="@color/colorPrimary" />
-        </com.google.android.material.card.MaterialCardView>
-
-        <TextView
-            android:id="@+id/recyclerview_nrOfFaves_textView"
-            style="@style/TextAppearance.MaterialComponents.Chip"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/recycler_view_recipeItem_Image_CardView"
-            android:layout_marginTop="14dp"
-            android:layout_marginEnd="4dp"
-            android:layout_toEndOf="@id/recyclerview_favorite"
-            tools:text="88" />
-
-        <ImageView
-            android:id="@+id/recyclerview_favorite"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:layout_below="@id/recycler_view_recipeItem_Image_CardView"
-            android:layout_alignParentStart="true"
-            android:layout_marginStart="4dp"
-            android:layout_marginTop="12dp"
-            android:layout_marginEnd="8dp"
-            android:contentDescription="Recipe Image"
-            android:elevation="4dp"
-            android:src="@drawable/ic_favorite_border_black_24dp" />
-
-        <RelativeLayout
-            android:id="@+id/creatorLayout"
-            android:layout_below="@id/recycler_view_recipeItem_Image_CardView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="12dp">
-
-            <de.hdodenhof.circleimageview.CircleImageView
-                android:id="@+id/recipeItem_creator_image"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                tools:src="@color/colorPrimaryDark" />
-
-            <TextView
-                android:id="@+id/recipeItem_creator_name_textView"
-                style="@style/TextAppearance.MaterialComponents.Caption"
+            <RelativeLayout
+                android:id="@+id/creatorLayout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_marginStart="4dp"
-                android:layout_toEndOf="@id/recipeItem_creator_image"
-                tools:text="Creator Name" />
+                android:layout_below="@id/text_view_title"
+                android:layout_marginStart="8dp">
+
+                <TextView
+                    android:id="@+id/recycler_view_recipeItem_by_tv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentStart="true"
+                    android:layout_marginStart="2dp"
+                    android:layout_marginEnd="8dp"
+                    android:text="by" />
+
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:visibility="gone"
+                    android:id="@+id/recipeItem_creator_image"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_marginStart="4dp"
+                    android:layout_alignParentEnd="true"
+                    tools:src="@color/colorPrimaryDark" />
+
+                <TextView
+                    android:id="@+id/recipeItem_creator_name_textView"
+                    style="@style/TextAppearance.MaterialComponents.Caption"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_toEndOf="@id/recycler_view_recipeItem_by_tv"
+                    tools:text="Creator Name" />
+            </RelativeLayout>
+
+            <TextView
+                android:maxLines="3"
+                android:id="@+id/text_view_description"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/creatorLayout"
+                android:layout_alignParentEnd="true"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="4dp"
+                tools:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris sit amet sapien dignissim, volutpat lacus luctus, condimentum lacus." />
+
+            <RelativeLayout
+                android:id="@+id/relLayoutLikeComm"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="110dp">
+
+                <ImageView
+                    android:id="@+id/recyclerview_favorite"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="12dp"
+                    android:layout_marginEnd="8dp"
+                    android:contentDescription="Recipe Image"
+                    android:elevation="4dp"
+                    android:src="@drawable/ic_favorite_border_black_24dp" />
+
+                <TextView
+                    android:id="@+id/recyclerview_nrOfFaves_textView"
+                    style="@style/TextAppearance.MaterialComponents.Chip"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    android:layout_marginEnd="4dp"
+                    android:layout_toEndOf="@id/recyclerview_favorite"
+                    tools:text="88" />
+
+                <ImageView
+                    android:id="@+id/recipeItem_comment"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_marginStart="12dp"
+                    android:layout_marginTop="12dp"
+                    android:layout_marginEnd="4dp"
+                    android:layout_toEndOf="@id/recyclerview_nrOfFaves_textView"
+                    android:contentDescription="Post Comment"
+                    android:src="@drawable/ic_baseline_chat_bubble_outline_24" />
+
+                <TextView
+                    android:id="@+id/recycler_view_recipeItem_nrOfComments_textView"
+                    style="@style/TextAppearance.MaterialComponents.Chip"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_toEndOf="@id/recipeItem_comment"
+                    tools:text="88" />
+            </RelativeLayout>
+
         </RelativeLayout>
 
-
-
-
-        <TextView
-            android:id="@+id/recycler_view_recipeItem_nrOfComments_textView"
-            style="@style/TextAppearance.MaterialComponents.Chip"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/recycler_view_recipeItem_Image_CardView"
-            android:layout_marginTop="14dp"
-            android:layout_marginEnd="8dp"
-            android:layout_toStartOf="@id/recipeItem_comment"
-            tools:text="88" />
-
-        <ImageView
-            android:id="@+id/recipeItem_comment"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:layout_below="@id/recycler_view_recipeItem_Image_CardView"
-            android:layout_alignParentEnd="true"
-            android:layout_marginTop="12dp"
-            android:layout_marginEnd="4dp"
-            android:contentDescription="Post Comment"
-            android:src="@drawable/ic_baseline_chat_bubble_outline_24" />
-
-
-        <TextView
-            android:id="@+id/text_view_description"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/recyclerview_favorite"
-            android:layout_alignParentStart="true"
-            android:layout_marginStart="12dp"
-            android:layout_marginEnd="8dp"
-            android:text="Description" />
 
         <TextView
             android:id="@+id/recycler_view_recipeItem_missingIngredients"
             style="@style/TextAppearance.MaterialComponents.Caption"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/text_view_description"
+            android:layout_below="@id/relLayoutPic_Title"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="4dp"
             android:textStyle="bold"

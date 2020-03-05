@@ -55,7 +55,6 @@ public class profileMyIngredientsFragment extends Fragment {
 
     private View view;
     private ProgressBar progressBar;
-    private FloatingActionButton fab;
 
     private String userDocId;
     private List<Ingredient> userIngredientList;
@@ -96,29 +95,28 @@ public class profileMyIngredientsFragment extends Fragment {
             Log.e(TAG, "onCreateView: ", e);
         }
 
-        fab = view.findViewById(R.id.profileFragmentMyIngredients_addIngredientBtn);
         ingredientsRecyclerView = view.findViewById(R.id.profileMyIngredientsFragment_recycler_view);
         progressBar = view.findViewById(R.id.profileMyIngredientsFragment_pbLoading);
         userIngredientList = new ArrayList<>();
 
-        ingredientsRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                super.onScrolled(recyclerView, dx, dy);
-
-                if (dy > 0) {
-                    // Scroll Down
-                    if (fab.isShown()) {
-                        fab.hide();
-                    }
-                } else if (dy < 0) {
-                    // Scroll Up
-                    if (!fab.isShown()) {
-                        fab.show();
-                    }
-                }
-            }
-        });
+//        ingredientsRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+//            @Override
+//            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+//                super.onScrolled(recyclerView, dx, dy);
+//
+//                if (dy > 0) {
+//                    // Scroll Down
+//                    if (fab.isShown()) {
+//                        fab.hide();
+//                    }
+//                } else if (dy < 0) {
+//                    // Scroll Up
+//                    if (!fab.isShown()) {
+//                        fab.show();
+//                    }
+//                }
+//            }
+//        });
 
 
         buildRecyclerView();
@@ -162,6 +160,7 @@ public class profileMyIngredientsFragment extends Fragment {
                         if (e == null) {
                             User user = Objects.requireNonNull(documentSnapshot).toObject(User.class);
                             userDocId = Objects.requireNonNull(user).getUser_id();
+                            //Get categories list
                             ingredientsReference.document("ingredient_categories").addSnapshotListener(new EventListener<DocumentSnapshot>() {
                                 @Override
                                 public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
@@ -228,72 +227,6 @@ public class profileMyIngredientsFragment extends Fragment {
 
                             }
                             ingredientsAdapter.notifyDataSetChanged();
-
-
-                            //Button to add ingredient manually
-                            fab.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View view) {
-                                    final LinearLayout linearLayout = new LinearLayout(getActivity());
-                                    linearLayout.setOrientation(LinearLayout.VERTICAL);
-                                    final EditText input = new EditText(getActivity());
-                                    final Spinner spinner = new Spinner(getActivity());
-                                    //create an adapter to describe how the items are displayed, adapters are used in several places in android.
-                                    //There are multiple variations of this, but this is the basic variant.
-                                    ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_dropdown_item, categories);
-                                    //set the spinners adapter to the previously created one.
-                                    spinner.setAdapter(adapter);
-                                    input.setInputType(InputType.TYPE_TEXT_FLAG_CAP_WORDS);
-                                    MaterialAlertDialogBuilder materialAlertDialogBuilder = new MaterialAlertDialogBuilder(getActivity(), R.style.ThemeOverlay_MaterialComponents_MaterialAlertDialog_Centered);
-                                    linearLayout.addView(input);
-                                    linearLayout.addView(spinner);
-                                    materialAlertDialogBuilder.setView(linearLayout);
-                                    materialAlertDialogBuilder.setMessage("Add ingredient to list");
-                                    materialAlertDialogBuilder.setCancelable(true);
-                                    materialAlertDialogBuilder.setPositiveButton(
-                                            "Confirm",
-                                            new DialogInterface.OnClickListener() {
-                                                public void onClick(DialogInterface dialog, int id) {
-                                                    //
-                                                    Ingredient ingredient = new Ingredient(input.getText().toString(), spinner.getSelectedItem().toString(), 0f, "g", true);
-
-                                                    if (input.getText().toString().trim().equals("")) {
-                                                        Toast.makeText(getActivity(), "You need to write the name of what you want to add to the list", Toast.LENGTH_SHORT).show();
-                                                    } else {
-                                                        if (userIngredientList.contains(ingredient)) {
-                                                            Toast.makeText(getActivity(), "" + input.getText().toString() + " is already in your list", Toast.LENGTH_SHORT).show();
-                                                        } else if (allIngredientsList.contains(ingredient) && !allIngredientsList.get(allIngredientsList.indexOf(ingredient)).getOwned()) {
-                                                            ingredient.setDocumentId(allIngredientsList.get(allIngredientsList.indexOf(ingredient)).getDocumentId());
-                                                            usersReference.document(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid()).collection("Ingredients")
-                                                                    .document(ingredient.getDocumentId()).set(ingredient);
-                                                        } else {
-                                                            usersReference.document(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid()).collection("Ingredients")
-                                                                    .add(ingredient).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                                                                @Override
-                                                                public void onSuccess(DocumentReference documentReference) {
-                                                                    Log.d(TAG, "onSuccess: added to db");
-                                                                }
-                                                            });
-
-                                                        }
-                                                        dialog.cancel();
-                                                    }
-
-                                                }
-                                            });
-
-                                    materialAlertDialogBuilder.setNegativeButton(
-                                            "Cancel",
-                                            new DialogInterface.OnClickListener() {
-                                                public void onClick(DialogInterface dialog, int id) {
-                                                    dialog.cancel();
-                                                }
-                                            });
-
-                                    materialAlertDialogBuilder.show();
-
-                                }
-                            });
 
                         }
                     }

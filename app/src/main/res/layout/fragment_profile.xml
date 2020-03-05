@@ -171,4 +171,12 @@
         android:layout_marginTop="40dp" />
 
 
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/profileFragment_fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:src="@drawable/ic_fb_plus"
+        android:layout_margin="8dp"/>
+
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

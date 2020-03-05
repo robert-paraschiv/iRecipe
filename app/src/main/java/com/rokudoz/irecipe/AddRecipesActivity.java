@@ -15,7 +15,6 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.text.InputType;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -67,6 +66,8 @@ import java.util.List;
 public class AddRecipesActivity extends AppCompatActivity {
 
     private static final String TAG = "AddRecipesActivity";
+
+    private String[] ingredientSpinnerItems = {"g", "kg", "pieces"};
 
     //FireBase refs
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -562,9 +563,9 @@ public class AddRecipesActivity extends AppCompatActivity {
         ingredientQuantityEtList.add(editText2);
 
         final Spinner spinner = new Spinner(this);
-        String[] spinnerItems = {"g", "kg"};
+
         linearLayout.addView(spinner);
-        setUpIngredientQuantitySpinner(spinner, spinnerItems);
+        setUpIngredientQuantitySpinner(spinner, ingredientSpinnerItems);
         ingredientQuantityTypeSpinnerList.add(spinner);
 
         final MaterialButton button = new MaterialButton(this, null, R.attr.materialButtonOutlinedStyle);

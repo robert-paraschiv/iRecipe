@@ -7,11 +7,11 @@
 
 
     <com.google.android.material.appbar.MaterialToolbar
-        android:elevation="4dp"
         android:id="@+id/message_toolbar"
         android:layout_width="match_parent"
         android:layout_height="40dp"
-        android:background="@color/toolbar_color">
+        android:background="@color/toolbar_color"
+        android:elevation="4dp">
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -33,24 +33,24 @@
                     tools:src="@color/colorPrimaryDark" />
 
                 <TextView
-                    android:textColor="@color/color_message_friend_text"
                     android:id="@+id/message_friendName_TextView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
                     android:layout_marginStart="8dp"
+                    android:layout_marginTop="4dp"
                     android:layout_marginEnd="8dp"
                     android:layout_toEndOf="@id/message_friendImage_ImageView"
+                    android:textColor="@color/color_message_friend_text"
                     tools:text="Friend name" />
 
                 <TextView
-                    android:textSize="12sp"
                     android:id="@+id/fragment_message_onlineStatus"
-                    android:layout_marginStart="18dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_below="@id/message_friendName_TextView"
+                    android:layout_marginStart="18dp"
                     android:layout_toEndOf="@id/message_friendImage_ImageView"
+                    android:textSize="12sp"
                     tools:text="Online" />
             </RelativeLayout>
         </RelativeLayout>

@@ -8,6 +8,7 @@
         <item name="android:windowAnimationStyle">@style/CustomActivityAnimation</item>
         <item name="android:windowContentTransitions">true</item>
         <item name="colorSecondary">@color/colorSecondary</item>
+        <item name="android:navigationBarColor">@color/navigationColor</item>
 <!--        <item name="android:statusBarColor">@color/statusBarColor</item>-->
 <!--        <item name="android:windowLightStatusBar">true</item>-->
     </style>
@@ -18,4 +19,5 @@
         <item name="android:activityCloseEnterAnimation">@anim/fade_in</item>
         <item name="android:activityCloseExitAnimation">@anim/fade_out</item>
     </style>
+
 </resources>

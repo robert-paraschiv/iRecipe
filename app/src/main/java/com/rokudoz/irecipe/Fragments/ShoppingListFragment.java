@@ -160,9 +160,9 @@ public class ShoppingListFragment extends Fragment {
                 for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
                     Ingredient ingredient = documentSnapshot.toObject(Ingredient.class);
                     ingredient.setDocumentId(documentSnapshot.getId());
-                    if (userIngredientList.contains(ingredient) && userIngredientList.get(userIngredientList.indexOf(ingredient)).getOwned()) {
-                        ingredient.setOwned(true);
-                    }
+//                    if (userIngredientList.contains(ingredient) && userIngredientList.get(userIngredientList.indexOf(ingredient)).getOwned()) {
+//                        ingredient.setOwned(true);
+//                    }
                     if (!shoppingListIngredients.contains(ingredient)) {
                         shoppingListIngredients.add(ingredient);
                     }

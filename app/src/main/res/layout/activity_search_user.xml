@@ -14,6 +14,7 @@
         <SearchView
             android:searchIcon="@drawable/ic_search_black_24dp"
             android:searchHintIcon="@drawable/ic_search_black_24dp"
+            android:inputType="textCapWords"
             android:closeIcon="@drawable/ic_close"
             android:id="@+id/searchUser_SearchView"
             android:layout_height="?attr/actionBarSize"

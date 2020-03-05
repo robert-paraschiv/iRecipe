@@ -14,6 +14,7 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.Icon;
+import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.Bundle;
 
@@ -90,6 +91,9 @@ public class MessageFragment extends Fragment {
     FirebaseDatabase database = FirebaseDatabase.getInstance();
     DatabaseReference usersRef = database.getReference("Users");
 
+    //Sound for sent message
+    private MediaPlayer mediaPlayer;
+
     private ImageView friendImage;
     private TextView friendName, friendOnlineStatus;
     private TextInputEditText textInputEditText;
@@ -127,6 +131,7 @@ public class MessageFragment extends Fragment {
         view = inflater.inflate(R.layout.fragment_message, container, false);
 
         gotMessagesFirstTime = false;
+        mediaPlayer = MediaPlayer.create(getContext(), R.raw.insight);
 
         friendImage = view.findViewById(R.id.message_friendImage_ImageView);
         friendOnlineStatus = view.findViewById(R.id.fragment_message_onlineStatus);
@@ -333,28 +338,27 @@ public class MessageFragment extends Fragment {
                 for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
                     Message message = documentSnapshot.toObject(Message.class);
                     message.setDocumentId(documentSnapshot.getId());
-                    if (!messageList.contains(message)) {
+                    if (messageList.contains(message)) {
+                        messageList.set(messageList.indexOf(message), message);
+                        mAdapter.notifyDataSetChanged();
+//                        mAdapter.notifyItemChanged(messageList.indexOf(message));
+                    } else {
                         if (gotMessagesFirstTime) {
                             messageList.add(message);
-                            mAdapter.notifyItemInserted(messageList.size() - 1);
+                            mAdapter.notifyItemInserted(messageList.size()-1);
+                            mRecyclerView.smoothScrollToPosition(messageList.size() - 1);
                             messagesDocumentSnapshots.add(documentSnapshot);
                         } else {
                             messageList.add(0, message);
                             messagesDocumentSnapshots.add(0, documentSnapshot);
-                            mAdapter.notifyItemInserted(0);
+                            mAdapter.notifyDataSetChanged();
                         }
-                    } else {
-                        messageList.set(messageList.indexOf(message), message);
-                        mAdapter.notifyDataSetChanged();
-//                        mAdapter.notifyItemChanged(messageList.indexOf(message));
                     }
-
-                    mRecyclerView.scrollToPosition(messageList.size() - 1);
-
                     if (queryDocumentSnapshots.getDocuments().size() != 0) {
                         mLastQueriedDocument = messagesDocumentSnapshots.get(0);
                     }
                 }
+                mRecyclerView.smoothScrollToPosition(messageList.size() - 1);
                 gotMessagesFirstTime = true;
             }
         });
@@ -429,6 +433,7 @@ public class MessageFragment extends Fragment {
                 @Override
                 public void onSuccess(Void aVoid) {
                     Log.d(TAG, "onSuccess: added message");
+                    mediaPlayer.start();
                 }
             });
 

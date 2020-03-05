@@ -111,43 +111,47 @@ public class FeedFragment extends Fragment implements FeedAdapter.OnItemClickLis
             view = inflater.inflate(R.layout.fragment_feed, container, false);
         }
 
-        BottomNavigationView navBar = getActivity().findViewById(R.id.bottom_navigation);
-        navBar.setVisibility(View.VISIBLE);
-
-        mUser = new User();
-        pbLoading = view.findViewById(R.id.homeFragment_pbLoading);
-        fab = view.findViewById(R.id.fab_add_recipe);
-        mRecyclerView = view.findViewById(R.id.recycler_view);
-        MaterialButton messagesBtn = view.findViewById(R.id.feedFragment_messages_MaterialBtn);
-        MaterialButton searchUserBtn = view.findViewById(R.id.feedFragment_searchUser_MaterialBtn);
-        RelativeLayout messagesLayout = view.findViewById(R.id.feedFragment_messages_relativeLayout);
-        unreadMessagesTv = view.findViewById(R.id.feedFragment_messages_UnreadText);
-        messagesCardView = view.findViewById(R.id.feedFragment_messages_materialCard);
-
-        pbLoading.setVisibility(View.VISIBLE);
-
-        messagesLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Navigation.findNavController(view).navigate(FeedFragmentDirections.actionFeedFragmentToAllMessagesFragment());
+        if (FirebaseAuth.getInstance().getCurrentUser() != null) {
+            if (getActivity() != null) {
+                BottomNavigationView navBar = getActivity().findViewById(R.id.bottom_navigation);
+                navBar.setVisibility(View.VISIBLE);
             }
-        });
-        messagesBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Navigation.findNavController(view).navigate(FeedFragmentDirections.actionFeedFragmentToAllMessagesFragment());
-            }
-        });
-        searchUserBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                navigateToSearchUser();
-            }
-        });
 
-        fab.setVisibility(View.INVISIBLE);
-        loadNativeAds();
-        buildRecyclerView();
+            mUser = new User();
+            pbLoading = view.findViewById(R.id.homeFragment_pbLoading);
+            fab = view.findViewById(R.id.fab_add_recipe);
+            mRecyclerView = view.findViewById(R.id.recycler_view);
+            MaterialButton messagesBtn = view.findViewById(R.id.feedFragment_messages_MaterialBtn);
+            MaterialButton searchUserBtn = view.findViewById(R.id.feedFragment_searchUser_MaterialBtn);
+            RelativeLayout messagesLayout = view.findViewById(R.id.feedFragment_messages_relativeLayout);
+            unreadMessagesTv = view.findViewById(R.id.feedFragment_messages_UnreadText);
+            messagesCardView = view.findViewById(R.id.feedFragment_messages_materialCard);
+
+            pbLoading.setVisibility(View.VISIBLE);
+
+            messagesLayout.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Navigation.findNavController(view).navigate(FeedFragmentDirections.actionFeedFragmentToAllMessagesFragment());
+                }
+            });
+            messagesBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Navigation.findNavController(view).navigate(FeedFragmentDirections.actionFeedFragmentToAllMessagesFragment());
+                }
+            });
+            searchUserBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    navigateToSearchUser();
+                }
+            });
+
+            fab.setVisibility(View.INVISIBLE);
+            loadNativeAds();
+            buildRecyclerView();
+        }
         setupFirebaseAuth();
 
         return view; // HAS TO BE THE LAST ONE ---------------------------------
