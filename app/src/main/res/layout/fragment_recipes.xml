@@ -1,16 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    xmlns:tools="http://schemas.android.com/tools">
+    android:layout_height="match_parent">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/fragmentHomeAppBarLayout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        >
+        android:layout_height="wrap_content">
+
         <com.google.android.material.appbar.CollapsingToolbarLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -19,11 +18,12 @@
             app:expandedTitleGravity="top"
             app:expandedTitleMarginEnd="64dp"
             app:expandedTitleMarginStart="48dp"
-            app:layout_scrollFlags="scroll|exitUntilCollapsed|snap"
-            >
+            app:layout_scrollFlags="scroll|exitUntilCollapsed|snap">
+
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
+
                 <com.google.android.material.appbar.MaterialToolbar
                     android:id="@+id/toolbar"
                     android:layout_width="match_parent"
@@ -35,15 +35,15 @@
     </com.google.android.material.appbar.AppBarLayout>
 
 
-
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/homeFragment_TabLayout_MaterialCard"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/fragmentHomeAppBarLayout"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"
         android:layout_margin="4dp"
-        app:cardCornerRadius="18dp">
+        app:cardCornerRadius="18dp"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
         <com.google.android.material.appbar.AppBarLayout
             android:id="@+id/app_bar"
             android:layout_width="match_parent"
@@ -60,12 +60,12 @@
 
 
     <androidx.viewpager.widget.ViewPager
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"
         android:id="@+id/container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/homeFragment_TabLayout_MaterialCard"
-        android:layout_marginTop="40dp"/>
+        android:layout_marginTop="40dp"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab_add_recipe"
@@ -78,17 +78,17 @@
         app:elevation="4dp"
         app:fabCustomSize="50dp" />
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fab_add_ingredient"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|start"
-        android:layout_margin="16dp"
-        android:src="@drawable/ic_kitchen_black_24dp"
-        app:backgroundTint="@color/colorPrimary"
-        app:elevation="4dp"
-        app:fabCustomSize="50dp"
-        android:visibility="invisible"
-        tools:visibility="visible"/>
+    <!--    <com.google.android.material.floatingactionbutton.FloatingActionButton-->
+    <!--        android:id="@+id/fab_add_ingredient"-->
+    <!--        android:layout_width="wrap_content"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:layout_gravity="bottom|start"-->
+    <!--        android:layout_margin="16dp"-->
+    <!--        android:src="@drawable/ic_kitchen_black_24dp"-->
+    <!--        app:backgroundTint="@color/colorPrimary"-->
+    <!--        app:elevation="4dp"-->
+    <!--        app:fabCustomSize="50dp"-->
+    <!--        android:visibility="invisible"-->
+    <!--        tools:visibility="visible"/>-->
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

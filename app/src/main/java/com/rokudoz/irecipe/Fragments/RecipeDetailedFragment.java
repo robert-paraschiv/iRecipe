@@ -631,6 +631,7 @@ public class RecipeDetailedFragment extends Fragment implements RecipeInstructio
 
     private void getMissingRecipeIngredients() {
 
+        nrOfMissingIngredients = 0;
         final List<Ingredient> recipeIngredientsToAddToShoppingList = new ArrayList<>();
 
         for (Ingredient ing : recipeIngredientList) {

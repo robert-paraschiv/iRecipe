@@ -47,7 +47,7 @@ public class RecipesFragment extends Fragment {
             view = inflater.inflate(R.layout.fragment_recipes, container, false);
         }
         fab_addRecipes = view.findViewById(R.id.fab_add_recipe);
-        fab_addIngredient = view.findViewById(R.id.fab_add_ingredient);
+//        fab_addIngredient = view.findViewById(R.id.fab_add_ingredient);
 
 
         viewPager = view.findViewById(R.id.container);
@@ -63,16 +63,16 @@ public class RecipesFragment extends Fragment {
             }
         });
 
-        if (FirebaseAuth.getInstance().getCurrentUser().getEmail().equals("paraschivlongin@gmail.com")) {
-            fab_addIngredient.setVisibility(View.VISIBLE);
-            fab_addIngredient.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    navigateToAddIngredient();
-                }
-            });
-        } else
-            fab_addIngredient.setVisibility(View.GONE);
+//        if (FirebaseAuth.getInstance().getCurrentUser().getEmail().equals("paraschivlongin@gmail.com")) {
+//            fab_addIngredient.setVisibility(View.VISIBLE);
+//            fab_addIngredient.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View v) {
+//                    navigateToAddIngredient();
+//                }
+//            });
+//        } else
+//            fab_addIngredient.setVisibility(View.GONE);
 
 
         return view; // HAS TO BE THE LAST ONE ---------------------------------

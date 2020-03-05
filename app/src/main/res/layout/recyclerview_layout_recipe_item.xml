@@ -9,7 +9,6 @@
     app:cardCornerRadius="18dp">
 
     <RelativeLayout
-        android:layout_margin="4dp"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:padding="8dp">
@@ -17,8 +16,8 @@
         <RelativeLayout
             android:id="@+id/recipe_image_layout"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            >
+            android:layout_height="wrap_content">
+
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/recycler_view_recipeItem_Image_CardView"
                 android:layout_width="wrap_content"
@@ -27,17 +26,17 @@
 
                 <ImageView
                     android:id="@+id/recipeItem_image"
-                    android:layout_width="170dp"
+                    android:layout_width="150dp"
                     android:layout_height="150dp"
                     tools:src="@color/colorPrimary" />
             </com.google.android.material.card.MaterialCardView>
         </RelativeLayout>
 
         <RelativeLayout
-            android:layout_marginStart="4dp"
             android:id="@+id/relLayoutPic_Title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
             android:layout_toEndOf="@id/recipe_image_layout">
 
             <TextView
@@ -60,19 +59,19 @@
                     android:id="@+id/recycler_view_recipeItem_by_tv"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
                     android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true"
                     android:layout_marginStart="2dp"
                     android:layout_marginEnd="8dp"
                     android:text="by" />
 
                 <de.hdodenhof.circleimageview.CircleImageView
-                    android:visibility="gone"
                     android:id="@+id/recipeItem_creator_image"
                     android:layout_width="30dp"
                     android:layout_height="30dp"
-                    android:layout_marginStart="4dp"
                     android:layout_alignParentEnd="true"
+                    android:layout_marginStart="4dp"
+                    android:visibility="gone"
                     tools:src="@color/colorPrimaryDark" />
 
                 <TextView
@@ -86,7 +85,6 @@
             </RelativeLayout>
 
             <TextView
-                android:maxLines="3"
                 android:id="@+id/text_view_description"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -95,6 +93,7 @@
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="4dp"
+                android:maxLines="3"
                 tools:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris sit amet sapien dignissim, volutpat lacus luctus, condimentum lacus." />
 
             <RelativeLayout
@@ -105,8 +104,8 @@
 
                 <ImageView
                     android:id="@+id/recyclerview_favorite"
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
                     android:layout_marginStart="8dp"
                     android:layout_marginTop="12dp"
                     android:layout_marginEnd="8dp"
@@ -126,8 +125,8 @@
 
                 <ImageView
                     android:id="@+id/recipeItem_comment"
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
                     android:layout_marginStart="12dp"
                     android:layout_marginTop="12dp"
                     android:layout_marginEnd="4dp"
