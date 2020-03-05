@@ -87,7 +87,12 @@ public class MainActivity extends AppCompatActivity {
         );
         if (FirebaseAuth.getInstance().getCurrentUser() != null) {
             usersRef = database.getReference("Users").child(FirebaseAuth.getInstance().getCurrentUser().getUid());
-            usersRef.child("online").setValue(true);
+            usersRef.child("online").setValue(true).addOnSuccessListener(new OnSuccessListener<Void>() {
+                @Override
+                public void onSuccess(Void aVoid) {
+                    Log.d(TAG, "onSuccess: SET user online TRUE");
+                }
+            });
         }
     }
 
@@ -95,8 +100,15 @@ public class MainActivity extends AppCompatActivity {
     protected void onStop() {
         super.onStop();
         LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReceiver);
-        if (FirebaseAuth.getInstance().getCurrentUser() != null)
-            usersRef.child("online").setValue(false);
+        if (FirebaseAuth.getInstance().getCurrentUser() != null) {
+            usersRef = database.getReference("Users").child(FirebaseAuth.getInstance().getCurrentUser().getUid());
+            usersRef.child("online").setValue(false).addOnSuccessListener(new OnSuccessListener<Void>() {
+                @Override
+                public void onSuccess(Void aVoid) {
+                    Log.d(TAG, "onSuccess: SET user online FALSE");
+                }
+            });
+        }
     }
 
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
