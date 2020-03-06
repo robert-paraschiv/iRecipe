@@ -25,10 +25,12 @@ import com.rokudoz.irecipe.R;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.Random;
 
 
 public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageViewHolder> {
@@ -94,8 +96,8 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
             RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
             params.addRule(RelativeLayout.ALIGN_PARENT_END);
             holder.materialCardView.setLayoutParams(params);
-            holder.materialCardView.setCardBackgroundColor(ContextCompat.getColor(context, R.color.colorPrimary));
-            holder.tvMessageText.setTextColor(holder.tvMessageText.getResources().getColor(R.color.black));
+            holder.materialCardView.setCardBackgroundColor(ContextCompat.getColor(context, R.color.color_message_user_background));
+            holder.tvMessageText.setTextColor(ContextCompat.getColor(context, R.color.color_message_friend_text));
 
         } else if (currentItem.getType() != null && currentItem.getType().equals("message_received")) {
             holder.readStatus.setVisibility(View.GONE);
@@ -125,8 +127,8 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
             RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
             params.addRule(RelativeLayout.ALIGN_PARENT_START);
             holder.materialCardView.setLayoutParams(params);
-            holder.materialCardView.setCardBackgroundColor(holder.materialCardView.getResources().getColor(R.color.color_message_friend_background));
-            holder.tvMessageText.setTextColor(holder.tvMessageText.getResources().getColor(R.color.color_message_friend_text));
+            holder.materialCardView.setCardBackgroundColor(ContextCompat.getColor(context, R.color.color_message_friend_background));
+            holder.tvMessageText.setTextColor(ContextCompat.getColor(context, R.color.color_message_friend_text));
         }
 
         if (currentItem.getText() != null)

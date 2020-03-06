@@ -1,11 +1,7 @@
 package com.rokudoz.irecipe.Fragments.Messages;
 
 
-import android.app.Notification;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.app.RemoteInput;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -13,9 +9,7 @@ import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
-import android.graphics.drawable.Icon;
 import android.media.MediaPlayer;
-import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -29,6 +23,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.SimpleItemAnimator;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -41,11 +36,8 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.CustomTarget;
-import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.material.appbar.AppBarLayout;
-import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
@@ -56,30 +48,25 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.WriteBatch;
 import com.rokudoz.irecipe.App;
-import com.rokudoz.irecipe.MainActivity;
 import com.rokudoz.irecipe.Models.Conversation;
 import com.rokudoz.irecipe.Models.Message;
 import com.rokudoz.irecipe.Models.User;
 import com.rokudoz.irecipe.R;
-import com.rokudoz.irecipe.Utils.Adapters.ConversationAdapter;
 import com.rokudoz.irecipe.Utils.Adapters.MessageAdapter;
 import com.rokudoz.irecipe.Utils.DirectReplyReceiver;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.ExecutionException;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -237,7 +224,7 @@ public class MessageFragment extends Fragment {
                 if (documentSnapshot != null) {
                     User user = documentSnapshot.toObject(User.class);
                     if (user != null) {
-                        Glide.with(getActivity()).asBitmap().load(user.getUserProfilePicUrl()).apply(RequestOptions.circleCropTransform()).into(new CustomTarget<Bitmap>() {
+                        Glide.with(Objects.requireNonNull(getActivity())).asBitmap().load(user.getUserProfilePicUrl()).apply(RequestOptions.circleCropTransform()).into(new CustomTarget<Bitmap>() {
                             @Override
                             public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
                                 String click_action = intent.getStringExtra("click_action");
@@ -266,7 +253,7 @@ public class MessageFragment extends Fragment {
                                         new NotificationCompat.MessagingStyle.Message(messageBody, System.currentTimeMillis(), user);
                                 messagingStyle.addMessage(message);
 
-                                NotificationCompat.Builder builder = new NotificationCompat.Builder(getContext(), App.CHANNEL_MESSAGES)
+                                NotificationCompat.Builder builder = new NotificationCompat.Builder(Objects.requireNonNull(getContext()), App.CHANNEL_MESSAGES)
                                         .setSmallIcon(R.mipmap.ic_launcher_foreground)
                                         .setStyle(messagingStyle)
                                         .addAction(replyAction)
@@ -301,14 +288,13 @@ public class MessageFragment extends Fragment {
     private void buildRecyclerView() {
         Log.d(TAG, "buildRecyclerView: ");
         mRecyclerView.setHasFixedSize(true);
-        mLayoutManager = new LinearLayoutManager(getContext());
         final LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
         linearLayoutManager.setStackFromEnd(true);
 
         mAdapter = new MessageAdapter(messageList, getActivity());
-
         mRecyclerView.setLayoutManager(linearLayoutManager);
         mRecyclerView.setAdapter(mAdapter);
+        ((SimpleItemAnimator) Objects.requireNonNull(mRecyclerView.getItemAnimator())).setSupportsChangeAnimations(false);
 
         mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
@@ -316,7 +302,7 @@ public class MessageFragment extends Fragment {
                 super.onScrollStateChanged(recyclerView, newState);
                 if (!recyclerView.canScrollVertically(-1)) { //Up
                     if (gotMessagesFirstTime)
-                        getMessagesAgain();
+                        getMoreMessages();
                 }
             }
         });
@@ -328,43 +314,46 @@ public class MessageFragment extends Fragment {
         messagesDocumentSnapshots.clear();
         gotMessagesFirstTime = false;
         usersReference.document(currentUserId).collection("Conversations").document(friendUserId)
-                .collection(friendUserId).orderBy("timestamp", Query.Direction.DESCENDING).limit(15).addSnapshotListener(new EventListener<QuerySnapshot>() {
+                .collection(friendUserId).orderBy("timestamp", Query.Direction.DESCENDING).limit(15).addSnapshotListener(Objects.requireNonNull(getActivity()), new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
                 if (e != null) {
                     Log.w(TAG, "onEvent: ", e);
                     return;
                 }
-                for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
-                    Message message = documentSnapshot.toObject(Message.class);
-                    message.setDocumentId(documentSnapshot.getId());
-                    if (messageList.contains(message)) {
-                        messageList.set(messageList.indexOf(message), message);
-                        mAdapter.notifyDataSetChanged();
-//                        mAdapter.notifyItemChanged(messageList.indexOf(message));
-                    } else {
-                        if (gotMessagesFirstTime) {
-                            messageList.add(message);
-                            mAdapter.notifyItemInserted(messageList.size()-1);
-                            mRecyclerView.smoothScrollToPosition(messageList.size() - 1);
-                            messagesDocumentSnapshots.add(documentSnapshot);
+                if (queryDocumentSnapshots != null) {
+                    for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                        Message message = documentSnapshot.toObject(Message.class);
+                        message.setDocumentId(documentSnapshot.getId());
+                        if (messageList.contains(message)) {
+                            messageList.set(messageList.indexOf(message), message);
+                            //                        mAdapter.notifyDataSetChanged();
+                            mAdapter.notifyItemChanged(messageList.indexOf(message));
                         } else {
-                            messageList.add(0, message);
-                            messagesDocumentSnapshots.add(0, documentSnapshot);
-                            mAdapter.notifyDataSetChanged();
+                            if (gotMessagesFirstTime) {
+                                messageList.add(message);
+                                mAdapter.notifyItemInserted(messageList.size() - 1);
+                                //                            mRecyclerView.smoothScrollToPosition(messageList.size() - 1);
+                                messagesDocumentSnapshots.add(documentSnapshot);
+                            } else {
+                                messageList.add(0, message);
+                                messagesDocumentSnapshots.add(0, documentSnapshot);
+                                mAdapter.notifyItemInserted(0);
+                            }
+                            mRecyclerView.smoothScrollToPosition(messageList.size() - 1);
+                        }
+                        if (queryDocumentSnapshots.getDocuments().size() != 0) {
+                            mLastQueriedDocument = messagesDocumentSnapshots.get(0);
                         }
                     }
-                    if (queryDocumentSnapshots.getDocuments().size() != 0) {
-                        mLastQueriedDocument = messagesDocumentSnapshots.get(0);
-                    }
+                    gotMessagesFirstTime = true;
                 }
-                mRecyclerView.smoothScrollToPosition(messageList.size() - 1);
-                gotMessagesFirstTime = true;
+
             }
         });
     }
 
-    private void getMessagesAgain() {
+    private void getMoreMessages() {
         Query query = null;
         if (mLastQueriedDocument != null) {
             query = usersReference.document(currentUserId).collection("Conversations").document(friendUserId)
@@ -383,17 +372,17 @@ public class MessageFragment extends Fragment {
                         if (!messageList.contains(message)) {
                             messageList.add(0, message);
                             messagesDocumentSnapshots.add(0, documentSnapshot);
-
+                            mAdapter.notifyItemInserted(0);
                         } else {
                             messageList.set(messageList.indexOf(message), message);
+                            mAdapter.notifyItemChanged(messageList.indexOf(message));
                         }
-                        mAdapter.notifyDataSetChanged();
 
                         if (queryDocumentSnapshots.getDocuments().size() != 0) {
                             mLastQueriedDocument = messagesDocumentSnapshots.get(0);
                         }
                     }
-                    mRecyclerView.scrollToPosition(queryDocumentSnapshots.size());
+//                    mRecyclerView.scrollToPosition(queryDocumentSnapshots.size());
                 }
             }
         });

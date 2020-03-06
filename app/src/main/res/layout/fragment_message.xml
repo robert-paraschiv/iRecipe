@@ -69,8 +69,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_marginBottom="4dp"
-        android:background="@color/toolbar_color">
+        android:layout_marginBottom="4dp">
 
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/message_input_card"
@@ -91,15 +90,23 @@
                 android:inputType="textCapSentences" />
         </com.google.android.material.card.MaterialCardView>
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/message_send_MaterialBtn"
-            style="@style/Widget.MaterialComponents.Button.TextButton"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
             android:layout_marginEnd="8dp"
-            app:icon="@drawable/ic_send_black_24dp" />
+            app:cardCornerRadius="30dp">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/message_send_MaterialBtn"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:layout_width="40dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                app:icon="@drawable/ic_send_black_24dp" />
+        </com.google.android.material.card.MaterialCardView>
+
     </RelativeLayout>
 
 </RelativeLayout>

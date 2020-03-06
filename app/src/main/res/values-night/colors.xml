@@ -9,6 +9,7 @@
     <color name="background">#fafafa</color>
     <color name="message_unread_red">#fc0303</color>
     <color name="color_message_friend_background">#424242</color>
+    <color name="color_message_user_background">#0064b7</color>
     <color name="color_message_friend_text">#ffffff</color>
     <color name="toolbar_color">#212121</color>
     <color name="navigationColor">#000000</color>

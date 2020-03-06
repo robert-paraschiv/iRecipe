@@ -13,7 +13,7 @@
         android:layout_margin="4dp"
         android:elevation="4dp"
         app:cardBackgroundColor="@color/color_message_friend_background"
-        app:cardCornerRadius="12dp">
+        app:cardCornerRadius="14dp">
 
         <RelativeLayout
             android:layout_width="wrap_content"
