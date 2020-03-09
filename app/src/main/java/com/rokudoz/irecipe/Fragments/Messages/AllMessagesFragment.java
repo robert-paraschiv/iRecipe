@@ -110,6 +110,8 @@ public class AllMessagesFragment extends Fragment implements ConversationAdapter
                 performQuery();
             }
         });
+
+
     }
 
     @Override

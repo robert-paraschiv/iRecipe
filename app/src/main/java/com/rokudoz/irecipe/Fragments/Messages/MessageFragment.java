@@ -73,10 +73,11 @@ import java.util.Objects;
  */
 public class MessageFragment extends Fragment {
     private static final String TAG = "MessageFragment";
+    private static int NR_OF_MESSAGES_TO_LIMIT = 20;
 
     //Firebase RealTime db
-    FirebaseDatabase database = FirebaseDatabase.getInstance();
-    DatabaseReference usersRef = database.getReference("Users");
+    private FirebaseDatabase database = FirebaseDatabase.getInstance();
+    private DatabaseReference usersRef = database.getReference("Users");
 
     //Sound for sent message
     private MediaPlayer mediaPlayer;
@@ -304,6 +305,7 @@ public class MessageFragment extends Fragment {
                     if (gotMessagesFirstTime)
                         getMoreMessages();
                 }
+
             }
         });
     }
@@ -314,7 +316,7 @@ public class MessageFragment extends Fragment {
         messagesDocumentSnapshots.clear();
         gotMessagesFirstTime = false;
         usersReference.document(currentUserId).collection("Conversations").document(friendUserId)
-                .collection(friendUserId).orderBy("timestamp", Query.Direction.DESCENDING).limit(15).addSnapshotListener(Objects.requireNonNull(getActivity()), new EventListener<QuerySnapshot>() {
+                .collection(friendUserId).orderBy("timestamp", Query.Direction.DESCENDING).limit(NR_OF_MESSAGES_TO_LIMIT).addSnapshotListener(Objects.requireNonNull(getActivity()), new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
                 if (e != null) {
@@ -357,10 +359,10 @@ public class MessageFragment extends Fragment {
         Query query = null;
         if (mLastQueriedDocument != null) {
             query = usersReference.document(currentUserId).collection("Conversations").document(friendUserId)
-                    .collection(friendUserId).orderBy("timestamp", Query.Direction.DESCENDING).limit(15).startAfter(mLastQueriedDocument);
+                    .collection(friendUserId).orderBy("timestamp", Query.Direction.DESCENDING).limit(NR_OF_MESSAGES_TO_LIMIT).startAfter(mLastQueriedDocument);
         } else {
             query = usersReference.document(currentUserId).collection("Conversations").document(friendUserId)
-                    .collection(friendUserId).orderBy("timestamp", Query.Direction.DESCENDING).limit(15);
+                    .collection(friendUserId).orderBy("timestamp", Query.Direction.DESCENDING).limit(NR_OF_MESSAGES_TO_LIMIT);
         }
         query.get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
             @Override
@@ -422,7 +424,7 @@ public class MessageFragment extends Fragment {
                 @Override
                 public void onSuccess(Void aVoid) {
                     Log.d(TAG, "onSuccess: added message");
-                    mediaPlayer.start();
+//                    mediaPlayer.start();
                 }
             });
 
@@ -452,10 +454,14 @@ public class MessageFragment extends Fragment {
                     Log.w(TAG, "onEvent: ", e);
                     return;
                 }
-                userFriend = documentSnapshot.toObject(User.class);
+                if (documentSnapshot != null) {
+                    userFriend = documentSnapshot.toObject(User.class);
+                    if (userFriend != null) {
+                        friendName.setText(userFriend.getName());
+                        Glide.with(friendImage).load(userFriend.getUserProfilePicUrl()).centerCrop().into(friendImage);
+                    }
+                }
 
-                friendName.setText(userFriend.getName());
-                Glide.with(friendImage).load(userFriend.getUserProfilePicUrl()).centerCrop().into(friendImage);
             }
         });
     }

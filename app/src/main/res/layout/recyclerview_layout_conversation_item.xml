@@ -48,9 +48,23 @@
             android:layout_below="@id/recycler_view_conversationItem_friendName"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
+            android:layout_toStartOf="@id/recycler_view_conversationItem_lastMessageSeen"
             android:layout_toEndOf="@id/recycler_view_conversationItem_friendImage"
+            android:maxLines="1"
             tools:text="Last message text here " />
 
+        <ImageView
+            android:id="@+id/recycler_view_conversationItem_lastMessageSeen"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_below="@id/recycler_view_conversationItem_friendName"
+            android:layout_alignParentEnd="true"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="4dp"
+            android:src="@drawable/ic_check_black_24dp"
+            android:visibility="invisible"
+            tools:visibility="visible" />
 
     </RelativeLayout>
 </com.google.android.material.card.MaterialCardView>

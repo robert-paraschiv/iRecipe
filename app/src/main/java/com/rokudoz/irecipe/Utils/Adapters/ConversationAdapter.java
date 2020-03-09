@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -46,6 +47,7 @@ public class ConversationAdapter extends RecyclerView.Adapter<ConversationAdapte
     public class ConversationViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         TextView tvName, tvMessage, tvTimeStamp;
         CircleImageView mImage;
+        ImageView seenCheck;
 
 
         public ConversationViewHolder(View itemView) {
@@ -54,6 +56,7 @@ public class ConversationAdapter extends RecyclerView.Adapter<ConversationAdapte
             mImage = itemView.findViewById(R.id.recycler_view_conversationItem_friendImage);
             tvMessage = itemView.findViewById(R.id.recycler_view_conversationItem_lastMessageText);
             tvTimeStamp = itemView.findViewById(R.id.recycler_view_conversationItem_lastMessageTimeStamp);
+            seenCheck = itemView.findViewById(R.id.recycler_view_conversationItem_lastMessageSeen);
 
             itemView.setOnClickListener(this);
         }
@@ -103,8 +106,20 @@ public class ConversationAdapter extends RecyclerView.Adapter<ConversationAdapte
         }
         if (currentItem.getRead() != null && currentItem.getType() != null) {
             if (currentItem.getType().equals("message_received") && !currentItem.getRead()) {
+                holder.seenCheck.setVisibility(View.GONE);
                 holder.tvMessage.setTextColor(holder.tvMessage.getResources().getColor(R.color.colorPrimary));
-            } else {
+            } else if (currentItem.getType().equals("message_received") && currentItem.getRead()) {
+                holder.seenCheck.setVisibility(View.GONE);
+                TextView textView = new TextView(holder.tvMessage.getContext());
+                holder.tvMessage.setTextColor(textView.getCurrentTextColor());
+            } else if (currentItem.getType().equals("message_sent") && !currentItem.getRead()) {
+                holder.seenCheck.setVisibility(View.VISIBLE);
+                holder.seenCheck.setImageResource(R.drawable.ic_pngwave);
+                TextView textView = new TextView(holder.tvMessage.getContext());
+                holder.tvMessage.setTextColor(textView.getCurrentTextColor());
+            } else if (currentItem.getType().equals("message_sent") && currentItem.getRead()) {
+                holder.seenCheck.setVisibility(View.VISIBLE);
+                holder.seenCheck.setImageResource(R.drawable.ic_message_read_status);
                 TextView textView = new TextView(holder.tvMessage.getContext());
                 holder.tvMessage.setTextColor(textView.getCurrentTextColor());
             }
