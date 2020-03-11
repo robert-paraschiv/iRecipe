@@ -10,34 +10,35 @@
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="40dp"
-        app:title="Shopping Cart"
-        />
+        app:title="Shopping Cart" />
 
     <ScrollView
+        android:id="@+id/ingredients_checkbox_scrollView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/toolbar"
-        android:layout_marginTop="12dp"
-        android:id="@+id/ingredients_checkbox_scrollView"
-        >
+        android:layout_marginTop="12dp">
+
         <LinearLayout
+            android:id="@+id/ingredients_checkBox_linearLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:id="@+id/ingredients_checkBox_linearLayout"
             android:animateLayoutChanges="true"
-            />
+            android:orientation="vertical" />
     </ScrollView>
+
     <com.google.android.material.button.MaterialButton
         android:id="@+id/empty_basket_btn"
+        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-        app:cornerRadius="18dp"
         android:layout_alignParentBottom="true"
-        android:layout_marginBottom="10dp"
         android:layout_centerHorizontal="true"
-        android:text="Empty basket" />
+        android:layout_marginBottom="10dp"
+        android:text="Empty basket"
+        android:visibility="invisible"
+        app:cornerRadius="18dp"
+        tools:visibility="visible" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab_add_ingredient_toShoppingList"
@@ -47,7 +48,7 @@
         android:layout_alignParentBottom="true"
         android:layout_margin="16dp"
         android:src="@drawable/ic_add"
-        app:fabCustomSize="50dp"
-        app:elevation="4dp"/>
+        app:elevation="4dp"
+        app:fabCustomSize="50dp" />
 
 </RelativeLayout>

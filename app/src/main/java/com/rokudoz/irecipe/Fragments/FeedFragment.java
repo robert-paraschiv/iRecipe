@@ -14,8 +14,6 @@ import android.widget.Toast;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdLoader;
 import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.MobileAds;
-import com.google.android.gms.ads.formats.NativeAd;
 import com.google.android.gms.ads.formats.UnifiedNativeAd;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -30,12 +28,10 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.WriteBatch;
-import com.google.firebase.storage.FirebaseStorage;
 import com.rokudoz.irecipe.Account.LoginActivity;
 import com.rokudoz.irecipe.AddPostActivity;
 import com.rokudoz.irecipe.Models.FavoritePost;
@@ -48,12 +44,10 @@ import com.rokudoz.irecipe.Models.UserWhoFaved;
 import com.rokudoz.irecipe.R;
 import com.rokudoz.irecipe.SearchUserActivity;
 import com.rokudoz.irecipe.Utils.Adapters.FeedAdapter;
-import com.rokudoz.irecipe.Utils.Adapters.PostAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Random;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -75,7 +69,7 @@ public class FeedFragment extends Fragment implements FeedAdapter.OnItemClickLis
     private MaterialCardView messagesCardView;
 
     private ProgressBar pbLoading;
-    private FloatingActionButton fab;
+    private FloatingActionButton addPostFab, scheduleFab;
 
     //FireBase
     private FirebaseAuth.AuthStateListener mAuthListener;
@@ -119,7 +113,8 @@ public class FeedFragment extends Fragment implements FeedAdapter.OnItemClickLis
 
             mUser = new User();
             pbLoading = view.findViewById(R.id.homeFragment_pbLoading);
-            fab = view.findViewById(R.id.fab_add_recipe);
+            addPostFab = view.findViewById(R.id.fab_add_recipe);
+            scheduleFab = view.findViewById(R.id.fab_calendar_schedule);
             mRecyclerView = view.findViewById(R.id.recycler_view);
             MaterialButton messagesBtn = view.findViewById(R.id.feedFragment_messages_MaterialBtn);
             MaterialButton searchUserBtn = view.findViewById(R.id.feedFragment_searchUser_MaterialBtn);
@@ -148,7 +143,8 @@ public class FeedFragment extends Fragment implements FeedAdapter.OnItemClickLis
                 }
             });
 
-            fab.setVisibility(View.INVISIBLE);
+            addPostFab.setVisibility(View.INVISIBLE);
+            scheduleFab.setVisibility(View.INVISIBLE);
             loadNativeAds();
             buildRecyclerView();
         }
@@ -249,14 +245,18 @@ public class FeedFragment extends Fragment implements FeedAdapter.OnItemClickLis
 
                 if (dy > 0) {
                     // Scroll Down
-                    if (fab.isShown()) {
-                        fab.hide();
+                    if (addPostFab.isShown()) {
+                        addPostFab.hide();
                     }
+                    if (scheduleFab.isShown())
+                        scheduleFab.hide();
                 } else if (dy < 0) {
                     // Scroll Up
-                    if (!fab.isShown()) {
-                        fab.show();
+                    if (!addPostFab.isShown()) {
+                        addPostFab.show();
                     }
+                    if (!scheduleFab.isShown())
+                        scheduleFab.show();
                 }
             }
         });
@@ -544,11 +544,18 @@ public class FeedFragment extends Fragment implements FeedAdapter.OnItemClickLis
 //                        Log.d(TAG, "onAuthStateChanged: signed_in: " + user.getUid());
 //                        Toast.makeText(MainActivity.this, "Authenticated with: " + user.getEmail(), Toast.LENGTH_SHORT).show();
 //                        fab.show();
-                        fab.setVisibility(View.VISIBLE);
-                        fab.setOnClickListener(new View.OnClickListener() {
+                        addPostFab.setVisibility(View.VISIBLE);
+                        addPostFab.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
                                 navigateToAddPost();
+                            }
+                        });
+                        scheduleFab.setVisibility(View.VISIBLE);
+                        scheduleFab.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                navigateToSchedule();
                             }
                         });
 
@@ -571,5 +578,9 @@ public class FeedFragment extends Fragment implements FeedAdapter.OnItemClickLis
                 // ...
             }
         };
+    }
+
+    private void navigateToSchedule() {
+        Navigation.findNavController(view).navigate(FeedFragmentDirections.actionFeedFragmentToScheduleFragment());
     }
 }

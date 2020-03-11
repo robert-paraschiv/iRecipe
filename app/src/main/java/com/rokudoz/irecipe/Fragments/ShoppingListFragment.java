@@ -192,8 +192,12 @@ public class ShoppingListFragment extends Fragment {
                     addCategoryOfIngredientsLayout(ingredientsByCategoryList, category);
                 }
 
-                if (shoppingListIngredients.isEmpty()) {
+                if (shoppingListIngredients.size() > 0 && queryDocumentSnapshots.size() > 0) {
+                    mEmptyBasketBtn.setVisibility(View.VISIBLE);
+                    Log.d(TAG, "onEvent: NOT EMPTY" + " docs " + queryDocumentSnapshots.size());
+                } else {
                     mEmptyBasketBtn.setVisibility(View.INVISIBLE);
+                    Log.d(TAG, "onEvent: EMPTY");
                 }
                 // EMPTY basket on click
                 mEmptyBasketBtn.setOnClickListener(new View.OnClickListener() {
@@ -205,12 +209,13 @@ public class ShoppingListFragment extends Fragment {
                                 @Override
                                 public void onSuccess(Void aVoid) {
                                     Log.d(TAG, "onSuccess: Deleted" + ingToDelete.toString() + " from shopping list");
-                                    shoppingListIngredients.remove(ingToDelete);
+
                                 }
                             });
                         }
                         ingredientsCheckBoxLinearLayout.removeAllViews();
-                        mEmptyBasketBtn.setVisibility(View.INVISIBLE);
+                        shoppingListIngredients.clear();
+                        mEmptyBasketBtn.setVisibility(View.GONE);
                     }
                 });
                 addIngredientToListFab.setOnClickListener(new View.OnClickListener() {
