@@ -13,4 +13,10 @@
     <color name="color_message_friend_text">#ffffff</color>
     <color name="toolbar_color">#212121</color>
     <color name="navigationColor">#000000</color>
+
+    <color name="calendar_backgroundColor">#212121</color>
+    <color name="calendar_currentDayBackgroundColor">#0064b7</color>
+    <color name="calendar_currentSelectedDayBackgroundColor">#0091ea</color>
+    <color name="calendar_multiEventIndicatorColor">#fff</color>
+    <color name="calendar_textColor">#fff</color>
 </resources>

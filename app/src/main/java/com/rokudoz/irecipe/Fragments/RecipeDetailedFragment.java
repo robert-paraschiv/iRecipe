@@ -12,6 +12,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
+import androidx.core.content.ContextCompat;
 import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
@@ -61,6 +62,7 @@ import com.rokudoz.irecipe.Models.Comment;
 import com.rokudoz.irecipe.Models.Ingredient;
 import com.rokudoz.irecipe.Models.Instruction;
 import com.rokudoz.irecipe.Models.Recipe;
+import com.rokudoz.irecipe.Models.ScheduleEvent;
 import com.rokudoz.irecipe.Models.User;
 import com.rokudoz.irecipe.Models.UserWhoFaved;
 import com.rokudoz.irecipe.R;
@@ -258,6 +260,13 @@ public class RecipeDetailedFragment extends Fragment implements RecipeInstructio
                 mealTypeSpinner.setAdapter(adapter);
 
                 final CompactCalendarView compactCalendarView = new CompactCalendarView(getActivity());
+                compactCalendarView.setCalendarBackgroundColor(ContextCompat.getColor(getActivity(), R.color.calendar_backgroundColor));
+                compactCalendarView.setCurrentDayBackgroundColor(ContextCompat.getColor(getActivity(), R.color.calendar_currentDayBackgroundColor));
+                compactCalendarView.setCurrentSelectedDayBackgroundColor(ContextCompat.getColor(getActivity(), R.color.calendar_currentSelectedDayBackgroundColor));
+                compactCalendarView.setCurrentDayTextColor(ContextCompat.getColor(getActivity(), R.color.calendar_textColor));
+                compactCalendarView.setCurrentSelectedDayTextColor(ContextCompat.getColor(getActivity(), R.color.calendar_textColor));
+
+
                 LinearLayout.LayoutParams calendarParams = new LinearLayout.LayoutParams(
                         LinearLayout.LayoutParams.MATCH_PARENT,
                         550);
@@ -270,8 +279,8 @@ public class RecipeDetailedFragment extends Fragment implements RecipeInstructio
                 materialAlertDialogBuilder.setView(linearLayout);
                 materialAlertDialogBuilder.setMessage("When do you want to cook this ?");
                 materialAlertDialogBuilder.setCancelable(true);
-
-                final DateFormat smallDateFormat = new SimpleDateFormat("MMM, YYYY", Locale.getDefault());
+                final DateFormat dateFormat = new SimpleDateFormat("dd, MMMM, YYYY", Locale.getDefault());
+                final DateFormat smallDateFormat = new SimpleDateFormat("MMMM, YYYY", Locale.getDefault());
                 String timeString = smallDateFormat.format(compactCalendarView.getFirstDayOfCurrentMonth());
                 textView.setText(timeString);
 
@@ -292,6 +301,15 @@ public class RecipeDetailedFragment extends Fragment implements RecipeInstructio
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
 
+                                ScheduleEvent scheduleEvent = new ScheduleEvent(documentID, date[0], dateFormat.format(date[0]), mealTypeSpinner.getSelectedItem().toString());
+                                usersRef.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).collection("ScheduleEvents").add(scheduleEvent)
+                                        .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                                            @Override
+                                            public void onSuccess(DocumentReference documentReference) {
+                                                Log.d(TAG, "onSuccess: ADDED");
+                                                Toast.makeText(getContext(), "Added to meal schedule", Toast.LENGTH_SHORT).show();
+                                            }
+                                        });
                                 Log.d(TAG, "onClick: " + date[0] + " " + mealTypeSpinner.getSelectedItem().toString() + " " + documentID);
 
                                 dialog.cancel();

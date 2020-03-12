@@ -1,21 +1,57 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".Fragments.ScheduleFragment">
 
-    <com.github.sundeepk.compactcalendarview.CompactCalendarView xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:layout_centerVertical="true"
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/scheduleFragment_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:background="@color/toolbar_color"
+        android:elevation="4dp"
+        app:title="Meal schedule" />
+
+    <RelativeLayout
+        android:id="@+id/scheduleFragment_month_RelLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/scheduleFragment_toolbar"
+        android:background="@color/toolbar_color">
+
+        <TextView
+            android:id="@+id/scheduleFragment_month_textView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            tools:text="March, 2020" />
+    </RelativeLayout>
+
+
+    <com.github.sundeepk.compactcalendarview.CompactCalendarView
         android:id="@+id/scheduleFragment_calendarView"
         android:layout_width="match_parent"
         android:layout_height="300dp"
+        android:layout_below="@id/scheduleFragment_month_RelLayout"
         android:padding="10dp"
-        app:compactCalendarBackgroundColor="#ffe95451"
-        app:compactCalendarCurrentDayBackgroundColor="#B71C1C"
-        app:compactCalendarCurrentSelectedDayBackgroundColor="#E57373"
-        app:compactCalendarMultiEventIndicatorColor="#fff"
+        app:compactCalendarBackgroundColor="@color/calendar_backgroundColor"
+        app:compactCalendarCurrentDayBackgroundColor="@color/calendar_currentDayBackgroundColor"
+        app:compactCalendarCurrentSelectedDayBackgroundColor="@color/calendar_currentSelectedDayBackgroundColor"
+        app:compactCalendarMultiEventIndicatorColor="@color/calendar_multiEventIndicatorColor"
         app:compactCalendarTargetHeight="250dp"
-        app:compactCalendarTextColor="#fff"
+        app:compactCalendarTextColor="@color/calendar_textColor"
         app:compactCalendarTextSize="14sp" />
+
+    <TextView
+        android:id="@+id/scheduleFragment_nrEventsTV"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/scheduleFragment_calendarView"
+        android:layout_margin="8dp"
+        tools:text="2333 Events today" />
+
 </RelativeLayout>

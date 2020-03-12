@@ -10,11 +10,13 @@ public class ScheduleEvent {
     private String documentID;
     private String recipeID;
     private Date date;
+    private String dateString;
     private String mealType;
 
-    public ScheduleEvent(String recipeID, Date date, String mealType) {
+    public ScheduleEvent(String recipeID, Date date, String dateString, String mealType) {
         this.recipeID = recipeID;
         this.date = date;
+        this.dateString = dateString;
         this.mealType = mealType;
     }
 
@@ -46,6 +48,14 @@ public class ScheduleEvent {
         this.date = date;
     }
 
+    public String getDateString() {
+        return dateString;
+    }
+
+    public void setDateString(String dateString) {
+        this.dateString = dateString;
+    }
+
     public String getMealType() {
         return mealType;
     }
@@ -60,6 +70,7 @@ public class ScheduleEvent {
                 "documentID='" + documentID + '\'' +
                 ", recipeID='" + recipeID + '\'' +
                 ", date=" + date +
+                ", dateString='" + dateString + '\'' +
                 ", mealType='" + mealType + '\'' +
                 '}';
     }
