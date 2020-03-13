@@ -4,7 +4,13 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
+import android.app.AlarmManager;
+import android.app.DatePickerDialog;
+import android.app.PendingIntent;
+import android.app.TimePickerDialog;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.os.Bundle;
@@ -12,7 +18,6 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
-import androidx.core.content.ContextCompat;
 import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
@@ -21,28 +26,23 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.ViewPager;
 
 import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.DecelerateInterpolator;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.ScrollView;
-import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.github.sundeepk.compactcalendarview.CompactCalendarView;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.button.MaterialButton;
-import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -62,7 +62,7 @@ import com.rokudoz.irecipe.Models.Comment;
 import com.rokudoz.irecipe.Models.Ingredient;
 import com.rokudoz.irecipe.Models.Instruction;
 import com.rokudoz.irecipe.Models.Recipe;
-import com.rokudoz.irecipe.Models.ScheduleEvent;
+import com.rokudoz.irecipe.Models.ScheduledMeal;
 import com.rokudoz.irecipe.Models.User;
 import com.rokudoz.irecipe.Models.UserWhoFaved;
 import com.rokudoz.irecipe.R;
@@ -70,24 +70,26 @@ import com.rokudoz.irecipe.Utils.Adapters.RecipeIngredientsAdapter;
 import com.rokudoz.irecipe.Utils.Adapters.RecipeInstructionsAdapter;
 import com.rokudoz.irecipe.Utils.Adapters.RecipeParentCommentAdapter;
 import com.rokudoz.irecipe.Utils.Adapters.RecipeDetailedViewPagerAdapter;
+import com.rokudoz.irecipe.Utils.ScheduleNotifReceiver;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Locale;
 
 import de.hdodenhof.circleimageview.CircleImageView;
-
-import static android.widget.RelativeLayout.CENTER_HORIZONTAL;
 
 public class RecipeDetailedFragment extends Fragment implements RecipeInstructionsAdapter.OnItemClickListener {
     private static final String TAG = "RecipeDetailedFragment";
     // Hold a reference to the current animator,
     // so that it can be canceled mid-way.
     private Animator currentAnimator;
+
+    private int mYear, mMonth, mDate, mHour, mMin;
 
     // The system "short" animation time duration, in milliseconds. This
     // duration is ideal for subtle animations or animations that occur
@@ -100,6 +102,7 @@ public class RecipeDetailedFragment extends Fragment implements RecipeInstructio
     private String currentUserName = "";
     private String loggedInUserDocumentId = "";
     private String title = "";
+    private String recipeCategory = "";
     private String userFavDocId = "";
     private Boolean isRecipeFavorite = false;
     private List<String> imageUrls;
@@ -244,79 +247,43 @@ public class RecipeDetailedFragment extends Fragment implements RecipeInstructio
         fab_AddToSchedule.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.WRAP_CONTENT,
-                        LinearLayout.LayoutParams.WRAP_CONTENT);
 
-                final Date[] date = {Calendar.getInstance().getTime()};
-                String[] mealTypes = {"breakfast", "lunch", "dinner"};
-                final LinearLayout linearLayout = new LinearLayout(getActivity());
-                linearLayout.setOrientation(LinearLayout.VERTICAL);
-                final TextView textView = new TextView(getActivity());
-//                textView.setLayoutParams(params);
-                textView.setGravity(Gravity.CENTER_HORIZONTAL);
-                final Spinner mealTypeSpinner = new Spinner(getActivity());
-                ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_dropdown_item, mealTypes);
-                mealTypeSpinner.setAdapter(adapter);
-
-                final CompactCalendarView compactCalendarView = new CompactCalendarView(getActivity());
-                compactCalendarView.setCalendarBackgroundColor(ContextCompat.getColor(getActivity(), R.color.calendar_backgroundColor));
-                compactCalendarView.setCurrentDayBackgroundColor(ContextCompat.getColor(getActivity(), R.color.calendar_currentDayBackgroundColor));
-                compactCalendarView.setCurrentSelectedDayBackgroundColor(ContextCompat.getColor(getActivity(), R.color.calendar_currentSelectedDayBackgroundColor));
-                compactCalendarView.setCurrentDayTextColor(ContextCompat.getColor(getActivity(), R.color.calendar_textColor));
-                compactCalendarView.setCurrentSelectedDayTextColor(ContextCompat.getColor(getActivity(), R.color.calendar_textColor));
-
-
-                LinearLayout.LayoutParams calendarParams = new LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.MATCH_PARENT,
-                        550);
-                compactCalendarView.setLayoutParams(calendarParams);
-                linearLayout.addView(textView);
-                linearLayout.addView(compactCalendarView);
-                linearLayout.addView(mealTypeSpinner);
-
-                MaterialAlertDialogBuilder materialAlertDialogBuilder = new MaterialAlertDialogBuilder(getActivity(), R.style.ThemeOverlay_MaterialComponents_MaterialAlertDialog_Centered);
-                materialAlertDialogBuilder.setView(linearLayout);
-                materialAlertDialogBuilder.setMessage("When do you want to cook this ?");
-                materialAlertDialogBuilder.setCancelable(true);
-                final DateFormat dateFormat = new SimpleDateFormat("dd, MMMM, YYYY", Locale.getDefault());
-                final DateFormat smallDateFormat = new SimpleDateFormat("MMMM, YYYY", Locale.getDefault());
-                String timeString = smallDateFormat.format(compactCalendarView.getFirstDayOfCurrentMonth());
-                textView.setText(timeString);
-
-                compactCalendarView.setListener(new CompactCalendarView.CompactCalendarViewListener() {
+                //Show Date Picker dialog and then TimePicker dialog to schedule the recipe accordingly
+                final Calendar calendar = Calendar.getInstance();
+                mYear = calendar.get(Calendar.YEAR);
+                mMonth = calendar.get(Calendar.MONTH);
+                mDate = calendar.get(Calendar.DATE);
+                DatePickerDialog datePickerDialog = new DatePickerDialog(getActivity(), new DatePickerDialog.OnDateSetListener() {
                     @Override
-                    public void onDayClick(Date dateClicked) {
-                        date[0] = dateClicked;
-                    }
+                    public void onDateSet(DatePicker view, final int year, final int month, final int dayOfMonth) {
+                        mHour = calendar.get(Calendar.HOUR_OF_DAY);
+                        mMin = calendar.get(Calendar.MINUTE);
+                        TimePickerDialog timePickerDialog = new TimePickerDialog(getActivity(), new TimePickerDialog.OnTimeSetListener() {
+                            @Override
+                            public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                                final DateFormat dateFormat = new SimpleDateFormat("dd, MMMM, YYYY", Locale.getDefault());
 
-                    @Override
-                    public void onMonthScroll(Date firstDayOfNewMonth) {
-                        textView.setText(smallDateFormat.format(compactCalendarView.getFirstDayOfCurrentMonth()));
-                    }
-                });
+                                final Date date = new GregorianCalendar(year, month, dayOfMonth, hourOfDay, minute).getTime();
 
-                materialAlertDialogBuilder.setPositiveButton(
-                        "Add to schedule",
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
+                                final ScheduledMeal scheduleEvent = new ScheduledMeal(documentID, date, dateFormat.format(date), recipeCategory);
 
-                                ScheduleEvent scheduleEvent = new ScheduleEvent(documentID, date[0], dateFormat.format(date[0]), mealTypeSpinner.getSelectedItem().toString());
                                 usersRef.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).collection("ScheduleEvents").add(scheduleEvent)
                                         .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                                             @Override
                                             public void onSuccess(DocumentReference documentReference) {
-                                                Log.d(TAG, "onSuccess: ADDED");
+                                                Log.d(TAG, "onSuccess: ADDED " + scheduleEvent.toString());
+                                                scheduleNotification(getActivity(), 0, date.getTime(), documentID);
                                                 Toast.makeText(getContext(), "Added to meal schedule", Toast.LENGTH_SHORT).show();
                                             }
                                         });
-                                Log.d(TAG, "onClick: " + date[0] + " " + mealTypeSpinner.getSelectedItem().toString() + " " + documentID);
 
-                                dialog.cancel();
                             }
-                        });
+                        }, mHour, mMin, true);
+                        timePickerDialog.show();
+                    }
+                }, mYear, mMonth, mDate);
+                datePickerDialog.show();
 
-                materialAlertDialogBuilder.show();
             }
         });
 
@@ -324,6 +291,18 @@ public class RecipeDetailedFragment extends Fragment implements RecipeInstructio
         getCurrentUserDetails(view);
 
         return view; // HAS TO BE THE LAST ONE ---------------------------------
+    }
+
+    private void scheduleNotification(Context context, int reqCode, long time, String recipe_id) {
+        Intent intent = new Intent(context, ScheduleNotifReceiver.class);
+        intent.putExtra("recipe_id", recipe_id);
+        intent.putExtra("recipe_category", recipeCategory);
+        intent.putExtra("recipe_title", title);
+        PendingIntent pending = PendingIntent.getBroadcast(context, reqCode, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        AlarmManager manager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        if (manager != null) {
+            manager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, time, pending);
+        }
     }
 
     private void setupViewPager(View view) {
@@ -557,6 +536,9 @@ public class RecipeDetailedFragment extends Fragment implements RecipeInstructio
                     }
                     if (recipe.getImageUrls_list() != null) {
                         imageUrls = recipe.getImageUrls_list();
+                    }
+                    if (recipe.getCategory() != null) {
+                        recipeCategory = recipe.getCategory();
                     }
                     if (recipe.getIngredient_list() != null) {
                         List<Ingredient> ingredientList = recipe.getIngredient_list();

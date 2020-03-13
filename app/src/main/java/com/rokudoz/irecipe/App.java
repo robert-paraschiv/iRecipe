@@ -37,6 +37,7 @@ public class App extends Application {
     public static final String CHANNEL_LIKES = "Channel_Likes";
     public static final String CHANNEL_FRIEND_REQUEST = "Channel_Friend_Request";
     public static final String CHANNEL_COMMENTS = "Channel_Comments";
+    public static final String CHANNEL_MEAL_PLANS = "Meal_Plans";
 
     @Override
     public void onCreate() {
@@ -126,6 +127,16 @@ public class App extends Application {
             channel_friend_req.setDescription("This is the channel used for friend requests");
             channel_friend_req.setLockscreenVisibility(Notification.VISIBILITY_PRIVATE);
             notificationChannelList.add(channel_friend_req);
+
+            //Meal Plans Channel
+            NotificationChannel channel_meal_plans = new NotificationChannel(
+                    CHANNEL_MEAL_PLANS,
+                    "Meal Plans channel",
+                    NotificationManager.IMPORTANCE_DEFAULT
+            );
+            channel_meal_plans.setDescription("This is the channel used for planning meals");
+            channel_meal_plans.setLockscreenVisibility(Notification.VISIBILITY_PRIVATE);
+            notificationChannelList.add(channel_meal_plans);
 
             NotificationManager notificationManager = getSystemService(NotificationManager.class);
             if (notificationManager != null) {

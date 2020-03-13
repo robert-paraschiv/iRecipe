@@ -263,6 +263,9 @@
         <action
             android:id="@+id/action_scheduleFragment_to_dayScheduleFragment"
             app:destination="@id/dayScheduleFragment" />
+        <action
+            android:id="@+id/action_scheduleFragment_to_recipeDetailedFragment"
+            app:destination="@id/recipeDetailedFragment" />
     </fragment>
     <fragment
         android:id="@+id/dayScheduleFragment"
@@ -272,5 +275,8 @@
         <argument
             android:name="dateString"
             app:argType="string" />
+        <action
+            android:id="@+id/action_dayScheduleFragment_to_recipeDetailedFragment"
+            app:destination="@id/recipeDetailedFragment" />
     </fragment>
 </navigation>
