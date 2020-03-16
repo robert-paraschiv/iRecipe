@@ -69,7 +69,8 @@ public class FeedFragment extends Fragment implements FeedAdapter.OnItemClickLis
     private MaterialCardView messagesCardView;
 
     private ProgressBar pbLoading;
-    private FloatingActionButton addPostFab, scheduleFab;
+    private FloatingActionButton addPostFab;
+//    private FloatingActionButton addPostFab, scheduleFab;
 
     //FireBase
     private FirebaseAuth.AuthStateListener mAuthListener;
@@ -114,7 +115,7 @@ public class FeedFragment extends Fragment implements FeedAdapter.OnItemClickLis
             mUser = new User();
             pbLoading = view.findViewById(R.id.homeFragment_pbLoading);
             addPostFab = view.findViewById(R.id.fab_add_recipe);
-            scheduleFab = view.findViewById(R.id.fab_calendar_schedule);
+//            scheduleFab = view.findViewById(R.id.fab_calendar_schedule);
             mRecyclerView = view.findViewById(R.id.recycler_view);
             MaterialButton messagesBtn = view.findViewById(R.id.feedFragment_messages_MaterialBtn);
             MaterialButton searchUserBtn = view.findViewById(R.id.feedFragment_searchUser_MaterialBtn);
@@ -144,7 +145,7 @@ public class FeedFragment extends Fragment implements FeedAdapter.OnItemClickLis
             });
 
             addPostFab.setVisibility(View.INVISIBLE);
-            scheduleFab.setVisibility(View.INVISIBLE);
+//            scheduleFab.setVisibility(View.INVISIBLE);
             loadNativeAds();
             buildRecyclerView();
         }
@@ -248,15 +249,15 @@ public class FeedFragment extends Fragment implements FeedAdapter.OnItemClickLis
                     if (addPostFab.isShown()) {
                         addPostFab.hide();
                     }
-                    if (scheduleFab.isShown())
-                        scheduleFab.hide();
+//                    if (scheduleFab.isShown())
+//                        scheduleFab.hide();
                 } else if (dy < 0) {
                     // Scroll Up
                     if (!addPostFab.isShown()) {
                         addPostFab.show();
                     }
-                    if (!scheduleFab.isShown())
-                        scheduleFab.show();
+//                    if (!scheduleFab.isShown())
+//                        scheduleFab.show();
                 }
             }
         });
@@ -551,13 +552,13 @@ public class FeedFragment extends Fragment implements FeedAdapter.OnItemClickLis
                                 navigateToAddPost();
                             }
                         });
-                        scheduleFab.setVisibility(View.VISIBLE);
-                        scheduleFab.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                navigateToSchedule();
-                            }
-                        });
+//                        scheduleFab.setVisibility(View.VISIBLE);
+//                        scheduleFab.setOnClickListener(new View.OnClickListener() {
+//                            @Override
+//                            public void onClick(View v) {
+//                                navigateToSchedule();
+//                            }
+//                        });
 
                         //If use is authenticated, perform query
                         getCurrentUserDetails();

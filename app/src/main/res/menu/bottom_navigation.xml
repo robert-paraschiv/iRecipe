@@ -4,19 +4,19 @@
 
     <item
         android:id="@+id/feedFragment"
-        android:icon="@drawable/ic_receipt_black_24dp"
+        android:icon="@drawable/ic_home_black_24dp"
         app:showAsAction="ifRoom"
         android:title="Feed"/>
     <item
         android:id="@+id/recipesFragment"
-        android:icon="@drawable/ic_kitchen_black_24dp"
+        android:icon="@drawable/ic_restaurant_black_24dp"
         app:showAsAction="ifRoom"
         android:title="Recipes"/>
     <item
-        android:id="@+id/favoritesFragment"
-        android:icon="@drawable/ic_favorite_red_24dp"
+        android:id="@+id/scheduleFragment"
+        android:icon="@drawable/ic_today_black_24dp"
         app:showAsAction="ifRoom"
-        android:title="Favorites"/>
+        android:title="Schedule"/>
     <item
         android:id="@+id/shoppingListFragment"
         android:icon="@drawable/ic_shopping_basket_black_24dp"

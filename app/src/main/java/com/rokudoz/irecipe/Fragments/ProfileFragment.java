@@ -261,10 +261,13 @@ public class ProfileFragment extends Fragment {
         SectionsPagerAdapter adapter = new SectionsPagerAdapter(getChildFragmentManager(), FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
         adapter.addFragment(new profileMyIngredientsFragment(), "Fridge");
         adapter.addFragment(new profileMyRecipesFragment(), "My recipes");
+        adapter.addFragment(new FavoritesFragment(), "Favorites");
         adapter.addFragment(new profileMyFriendList(), "Friend List");
         viewPager.setAdapter(adapter);
 
+        final FloatingActionButton floatingActionButton = view.findViewById(R.id.profileFragment_fab);
         final int[] positionn = {0};
+
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
@@ -273,8 +276,11 @@ public class ProfileFragment extends Fragment {
 
             @Override
             public void onPageSelected(final int position) {
-
                 positionn[0] = position;
+                if (positionn[0] == 0 || positionn[0] == 1) {
+                    floatingActionButton.show();
+                } else
+                    floatingActionButton.hide();
             }
 
             @Override
@@ -283,7 +289,6 @@ public class ProfileFragment extends Fragment {
             }
         });
 
-        final FloatingActionButton floatingActionButton = view.findViewById(R.id.profileFragment_fab);
         if (positionn[0] == 0 || positionn[0] == 1)
             floatingActionButton.show();
         floatingActionButton.setOnClickListener(new View.OnClickListener() {
