@@ -273,7 +273,7 @@ public class profileMyIngredientsFragment extends Fragment {
                     }
                 }
             });
-            Snackbar snackbar = Snackbar.make(view.findViewById(R.id.profileFragmentMyIngredients_relativelayout), ingredient.getName() + " removed",
+            Snackbar snackbar = Snackbar.make(Objects.requireNonNull(getActivity()).findViewById(R.id.profileFragment_rootLayout), ingredient.getName() + " removed",
                     Snackbar.LENGTH_SHORT)
                     .setAction("Undo", new View.OnClickListener() {
                         @Override

@@ -135,7 +135,6 @@ public class AllMessagesFragment extends Fragment implements ConversationAdapter
 
 
     private void performQuery() {
-        initializeRecyclerViewAdapterOnClicks();
         usersReference.document(mUser.getUser_id()).collection("Conversations").orderBy("date", Query.Direction.DESCENDING)
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
@@ -166,23 +165,13 @@ public class AllMessagesFragment extends Fragment implements ConversationAdapter
                         mAdapter.notifyDataSetChanged();
                     }
                 });
-
-    }
-
-    private void initializeRecyclerViewAdapterOnClicks() {
-        mAdapter.setOnItemClickListener(new ConversationAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(int position) {
-                String id = conversationList.get(position).getUserId();
-                Log.d(TAG, "onItemClick: CLICKED " + " id " + id);
-
-                Navigation.findNavController(view).navigate(AllMessagesFragmentDirections.actionAllMessagesFragmentToMessageFragment(id));
-            }
-        });
     }
 
     @Override
     public void onItemClick(int position) {
+        String id = conversationList.get(position).getUserId();
+        Log.d(TAG, "onItemClick: CLICKED " + " id " + id);
 
+        Navigation.findNavController(view).navigate(AllMessagesFragmentDirections.actionAllMessagesFragmentToMessageFragment(id));
     }
 }

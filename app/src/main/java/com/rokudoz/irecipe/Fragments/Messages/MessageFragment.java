@@ -116,7 +116,9 @@ public class MessageFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        view = inflater.inflate(R.layout.fragment_message, container, false);
+        if (view == null) {
+            view = inflater.inflate(R.layout.fragment_message, container, false);
+        }
 
         gotMessagesFirstTime = false;
         mediaPlayer = MediaPlayer.create(getContext(), R.raw.insight);
@@ -227,60 +229,60 @@ public class MessageFragment extends Fragment {
                     if (user != null) {
                         Glide.with(Objects.requireNonNull(getActivity())).asBitmap().load(user.getUserProfilePicUrl()).apply(RequestOptions.circleCropTransform())
                                 .into(new CustomTarget<Bitmap>() {
-                            @Override
-                            public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
-                                String click_action = intent.getStringExtra("click_action");
-                                String messageBody = intent.getStringExtra("messageBody");
-                                String messageTitle = intent.getStringExtra("messageTitle");
+                                    @Override
+                                    public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+                                        String click_action = intent.getStringExtra("click_action");
+                                        String messageBody = intent.getStringExtra("messageBody");
+                                        String messageTitle = intent.getStringExtra("messageTitle");
 
-                                androidx.core.app.RemoteInput remoteInput = new androidx.core.app.RemoteInput.Builder("key_text_reply")
-                                        .setLabel("Send message").build();
-                                Intent replyIntent = new Intent(getContext(), DirectReplyReceiver.class);
-                                replyIntent.putExtra("friend_id_messageFragment", friend_id);
-                                replyIntent.putExtra("coming_from", "MessageFragment");
-                                replyIntent.putExtra("notification_id", finalNotificationID);
-                                PendingIntent replyPendingIntent = PendingIntent.getBroadcast(getContext(), finalNotificationID, replyIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+                                        androidx.core.app.RemoteInput remoteInput = new androidx.core.app.RemoteInput.Builder("key_text_reply")
+                                                .setLabel("Send message").build();
+                                        Intent replyIntent = new Intent(getContext(), DirectReplyReceiver.class);
+                                        replyIntent.putExtra("friend_id_messageFragment", friend_id);
+                                        replyIntent.putExtra("coming_from", "MessageFragment");
+                                        replyIntent.putExtra("notification_id", finalNotificationID);
+                                        PendingIntent replyPendingIntent = PendingIntent.getBroadcast(getContext(), finalNotificationID, replyIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-                                NotificationCompat.Action replyAction = new NotificationCompat.Action.Builder(
-                                        R.drawable.ic_send_black_24dp,
-                                        "Reply",
-                                        replyPendingIntent
-                                ).addRemoteInput(remoteInput).build();
+                                        NotificationCompat.Action replyAction = new NotificationCompat.Action.Builder(
+                                                R.drawable.ic_send_black_24dp,
+                                                "Reply",
+                                                replyPendingIntent
+                                        ).addRemoteInput(remoteInput).build();
 
-                                Person user = new Person.Builder().setName(messageTitle).setIcon(IconCompat.createWithBitmap(resource)).build();
-                                messagingStyle = new NotificationCompat.MessagingStyle(user);
-                                messagingStyle.setConversationTitle("Chat");
+                                        Person user = new Person.Builder().setName(messageTitle).setIcon(IconCompat.createWithBitmap(resource)).build();
+                                        messagingStyle = new NotificationCompat.MessagingStyle(user);
+                                        messagingStyle.setConversationTitle("Chat");
 
-                                NotificationCompat.MessagingStyle.Message message =
-                                        new NotificationCompat.MessagingStyle.Message(messageBody, System.currentTimeMillis(), user);
-                                messagingStyle.addMessage(message);
+                                        NotificationCompat.MessagingStyle.Message message =
+                                                new NotificationCompat.MessagingStyle.Message(messageBody, System.currentTimeMillis(), user);
+                                        messagingStyle.addMessage(message);
 
-                                NotificationCompat.Builder builder = new NotificationCompat.Builder(Objects.requireNonNull(getContext()), App.CHANNEL_MESSAGES)
-                                        .setSmallIcon(R.mipmap.ic_launcher_foreground)
-                                        .setStyle(messagingStyle)
-                                        .addAction(replyAction)
-                                        .setColor(Color.BLUE)
-                                        .setPriority(NotificationCompat.PRIORITY_HIGH)
-                                        .setCategory(NotificationCompat.CATEGORY_MESSAGE)
-                                        .setAutoCancel(true);
+                                        NotificationCompat.Builder builder = new NotificationCompat.Builder(Objects.requireNonNull(getContext()), App.CHANNEL_MESSAGES)
+                                                .setSmallIcon(R.mipmap.ic_launcher_foreground)
+                                                .setStyle(messagingStyle)
+                                                .addAction(replyAction)
+                                                .setColor(Color.BLUE)
+                                                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                                                .setCategory(NotificationCompat.CATEGORY_MESSAGE)
+                                                .setAutoCancel(true);
 
-                                Intent resultIntent = new Intent(click_action);
-                                resultIntent.putExtra("friend_id", friend_id);
-                                resultIntent.putExtra("coming_from", "MessageFragment");
-                                resultIntent.putExtra("notification_id", finalNotificationID);
-                                PendingIntent resultPendingIntent = PendingIntent.getActivity(getContext(), finalNotificationID, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-                                builder.setContentIntent(resultPendingIntent);
+                                        Intent resultIntent = new Intent(click_action);
+                                        resultIntent.putExtra("friend_id", friend_id);
+                                        resultIntent.putExtra("coming_from", "MessageFragment");
+                                        resultIntent.putExtra("notification_id", finalNotificationID);
+                                        PendingIntent resultPendingIntent = PendingIntent.getActivity(getContext(), finalNotificationID, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+                                        builder.setContentIntent(resultPendingIntent);
 
 
-                                NotificationManagerCompat notificationManager = NotificationManagerCompat.from(getContext());
-                                notificationManager.notify(finalNotificationID, builder.build());
-                            }
+                                        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(getContext());
+                                        notificationManager.notify(finalNotificationID, builder.build());
+                                    }
 
-                            @Override
-                            public void onLoadCleared(@Nullable Drawable placeholder) {
+                                    @Override
+                                    public void onLoadCleared(@Nullable Drawable placeholder) {
 
-                            }
-                        });
+                                    }
+                                });
                     }
                 }
             }
