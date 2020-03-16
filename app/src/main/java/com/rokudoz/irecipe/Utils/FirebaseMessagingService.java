@@ -120,7 +120,10 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
 
             //User id to unique INT id for notifications
             int notificationID = 0;
-            char[] chars = friend_id.toCharArray();
+            char[] chars = new char[0];
+            if (friend_id != null) {
+                chars = friend_id.toCharArray();
+            }
             for (Character c : chars) {
                 notificationID += c - 'a' + 1;
             }

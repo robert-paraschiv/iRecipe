@@ -29,9 +29,7 @@
                 <com.google.android.material.appbar.MaterialToolbar
                     android:id="@+id/scheduleFragment_toolbar"
                     android:layout_width="match_parent"
-                    android:layout_height="40dp"
-                    android:background="@color/toolbar_color"
-                    android:elevation="4dp">
+                    android:layout_height="40dp">
 
                     <RelativeLayout
                         android:layout_width="match_parent"

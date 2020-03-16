@@ -8,9 +8,7 @@
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="40dp"
-        android:background="@color/toolbar_color"
-        android:elevation="4dp">
+        android:layout_height="40dp">
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -38,6 +36,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
+                android:layout_marginEnd="8dp"
                 android:layout_centerVertical="true">
 
 

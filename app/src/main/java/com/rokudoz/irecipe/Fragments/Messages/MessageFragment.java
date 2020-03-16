@@ -225,7 +225,8 @@ public class MessageFragment extends Fragment {
                 if (documentSnapshot != null) {
                     User user = documentSnapshot.toObject(User.class);
                     if (user != null) {
-                        Glide.with(Objects.requireNonNull(getActivity())).asBitmap().load(user.getUserProfilePicUrl()).apply(RequestOptions.circleCropTransform()).into(new CustomTarget<Bitmap>() {
+                        Glide.with(Objects.requireNonNull(getActivity())).asBitmap().load(user.getUserProfilePicUrl()).apply(RequestOptions.circleCropTransform())
+                                .into(new CustomTarget<Bitmap>() {
                             @Override
                             public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
                                 String click_action = intent.getStringExtra("click_action");
@@ -316,7 +317,7 @@ public class MessageFragment extends Fragment {
         messagesDocumentSnapshots.clear();
         gotMessagesFirstTime = false;
         usersReference.document(currentUserId).collection("Conversations").document(friendUserId)
-                .collection(friendUserId).orderBy("timestamp", Query.Direction.DESCENDING).limit(NR_OF_MESSAGES_TO_LIMIT).addSnapshotListener(Objects.requireNonNull(getActivity()), new EventListener<QuerySnapshot>() {
+                .collection(friendUserId).orderBy("timestamp", Query.Direction.DESCENDING).limit(NR_OF_MESSAGES_TO_LIMIT).addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
                 if (e != null) {
