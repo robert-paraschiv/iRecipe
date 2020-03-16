@@ -47,8 +47,8 @@ public class ScheduleFragment extends Fragment implements ScheduledMealAdapter.O
     private View view;
     private TextView currentDayNREvents, monthTextView;
 
-    final List<ScheduledMeal> scheduleEventList = new ArrayList<>();
-    final List<ScheduledMeal> todayScheduleList = new ArrayList<>();
+    private final List<ScheduledMeal> scheduleEventList = new ArrayList<>();
+    private final List<ScheduledMeal> todayScheduleList = new ArrayList<>();
 
     //FireBase
     private FirebaseAuth.AuthStateListener mAuthListener;
@@ -61,7 +61,6 @@ public class ScheduleFragment extends Fragment implements ScheduledMealAdapter.O
     //RecyclerView
     private RecyclerView recyclerView;
     private ScheduledMealAdapter scheduledMealAdapter;
-    private RecyclerView.LayoutManager layoutManager;
 
     public ScheduleFragment() {
         // Required empty public constructor
@@ -120,13 +119,18 @@ public class ScheduleFragment extends Fragment implements ScheduledMealAdapter.O
                                                 scheduledMealAdapter.notifyItemInserted(todayScheduleList.size());
                                             }
                                             if (todayScheduleList.size() > 0) {
-                                                currentDayNREvents.setText("You've scheduled " + todayScheduleList.size() + " meals for today");
+                                                if (todayScheduleList.size() == 1) {
+                                                    currentDayNREvents.setText("You've scheduled 1 meal for today");
+                                                } else {
+                                                    currentDayNREvents.setText("You've scheduled " + todayScheduleList.size() + " meals for today");
+                                                }
+
                                             } else {
                                                 currentDayNREvents.setText("No meals planned for today");
                                             }
-                                        }else
+                                        } else
                                             Log.d(TAG, "onEvent: RECIPE NULL");
-                                    }else
+                                    } else
                                         Log.d(TAG, "onEvent: FIAL");
                                 }
                             });
@@ -180,7 +184,7 @@ public class ScheduleFragment extends Fragment implements ScheduledMealAdapter.O
 
     private void buildRecyclerView() {
         recyclerView.setHasFixedSize(true);
-        layoutManager = new LinearLayoutManager(getContext());
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
         scheduledMealAdapter = new ScheduledMealAdapter(todayScheduleList);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(scheduledMealAdapter);

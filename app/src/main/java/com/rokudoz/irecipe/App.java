@@ -132,10 +132,10 @@ public class App extends Application {
             NotificationChannel channel_meal_plans = new NotificationChannel(
                     CHANNEL_MEAL_PLANS,
                     "Meal Plans channel",
-                    NotificationManager.IMPORTANCE_DEFAULT
+                    NotificationManager.IMPORTANCE_HIGH
             );
             channel_meal_plans.setDescription("This is the channel used for planning meals");
-            channel_meal_plans.setLockscreenVisibility(Notification.VISIBILITY_PRIVATE);
+            channel_meal_plans.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
             notificationChannelList.add(channel_meal_plans);
 
             NotificationManager notificationManager = getSystemService(NotificationManager.class);

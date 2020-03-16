@@ -4,6 +4,7 @@ import android.os.Bundle;
 
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -119,6 +120,6 @@ public class DayScheduleFragment extends Fragment implements ScheduledMealAdapte
 
     @Override
     public void onItemClick(int position) {
-
+        Navigation.findNavController(view).navigate(DayScheduleFragmentDirections.actionDayScheduleFragmentToRecipeDetailedFragment(scheduleEventList.get(position).getRecipeID()));
     }
 }
