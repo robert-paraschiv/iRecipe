@@ -153,7 +153,7 @@ public class ParentCommentAdapter extends RecyclerView.Adapter<ParentCommentAdap
 
                 if (!replyText.trim().equals("")) {
                     Comment comment = new Comment(currentItem.getRecipe_documentID(), mUser.getUser_id(), mUser.getName(), mUser.getUserProfilePicUrl(), replyText
-                            , currentItem.getComment_for_type(), null);
+                            , currentItem.getComment_for_type(), currentItem.getDocumentID(), null);
                     db.collection("Posts").document(currentItem.getRecipe_documentID()).collection("Comments")
                             .document(currentItem.getDocumentID()).collection("ChildComments").add(comment)
                             .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
@@ -176,7 +176,6 @@ public class ParentCommentAdapter extends RecyclerView.Adapter<ParentCommentAdap
         });
 
         // EDIT COMMENT
-
         if (currentItem.getComment_for_type() == null || !currentItem.getUser_id().equals(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
             holder.editCommentBtn.setVisibility(View.GONE);
         } else {
@@ -233,7 +232,8 @@ public class ParentCommentAdapter extends RecyclerView.Adapter<ParentCommentAdap
                     holder.deleteCommentBtn.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            MaterialAlertDialogBuilder materialAlertDialogBuilder = new MaterialAlertDialogBuilder(ctx, R.style.ThemeOverlay_MaterialComponents_MaterialAlertDialog_Centered);
+                            MaterialAlertDialogBuilder materialAlertDialogBuilder = new MaterialAlertDialogBuilder(ctx
+                                    , R.style.ThemeOverlay_MaterialComponents_MaterialAlertDialog_Centered);
                             materialAlertDialogBuilder.setMessage("Are you sure you want to delete this comment?");
                             materialAlertDialogBuilder.setCancelable(true);
                             materialAlertDialogBuilder.setPositiveButton(
@@ -286,7 +286,7 @@ public class ParentCommentAdapter extends RecyclerView.Adapter<ParentCommentAdap
 
     }
 
-    private ArrayList<Comment> getChildComments(Comment comment) {
+    private ArrayList<Comment> getChildComments(final Comment comment) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         final ArrayList<Comment> childComments = new ArrayList<>();
         db.collection("Posts").document(comment.getRecipe_documentID()).collection("Comments")
@@ -299,6 +299,7 @@ public class ParentCommentAdapter extends RecyclerView.Adapter<ParentCommentAdap
                                 Comment commentToAdd = document.toObject(Comment.class);
                                 if (commentToAdd != null) {
                                     commentToAdd.setDocumentID(document.getId());
+                                    commentToAdd.setParent_comment_ID(comment.getDocumentID());
 
                                     if (!childComments.contains(commentToAdd)) {
                                         childComments.add(0, commentToAdd);
@@ -321,7 +322,7 @@ public class ParentCommentAdapter extends RecyclerView.Adapter<ParentCommentAdap
 
     private void initchildLayout(RecyclerView rv_child, ArrayList<Comment> childData) {
         rv_child.setLayoutManager(new LinearLayoutManager(ctx));
-        childAdapter = new ChildCommentAdapter(childData);
+        childAdapter = new ChildCommentAdapter(ctx, childData);
         rv_child.setAdapter(childAdapter);
         rv_child.setHasFixedSize(true);
     }

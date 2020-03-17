@@ -352,7 +352,7 @@ public class RecipeDetailedFragment extends Fragment implements RecipeInstructio
 
 
         final Comment comment = new Comment(documentID, FirebaseAuth.getInstance().getCurrentUser().getUid(), mUser.getName(), mUser.getUserProfilePicUrl()
-                , commentText, "Recipe", null);
+                , commentText, "Recipe", null, null);
         DocumentReference currentRecipeRef = recipeRef.document(documentID);
         CollectionReference commentRef = currentRecipeRef.collection("Comments");
 

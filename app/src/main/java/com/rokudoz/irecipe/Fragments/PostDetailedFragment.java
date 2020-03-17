@@ -185,7 +185,7 @@ public class PostDetailedFragment extends Fragment{
         String commentText = commentEditText.getText().toString();
 
         final Comment comment = new Comment(documentID, FirebaseAuth.getInstance().getCurrentUser().getUid(), mUser.getName()
-                , mUser.getUserProfilePicUrl(), commentText, "Post",null);
+                , mUser.getUserProfilePicUrl(), commentText, "Post",null,null);
         DocumentReference currentRecipeRef = postsRef.document(documentID);
         CollectionReference commentRef = currentRecipeRef.collection("Comments");
 

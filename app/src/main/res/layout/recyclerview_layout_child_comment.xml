@@ -42,6 +42,64 @@
                 android:textAppearance="@style/TextAppearance.AppCompat.Medium"
                 tools:text="Name" />
 
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/comment_rv_editBtn"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:layout_width="33dp"
+                android:layout_height="33dp"
+                android:layout_alignParentEnd="true"
+                app:icon="@drawable/ic_edit_black_24dp" />
+
+            <RelativeLayout
+                android:id="@+id/comment_rv_editCommentLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/comment_rv_tv_name"
+                android:layout_marginStart="8dp"
+                android:layout_toEndOf="@id/comment_rv_profile_img"
+                android:visibility="gone"
+                tools:visibility="visible">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/comment_rv_comment_editText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Comment"
+                    android:inputType="textCapSentences"
+                    android:maxLines="4" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/comment_rv_comment_save"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="40dp"
+                    android:layout_below="@id/comment_rv_comment_editText"
+                    android:layout_alignParentStart="true"
+                    android:text="Save"
+                    android:textAllCaps="false" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/comment_rv_comment_cancel"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="40dp"
+                    android:layout_below="@id/comment_rv_comment_editText"
+                    android:layout_marginStart="12dp"
+                    android:layout_toEndOf="@id/comment_rv_comment_save"
+                    android:text="Cancel"
+                    android:textAllCaps="false" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/comment_rv_comment_delete"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="40dp"
+                    android:layout_below="@id/comment_rv_comment_editText"
+                    android:layout_alignParentEnd="true"
+                    android:text="Delete"
+                    android:textAllCaps="false" />
+            </RelativeLayout>
+
             <TextView
                 android:id="@+id/comment_rv_tv_comment_text"
                 android:layout_width="wrap_content"
