@@ -11,7 +11,8 @@
         android:id="@+id/margin"
         android:layout_width="match_parent"
         android:layout_height="0.5dp"
-        android:src="@color/black" />
+        android:src="@color/black"
+        android:contentDescription="Step separator" />
 
     <TextView
         android:id="@+id/step_item_StepText_TextView"
@@ -36,7 +37,8 @@
             android:id="@+id/stepItem_image"
             android:layout_width="match_parent"
             android:layout_height="150dp"
-            tools:src="@color/colorPrimary" />
+            tools:src="@color/colorPrimary"
+            android:contentDescription="Step image" />
     </com.google.android.material.card.MaterialCardView>
 
 </RelativeLayout>

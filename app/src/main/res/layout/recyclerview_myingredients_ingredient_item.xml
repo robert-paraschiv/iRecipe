@@ -19,6 +19,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:layout_margin="8dp"
+            android:maxLines="1"
             tools:text="Ingredient name boss" />
     </com.google.android.material.card.MaterialCardView>
 </RelativeLayout>

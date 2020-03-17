@@ -1,6 +1,7 @@
 package com.rokudoz.irecipe.Utils.Adapters;
 
 import android.content.Context;
+import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,7 +23,6 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
-import com.rokudoz.irecipe.Fragments.RecipeDetailedFragmentDirections;
 import com.rokudoz.irecipe.Models.Comment;
 import com.rokudoz.irecipe.Models.User;
 import com.rokudoz.irecipe.R;
@@ -42,34 +42,45 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class RecipeParentCommentAdapter
-        extends RecyclerView.Adapter<RecipeParentCommentAdapter.CommentViewHolder>
-        implements View.OnClickListener {
+public class ParentCommentAdapter extends RecyclerView.Adapter<ParentCommentAdapter.CommentViewHolder> implements View.OnClickListener {
+
+    private OnItemClickListener mListener;
 
     private static final int SECOND_MILLIS = 1000;
     private static final int MINUTE_MILLIS = 60 * SECOND_MILLIS;
     private static final int HOUR_MILLIS = 60 * MINUTE_MILLIS;
     private static final int DAY_MILLIS = 24 * HOUR_MILLIS;
 
+    public interface OnItemClickListener {
+        void onItemClick(int position);
+
+        void onUserClick(int position);
+
+        void onEditClick(int position);
+    }
+
+    public void setOnItemClickListener(OnItemClickListener listener) {
+        mListener = listener;
+    }
 
     private static final String TAG = "RecipeParentCommentAdapter";
     private Integer expandedPosition = -1;
     private ArrayList<Comment> mCommentList;
-    private RecipeChildCommentAdapter childAdapter;
+    private ChildCommentAdapter childAdapter;
     private User mUser;
-    Context ctx;
+    private Context ctx;
 
-    public class CommentViewHolder extends RecyclerView.ViewHolder {
-        public CircleImageView mImageView;
-        public TextView mName;
-        public TextView mCommentText;
-        public TextView mCommentTimeStamp;
-        public MaterialButton mAddReplyBtn, deleteCommentBtn;
-        public TextInputEditText mReplyText;
+    class CommentViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+        CircleImageView mImageView;
+        TextView mName;
+        TextView mCommentText;
+        TextView mCommentTimeStamp;
+        MaterialButton mAddReplyBtn, editCommentBtn;
+        TextInputEditText mReplyText;
         RelativeLayout llExpandArea;
         RecyclerView rv_child;
 
-        public CommentViewHolder(@NonNull View itemView) {
+        CommentViewHolder(@NonNull View itemView) {
             super(itemView);
             mImageView = itemView.findViewById(R.id.comment_rv_profile_img);
             mName = itemView.findViewById(R.id.comment_rv_tv_name);
@@ -78,12 +89,47 @@ public class RecipeParentCommentAdapter
             llExpandArea = itemView.findViewById(R.id.llExpandArea);
             rv_child = itemView.findViewById(R.id.comment_rv_childRecyclerView);
             mAddReplyBtn = itemView.findViewById(R.id.comment_rv_addReply_btn);
-            deleteCommentBtn = itemView.findViewById(R.id.comment_rv_deleteBtn);
+            editCommentBtn = itemView.findViewById(R.id.comment_rv_editBtn);
             mReplyText = itemView.findViewById(R.id.comment_rv_reply_editText);
+
+            itemView.setOnClickListener(this);
+
+            mImageView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (mListener != null) {
+                        int position = getAdapterPosition();
+                        if (position != RecyclerView.NO_POSITION) {
+                            mListener.onUserClick(position);
+                        }
+                    }
+                }
+            });
+            editCommentBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (mListener != null) {
+                        int position = getAdapterPosition();
+                        if (position != RecyclerView.NO_POSITION) {
+                            mListener.onEditClick(position);
+                        }
+                    }
+                }
+            });
+        }
+
+        @Override
+        public void onClick(View v) {
+            if (mListener != null) {
+                int position = getAdapterPosition();
+                if (position != RecyclerView.NO_POSITION) {
+                    mListener.onItemClick(position);
+                }
+            }
         }
     }
 
-    public RecipeParentCommentAdapter(Context ctx, ArrayList<Comment> commentArrayList) {
+    public ParentCommentAdapter(Context ctx, ArrayList<Comment> commentArrayList) {
         this.ctx = ctx;
         mCommentList = commentArrayList;
     }
@@ -95,7 +141,7 @@ public class RecipeParentCommentAdapter
         CommentViewHolder cvh = new CommentViewHolder(v);
         mUser = new User();
         getCurrentUserDetails();
-        cvh.itemView.setOnClickListener(RecipeParentCommentAdapter.this);
+        cvh.itemView.setOnClickListener(ParentCommentAdapter.this);
         cvh.itemView.setTag(cvh);
         return cvh;
     }
@@ -139,23 +185,9 @@ public class RecipeParentCommentAdapter
         }
 
         if (currentItem.getUser_id().equals(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
-            holder.deleteCommentBtn.setVisibility(View.VISIBLE);
-
-            holder.deleteCommentBtn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    mCommentList.remove(currentItem);
-                    db.collection("Recipes").document(currentItem.getRecipe_documentID()).collection("Comments").document(currentItem.getDocumentID()).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
-                        @Override
-                        public void onSuccess(Void aVoid) {
-                            Toast.makeText(ctx, "Deleted comment", Toast.LENGTH_SHORT).show();
-                            Log.d(TAG, "onSuccess: Deleted comm");
-                        }
-                    });
-                }
-            });
+            holder.editCommentBtn.setVisibility(View.VISIBLE);
         } else {
-            holder.deleteCommentBtn.setVisibility(View.GONE);
+            holder.editCommentBtn.setVisibility(View.GONE);
         }
 
         holder.mAddReplyBtn.setOnClickListener(new View.OnClickListener() {
@@ -166,12 +198,12 @@ public class RecipeParentCommentAdapter
 
                 if (!replyText.trim().equals("")) {
                     Comment comment = new Comment(currentItem.getRecipe_documentID(), mUser.getUser_id(), mUser.getName(), mUser.getUserProfilePicUrl(), replyText, null);
-                    db.collection("Recipes").document(currentItem.getRecipe_documentID()).collection("Comments")
+                    db.collection("Posts").document(currentItem.getRecipe_documentID()).collection("Comments")
                             .document(currentItem.getDocumentID()).collection("ChildComments").add(comment)
                             .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                                 @Override
                                 public void onSuccess(DocumentReference documentReference) {
-                                    Toast.makeText(ctx, "Succesfully Added Reply", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(ctx, "Successfully Added Reply", Toast.LENGTH_SHORT).show();
                                     holder.mReplyText.setText("");
                                 }
                             })
@@ -183,13 +215,6 @@ public class RecipeParentCommentAdapter
                             });
                 }
 
-            }
-        });
-
-        holder.mImageView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Navigation.findNavController(v).navigate(RecipeDetailedFragmentDirections.actionRecipeDetailedFragmentToUserProfileFragment2(currentItem.getUser_id()));
             }
         });
 
@@ -211,25 +236,28 @@ public class RecipeParentCommentAdapter
     private ArrayList<Comment> getChildComments(Comment comment) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         final ArrayList<Comment> childComments = new ArrayList<>();
-        final ArrayList<String> childcommentID = new ArrayList<>();
-        db.collection("Recipes").document(comment.getRecipe_documentID()).collection("Comments")
+        db.collection("Posts").document(comment.getRecipe_documentID()).collection("Comments")
                 .document(comment.getDocumentID()).collection("ChildComments").orderBy("comment_timeStamp", Query.Direction.ASCENDING)
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
                     public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
-                        if (e != null) {
-                            Log.w(TAG, "onEvent: ", e);
-                            return;
-                        }
-                        for (DocumentSnapshot document : queryDocumentSnapshots) {
-                            Comment commentToAdd = document.toObject(Comment.class);
-                            if (!childcommentID.contains(document.getId())) {
-                                childcommentID.add(document.getId());
-                                childComments.add(0, commentToAdd);
-                            }
+                        if (e == null && queryDocumentSnapshots != null) {
+                            for (DocumentSnapshot document : queryDocumentSnapshots) {
+                                Comment commentToAdd = document.toObject(Comment.class);
+                                if (commentToAdd != null) {
+                                    commentToAdd.setDocumentID(document.getId());
 
+                                    if (!childComments.contains(commentToAdd)) {
+                                        childComments.add(0, commentToAdd);
+                                        childAdapter.notifyItemInserted(0);
+                                    } else {
+                                        childComments.set(childComments.indexOf(commentToAdd), commentToAdd);
+                                        childAdapter.notifyItemChanged(childComments.indexOf(commentToAdd));
+                                    }
+                                }
+                            }
+//                        childAdapter.notifyDataSetChanged();
                         }
-                        childAdapter.notifyDataSetChanged();
                     }
                 });
 //        childAdapter.notifyDataSetChanged();
@@ -240,7 +268,7 @@ public class RecipeParentCommentAdapter
 
     private void initchildLayout(RecyclerView rv_child, ArrayList<Comment> childData) {
         rv_child.setLayoutManager(new LinearLayoutManager(ctx));
-        childAdapter = new RecipeChildCommentAdapter(childData);
+        childAdapter = new ChildCommentAdapter(childData);
         rv_child.setAdapter(childAdapter);
         rv_child.setHasFixedSize(true);
     }

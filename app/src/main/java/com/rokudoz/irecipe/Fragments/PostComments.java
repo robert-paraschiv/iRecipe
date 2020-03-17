@@ -1,11 +1,13 @@
 package com.rokudoz.irecipe.Fragments;
 
 
+import android.content.DialogInterface;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -18,6 +20,7 @@ import android.widget.Toast;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
@@ -33,7 +36,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 import com.rokudoz.irecipe.Models.Comment;
 import com.rokudoz.irecipe.Models.User;
 import com.rokudoz.irecipe.R;
-import com.rokudoz.irecipe.Utils.Adapters.PostParentCommentAdapter;
+import com.rokudoz.irecipe.Utils.Adapters.ParentCommentAdapter;
 
 import java.util.ArrayList;
 import java.util.Objects;
@@ -41,7 +44,7 @@ import java.util.Objects;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class PostComments extends Fragment {
+public class PostComments extends Fragment implements ParentCommentAdapter.OnItemClickListener {
     private static final String TAG = "PostComments";
 
     private String documentID = "";
@@ -51,7 +54,7 @@ public class PostComments extends Fragment {
     private TextInputEditText commentTextInput;
 
     private RecyclerView commentRecyclerView;
-    private RecyclerView.Adapter mAdapter;
+    private ParentCommentAdapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
     private ArrayList<Comment> commentList = new ArrayList<>();
 
@@ -127,9 +130,10 @@ public class PostComments extends Fragment {
     private void buildRecyclerView() {
         commentRecyclerView.setHasFixedSize(true);
         mLayoutManager = new LinearLayoutManager(getContext());
-        mAdapter = new PostParentCommentAdapter(getContext(), commentList);
+        mAdapter = new ParentCommentAdapter(getContext(), commentList);
         commentRecyclerView.setLayoutManager(mLayoutManager);
         commentRecyclerView.setAdapter(mAdapter);
+        mAdapter.setOnItemClickListener(PostComments.this);
     }
 
     private void addComment() {
@@ -139,20 +143,24 @@ public class PostComments extends Fragment {
         DocumentReference currentRecipeRef = postsRef.document(documentID);
         CollectionReference commentRef = currentRecipeRef.collection("Comments");
 
-        commentRef.add(comment)
-                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                    @Override
-                    public void onSuccess(DocumentReference documentReference) {
-                        commentTextInput.setText("");
-                        Toast.makeText(getContext(), "Successfully added comment ", Toast.LENGTH_SHORT).show();
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.d(TAG, "onFailure: ", e);
-                    }
-                });
+        if (commentTextInput.toString().trim().equals("")) {
+            Toast.makeText(getActivity(), "Comment cannot be empty", Toast.LENGTH_SHORT).show();
+        } else {
+            commentRef.add(comment)
+                    .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                        @Override
+                        public void onSuccess(DocumentReference documentReference) {
+                            commentTextInput.setText("");
+                            Toast.makeText(getContext(), "Successfully added comment ", Toast.LENGTH_SHORT).show();
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Log.d(TAG, "onFailure: ", e);
+                        }
+                    });
+        }
     }
 
     private void getCommentsFromDb() {
@@ -199,4 +207,53 @@ public class PostComments extends Fragment {
     }
 
 
+    @Override
+    public void onItemClick(int position) {
+
+    }
+
+    @Override
+    public void onUserClick(int position) {
+        Comment comment = commentList.get(position);
+        Bundle args = new Bundle();
+        args.putString("documentID", comment.getUser_id());
+        Navigation.findNavController(view).navigate(R.id.userProfileFragment2, args);
+    }
+
+    @Override
+    public void onEditClick(int position) {
+        final Comment comment = commentList.get(position);
+
+        MaterialAlertDialogBuilder materialAlertDialogBuilder = new MaterialAlertDialogBuilder(getActivity(), R.style.ThemeOverlay_MaterialComponents_MaterialAlertDialog_Centered);
+        materialAlertDialogBuilder.setMessage("Are you sure you want to delete this comment?");
+        materialAlertDialogBuilder.setCancelable(true);
+        materialAlertDialogBuilder.setPositiveButton(
+                "Yes",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        //Delete user from friends
+                        db.collection("Posts").document(comment.getRecipe_documentID()).collection("Comments").document(comment.getDocumentID())
+                                .delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                commentList.remove(comment);
+                                mAdapter.notifyDataSetChanged();
+                                Toast.makeText(getContext(), "Deleted comment", Toast.LENGTH_SHORT).show();
+                                Log.d(TAG, "onSuccess: Deleted comm");
+                            }
+                        });
+                        dialog.cancel();
+                    }
+                });
+
+        materialAlertDialogBuilder.setNegativeButton(
+                "No",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.cancel();
+                    }
+                });
+
+        materialAlertDialogBuilder.show();
+    }
 }

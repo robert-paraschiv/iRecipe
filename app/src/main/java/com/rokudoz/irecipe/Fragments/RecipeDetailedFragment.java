@@ -66,9 +66,9 @@ import com.rokudoz.irecipe.Models.ScheduledMeal;
 import com.rokudoz.irecipe.Models.User;
 import com.rokudoz.irecipe.Models.UserWhoFaved;
 import com.rokudoz.irecipe.R;
+import com.rokudoz.irecipe.Utils.Adapters.ParentCommentAdapter;
 import com.rokudoz.irecipe.Utils.Adapters.RecipeIngredientsAdapter;
 import com.rokudoz.irecipe.Utils.Adapters.RecipeInstructionsAdapter;
-import com.rokudoz.irecipe.Utils.Adapters.RecipeParentCommentAdapter;
 import com.rokudoz.irecipe.Utils.Adapters.RecipeDetailedViewPagerAdapter;
 import com.rokudoz.irecipe.Utils.ScheduleNotifReceiver;
 
@@ -83,7 +83,7 @@ import java.util.Locale;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class RecipeDetailedFragment extends Fragment implements RecipeInstructionsAdapter.OnItemClickListener {
+public class RecipeDetailedFragment extends Fragment implements RecipeInstructionsAdapter.OnItemClickListener, ParentCommentAdapter.OnItemClickListener {
     private static final String TAG = "RecipeDetailedFragment";
     // Hold a reference to the current animator,
     // so that it can be canceled mid-way.
@@ -114,7 +114,7 @@ public class RecipeDetailedFragment extends Fragment implements RecipeInstructio
     private RecipeDetailedViewPagerAdapter recipeDetailedViewPagerAdapter;
 
     private RecyclerView commentRecyclerView;
-    private RecipeParentCommentAdapter commentAdapter;
+    private ParentCommentAdapter commentAdapter;
     private RecyclerView.LayoutManager commentLayoutManager;
 
     private RecyclerView instructionsRecyclewView;
@@ -387,9 +387,10 @@ public class RecipeDetailedFragment extends Fragment implements RecipeInstructio
     private void buildRecyclerView() {
         commentRecyclerView.setHasFixedSize(true);
         commentLayoutManager = new LinearLayoutManager(getContext());
-        commentAdapter = new RecipeParentCommentAdapter(getContext(), commentList);
+        commentAdapter = new ParentCommentAdapter(getContext(), commentList);
         commentRecyclerView.setLayoutManager(commentLayoutManager);
         commentRecyclerView.setAdapter(commentAdapter);
+        commentAdapter.setOnItemClickListener(RecipeDetailedFragment.this);
 
         instructionsRecyclewView.setHasFixedSize(true);
         instructionsLayoutManager = new LinearLayoutManager(getContext());
@@ -948,5 +949,55 @@ public class RecipeDetailedFragment extends Fragment implements RecipeInstructio
     @Override
     public void onItemImageClick(int position) {
         zoomImageFromThumb(instructionsRecyclewView.getChildAt(position), recipeInstructionList.get(position).getImgUrl());
+    }
+
+    @Override
+    public void onItemClick(int position) {
+
+    }
+
+    @Override
+    public void onUserClick(int position) {
+        Comment comment = commentList.get(position);
+        Bundle args = new Bundle();
+        args.putString("documentID", comment.getUser_id());
+        Navigation.findNavController(view).navigate(R.id.userProfileFragment2, args);
+    }
+
+    @Override
+    public void onEditClick(int position) {
+        final Comment comment = commentList.get(position);
+
+        MaterialAlertDialogBuilder materialAlertDialogBuilder = new MaterialAlertDialogBuilder(getActivity(), R.style.ThemeOverlay_MaterialComponents_MaterialAlertDialog_Centered);
+        materialAlertDialogBuilder.setMessage("Are you sure you want to delete this comment?");
+        materialAlertDialogBuilder.setCancelable(true);
+        materialAlertDialogBuilder.setPositiveButton(
+                "Yes",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        //Delete user from friends
+                        db.collection("Recipes").document(comment.getRecipe_documentID()).collection("Comments").document(comment.getDocumentID())
+                                .delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                commentList.remove(comment);
+                                commentAdapter.notifyDataSetChanged();
+                                Toast.makeText(getContext(), "Deleted comment", Toast.LENGTH_SHORT).show();
+                                Log.d(TAG, "onSuccess: Deleted comm");
+                            }
+                        });
+                        dialog.cancel();
+                    }
+                });
+
+        materialAlertDialogBuilder.setNegativeButton(
+                "No",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.cancel();
+                    }
+                });
+
+        materialAlertDialogBuilder.show();
     }
 }

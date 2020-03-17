@@ -1,104 +1,103 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    android:layout_height="match_parent">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:orientation="vertical"
-        android:paddingTop="55dp"
         android:paddingLeft="25dp"
-        android:paddingRight="25dp"
-        >
+        android:paddingTop="55dp"
+        android:paddingRight="25dp">
 
         <ImageView
+            android:id="@+id/logo"
             android:layout_width="wrap_content"
             android:layout_height="75dp"
             android:layout_gravity="center_horizontal"
-            android:src="@drawable/foodify_logo_black"
             android:layout_marginBottom="40dp"
-            android:id="@+id/logo"/>
+            android:src="@drawable/foodify_logo_black" />
 
         <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-            android:hint="Email">
-        <EditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="textEmailAddress"
-            android:id="@+id/input_email"
-            android:layout_marginTop="15dp"/>
+            android:hint="Email">
+
+            <EditText
+                android:id="@+id/input_email"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="15dp"
+                android:inputType="textEmailAddress" />
         </com.google.android.material.textfield.TextInputLayout>
 
 
         <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:passwordToggleEnabled="true"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-            android:hint="Password">
-        <EditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="textPassword"
-            android:id="@+id/input_password"
-            android:layout_marginTop="15dp"/>
+            android:hint="Password"
+            app:passwordToggleEnabled="true">
+
+            <EditText
+                android:id="@+id/input_password"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="15dp"
+                android:inputType="textPassword" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_login"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            app:cornerRadius="18dp"
-            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
             android:layout_marginTop="25dp"
+            android:padding="14dp"
             android:text="Log in"
             android:textAllCaps="false"
-            android:id="@+id/btn_login"
-            android:padding="14dp"/>
+            app:cornerRadius="18dp" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/login_forgotPassword_btn"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            style="@style/Widget.MaterialComponents.Button.TextButton"
-            android:textSize="12sp"
-            android:textStyle="normal"
-            android:textAllCaps="false"
             android:layout_marginBottom="25dp"
             android:text="Forgot your password ?"
-            />
+            android:textAllCaps="false"
+            android:textSize="12sp"
+            android:textStyle="normal" />
 
         <TextView
+            android:id="@+id/link_register"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="25dp"
-            android:text="Register"
             android:gravity="center"
-            android:textSize="16dp"
-            android:id="@+id/link_register"
-            android:textColor="@color/colorPrimary"/>
+            android:text="Register"
+            android:textColor="@color/colorPrimary"
+            android:textSize="16sp" />
 
         <com.google.android.gms.common.SignInButton
             android:id="@+id/signInButton"
-            app:cornerRadius="18dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center">
-        </com.google.android.gms.common.SignInButton>
+            android:layout_gravity="center"
+            app:cornerRadius="18dp" />
 
     </LinearLayout>
 
     <ProgressBar
+        android:id="@+id/progressBar"
         android:layout_width="50dp"
         android:layout_height="50dp"
-        android:id="@+id/progressBar"
-        android:layout_centerInParent="true"/>
+        android:layout_centerInParent="true" />
 
 
 </RelativeLayout>

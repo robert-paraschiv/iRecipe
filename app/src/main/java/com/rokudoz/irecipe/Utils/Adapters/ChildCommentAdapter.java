@@ -1,19 +1,13 @@
 package com.rokudoz.irecipe.Utils.Adapters;
 
-import android.util.Log;
+import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
-import com.google.firebase.firestore.EventListener;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.google.firebase.firestore.QuerySnapshot;
-import com.rokudoz.irecipe.Fragments.RecipeDetailedFragmentDirections;
 import com.rokudoz.irecipe.Models.Comment;
-import com.rokudoz.irecipe.Models.User;
 import com.rokudoz.irecipe.R;
 
 import java.text.DateFormat;
@@ -21,7 +15,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
-import java.util.Objects;
 
 import androidx.annotation.NonNull;
 import androidx.navigation.Navigation;
@@ -29,14 +22,14 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class RecipeChildCommentAdapter extends RecyclerView.Adapter<RecipeChildCommentAdapter.CommentViewHolder> {
+public class ChildCommentAdapter extends RecyclerView.Adapter<ChildCommentAdapter.CommentViewHolder> {
     private static final int SECOND_MILLIS = 1000;
     private static final int MINUTE_MILLIS = 60 * SECOND_MILLIS;
     private static final int HOUR_MILLIS = 60 * MINUTE_MILLIS;
     private static final int DAY_MILLIS = 24 * HOUR_MILLIS;
 
     private ArrayList<Comment> mCommentList;
-    private static final String TAG = "RecipeChildCommentAdapter";
+    private static final String TAG = "ChildCommentAdapter";
 
     public class CommentViewHolder extends RecyclerView.ViewHolder {
         public CircleImageView mImageView;
@@ -53,7 +46,7 @@ public class RecipeChildCommentAdapter extends RecyclerView.Adapter<RecipeChildC
         }
     }
 
-    public RecipeChildCommentAdapter(ArrayList<Comment> commentArrayList) {
+    public ChildCommentAdapter(ArrayList<Comment> commentArrayList) {
         mCommentList = commentArrayList;
     }
 
@@ -73,6 +66,7 @@ public class RecipeChildCommentAdapter extends RecyclerView.Adapter<RecipeChildC
             holder.mName.setText(currentItem.getUser_name());
         if (currentItem.getUser_profilePic() != null && !currentItem.getUser_profilePic().equals(""))
             Glide.with(holder.mImageView).load(currentItem.getUser_profilePic()).centerCrop().into(holder.mImageView);
+
         holder.mCommentText.setText(currentItem.getComment_text());
 
         Date date = currentItem.getComment_timeStamp();
@@ -87,7 +81,9 @@ public class RecipeChildCommentAdapter extends RecyclerView.Adapter<RecipeChildC
         holder.mImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Navigation.findNavController(v).navigate(RecipeDetailedFragmentDirections.actionRecipeDetailedFragmentToUserProfileFragment2(currentItem.getUser_id()));
+                Bundle args = new Bundle();
+                args.putString("documentID", currentItem.getUser_id());
+                Navigation.findNavController(v).navigate(R.id.userProfileFragment2, args);
             }
         });
 

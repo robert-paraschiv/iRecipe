@@ -1,6 +1,7 @@
 package com.rokudoz.irecipe.Fragments;
 
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 
@@ -26,7 +27,7 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.button.MaterialButton;
-import com.google.android.material.card.MaterialCardView;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
@@ -47,18 +48,17 @@ import com.rokudoz.irecipe.Models.Recipe;
 import com.rokudoz.irecipe.Models.User;
 import com.rokudoz.irecipe.Models.UserWhoFaved;
 import com.rokudoz.irecipe.R;
-import com.rokudoz.irecipe.Utils.Adapters.PostParentCommentAdapter;
+import com.rokudoz.irecipe.Utils.Adapters.ParentCommentAdapter;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.Locale;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class PostDetailedFragment extends Fragment {
+public class PostDetailedFragment extends Fragment implements ParentCommentAdapter.OnItemClickListener {
     private static final String TAG = "PostDetailedFragment";
 
     private static final int SECOND_MILLIS = 1000;
@@ -78,7 +78,7 @@ public class PostDetailedFragment extends Fragment {
     private String documentID = "";
     private View view;
 
-    private RecyclerView.Adapter mAdapter;
+    private ParentCommentAdapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
     private ArrayList<Comment> commentList = new ArrayList<>();
 
@@ -159,9 +159,10 @@ public class PostDetailedFragment extends Fragment {
     private void buildRecyclerView() {
         commentRecyclerView.setHasFixedSize(true);
         mLayoutManager = new LinearLayoutManager(getContext());
-        mAdapter = new PostParentCommentAdapter(getContext(), commentList);
+        mAdapter = new ParentCommentAdapter(getContext(), commentList);
         commentRecyclerView.setLayoutManager(mLayoutManager);
         commentRecyclerView.setAdapter(mAdapter);
+        mAdapter.setOnItemClickListener(PostDetailedFragment.this);
     }
 
     @Override
@@ -490,4 +491,53 @@ public class PostDetailedFragment extends Fragment {
         }
     }
 
+    @Override
+    public void onItemClick(int position) {
+
+    }
+
+    @Override
+    public void onUserClick(int position) {
+        Comment comment = commentList.get(position);
+        Bundle args = new Bundle();
+        args.putString("documentID", comment.getUser_id());
+        Navigation.findNavController(view).navigate(R.id.userProfileFragment2, args);
+    }
+
+    @Override
+    public void onEditClick(int position) {
+        final Comment comment = commentList.get(position);
+
+        MaterialAlertDialogBuilder materialAlertDialogBuilder = new MaterialAlertDialogBuilder(getActivity(), R.style.ThemeOverlay_MaterialComponents_MaterialAlertDialog_Centered);
+        materialAlertDialogBuilder.setMessage("Are you sure you want to delete this comment?");
+        materialAlertDialogBuilder.setCancelable(true);
+        materialAlertDialogBuilder.setPositiveButton(
+                "Yes",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        //Delete user from friends
+                        db.collection("Posts").document(comment.getRecipe_documentID()).collection("Comments").document(comment.getDocumentID())
+                                .delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                commentList.remove(comment);
+                                mAdapter.notifyDataSetChanged();
+                                Toast.makeText(getContext(), "Deleted comment", Toast.LENGTH_SHORT).show();
+                                Log.d(TAG, "onSuccess: Deleted comm");
+                            }
+                        });
+                        dialog.cancel();
+                    }
+                });
+
+        materialAlertDialogBuilder.setNegativeButton(
+                "No",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.cancel();
+                    }
+                });
+
+        materialAlertDialogBuilder.show();
+    }
 }

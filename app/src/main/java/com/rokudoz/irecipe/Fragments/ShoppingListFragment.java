@@ -221,6 +221,12 @@ public class ShoppingListFragment extends Fragment {
                 addIngredientToListFab.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                                LinearLayout.LayoutParams.MATCH_PARENT,
+                                LinearLayout.LayoutParams.WRAP_CONTENT
+                        );
+                        params.setMargins(8, 0, 8, 0);
+
                         String[] ingredientQuantitySpinnerItems = getResources().getStringArray(R.array.ingredient_quantity_type);
                         final LinearLayout linearLayout = new LinearLayout(getActivity());
                         linearLayout.setOrientation(LinearLayout.VERTICAL);
@@ -230,6 +236,9 @@ public class ShoppingListFragment extends Fragment {
                         inputQuantity.setHint("Quantity");
                         final Spinner categorySpinner = new Spinner(getActivity());
                         final Spinner quantityTypeSpinner = new Spinner(getActivity());
+
+                        input.setLayoutParams(params);
+                        inputQuantity.setLayoutParams(params);
 
                         //create an adapter to describe how the items are displayed, adapters are used in several places in android.
                         //There are multiple variations of this, but this is the basic variant.
