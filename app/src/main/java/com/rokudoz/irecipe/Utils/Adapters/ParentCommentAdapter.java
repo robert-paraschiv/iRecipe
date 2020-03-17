@@ -1,6 +1,7 @@
 package com.rokudoz.irecipe.Utils.Adapters;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -14,6 +15,7 @@ import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
@@ -44,24 +46,11 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 public class ParentCommentAdapter extends RecyclerView.Adapter<ParentCommentAdapter.CommentViewHolder> implements View.OnClickListener {
 
-    private OnItemClickListener mListener;
-
     private static final int SECOND_MILLIS = 1000;
     private static final int MINUTE_MILLIS = 60 * SECOND_MILLIS;
     private static final int HOUR_MILLIS = 60 * MINUTE_MILLIS;
     private static final int DAY_MILLIS = 24 * HOUR_MILLIS;
 
-    public interface OnItemClickListener {
-        void onItemClick(int position);
-
-        void onUserClick(int position);
-
-        void onEditClick(int position);
-    }
-
-    public void setOnItemClickListener(OnItemClickListener listener) {
-        mListener = listener;
-    }
 
     private static final String TAG = "RecipeParentCommentAdapter";
     private Integer expandedPosition = -1;
@@ -70,14 +59,14 @@ public class ParentCommentAdapter extends RecyclerView.Adapter<ParentCommentAdap
     private User mUser;
     private Context ctx;
 
-    class CommentViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    class CommentViewHolder extends RecyclerView.ViewHolder {
         CircleImageView mImageView;
         TextView mName;
         TextView mCommentText;
         TextView mCommentTimeStamp;
-        MaterialButton mAddReplyBtn, editCommentBtn;
-        TextInputEditText mReplyText;
-        RelativeLayout llExpandArea;
+        MaterialButton mAddReplyBtn, editCommentBtn, saveCommentBtn, cancelEditBtn, deleteCommentBtn;
+        TextInputEditText mReplyText, editCommentInput;
+        RelativeLayout llExpandArea, editCommentLayout;
         RecyclerView rv_child;
 
         CommentViewHolder(@NonNull View itemView) {
@@ -92,40 +81,12 @@ public class ParentCommentAdapter extends RecyclerView.Adapter<ParentCommentAdap
             editCommentBtn = itemView.findViewById(R.id.comment_rv_editBtn);
             mReplyText = itemView.findViewById(R.id.comment_rv_reply_editText);
 
-            itemView.setOnClickListener(this);
+            editCommentLayout = itemView.findViewById(R.id.comment_rv_editCommentLayout);
+            editCommentInput = itemView.findViewById(R.id.comment_rv_comment_editText);
+            saveCommentBtn = itemView.findViewById(R.id.comment_rv_comment_save);
+            deleteCommentBtn = itemView.findViewById(R.id.comment_rv_comment_delete);
+            cancelEditBtn = itemView.findViewById(R.id.comment_rv_comment_cancel);
 
-            mImageView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (mListener != null) {
-                        int position = getAdapterPosition();
-                        if (position != RecyclerView.NO_POSITION) {
-                            mListener.onUserClick(position);
-                        }
-                    }
-                }
-            });
-            editCommentBtn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (mListener != null) {
-                        int position = getAdapterPosition();
-                        if (position != RecyclerView.NO_POSITION) {
-                            mListener.onEditClick(position);
-                        }
-                    }
-                }
-            });
-        }
-
-        @Override
-        public void onClick(View v) {
-            if (mListener != null) {
-                int position = getAdapterPosition();
-                if (position != RecyclerView.NO_POSITION) {
-                    mListener.onItemClick(position);
-                }
-            }
         }
     }
 
@@ -184,12 +145,6 @@ public class ParentCommentAdapter extends RecyclerView.Adapter<ParentCommentAdap
             }
         }
 
-        if (currentItem.getUser_id().equals(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
-            holder.editCommentBtn.setVisibility(View.VISIBLE);
-        } else {
-            holder.editCommentBtn.setVisibility(View.GONE);
-        }
-
         holder.mAddReplyBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -197,7 +152,8 @@ public class ParentCommentAdapter extends RecyclerView.Adapter<ParentCommentAdap
                 FirebaseFirestore db = FirebaseFirestore.getInstance();
 
                 if (!replyText.trim().equals("")) {
-                    Comment comment = new Comment(currentItem.getRecipe_documentID(), mUser.getUser_id(), mUser.getName(), mUser.getUserProfilePicUrl(), replyText, null);
+                    Comment comment = new Comment(currentItem.getRecipe_documentID(), mUser.getUser_id(), mUser.getName(), mUser.getUserProfilePicUrl(), replyText
+                            , currentItem.getComment_for_type(), null);
                     db.collection("Posts").document(currentItem.getRecipe_documentID()).collection("Comments")
                             .document(currentItem.getDocumentID()).collection("ChildComments").add(comment)
                             .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
@@ -213,10 +169,107 @@ public class ParentCommentAdapter extends RecyclerView.Adapter<ParentCommentAdap
                                     Toast.makeText(ctx, "Failed to add Reply", Toast.LENGTH_SHORT).show();
                                 }
                             });
-                }
+                } else
+                    Toast.makeText(ctx, "Comment can't be empty", Toast.LENGTH_SHORT).show();
 
             }
         });
+
+        // EDIT COMMENT
+
+        if (currentItem.getComment_for_type() == null || !currentItem.getUser_id().equals(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
+            holder.editCommentBtn.setVisibility(View.GONE);
+        } else {
+            holder.editCommentBtn.setVisibility(View.VISIBLE);
+            holder.editCommentBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    holder.mCommentText.setVisibility(View.INVISIBLE);
+                    holder.mCommentTimeStamp.setVisibility(View.INVISIBLE);
+                    holder.editCommentLayout.setVisibility(View.VISIBLE);
+                    holder.editCommentBtn.setVisibility(View.GONE);
+                    holder.editCommentInput.setText(currentItem.getComment_text());
+
+                    DocumentReference commentRef = null;
+                    if (currentItem.getComment_for_type().equals("Recipe")) {
+                        commentRef = db.collection("Recipes").document(currentItem.getRecipe_documentID())
+                                .collection("Comments").document(currentItem.getDocumentID());
+                    } else if (currentItem.getComment_for_type().equals("Post")) {
+                        commentRef = db.collection("Posts").document(currentItem.getRecipe_documentID())
+                                .collection("Comments").document(currentItem.getDocumentID());
+                    }
+
+                    final DocumentReference finalCommentRef = commentRef;
+                    holder.saveCommentBtn.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            currentItem.setComment_text(holder.editCommentInput.getText().toString());
+
+                            if (finalCommentRef != null) {
+                                finalCommentRef.set(currentItem).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+                                        Log.d(TAG, "onSuccess: SAVED COMMENT");
+                                        holder.mCommentText.setVisibility(View.VISIBLE);
+                                        holder.mCommentTimeStamp.setVisibility(View.VISIBLE);
+                                        holder.editCommentBtn.setVisibility(View.VISIBLE);
+                                        holder.editCommentLayout.setVisibility(View.GONE);
+
+                                    }
+                                });
+                            }
+                        }
+                    });
+                    holder.cancelEditBtn.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Log.d(TAG, "onClick: CANCELLED Editting");
+                            holder.mCommentText.setVisibility(View.VISIBLE);
+                            holder.mCommentTimeStamp.setVisibility(View.VISIBLE);
+                            holder.editCommentBtn.setVisibility(View.VISIBLE);
+                            holder.editCommentLayout.setVisibility(View.GONE);
+                        }
+                    });
+                    holder.deleteCommentBtn.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            MaterialAlertDialogBuilder materialAlertDialogBuilder = new MaterialAlertDialogBuilder(ctx, R.style.ThemeOverlay_MaterialComponents_MaterialAlertDialog_Centered);
+                            materialAlertDialogBuilder.setMessage("Are you sure you want to delete this comment?");
+                            materialAlertDialogBuilder.setCancelable(true);
+                            materialAlertDialogBuilder.setPositiveButton(
+                                    "Yes",
+                                    new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int id) {
+                                            //Delete comment
+                                            mCommentList.remove(currentItem);
+                                            holder.mCommentText.setVisibility(View.VISIBLE);
+                                            holder.mCommentTimeStamp.setVisibility(View.VISIBLE);
+                                            holder.editCommentLayout.setVisibility(View.GONE);
+                                            if (finalCommentRef != null)
+                                                finalCommentRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                    @Override
+                                                    public void onSuccess(Void aVoid) {
+                                                        Log.d(TAG, "onSuccess: DELETED COMM");
+                                                    }
+                                                });
+                                            dialog.cancel();
+                                        }
+                                    });
+
+                            materialAlertDialogBuilder.setNegativeButton(
+                                    "No",
+                                    new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int id) {
+                                            dialog.cancel();
+                                        }
+                                    });
+
+                            materialAlertDialogBuilder.show();
+                        }
+                    });
+                }
+            });
+        }
 
         //Initialize Child Comment RecyclerView
         initchildLayout(holder.rv_child, getChildComments(currentItem));

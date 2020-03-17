@@ -44,7 +44,7 @@ import java.util.Objects;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class PostComments extends Fragment implements ParentCommentAdapter.OnItemClickListener {
+public class PostComments extends Fragment{
     private static final String TAG = "PostComments";
 
     private String documentID = "";
@@ -133,17 +133,17 @@ public class PostComments extends Fragment implements ParentCommentAdapter.OnIte
         mAdapter = new ParentCommentAdapter(getContext(), commentList);
         commentRecyclerView.setLayoutManager(mLayoutManager);
         commentRecyclerView.setAdapter(mAdapter);
-        mAdapter.setOnItemClickListener(PostComments.this);
     }
 
     private void addComment() {
         String commentText = Objects.requireNonNull(commentTextInput.getText()).toString();
 
-        final Comment comment = new Comment(documentID, FirebaseAuth.getInstance().getCurrentUser().getUid(), mUser.getName(), mUser.getUserProfilePicUrl(), commentText, null);
+        final Comment comment = new Comment(documentID, FirebaseAuth.getInstance().getCurrentUser().getUid(), mUser.getName(), mUser.getUserProfilePicUrl()
+                , commentText, "Post",null);
         DocumentReference currentRecipeRef = postsRef.document(documentID);
         CollectionReference commentRef = currentRecipeRef.collection("Comments");
 
-        if (commentTextInput.toString().trim().equals("")) {
+        if (commentText.trim().equals("")) {
             Toast.makeText(getActivity(), "Comment cannot be empty", Toast.LENGTH_SHORT).show();
         } else {
             commentRef.add(comment)
@@ -207,53 +207,53 @@ public class PostComments extends Fragment implements ParentCommentAdapter.OnIte
     }
 
 
-    @Override
-    public void onItemClick(int position) {
+//    @Override
+//    public void onItemClick(int position) {
+//
+//    }
+//
+//    @Override
+//    public void onUserClick(int position) {
+//        Comment comment = commentList.get(position);
+//        Bundle args = new Bundle();
+//        args.putString("documentID", comment.getUser_id());
+//        Navigation.findNavController(view).navigate(R.id.userProfileFragment2, args);
+//    }
 
-    }
-
-    @Override
-    public void onUserClick(int position) {
-        Comment comment = commentList.get(position);
-        Bundle args = new Bundle();
-        args.putString("documentID", comment.getUser_id());
-        Navigation.findNavController(view).navigate(R.id.userProfileFragment2, args);
-    }
-
-    @Override
-    public void onEditClick(int position) {
-        final Comment comment = commentList.get(position);
-
-        MaterialAlertDialogBuilder materialAlertDialogBuilder = new MaterialAlertDialogBuilder(getActivity(), R.style.ThemeOverlay_MaterialComponents_MaterialAlertDialog_Centered);
-        materialAlertDialogBuilder.setMessage("Are you sure you want to delete this comment?");
-        materialAlertDialogBuilder.setCancelable(true);
-        materialAlertDialogBuilder.setPositiveButton(
-                "Yes",
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        //Delete user from friends
-                        db.collection("Posts").document(comment.getRecipe_documentID()).collection("Comments").document(comment.getDocumentID())
-                                .delete().addOnSuccessListener(new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void aVoid) {
-                                commentList.remove(comment);
-                                mAdapter.notifyDataSetChanged();
-                                Toast.makeText(getContext(), "Deleted comment", Toast.LENGTH_SHORT).show();
-                                Log.d(TAG, "onSuccess: Deleted comm");
-                            }
-                        });
-                        dialog.cancel();
-                    }
-                });
-
-        materialAlertDialogBuilder.setNegativeButton(
-                "No",
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        dialog.cancel();
-                    }
-                });
-
-        materialAlertDialogBuilder.show();
-    }
+//    @Override
+//    public void onEditClick(int position) {
+//        final Comment comment = commentList.get(position);
+//
+//        MaterialAlertDialogBuilder materialAlertDialogBuilder = new MaterialAlertDialogBuilder(getActivity(), R.style.ThemeOverlay_MaterialComponents_MaterialAlertDialog_Centered);
+//        materialAlertDialogBuilder.setMessage("Are you sure you want to delete this comment?");
+//        materialAlertDialogBuilder.setCancelable(true);
+//        materialAlertDialogBuilder.setPositiveButton(
+//                "Yes",
+//                new DialogInterface.OnClickListener() {
+//                    public void onClick(DialogInterface dialog, int id) {
+//                        //Delete user from friends
+//                        db.collection("Posts").document(comment.getRecipe_documentID()).collection("Comments").document(comment.getDocumentID())
+//                                .delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+//                            @Override
+//                            public void onSuccess(Void aVoid) {
+//                                commentList.remove(comment);
+//                                mAdapter.notifyDataSetChanged();
+//                                Toast.makeText(getContext(), "Deleted comment", Toast.LENGTH_SHORT).show();
+//                                Log.d(TAG, "onSuccess: Deleted comm");
+//                            }
+//                        });
+//                        dialog.cancel();
+//                    }
+//                });
+//
+//        materialAlertDialogBuilder.setNegativeButton(
+//                "No",
+//                new DialogInterface.OnClickListener() {
+//                    public void onClick(DialogInterface dialog, int id) {
+//                        dialog.cancel();
+//                    }
+//                });
+//
+//        materialAlertDialogBuilder.show();
+//    }
 }

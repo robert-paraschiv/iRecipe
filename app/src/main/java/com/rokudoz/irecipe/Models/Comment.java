@@ -12,17 +12,19 @@ public class Comment {
     private String user_name;
     private String user_profilePic;
     private String comment_text;
+    private String comment_for_type;
 
     private @ServerTimestamp
     Date comment_timeStamp;
 
 
-    public Comment(String recipe_documentID, String user_id, String user_name, String user_profilePic, String comment_text, Date comment_timeStamp) {
+    public Comment(String recipe_documentID, String user_id, String user_name, String user_profilePic, String comment_text, String comment_for_type, Date comment_timeStamp) {
         this.recipe_documentID = recipe_documentID;
         this.user_id = user_id;
         this.user_name = user_name;
         this.user_profilePic = user_profilePic;
         this.comment_text = comment_text;
+        this.comment_for_type = comment_for_type;
         this.comment_timeStamp = comment_timeStamp;
     }
 
@@ -78,6 +80,14 @@ public class Comment {
         this.comment_text = comment_text;
     }
 
+    public String getComment_for_type() {
+        return comment_for_type;
+    }
+
+    public void setComment_for_type(String comment_for_type) {
+        this.comment_for_type = comment_for_type;
+    }
+
     public Date getComment_timeStamp() {
         return comment_timeStamp;
     }
@@ -95,6 +105,7 @@ public class Comment {
                 ", user_name='" + user_name + '\'' +
                 ", user_profilePic='" + user_profilePic + '\'' +
                 ", comment_text='" + comment_text + '\'' +
+                ", comment_for_type='" + comment_for_type + '\'' +
                 ", comment_timeStamp=" + comment_timeStamp +
                 '}';
     }
