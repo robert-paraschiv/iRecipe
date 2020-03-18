@@ -1,4 +1,4 @@
-package com.rokudoz.irecipe.Fragments;
+package com.rokudoz.irecipe.Fragments.profileSubFragments;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
+import android.view.InflateException;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -37,11 +38,11 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.rokudoz.irecipe.Account.LoginActivity;
+import com.rokudoz.irecipe.Fragments.ProfileFragmentDirections;
 import com.rokudoz.irecipe.Models.Recipe;
 import com.rokudoz.irecipe.Models.User;
 import com.rokudoz.irecipe.Models.UserWhoFaved;
 import com.rokudoz.irecipe.R;
-import com.rokudoz.irecipe.Utils.Adapters.RecipeAdapter;
 import com.rokudoz.irecipe.Utils.Adapters.RecipeWithAdsAdapter;
 
 import java.util.ArrayList;
@@ -94,9 +95,18 @@ public class FavoritesFragment extends Fragment implements RecipeWithAdsAdapter.
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        if (view == null) {
-            view = inflater.inflate(R.layout.fragment_favorites, container, false);
+        if (view != null) {
+            ViewGroup parent = (ViewGroup) view.getParent();
+            if (parent != null) {
+                parent.removeView(view);
+            }
         }
+        try {
+            view = inflater.inflate(R.layout.fragment_favorites, container, false);
+        } catch (InflateException e) {
+            Log.e(TAG, "onCreateView: ", e);
+        }
+
         mUser = new User();
         pbLoading = view.findViewById(R.id.favoritesFragment_pbLoading);
         mRecyclerView = view.findViewById(R.id.favoritesRecycler_view);
@@ -323,7 +333,7 @@ public class FavoritesFragment extends Fragment implements RecipeWithAdsAdapter.
                             public void onItemClick(int position) {
                                 Recipe recipe = (Recipe) mRecipeList.get(position);
                                 String id = recipe.getDocumentId();
-                                Navigation.findNavController(view).navigate(FavoritesFragmentDirections.actionFavoritesFragmentToRecipeDetailedFragment(id));
+                                Navigation.findNavController(view).navigate(ProfileFragmentDirections.actionProfileFragmentToRecipeDetailedFragment(id));
 
                             }
 

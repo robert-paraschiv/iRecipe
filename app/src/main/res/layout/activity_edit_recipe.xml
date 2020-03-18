@@ -80,6 +80,7 @@
                 android:id="@+id/editRecipes_category_spinner"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
                 android:layout_marginTop="4dp"
                 android:entries="@array/recipe_category"
                 android:spinnerMode="dropdown" />
@@ -88,7 +89,7 @@
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="10dp"
                 android:hint="Description">
 
                 <com.google.android.material.textfield.TextInputEditText
@@ -133,7 +134,18 @@
                         android:layout_below="@+id/editRecipe_ingredients_recyclerview"
                         android:layout_centerHorizontal="true"
                         android:layout_marginTop="8dp"
-                        android:text="Add New Ingredient"
+                        android:text="Add Ingredient"
+                        app:cornerRadius="18dp" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/editRecipes_removeIngredient_btn"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/editRecipes_addIngredient_btn"
+                        android:layout_centerHorizontal="true"
+                        android:layout_marginTop="8dp"
+                        android:text="Remove Ingredient"
                         app:cornerRadius="18dp" />
                 </RelativeLayout>
             </com.google.android.material.card.MaterialCardView>
@@ -174,6 +186,17 @@
                         android:layout_centerHorizontal="true"
                         android:layout_marginTop="8dp"
                         android:text="Add Step"
+                        app:cornerRadius="18dp" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/editRecipes_removeInstruction_btn"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/editRecipes_addInstruction_btn"
+                        android:layout_centerHorizontal="true"
+                        android:layout_marginTop="8dp"
+                        android:text="Remove Step"
                         app:cornerRadius="18dp" />
                 </RelativeLayout>
             </com.google.android.material.card.MaterialCardView>

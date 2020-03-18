@@ -64,7 +64,7 @@ public class EditRecipeActivity extends AppCompatActivity implements EditRecipeI
 
     //Components
     ImageView recipeImageView;
-    MaterialButton recipePhotoBtn, addIngredientBtn, addInstructionBtn, saveBtn;
+    MaterialButton recipePhotoBtn, addIngredientBtn, addInstructionBtn, saveBtn, removeInstructionBtn, removeIngredientBtn;
     TextInputEditText titleInputEditText, descriptionInputEditText, keywordsInputEditText;
     Spinner categorySpinner, privacySpinner;
     RecyclerView ingredientsRecyclerView, instructionsRecyclerView;
@@ -119,6 +119,8 @@ public class EditRecipeActivity extends AppCompatActivity implements EditRecipeI
         durationEditText = findViewById(R.id.editRecipes_duration_editText);
         durationTypeSpinner = findViewById(R.id.editRecipes_durationType_Spinner);
         complexitySpinner = findViewById(R.id.editRecipes_complexity_Spinner);
+        removeIngredientBtn = findViewById(R.id.editRecipes_removeIngredient_btn);
+        removeInstructionBtn = findViewById(R.id.editRecipes_removeInstruction_btn);
 
 
         if (getIntent() != null && getIntent().getStringExtra("recipe_id") != null) {
@@ -130,9 +132,6 @@ public class EditRecipeActivity extends AppCompatActivity implements EditRecipeI
         saveBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                Log.d(TAG, "onClick: " + editRecipeInstructionsAdapter.getInstructionList().toString());
-                Log.d(TAG, "onClick: " + instructionList.toString());
-                Log.d(TAG, "onClick: " + ingredientList.toString());
                 getIngredientList();
             }
         });
@@ -155,6 +154,26 @@ public class EditRecipeActivity extends AppCompatActivity implements EditRecipeI
                 ingredientList.add(ingredient);
                 int position = ingredientList.size();
                 editRecipeIngredientsAdapter.notifyItemInserted(position);
+            }
+        });
+        removeInstructionBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                instructionList.remove(instructionList.get(instructionList.size() - 1));
+                editRecipeInstructionsAdapter.notifyItemRemoved(instructionList.size());
+            }
+        });
+        removeIngredientBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ingredientList.remove(ingredientList.get(ingredientList.size() - 1));
+                editRecipeIngredientsAdapter.notifyItemRemoved(ingredientList.size());
+            }
+        });
+        recipePhotoBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
             }
         });
         buildRecyclerViews();

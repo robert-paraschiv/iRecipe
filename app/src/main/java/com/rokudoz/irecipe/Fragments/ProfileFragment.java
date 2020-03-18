@@ -50,9 +50,8 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.StorageTask;
 import com.google.firebase.storage.UploadTask;
-import com.rokudoz.irecipe.Account.LoginActivity;
-import com.rokudoz.irecipe.AddIngredientActivity;
 import com.rokudoz.irecipe.AddRecipesActivity;
+import com.rokudoz.irecipe.Fragments.profileSubFragments.FavoritesFragment;
 import com.rokudoz.irecipe.Fragments.profileSubFragments.profileMyFriendList;
 import com.rokudoz.irecipe.Fragments.profileSubFragments.profileMyIngredientsFragment;
 import com.rokudoz.irecipe.Fragments.profileSubFragments.profileMyRecipesFragment;
@@ -65,7 +64,6 @@ import com.rokudoz.irecipe.Utils.RotateBitmap;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
