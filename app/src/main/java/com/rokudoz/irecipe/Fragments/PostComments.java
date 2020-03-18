@@ -44,7 +44,7 @@ import java.util.Objects;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class PostComments extends Fragment{
+public class PostComments extends Fragment {
     private static final String TAG = "PostComments";
 
     private String documentID = "";
@@ -139,7 +139,7 @@ public class PostComments extends Fragment{
         String commentText = Objects.requireNonNull(commentTextInput.getText()).toString();
 
         final Comment comment = new Comment(documentID, FirebaseAuth.getInstance().getCurrentUser().getUid(), mUser.getName(), mUser.getUserProfilePicUrl()
-                , commentText, "Post",null,null);
+                , commentText, "Post", null, null);
         DocumentReference currentRecipeRef = postsRef.document(documentID);
         CollectionReference commentRef = currentRecipeRef.collection("Comments");
 
@@ -191,10 +191,11 @@ public class PostComments extends Fragment{
                                 comment.setDocumentID(document.getId());
                                 if (!commentList.contains(comment)) {
                                     commentList.add(0, comment);
-                                    mAdapter.notifyDataSetChanged();
-
+                                    mAdapter.notifyItemInserted(0);
+                                } else {
+                                    commentList.set(commentList.indexOf(comment), comment);
+                                    mAdapter.notifyItemChanged(commentList.indexOf(comment));
                                 }
-
                             }
                             if (queryDocumentSnapshots.getDocuments().size() != 0) {
                                 mLastQueriedDocument = queryDocumentSnapshots.getDocuments()

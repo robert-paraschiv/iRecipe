@@ -58,6 +58,7 @@ import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.rokudoz.irecipe.EditRecipeActivity;
 import com.rokudoz.irecipe.Models.Comment;
 import com.rokudoz.irecipe.Models.Ingredient;
 import com.rokudoz.irecipe.Models.Instruction;
@@ -127,7 +128,7 @@ public class RecipeDetailedFragment extends Fragment implements RecipeInstructio
 
     private NestedScrollView nestedScrollView;
 
-    private MaterialButton mDeleteRecipeBtn;
+    private MaterialButton mEditRecipeBtn;
     private TextView tvTitle, tvDescription, mFavoriteNumber, tvMissingIngredientsNumber, tvCreatorName, tvDuration, tvComplexity;
     private ImageView mFavoriteIcon;
     private CircleImageView mCreatorImage;
@@ -174,7 +175,7 @@ public class RecipeDetailedFragment extends Fragment implements RecipeInstructio
         fab_AddToSchedule = view.findViewById(R.id.recipeDetailed_addRecipeToSchedule);
         nestedScrollView = view.findViewById(R.id.nestedScrollView);
         tvMissingIngredientsNumber.setVisibility(View.INVISIBLE);
-        mDeleteRecipeBtn = view.findViewById(R.id.recipeDetailed_deleteRecipe_MaterialBtn);
+        mEditRecipeBtn = view.findViewById(R.id.recipeDetailed_editRecipe_MaterialBtn);
         tvCreatorName = view.findViewById(R.id.recipeDetailed_creatorName_TextView);
         mCreatorImage = view.findViewById(R.id.recipeDetailed_creatorImage_ImageView);
         tvDuration = view.findViewById(R.id.recipeDetailed_duration);
@@ -637,36 +638,41 @@ public class RecipeDetailedFragment extends Fragment implements RecipeInstructio
 
                     ////////////////////////////////////////////////////////// LOGIC TO GET RECIPES INGREDIENTS AND INSTRUCTIONS HERE
                     if (recipe.getCreator_docId() != null && recipe.getCreator_docId().equals(mUser.getUser_id())) {
-                        mDeleteRecipeBtn.setVisibility(View.VISIBLE);
-                        mDeleteRecipeBtn.setOnClickListener(new View.OnClickListener() {
+                        mEditRecipeBtn.setVisibility(View.VISIBLE);
+                        mEditRecipeBtn.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                MaterialAlertDialogBuilder materialAlertDialogBuilder = new MaterialAlertDialogBuilder(getActivity()
-                                        , R.style.ThemeOverlay_MaterialComponents_MaterialAlertDialog_Centered);
-                                materialAlertDialogBuilder.setMessage("Are you sure you want to delete your recipe?");
-                                materialAlertDialogBuilder.setCancelable(true);
-                                materialAlertDialogBuilder.setPositiveButton(
-                                        "Yes",
-                                        new DialogInterface.OnClickListener() {
-                                            public void onClick(DialogInterface dialog, int id) {
-                                                recipeRef.document(documentID).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                    @Override
-                                                    public void onSuccess(Void aVoid) {
-                                                        Toast.makeText(getActivity(), "Successfully deleted", Toast.LENGTH_SHORT).show();
-                                                        Navigation.findNavController(view).popBackStack();
-                                                    }
-                                                });
-                                                dialog.cancel();
-                                            }
-                                        });
-                                materialAlertDialogBuilder.setNegativeButton(
-                                        "No",
-                                        new DialogInterface.OnClickListener() {
-                                            public void onClick(DialogInterface dialog, int id) {
-                                                dialog.cancel();
-                                            }
-                                        });
-                                materialAlertDialogBuilder.show();
+                                Intent intent = new Intent(getActivity(), EditRecipeActivity.class);
+                                intent.putExtra("recipe_id", documentID);
+                                startActivity(intent);
+
+
+//                                MaterialAlertDialogBuilder materialAlertDialogBuilder = new MaterialAlertDialogBuilder(getActivity()
+//                                        , R.style.ThemeOverlay_MaterialComponents_MaterialAlertDialog_Centered);
+//                                materialAlertDialogBuilder.setMessage("Are you sure you want to delete your recipe?");
+//                                materialAlertDialogBuilder.setCancelable(true);
+//                                materialAlertDialogBuilder.setPositiveButton(
+//                                        "Yes",
+//                                        new DialogInterface.OnClickListener() {
+//                                            public void onClick(DialogInterface dialog, int id) {
+//                                                recipeRef.document(documentID).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+//                                                    @Override
+//                                                    public void onSuccess(Void aVoid) {
+//                                                        Toast.makeText(getActivity(), "Successfully deleted", Toast.LENGTH_SHORT).show();
+//                                                        Navigation.findNavController(view).popBackStack();
+//                                                    }
+//                                                });
+//                                                dialog.cancel();
+//                                            }
+//                                        });
+//                                materialAlertDialogBuilder.setNegativeButton(
+//                                        "No",
+//                                        new DialogInterface.OnClickListener() {
+//                                            public void onClick(DialogInterface dialog, int id) {
+//                                                dialog.cancel();
+//                                            }
+//                                        });
+//                                materialAlertDialogBuilder.show();
                             }
                         });
                     }

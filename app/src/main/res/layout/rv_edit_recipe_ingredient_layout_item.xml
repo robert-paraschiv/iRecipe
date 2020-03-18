@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="4dp"
+    app:cardCornerRadius="18dp">
+
+    <RelativeLayout
+        android:layout_margin="4dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="4dp">
+
+        <EditText
+            android:id="@+id/rv_edit_recipe_ingredient_name_editText"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Ingredient name"
+            android:inputType="textCapWords" />
+
+        <Spinner
+            android:id="@+id/rv_edit_recipe_ingredient_category_spinner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/rv_edit_recipe_ingredient_name_editText"
+            tools:listitem="@tools:sample/us_zipcodes" />
+
+        <EditText
+            android:id="@+id/rv_edit_recipe_ingredient_quantity_editText"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/rv_edit_recipe_ingredient_category_spinner"
+            android:hint="Quantity"
+            android:inputType="number" />
+
+        <Spinner
+            android:id="@+id/rv_edit_recipe_ingredient_quantity_spinner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/rv_edit_recipe_ingredient_quantity_editText"
+            tools:listitem="@tools:sample/us_zipcodes" />
+
+    </RelativeLayout>
+
+
+</com.google.android.material.card.MaterialCardView>

@@ -21,10 +21,10 @@ import java.util.Map;
 public class RecipeIngredientsAdapter extends RecyclerView.Adapter<RecipeIngredientsAdapter.RecipeIngredientsViewHolder> {
     private List<Ingredient> ingredientList = new ArrayList<>();
 
-    public class RecipeIngredientsViewHolder extends RecyclerView.ViewHolder {
+    class RecipeIngredientsViewHolder extends RecyclerView.ViewHolder {
         TextView tvIngredientName, tvIngredientQuantity,tvQuantityType;
 
-        public RecipeIngredientsViewHolder(View itemView) {
+        RecipeIngredientsViewHolder(View itemView) {
             super(itemView);
             tvIngredientName = itemView.findViewById(R.id.ingredient_item_Name_TextView);
             tvIngredientQuantity = itemView.findViewById(R.id.ingredient_item_quantity_TextView);

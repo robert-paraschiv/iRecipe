@@ -184,8 +184,6 @@ public class recipesBreakfastFragment extends Fragment implements RecipeAdapter.
 
                 if (!recyclerView.canScrollVertically(1)) {
                     performQuery();
-                } else if (!recyclerView.canScrollVertically(0)) {
-                    performQuery();
                 }
             }
         });

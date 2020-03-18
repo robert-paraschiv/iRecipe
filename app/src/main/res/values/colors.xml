@@ -17,7 +17,7 @@
     <color name="calendar_backgroundColor">#fafafa</color>
     <color name="calendar_currentDayBackgroundColor">#0064b7</color>
     <color name="calendar_currentSelectedDayBackgroundColor">#0091ea</color>
-    <color name="calendar_multiEventIndicatorColor">#fff</color>
+    <color name="calendar_multiEventIndicatorColor">#000000</color>
     <color name="calendar_textColor">#000000</color>
 
 </resources>

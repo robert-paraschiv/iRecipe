@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="4dp"
+    app:cardCornerRadius="18dp">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="4dp"
+        android:padding="4dp">
+
+        <EditText
+            android:id="@+id/rv_edit_recipe_instruction_editText"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Step text" />
+
+        <ImageView
+            android:id="@+id/rv_edit_recipe_instruction_imageView"
+            android:layout_width="match_parent"
+            android:layout_height="150dp"
+            android:layout_below="@id/rv_edit_recipe_instruction_editText"
+            tools:src="@color/colorPrimary" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/rv_edit_recipe_instruction_addPhoto_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/rv_edit_recipe_instruction_imageView"
+            android:layout_centerHorizontal="true"
+            android:text="Add photo" />
+    </RelativeLayout>
+
+</com.google.android.material.card.MaterialCardView>

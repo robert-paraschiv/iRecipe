@@ -13,28 +13,36 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity android:name=".EditRecipeActivity"></activity>
         <activity
             android:name=".SearchUserActivity"
             android:screenOrientation="portrait" />
-        <activity android:name=".EditPostActivity"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".SearchRecipeActivity"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".AddPostActivity"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".AddIngredientActivity"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".Account.RegisterActivity"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".AddRecipesActivity"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".Account.LoginActivity"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".UpdateRecipesActivity"/>
+        <activity
+            android:name=".EditPostActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".SearchRecipeActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".AddPostActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".AddIngredientActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".Account.RegisterActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".AddRecipesActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".Account.LoginActivity"
+            android:screenOrientation="portrait" />
+        <activity android:name=".UpdateRecipesActivity" />
         <activity
             android:name=".MainActivity"
-            android:windowSoftInputMode="adjustResize"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <action android:name="android.intent.action.MAIN" />
@@ -71,8 +79,6 @@
 
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
-
-
         </activity>
 
         <service android:name=".Utils.FirebaseMessagingService">
@@ -83,17 +89,14 @@
 
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_channel_id"
-            android:value="@string/default_notification_channel_id" />
-
-<!--        <meta-data-->
-<!--            android:name="com.google.android.gms.ads.APPLICATION_ID"-->
-<!--            android:value="ca-app-pub-3940256099942544~3347511713"/>-->
-
+            android:value="@string/default_notification_channel_id" /> <!-- <meta-data -->
+        <!-- android:name="com.google.android.gms.ads.APPLICATION_ID" -->
+        <!-- android:value="ca-app-pub-3940256099942544~3347511713"/> -->
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="ca-app-pub-3327926907082370~2155596069"/>
-
-        <meta-data android:name="com.google.firebase.messaging.default_notification_icon"
+            android:value="ca-app-pub-3327926907082370~2155596069" />
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_icon"
             android:resource="@drawable/ic_notification" />
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_color"
@@ -108,7 +111,5 @@
             android:enabled="true"
             android:exported="false" />
     </application>
-
-
 
 </manifest>
