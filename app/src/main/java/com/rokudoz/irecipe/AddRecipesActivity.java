@@ -174,6 +174,7 @@ public class AddRecipesActivity extends AppCompatActivity {
                     Toast.makeText(AddRecipesActivity.this, "Upload in progress...", Toast.LENGTH_SHORT).show();
 
                 } else {
+                    pd.show();
                     getIngredientList();
                 }
             }
@@ -359,7 +360,12 @@ public class AddRecipesActivity extends AppCompatActivity {
                                 public void onSuccess(Uri uri) {
                                     final String imageUrl = uri.toString();
                                     recipeImageUrlArray[position] = imageUrl;
+                                    nrOfPhotosUploaded++;
 
+                                    if (nrOfPhotosUploaded == mRecipeImageUriArray.length) {
+                                        getInstructionsPhotoUploadCount();
+//                                        addRecipe();
+                                    }
                                 }
                             });
 
@@ -394,6 +400,7 @@ public class AddRecipesActivity extends AppCompatActivity {
 
     // Adding Recipes -----------------------------------------------------------------------------
     public void addRecipe() {
+
         final String title = editTextTitle.getText().toString();
         final String description = editTextDescription.getText().toString();
         final String creator_docId = FirebaseAuth.getInstance().getCurrentUser().getUid();
@@ -436,6 +443,7 @@ public class AddRecipesActivity extends AppCompatActivity {
         //
 
         if (ingredients_without_category.size() > 0) {
+            pd.hide();
             final LinearLayout linearLayout = new LinearLayout(AddRecipesActivity.this);
             linearLayout.setOrientation(LinearLayout.VERTICAL);
             final List<Spinner> category_spinner_list = new ArrayList<>();
@@ -543,6 +551,16 @@ public class AddRecipesActivity extends AppCompatActivity {
 
             materialAlertDialogBuilder.show();
         } else {
+
+            for (int j = 0; j < instructionTextEtList.size(); j++) {
+                String url = "";
+                if (!mInstructionStepImageUriList.get(j).toString().equals("")) {
+                    url = instructionStepImageUrlArray[j];
+                }
+                Instruction instruction = new Instruction(j + 1, instructionTextEtList.get(j).getText().toString(), url);
+                instructions_list.add(instruction);
+            }
+
             Recipe recipe = new Recipe(title, creator_docId, mUser.getName(), mUser.getUserProfilePicUrl(), category, description, ingredients_list, instructions_list
                     , keywords, imageUrls_list, complexity, duration, durationType, 0f, isFavorite, privacy, 0, 0);
 
@@ -553,6 +571,7 @@ public class AddRecipesActivity extends AppCompatActivity {
                     .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                         @Override
                         public void onSuccess(DocumentReference documentReference) {
+                            pd.hide();
                             Toast.makeText(AddRecipesActivity.this, "Succesfully added " + title + " to the recipes list", Toast.LENGTH_SHORT).show();
                             Log.d(TAG, "onSuccess: doc id " + documentReference.getId());
                             Intent intent = new Intent(AddRecipesActivity.this, MainActivity.class);

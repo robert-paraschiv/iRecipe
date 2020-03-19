@@ -183,9 +183,7 @@ public class recipesLunchFragment extends Fragment implements RecipeAdapter.OnIt
                 super.onScrollStateChanged(recyclerView, newState);
 
                 if (!recyclerView.canScrollVertically(1)) {
-                    performQuery();
-                } else if (!recyclerView.canScrollVertically(0)) {
-                    performQuery();
+                    PerformMainQuery();
                 }
             }
         });
@@ -204,15 +202,9 @@ public class recipesLunchFragment extends Fragment implements RecipeAdapter.OnIt
                         mUser = documentSnapshot.toObject(User.class);
                         loggedInUserDocumentId = documentSnapshot.getId();
 
-                        Query recipesQuery = null;
-                        if (mLastQueriedDocument != null) {
-                            recipesQuery = recipeRef.whereEqualTo("category", "lunch").whereEqualTo("privacy", "Everyone")
-                                    .startAfter(mLastQueriedDocument).limit(10);
-                        } else {
-                            recipesQuery = recipeRef.whereEqualTo("category", "lunch").whereEqualTo("privacy", "Everyone").limit(10);
-                        }
 
-                        PerformMainQuery(recipesQuery);
+
+                        PerformMainQuery();
                         pbLoading.setVisibility(View.INVISIBLE);
 
                     }
@@ -220,7 +212,15 @@ public class recipesLunchFragment extends Fragment implements RecipeAdapter.OnIt
 
     }
 
-    private void PerformMainQuery(Query recipesQuery) {
+    private void PerformMainQuery() {
+        Query recipesQuery = null;
+        if (mLastQueriedDocument != null) {
+            recipesQuery = recipeRef.whereEqualTo("category", "lunch").whereEqualTo("privacy", "Everyone").orderBy("number_of_likes", Query.Direction.DESCENDING)
+                    .startAfter(mLastQueriedDocument).limit(10);
+        } else {
+            recipesQuery = recipeRef.whereEqualTo("category", "lunch").whereEqualTo("privacy", "Everyone").limit(10).orderBy("number_of_likes", Query.Direction.DESCENDING);
+        }
+
         recipesQuery.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@javax.annotation.Nullable QuerySnapshot queryDocumentSnapshots,
@@ -307,11 +307,11 @@ public class recipesLunchFragment extends Fragment implements RecipeAdapter.OnIt
         //Get Recipes where the recipes created by the logged in user are private
         Query privateRecipesQuery = null;
         if (mLastQueriedDocument != null) {
-            privateRecipesQuery = recipeRef.whereEqualTo("category", "lunch").whereEqualTo("creator_docId", loggedInUserDocumentId)
-                    .startAfter(mLastQueriedDocument); // Necessary so we don't have the same results multiple times
+            privateRecipesQuery = recipeRef.whereEqualTo("category", "lunch").whereEqualTo("creator_docId", loggedInUserDocumentId).orderBy("number_of_likes", Query.Direction.DESCENDING);
+//                    .startAfter(mLastQueriedDocument); // Necessary so we don't have the same results multiple times
 //                                    .limit(3);
         } else {
-            privateRecipesQuery = recipeRef.whereEqualTo("category", "lunch").whereEqualTo("creator_docId", loggedInUserDocumentId);
+            privateRecipesQuery = recipeRef.whereEqualTo("category", "lunch").whereEqualTo("creator_docId", loggedInUserDocumentId).orderBy("number_of_likes", Query.Direction.DESCENDING);
 //                                    .limit(3);
         }
         privateRecipesQuery.addSnapshotListener(new EventListener<QuerySnapshot>() {
@@ -383,11 +383,6 @@ public class recipesLunchFragment extends Fragment implements RecipeAdapter.OnIt
                         }
 
 
-                    }
-
-                    if (queryDocumentSnapshots.getDocuments().size() != 0) {
-                        mLastQueriedDocument = queryDocumentSnapshots.getDocuments()
-                                .get(queryDocumentSnapshots.getDocuments().size() - 1);
                     }
                 } else {
                     Log.d(TAG, "onEvent: Querry result is null");

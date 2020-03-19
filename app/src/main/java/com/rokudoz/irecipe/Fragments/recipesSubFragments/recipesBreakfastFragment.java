@@ -70,7 +70,7 @@ public class recipesBreakfastFragment extends Fragment implements RecipeAdapter.
     private CollectionReference recipeRef = db.collection("Recipes");
     private CollectionReference usersReference = db.collection("Users");
     private FirebaseStorage mStorageRef;
-    private ListenerRegistration userDetailsListener, userIngredientsListener, recipesListener, privateRecipesListener, privateRecipeIngredientsListener, recipesIngredientsListener;
+//    private ListenerRegistration userDetailsListener, userIngredientsListener, recipesListener, privateRecipesListener, privateRecipeIngredientsListener, recipesIngredientsListener;
 
     private RecyclerView mRecyclerView;
     private RecipeAdapter mAdapter;
@@ -103,11 +103,15 @@ public class recipesBreakfastFragment extends Fragment implements RecipeAdapter.
         mStorageRef = FirebaseStorage.getInstance();
 
         buildRecyclerView();
-        getUserIngredients();
+
         return view; // HAS TO BE THE LAST ONE ---------------------------------
     }
 
-
+    @Override
+    public void onStart() {
+        super.onStart();
+        getUserIngredients();
+    }
 
     private void getUserIngredients() {
         usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).collection("Ingredients")
@@ -125,7 +129,7 @@ public class recipesBreakfastFragment extends Fragment implements RecipeAdapter.
                                 userIngredientList.add(ingredient);
                             }
                         }
-                        performQuery();
+                        getCurrentUserDetails();
                     }
                 });
     }
@@ -134,36 +138,36 @@ public class recipesBreakfastFragment extends Fragment implements RecipeAdapter.
     @Override
     public void onStop() {
         super.onStop();
-        DetachFireStoreListeners();
+//        DetachFireStoreListeners();
         Log.d(TAG, "onStop: ");
     }
 
-    private void DetachFireStoreListeners() {
-        if (userDetailsListener != null) {
-            userDetailsListener.remove();
-            userDetailsListener = null;
-        }
-        if (userIngredientsListener != null) {
-            userIngredientsListener.remove();
-            userIngredientsListener = null;
-        }
-        if (recipesListener != null) {
-            recipesListener.remove();
-            recipesListener = null;
-        }
-        if (privateRecipesListener != null) {
-            privateRecipesListener.remove();
-            privateRecipesListener = null;
-        }
-        if (recipesIngredientsListener != null) {
-            recipesIngredientsListener.remove();
-            recipesIngredientsListener = null;
-        }
-        if (privateRecipeIngredientsListener != null) {
-            privateRecipeIngredientsListener.remove();
-            privateRecipeIngredientsListener = null;
-        }
-    }
+//    private void DetachFireStoreListeners() {
+//        if (userDetailsListener != null) {
+//            userDetailsListener.remove();
+//            userDetailsListener = null;
+//        }
+//        if (userIngredientsListener != null) {
+//            userIngredientsListener.remove();
+//            userIngredientsListener = null;
+//        }
+//        if (recipesListener != null) {
+//            recipesListener.remove();
+//            recipesListener = null;
+//        }
+//        if (privateRecipesListener != null) {
+//            privateRecipesListener.remove();
+//            privateRecipesListener = null;
+//        }
+//        if (recipesIngredientsListener != null) {
+//            recipesIngredientsListener.remove();
+//            recipesIngredientsListener = null;
+//        }
+//        if (privateRecipeIngredientsListener != null) {
+//            privateRecipeIngredientsListener.remove();
+//            privateRecipeIngredientsListener = null;
+//        }
+//    }
 
 
     private void buildRecyclerView() {
@@ -183,14 +187,15 @@ public class recipesBreakfastFragment extends Fragment implements RecipeAdapter.
                 super.onScrollStateChanged(recyclerView, newState);
 
                 if (!recyclerView.canScrollVertically(1)) {
-                    performQuery();
+                    PerformMainQuery();
+                    Log.d(TAG, "onScrollStateChanged: CANT SCROLL");
                 }
             }
         });
     }
 
 
-    private void performQuery() {
+    private void getCurrentUserDetails() {
         usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid())
                 .addSnapshotListener(new EventListener<DocumentSnapshot>() {
                     @Override
@@ -200,19 +205,10 @@ public class recipesBreakfastFragment extends Fragment implements RecipeAdapter.
                             return;
                         }
 
-
                         mUser = documentSnapshot.toObject(User.class);
                         loggedInUserDocumentId = documentSnapshot.getId();
 
-                        Query recipesQuery = null;
-                        if (mLastQueriedDocument != null) {
-                            recipesQuery = recipeRef.whereEqualTo("category", "breakfast").whereEqualTo("privacy", "Everyone")
-                                    .startAfter(mLastQueriedDocument).limit(10);
-                        } else {
-                            recipesQuery = recipeRef.whereEqualTo("category", "breakfast").whereEqualTo("privacy", "Everyone").limit(10);
-                        }
-
-                        PerformMainQuery(recipesQuery);
+                        PerformMainQuery();
                         pbLoading.setVisibility(View.INVISIBLE);
 
                     }
@@ -220,11 +216,23 @@ public class recipesBreakfastFragment extends Fragment implements RecipeAdapter.
 
     }
 
-    private void PerformMainQuery(Query recipesQuery) {
+    private void PerformMainQuery() {
+        Query recipesQuery;
+        if (mLastQueriedDocument != null) {
+            recipesQuery = recipeRef.whereEqualTo("category", "breakfast").whereEqualTo("privacy", "Everyone").orderBy("number_of_likes", Query.Direction.DESCENDING)
+                    .startAfter(mLastQueriedDocument).limit(10);
+        } else {
+            recipesQuery = recipeRef.whereEqualTo("category", "breakfast").whereEqualTo("privacy", "Everyone").orderBy("number_of_likes", Query.Direction.DESCENDING).limit(10);
+        }
+
         recipesQuery.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@javax.annotation.Nullable QuerySnapshot queryDocumentSnapshots,
                                 @javax.annotation.Nullable FirebaseFirestoreException e) {
+                if (e != null) {
+                    Log.e(TAG, "onEvent: ", e);
+                    return;
+                }
                 if (queryDocumentSnapshots != null) {
                     for (final QueryDocumentSnapshot document : queryDocumentSnapshots) {
                         final Recipe recipe = document.toObject(Recipe.class);
@@ -307,16 +315,20 @@ public class recipesBreakfastFragment extends Fragment implements RecipeAdapter.
         //Get Recipes where the recipes created by the logged in user are private
         Query privateRecipesQuery = null;
         if (mLastQueriedDocument != null) {
-            privateRecipesQuery = recipeRef.whereEqualTo("category", "breakfast").whereEqualTo("creator_docId", loggedInUserDocumentId)
-                    .startAfter(mLastQueriedDocument); // Necessary so we don't have the same results multiple times
+            privateRecipesQuery = recipeRef.whereEqualTo("category", "breakfast").whereEqualTo("creator_docId", loggedInUserDocumentId).orderBy("number_of_likes", Query.Direction.DESCENDING);
+//                    .startAfter(mLastQueriedDocument); // Necessary so we don't have the same results multiple times
 //                                    .limit(3);
         } else {
-            privateRecipesQuery = recipeRef.whereEqualTo("category", "breakfast").whereEqualTo("creator_docId", loggedInUserDocumentId);
+            privateRecipesQuery = recipeRef.whereEqualTo("category", "breakfast").whereEqualTo("creator_docId", loggedInUserDocumentId).orderBy("number_of_likes", Query.Direction.DESCENDING);
 //                                    .limit(3);
         }
         privateRecipesQuery.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                if (e != null) {
+                    Log.e(TAG, "onEvent: ", e);
+                    return;
+                }
                 if (queryDocumentSnapshots != null) {
                     for (final QueryDocumentSnapshot document : queryDocumentSnapshots) {
                         final Recipe recipe = document.toObject(Recipe.class);
@@ -385,10 +397,6 @@ public class recipesBreakfastFragment extends Fragment implements RecipeAdapter.
 
                     }
 
-                    if (queryDocumentSnapshots.getDocuments().size() != 0) {
-                        mLastQueriedDocument = queryDocumentSnapshots.getDocuments()
-                                .get(queryDocumentSnapshots.getDocuments().size() - 1);
-                    }
                 } else {
                     Log.d(TAG, "onEvent: Querry result is null");
                 }

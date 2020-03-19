@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.ProgressDialog;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -59,7 +60,7 @@ public class AddPostActivity extends AppCompatActivity {
 
     private User mUser = new User();
 
-
+    ProgressDialog pd;
     MaterialButton searchRecipeBtn, publishBtn, choosePhotoBtn;
     TextInputEditText descriptionInputText;
     Spinner privacySpinner;
@@ -71,6 +72,9 @@ public class AddPostActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_post);
+
+        pd = new ProgressDialog(AddPostActivity.this);
+        pd.setMessage("Please wait...");
 
         descriptionInputText = findViewById(R.id.addPost_description_editText);
         searchRecipeBtn = findViewById(R.id.addPost_selectRecipe_btn);
@@ -186,6 +190,7 @@ public class AddPostActivity extends AppCompatActivity {
             final StorageReference newFileReference = mStorageRef.child(System.currentTimeMillis()
                     + "." + getFileExtension(mImageUri));
 
+            pd.show();
             //Compress image
             Bitmap bitmap = imageBitmap;
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -203,7 +208,7 @@ public class AddPostActivity extends AppCompatActivity {
                                     final String imageUrl = uri.toString();
                                     postPicUrl = imageUrl;
                                     //
-
+                                    pd.hide();
                                     searchRecipeBtn.setEnabled(true);
                                 }
                             });
@@ -229,18 +234,19 @@ public class AddPostActivity extends AppCompatActivity {
         String text = descriptionInputText.getText().toString();
         String privacy = privacySpinner.getSelectedItem().toString();
 
-        Post post = new Post(referencedRecipeDocID, creatorId, mUser.getName(), mUser.getUserProfilePicUrl(), 0, 0,text, postPicUrl,
+        Post post = new Post(referencedRecipeDocID, creatorId, mUser.getName(), mUser.getUserProfilePicUrl(), 0, 0, text, postPicUrl,
                 false, privacy, null);
         if (postPicUrl.equals("")) {
             Toast.makeText(this, "Please select a photo for your post", Toast.LENGTH_SHORT).show();
         } else {
+            pd.show();
             db.collection("Posts").add(post).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                 @Override
                 public void onSuccess(DocumentReference documentReference) {
                     Toast.makeText(AddPostActivity.this, "Successfully published your post", Toast.LENGTH_SHORT).show();
-
+                    pd.hide();
                     Intent intent = new Intent(AddPostActivity.this, MainActivity.class);
-                    intent.putExtra("post_id",documentReference.getId());
+                    intent.putExtra("post_id", documentReference.getId());
                     startActivity(intent);
                     finish();
                 }
