@@ -110,7 +110,7 @@ public class recipesLunchFragment extends Fragment implements RecipeAdapter.OnIt
     }
 
     private void getUserIngredients() {
-        userIngredientsListener = usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).collection("Ingredients")
+        usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).collection("Ingredients")
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
                     public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
@@ -193,7 +193,7 @@ public class recipesLunchFragment extends Fragment implements RecipeAdapter.OnIt
 
 
     private void performQuery() {
-        userDetailsListener = usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid())
+        usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid())
                 .addSnapshotListener(new EventListener<DocumentSnapshot>() {
                     @Override
                     public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {

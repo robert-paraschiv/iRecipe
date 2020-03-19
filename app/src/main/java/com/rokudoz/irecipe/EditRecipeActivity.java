@@ -7,6 +7,8 @@ import androidx.appcompat.widget.AppCompatSpinner;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.ContentResolver;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -15,6 +17,7 @@ import android.graphics.Bitmap;
 import android.media.Image;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
@@ -42,7 +45,9 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.WriteBatch;
 import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.StorageTask;
 import com.google.firebase.storage.UploadTask;
@@ -71,6 +76,8 @@ public class EditRecipeActivity extends AppCompatActivity implements EditRecipeI
     EditText durationEditText;
     AppCompatSpinner durationTypeSpinner, complexitySpinner;
 
+    ProgressDialog pd;
+
 
     EditRecipeIngredientsAdapter editRecipeIngredientsAdapter;
     EditRecipeInstructionsAdapter editRecipeInstructionsAdapter;
@@ -90,6 +97,11 @@ public class EditRecipeActivity extends AppCompatActivity implements EditRecipeI
     private Uri mImageUri;
     Bitmap imageBitmap;
 
+    private Uri mRecipeImageUri;
+
+    private Uri[] mRecipeImageUriArray;
+    private String[] recipeImageUrlArray;
+
     //Firebase
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private CollectionReference usersReference = db.collection("Users");
@@ -103,6 +115,8 @@ public class EditRecipeActivity extends AppCompatActivity implements EditRecipeI
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_recipe);
 
+        pd = new ProgressDialog(EditRecipeActivity.this);
+        pd.setMessage("Please wait...");
 
         recipeImageView = findViewById(R.id.editRecipes_image);
         recipePhotoBtn = findViewById(R.id.editRecipes_choose_path_btn);
@@ -151,6 +165,7 @@ public class EditRecipeActivity extends AppCompatActivity implements EditRecipeI
             public void onClick(View v) {
                 Ingredient ingredient = new Ingredient();
                 ingredient.setName("");
+                ingredient.setOwned(false);
                 ingredientList.add(ingredient);
                 int position = ingredientList.size();
                 editRecipeIngredientsAdapter.notifyItemInserted(position);
@@ -173,11 +188,118 @@ public class EditRecipeActivity extends AppCompatActivity implements EditRecipeI
         recipePhotoBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                Intent intent = new Intent();
+                intent.setType("image/*");
+                intent.setAction(Intent.ACTION_GET_CONTENT);
+                intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+                startActivityForResult(Intent.createChooser(intent, "Select picture"), 0);
             }
         });
         buildRecyclerViews();
 
+    }
+
+    private void openFileChooser(int position) {
+        Intent intent = new Intent();
+        intent.setType("image/*");
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        startActivityForResult(intent, PICK_IMAGE_REQUEST + position);
+    }
+
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        Log.d(TAG, "onActivityResult: request code = " + requestCode);
+        if (requestCode == 0 && resultCode == Activity.RESULT_OK && data != null) {
+            if (data.getClipData() != null) {
+                //Multiple images have been selected
+
+                int count = data.getClipData().getItemCount();
+                mRecipeImageUriArray = new Uri[count];
+
+                recipeImageUrlArray = new String[count];
+                for (int i = 0; i < count; i++) {
+                    mRecipeImageUriArray[i] = data.getClipData().getItemAt(i).getUri();
+                    mRecipeImageUri = data.getClipData().getItemAt(i).getUri();
+                    addPhotoToFirestore(i);
+                }
+                Glide.with(recipeImageView).load(mRecipeImageUri).centerCrop().into(recipeImageView);
+
+            } else if (data.getData() != null) {
+                //Only one image has been selected
+                mRecipeImageUri = data.getData();
+                mRecipeImageUriArray = new Uri[1];
+                mRecipeImageUriArray[0] = mRecipeImageUri;
+                recipeImageUrlArray = new String[mRecipeImageUriArray.length];
+                addPhotoToFirestore(0);
+                Glide.with(recipeImageView).load(mRecipeImageUri).centerCrop().into(recipeImageView);
+            }
+
+        } else {
+            int position = requestCode - 1;
+
+            if (resultCode == RESULT_OK && data != null && data.getData() != null) {
+                mImageUri = data.getData();
+                try {
+                    RotateBitmap rotateBitmap = new RotateBitmap();
+                    imageBitmap = rotateBitmap.HandleSamplingAndRotationBitmap(this, mImageUri);
+                    uploadPostPic(position);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+//            Picasso.get().load(mImageUri).into(imageView);
+            }
+        }
+    }
+
+    private void addPhotoToFirestore(final int position) {
+        // Uploading image to Firestore
+        if (mRecipeImageUriArray != null) {
+            pd.show();
+            final StorageReference fileReference = mStorageRef.child(System.currentTimeMillis()
+                    + "." + getFileExtension(mRecipeImageUriArray[position]));
+
+            //Compress Image
+            Bitmap bitmap = null;
+            try {
+                RotateBitmap rotateBitmap = new RotateBitmap();
+                bitmap = rotateBitmap.HandleSamplingAndRotationBitmap(this, mRecipeImageUriArray[position]);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 35, baos);
+            byte[] data = baos.toByteArray();
+
+            mUploadTask = fileReference.putBytes(data)
+                    .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                        @Override
+                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                            fileReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                @Override
+                                public void onSuccess(Uri uri) {
+                                    final String imageUrl = uri.toString();
+                                    recipeImageUrlArray[position] = imageUrl;
+                                    pd.hide();
+
+                                }
+                            });
+
+
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Toast.makeText(EditRecipeActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                        }
+                    });
+
+        } else {
+            Toast.makeText(this, "No file selected", Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void getIngredientList() {
@@ -211,11 +333,16 @@ public class EditRecipeActivity extends AppCompatActivity implements EditRecipeI
         final String title = titleInputEditText.getText().toString();
         final String description = descriptionInputEditText.getText().toString();
         final String creator_docId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        final List<String> imageUrls_list = mRecipe.getImageUrls_list();
+        List<String> imageUrls_list = new ArrayList<>();
+        if (recipeImageUrlArray == null) {
+            imageUrls_list = mRecipe.getImageUrls_list();
+        } else {
+            imageUrls_list = Arrays.asList(recipeImageUrlArray);
+        }
+
         final String category = categorySpinner.getSelectedItem().toString();
         final List<Ingredient> ingredients_list = new ArrayList<>();
         final List<Ingredient> ingredients_without_category = new ArrayList<>();
-        final Boolean isFavorite = false;
         final String privacy = privacySpinner.getSelectedItem().toString();
         final String complexity = complexitySpinner.getSelectedItem().toString();
         Float duration = 0f;
@@ -281,6 +408,7 @@ public class EditRecipeActivity extends AppCompatActivity implements EditRecipeI
             materialAlertDialogBuilder.setMessage("This ingredient isn't in our Database yet, please specify the category");
             materialAlertDialogBuilder.setCancelable(true);
             final Float finalDuration = duration;
+            final List<String> finalImageUrls_list = imageUrls_list;
             materialAlertDialogBuilder.setPositiveButton(
                     "Confirm",
                     new DialogInterface.OnClickListener() {
@@ -301,31 +429,37 @@ public class EditRecipeActivity extends AppCompatActivity implements EditRecipeI
 
                             }
 
-                            Recipe recipe = new Recipe(title, creator_docId, mRecipe.getCreator_name(), mRecipe.getCreator_imageUrl(), category, description, ingredients_list
-                                    , instructionList, keywords, imageUrls_list, complexity, finalDuration, durationType, 0f, isFavorite, privacy, mRecipe.getNumber_of_likes()
-                                    , mRecipe.getNumber_of_comments());
-
-                            Log.d(TAG, "addRecipe: " + recipe.toString());
-
-                            // Sends recipe data to Firestore database
-                            recipesReference.document(mRecipe.getDocumentId()).set(recipe)
-                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                        @Override
-                                        public void onSuccess(Void aVoid) {
-                                            Toast.makeText(EditRecipeActivity.this, "Succesfully added " + title + " to the recipes list", Toast.LENGTH_SHORT).show();
-                                            Intent intent = new Intent(EditRecipeActivity.this, MainActivity.class);
-                                            intent.putExtra("recipe_id", mRecipe.getDocumentId());
-                                            startActivity(intent);
-                                            finish();
-                                        }
-                                    })
-                                    .addOnFailureListener(new OnFailureListener() {
-                                        @Override
-                                        public void onFailure(@NonNull Exception e) {
-                                            Toast.makeText(EditRecipeActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
-                                        }
-                                    });
-
+                            //Update recipe in db
+                            pd.show();
+                            WriteBatch batch = db.batch();
+                            DocumentReference documentReference = recipesReference.document(mRecipe.getDocumentId());
+                            batch.update(documentReference, "title", title);
+                            batch.update(documentReference, "category", category);
+                            batch.update(documentReference, "description", description);
+                            batch.update(documentReference, "ingredient_list", ingredients_list);
+                            batch.update(documentReference, "instruction_list", instructionList);
+                            batch.update(documentReference, "keywords", keywords);
+                            batch.update(documentReference, "imageUrls_list", finalImageUrls_list);
+                            batch.update(documentReference, "complexity", complexity);
+                            batch.update(documentReference, "duration", finalDuration);
+                            batch.update(documentReference, "durationType", durationType);
+                            batch.update(documentReference, "privacy", privacy);
+                            batch.commit().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                    pd.hide();
+                                    Toast.makeText(EditRecipeActivity.this, "Succesfully added " + title + " to the recipes list", Toast.LENGTH_SHORT).show();
+                                    Intent intent = new Intent(EditRecipeActivity.this, MainActivity.class);
+                                    intent.putExtra("recipe_id", mRecipe.getDocumentId());
+                                    startActivity(intent);
+                                    finish();
+                                }
+                            }).addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    Toast.makeText(EditRecipeActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                                }
+                            });
                             dialog.cancel();
                         }
                     });
@@ -340,30 +474,38 @@ public class EditRecipeActivity extends AppCompatActivity implements EditRecipeI
 
             materialAlertDialogBuilder.show();
         } else {
-            Recipe recipe = new Recipe(title, creator_docId, mRecipe.getCreator_name(), mRecipe.getCreator_imageUrl(), category, description, ingredients_list
-                    , instructionList, keywords, imageUrls_list, complexity, duration, durationType, 0f, isFavorite, privacy, mRecipe.getNumber_of_likes()
-                    , mRecipe.getNumber_of_comments());
+            pd.show();
 
-            Log.d(TAG, "addRecipe: " + recipe.toString());
-
-            // Sends recipe data to Firestore database
-            recipesReference.document(mRecipe.getDocumentId()).set(recipe)
-                    .addOnSuccessListener(new OnSuccessListener<Void>() {
-                        @Override
-                        public void onSuccess(Void aVoid) {
-                            Toast.makeText(EditRecipeActivity.this, "Succesfully added " + title + " to the recipes list", Toast.LENGTH_SHORT).show();
-                            Intent intent = new Intent(EditRecipeActivity.this, MainActivity.class);
-                            intent.putExtra("recipe_id", mRecipe.getDocumentId());
-                            startActivity(intent);
-                            finish();
-                        }
-                    })
-                    .addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            Toast.makeText(EditRecipeActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
-                        }
-                    });
+            //Update recipe in db
+            WriteBatch batch = db.batch();
+            DocumentReference documentReference = recipesReference.document(mRecipe.getDocumentId());
+            batch.update(documentReference, "title", title);
+            batch.update(documentReference, "category", category);
+            batch.update(documentReference, "description", description);
+            batch.update(documentReference, "ingredient_list", ingredients_list);
+            batch.update(documentReference, "instruction_list", instructionList);
+            batch.update(documentReference, "keywords", keywords);
+            batch.update(documentReference, "imageUrls_list", imageUrls_list);
+            batch.update(documentReference, "complexity", complexity);
+            batch.update(documentReference, "duration", duration);
+            batch.update(documentReference, "durationType", durationType);
+            batch.update(documentReference, "privacy", privacy);
+            batch.commit().addOnSuccessListener(new OnSuccessListener<Void>() {
+                @Override
+                public void onSuccess(Void aVoid) {
+                    pd.hide();
+                    Toast.makeText(EditRecipeActivity.this, "Succesfully added " + title + " to the recipes list", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(EditRecipeActivity.this, MainActivity.class);
+                    intent.putExtra("recipe_id", mRecipe.getDocumentId());
+                    startActivity(intent);
+                    finish();
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Toast.makeText(EditRecipeActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
         }
     }
 
@@ -449,31 +591,6 @@ public class EditRecipeActivity extends AppCompatActivity implements EditRecipeI
         openFileChooser(position);
     }
 
-    private void openFileChooser(int position) {
-        Intent intent = new Intent();
-        intent.setType("image/*");
-        intent.setAction(Intent.ACTION_GET_CONTENT);
-        startActivityForResult(intent, PICK_IMAGE_REQUEST + position);
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        int position = requestCode - 1;
-
-        if (resultCode == RESULT_OK && data != null && data.getData() != null) {
-            mImageUri = data.getData();
-            try {
-                RotateBitmap rotateBitmap = new RotateBitmap();
-                imageBitmap = rotateBitmap.HandleSamplingAndRotationBitmap(this, mImageUri);
-                uploadPostPic(position);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-//            Picasso.get().load(mImageUri).into(imageView);
-        }
-    }
 
     private String getFileExtension(Uri uri) {
         ContentResolver cR = this.getContentResolver();
@@ -485,6 +602,8 @@ public class EditRecipeActivity extends AppCompatActivity implements EditRecipeI
         if (mImageUri != null) {
             final StorageReference newFileReference = mStorageRef.child(System.currentTimeMillis()
                     + "." + getFileExtension(mImageUri));
+
+            pd.show();
 
             //Compress image
             Bitmap bitmap = imageBitmap;
@@ -507,6 +626,7 @@ public class EditRecipeActivity extends AppCompatActivity implements EditRecipeI
                                     instructionList.get(position).setImgUrl(imageUrl);
                                     editRecipeInstructionsAdapter.notifyItemChanged(position);
                                     Log.d(TAG, "onSuccess: position" + position + instructionList.get(position).toString());
+                                    pd.hide();
                                     //
                                 }
                             });

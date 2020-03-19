@@ -2,6 +2,7 @@ package com.rokudoz.irecipe;
 
 import android.animation.LayoutTransition;
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.ContentResolver;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -109,11 +110,15 @@ public class AddRecipesActivity extends AppCompatActivity {
     private Spinner recipeCategorySpinner, privacySpinner, durationTypeSpinner, complexitySpinner;
     private ImageView mImageView;
     private ProgressBar mProgressBar;
+    ProgressDialog pd;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_recipes);
+
+        pd = new ProgressDialog(AddRecipesActivity.this);
+        pd.setMessage("Please wait...");
 
         ingredientsLinearLayout = findViewById(R.id.addRecipes_ingredients_linear_layout);
         instructionsLinearLayout = findViewById(R.id.addRecipes_instructions_linear_layout);
@@ -354,12 +359,6 @@ public class AddRecipesActivity extends AppCompatActivity {
                                 public void onSuccess(Uri uri) {
                                     final String imageUrl = uri.toString();
                                     recipeImageUrlArray[position] = imageUrl;
-                                    nrOfPhotosUploaded++;
-
-                                    if (nrOfPhotosUploaded == mRecipeImageUriArray.length) {
-                                        getInstructionsPhotoUploadCount();
-//                                        addRecipe();
-                                    }
 
                                 }
                             });
@@ -508,11 +507,13 @@ public class AddRecipesActivity extends AppCompatActivity {
 
                             Log.d(TAG, "addRecipe: " + recipe.toString());
 
+                            pd.show();
                             // Sends recipe data to Firestore database
                             recipesReference.add(recipe)
                                     .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                                         @Override
                                         public void onSuccess(DocumentReference documentReference) {
+                                            pd.hide();
                                             Toast.makeText(AddRecipesActivity.this, "Succesfully added " + title + " to the recipes list", Toast.LENGTH_SHORT).show();
                                             Log.d(TAG, "onSuccess: doc id " + documentReference.getId());
                                             Intent intent = new Intent(AddRecipesActivity.this, MainActivity.class);
