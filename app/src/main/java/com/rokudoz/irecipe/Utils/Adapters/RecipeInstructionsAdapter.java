@@ -78,7 +78,7 @@ public class RecipeInstructionsAdapter extends RecyclerView.Adapter<RecipeInstru
         final Instruction currentItem = instructionList.get(position);
 
         holder.tvStepText.setText(currentItem.getText());
-        if (!currentItem.getImgUrl().equals("")) {
+        if (currentItem.getImgUrl() != null && !currentItem.getImgUrl().equals("")) {
             Glide.with(holder.stepImage).load(currentItem.getImgUrl()).centerCrop().into(holder.stepImage);
         } else {
             holder.stepImage.setVisibility(View.GONE);

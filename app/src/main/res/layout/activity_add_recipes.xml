@@ -80,6 +80,9 @@
                 android:id="@+id/addRecipes_category_spinner"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="4dp"
+                android:entries="@array/recipe_category"
                 android:spinnerMode="dropdown" />
 
             <com.google.android.material.textfield.TextInputLayout
@@ -116,20 +119,18 @@
                         android:textSize="18sp"
                         android:textStyle="bold" />
 
-                    <LinearLayout
-                        android:id="@+id/addRecipes_ingredients_linear_layout"
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/addRecipes_ingredients_recyclerview"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_below="@+id/addRecipes_ingredientsTitle_tv"
-                        android:animateLayoutChanges="true"
-                        android:orientation="vertical" />
+                        android:layout_height="match_parent"
+                        android:layout_below="@id/addRecipes_ingredientsTitle_tv" />
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/addRecipes_addIngredient_btn"
                         style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_below="@+id/addRecipes_ingredients_linear_layout"
+                        android:layout_below="@+id/addRecipes_ingredients_recyclerview"
                         android:layout_centerHorizontal="true"
                         android:layout_marginTop="8dp"
                         android:text="Add New Ingredient"
@@ -158,20 +159,18 @@
                         android:textSize="18sp"
                         android:textStyle="bold" />
 
-                    <LinearLayout
-                        android:id="@+id/addRecipes_instructions_linear_layout"
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/addRecipes_instructions_recyclerview"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_below="@id/addRecipes_instructionsTitle_tv"
-                        android:animateLayoutChanges="true"
-                        android:orientation="vertical" />
+                        android:layout_height="match_parent"
+                        android:layout_below="@id/addRecipes_instructionsTitle_tv" />
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/addRecipes_addInstruction_btn"
                         style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_below="@id/addRecipes_instructions_linear_layout"
+                        android:layout_below="@id/addRecipes_instructions_recyclerview"
                         android:layout_centerHorizontal="true"
                         android:layout_marginTop="8dp"
                         android:text="Add Step"
