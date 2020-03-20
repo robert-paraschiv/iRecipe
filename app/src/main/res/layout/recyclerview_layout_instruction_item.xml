@@ -4,23 +4,25 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="4dp"
     android:padding="4dp">
 
     <ImageView
-        android:id="@+id/margin"
+        android:id="@+id/rv_layout_instruction_spacer"
         android:layout_width="match_parent"
-        android:layout_height="0.5dp"
-        android:src="@color/black"
-        android:contentDescription="Step separator" />
+        android:layout_height="0.1dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:contentDescription="Spacer"
+        android:src="@color/black" />
 
     <TextView
         android:id="@+id/step_item_StepText_TextView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_below="@id/rv_layout_instruction_spacer"
         android:layout_marginStart="8dp"
+        android:layout_marginTop="4dp"
         android:layout_marginEnd="8dp"
-        android:textSize="12sp"
         tools:text="You cook the shit out of it and then you put it in the oven
 \nand then you also fuck it up untill it's burn out" />
 
@@ -37,8 +39,8 @@
             android:id="@+id/stepItem_image"
             android:layout_width="match_parent"
             android:layout_height="150dp"
-            tools:src="@color/colorPrimary"
-            android:contentDescription="Step image" />
+            android:contentDescription="Step image"
+            tools:src="@color/colorPrimary" />
     </com.google.android.material.card.MaterialCardView>
 
 </RelativeLayout>

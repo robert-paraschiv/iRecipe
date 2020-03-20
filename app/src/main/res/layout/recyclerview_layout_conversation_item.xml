@@ -1,29 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_margin="4dp"
-    android:elevation="4dp"
-    app:cardCornerRadius="18dp">
+    android:layout_height="wrap_content">
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:padding="4dp">
 
+        <ImageView
+            android:id="@+id/rv_conversation_item_spacer"
+            android:layout_width="match_parent"
+            android:layout_height="0.1dp"
+            android:layout_marginBottom="8dp"
+            android:layout_toEndOf="@id/recycler_view_conversationItem_friendImage"
+            android:contentDescription="Spacer"
+            android:src="@color/black" />
+
 
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/recycler_view_conversationItem_friendImage"
             android:layout_width="60dp"
             android:layout_height="60dp"
+            android:layout_below="@id/rv_conversation_item_spacer"
             tools:src="@color/black" />
 
         <TextView
             android:id="@+id/recycler_view_conversationItem_friendName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_below="@id/rv_conversation_item_spacer"
             android:layout_marginStart="8dp"
             android:layout_toEndOf="@+id/recycler_view_conversationItem_friendImage"
             android:maxLines="1"
@@ -31,6 +39,7 @@
             tools:text="User name" />
 
         <TextView
+            android:layout_below="@id/rv_conversation_item_spacer"
             android:id="@+id/recycler_view_conversationItem_lastMessageTimeStamp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -43,13 +52,13 @@
 
         <TextView
             android:id="@+id/recycler_view_conversationItem_lastMessageText"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/recycler_view_conversationItem_friendName"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
-            android:layout_toStartOf="@id/recycler_view_conversationItem_lastMessageSeen"
-            android:layout_toEndOf="@id/recycler_view_conversationItem_friendImage"
+            android:layout_marginEnd="4dp"
+            android:layout_toEndOf="@id/recycler_view_conversationItem_lastMessageSeen"
             android:maxLines="1"
             tools:text="Last message text here " />
 
@@ -58,13 +67,13 @@
             android:layout_width="20dp"
             android:layout_height="20dp"
             android:layout_below="@id/recycler_view_conversationItem_friendName"
-            android:layout_alignParentEnd="true"
             android:layout_marginStart="4dp"
             android:layout_marginTop="8dp"
             android:layout_marginEnd="4dp"
+            android:layout_toEndOf="@id/recycler_view_conversationItem_friendImage"
             android:src="@drawable/ic_check_black_24dp"
             android:visibility="invisible"
             tools:visibility="visible" />
 
     </RelativeLayout>
-</com.google.android.material.card.MaterialCardView>
+</RelativeLayout>

@@ -47,7 +47,7 @@ public class ConversationAdapter extends RecyclerView.Adapter<ConversationAdapte
     public class ConversationViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         TextView tvName, tvMessage, tvTimeStamp;
         CircleImageView mImage;
-        ImageView seenCheck;
+        ImageView seenCheck, spacer;
 
 
         public ConversationViewHolder(View itemView) {
@@ -57,7 +57,7 @@ public class ConversationAdapter extends RecyclerView.Adapter<ConversationAdapte
             tvMessage = itemView.findViewById(R.id.recycler_view_conversationItem_lastMessageText);
             tvTimeStamp = itemView.findViewById(R.id.recycler_view_conversationItem_lastMessageTimeStamp);
             seenCheck = itemView.findViewById(R.id.recycler_view_conversationItem_lastMessageSeen);
-
+            spacer = itemView.findViewById(R.id.rv_conversation_item_spacer);
             itemView.setOnClickListener(this);
         }
 
@@ -86,6 +86,11 @@ public class ConversationAdapter extends RecyclerView.Adapter<ConversationAdapte
     @Override
     public void onBindViewHolder(@NonNull final ConversationViewHolder holder, int position) {
         final Conversation currentItem = conversationList.get(position);
+        if (position == 0) {
+            holder.spacer.setVisibility(View.GONE);
+        } else {
+            holder.spacer.setVisibility(View.VISIBLE);
+        }
 
         if (currentItem.getUser_name() != null)
             holder.tvName.setText(currentItem.getUser_name());

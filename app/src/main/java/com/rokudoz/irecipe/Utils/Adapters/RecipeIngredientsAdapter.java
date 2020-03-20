@@ -22,13 +22,15 @@ public class RecipeIngredientsAdapter extends RecyclerView.Adapter<RecipeIngredi
     private List<Ingredient> ingredientList = new ArrayList<>();
 
     class RecipeIngredientsViewHolder extends RecyclerView.ViewHolder {
-        TextView tvIngredientName, tvIngredientQuantity,tvQuantityType;
+        TextView tvIngredientName, tvIngredientQuantity, tvQuantityType;
+        ImageView spacer;
 
         RecipeIngredientsViewHolder(View itemView) {
             super(itemView);
             tvIngredientName = itemView.findViewById(R.id.ingredient_item_Name_TextView);
             tvIngredientQuantity = itemView.findViewById(R.id.ingredient_item_quantity_TextView);
             tvQuantityType = itemView.findViewById(R.id.ingredient_item_quantity_type_TextView);
+            spacer = itemView.findViewById(R.id.rv_layout_ingredient_spacer);
         }
 
     }
@@ -47,9 +49,18 @@ public class RecipeIngredientsAdapter extends RecyclerView.Adapter<RecipeIngredi
     public void onBindViewHolder(@NonNull final RecipeIngredientsViewHolder holder, int position) {
         final Ingredient currentItem = ingredientList.get(position);
 
-        holder.tvIngredientName.setText(currentItem.getName());
-        holder.tvIngredientQuantity.setText(currentItem.getQuantity().toString());
-        holder.tvQuantityType.setText(currentItem.getQuantity_type());
+        if (position == 0) {
+            holder.spacer.setVisibility(View.GONE);
+        } else {
+            holder.spacer.setVisibility(View.VISIBLE);
+        }
+
+        if (currentItem.getName() != null)
+            holder.tvIngredientName.setText(currentItem.getName());
+        if (currentItem.getQuantity() != null)
+            holder.tvIngredientQuantity.setText(currentItem.getQuantity().toString());
+        if (currentItem.getQuantity_type() != null)
+            holder.tvQuantityType.setText(currentItem.getQuantity_type());
     }
 
     @Override

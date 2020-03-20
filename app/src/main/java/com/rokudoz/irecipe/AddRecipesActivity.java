@@ -44,7 +44,6 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
-import com.google.firebase.firestore.WriteBatch;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.StorageTask;
@@ -62,6 +61,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 
 public class AddRecipesActivity extends AppCompatActivity implements EditRecipeInstructionsAdapter.OnItemClickListener
@@ -70,7 +70,7 @@ public class AddRecipesActivity extends AppCompatActivity implements EditRecipeI
 
     //Components
     ImageView recipeImageView;
-    MaterialButton recipePhotoBtn, addIngredientBtn, addInstructionBtn, saveBtn;
+    MaterialButton recipePhotoBtn, addIngredientBtn, addInstructionBtn, addRecipeBtn;
     TextInputEditText titleInputEditText, descriptionInputEditText, keywordsInputEditText;
     Spinner categorySpinner, privacySpinner;
     RecyclerView ingredientsRecyclerView, instructionsRecyclerView;
@@ -123,7 +123,7 @@ public class AddRecipesActivity extends AppCompatActivity implements EditRecipeI
         recipePhotoBtn = findViewById(R.id.addRecipes_choose_path_btn);
         addIngredientBtn = findViewById(R.id.addRecipes_addIngredient_btn);
         addInstructionBtn = findViewById(R.id.addRecipes_addInstruction_btn);
-        saveBtn = findViewById(R.id.addRecipes_add_btn);
+        addRecipeBtn = findViewById(R.id.addRecipes_add_btn);
         titleInputEditText = findViewById(R.id.addRecipes_title_editText);
         descriptionInputEditText = findViewById(R.id.addRecipes_description_editText);
         keywordsInputEditText = findViewById(R.id.addRecipes_keywords_editText);
@@ -138,7 +138,7 @@ public class AddRecipesActivity extends AppCompatActivity implements EditRecipeI
 
         getCurrentUserDetails();
 
-        saveBtn.setOnClickListener(new View.OnClickListener() {
+        addRecipeBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 getIngredientList();
@@ -337,6 +337,18 @@ public class AddRecipesActivity extends AppCompatActivity implements EditRecipeI
         if (recipeImageUrlArray == null) {
             Toast.makeText(this, "Please select a picture for the recipe", Toast.LENGTH_SHORT).show();
             return;
+        } else if (Objects.requireNonNull(titleInputEditText.getText()).toString().trim().equals("")) {
+            Toast.makeText(this, "Please choose a title for the recipe", Toast.LENGTH_SHORT).show();
+            return;
+        } else if (Objects.requireNonNull(descriptionInputEditText.getText()).toString().trim().equals("")) {
+            Toast.makeText(this, "Please type a description for the recipe", Toast.LENGTH_SHORT).show();
+            return;
+        } else if (durationEditText.getText().toString().trim().equals("")) {
+            Toast.makeText(this, "Please type how much time it takes to cook the recipe", Toast.LENGTH_SHORT).show();
+            return;
+        } else if (Objects.requireNonNull(keywordsInputEditText.getText()).toString().trim().equals("")) {
+            Toast.makeText(this, "Please choose a few keywords for the recipe", Toast.LENGTH_SHORT).show();
+            return;
         }
 
         final String title = titleInputEditText.getText().toString();
@@ -362,11 +374,19 @@ public class AddRecipesActivity extends AppCompatActivity implements EditRecipeI
 
         //Get instructions list in order
         for (int i = 0; i < instructionList.size(); i++) {
+            if (instructionList.get(i).getText().trim().equals("")) {
+                Toast.makeText(this, "Please don't lave any instruction without text", Toast.LENGTH_SHORT).show();
+                return;
+            }
             instructionList.get(i).setStepNumber(i + 1);
         }
 
         //Get ingredients list items from edit texts
         for (Ingredient ingredient : ingredientList) {
+            if (ingredient.getName().trim().equals("")) {
+                Toast.makeText(this, "Please don't lave any ingredient without name", Toast.LENGTH_SHORT).show();
+                return;
+            }
             if (!ingredient.getName().equals("") && !ingredient.getQuantity().toString().equals("")) {
                 if (allIngredientsList.contains(ingredient)) {
                     ingredient.setCategory(allIngredientsList.get(allIngredientsList.indexOf(ingredient)).getCategory());
@@ -379,10 +399,10 @@ public class AddRecipesActivity extends AppCompatActivity implements EditRecipeI
             }
         }
 
+        // If there are any ingredients without category in db, ask the user
         if (ingredients_without_category.size() > 0) {
 
-
-            //
+            //Create a dialog to ask the user the category of the ingredient if there is one that isn't in db
             final LinearLayout linearLayout = new LinearLayout(AddRecipesActivity.this);
             linearLayout.setOrientation(LinearLayout.VERTICAL);
             final List<Spinner> category_spinner_list = new ArrayList<>();
@@ -417,8 +437,6 @@ public class AddRecipesActivity extends AppCompatActivity implements EditRecipeI
             materialAlertDialogBuilder.setView(linearLayout);
             materialAlertDialogBuilder.setMessage("This ingredient isn't in our Database yet, please specify the category");
             materialAlertDialogBuilder.setCancelable(true);
-            final Float finalDuration = duration;
-            final List<String> finalImageUrls_list = imageUrls_list;
             final Float finalDuration1 = duration;
             materialAlertDialogBuilder.setPositiveButton(
                     "Confirm",
@@ -444,6 +462,7 @@ public class AddRecipesActivity extends AppCompatActivity implements EditRecipeI
                                     , ingredients_list, instructionList, keywords, imageUrls_list, complexity, finalDuration1, durationType
                                     , 0f, false, privacy, 0, 0, null);
 
+                            pd.show();
                             // Upload recipe to db
                             recipesReference.add(recipe).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                                 @Override
@@ -476,6 +495,7 @@ public class AddRecipesActivity extends AppCompatActivity implements EditRecipeI
 
             materialAlertDialogBuilder.show();
         } else {
+            // All the ingredients are in db with category, proceed to upload
             pd.show();
 
             Recipe recipe = new Recipe(title, creator_docId, mUser.getName(), mUser.getUserProfilePicUrl(), category, description

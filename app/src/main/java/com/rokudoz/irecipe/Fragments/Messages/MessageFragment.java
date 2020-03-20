@@ -25,6 +25,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.SimpleItemAnimator;
 
+import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -63,6 +64,7 @@ import com.rokudoz.irecipe.Models.User;
 import com.rokudoz.irecipe.R;
 import com.rokudoz.irecipe.Utils.Adapters.MessageAdapter;
 import com.rokudoz.irecipe.Utils.DirectReplyReceiver;
+import com.rokudoz.irecipe.Utils.LinearLayoutManagerWrapper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -292,7 +294,7 @@ public class MessageFragment extends Fragment {
     private void buildRecyclerView() {
         Log.d(TAG, "buildRecyclerView: ");
         mRecyclerView.setHasFixedSize(true);
-        final LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
+        final LinearLayoutManager linearLayoutManager = new LinearLayoutManagerWrapper(getActivity(), LinearLayoutManager.VERTICAL, false);
         linearLayoutManager.setStackFromEnd(true);
 
         mAdapter = new MessageAdapter(messageList, getActivity());
@@ -470,3 +472,5 @@ public class MessageFragment extends Fragment {
     }
 
 }
+
+
