@@ -136,17 +136,6 @@
                         android:layout_marginTop="8dp"
                         android:text="Add Ingredient"
                         app:cornerRadius="18dp" />
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/editRecipes_removeIngredient_btn"
-                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_below="@+id/editRecipes_addIngredient_btn"
-                        android:layout_centerHorizontal="true"
-                        android:layout_marginTop="8dp"
-                        android:text="Remove Ingredient"
-                        app:cornerRadius="18dp" />
                 </RelativeLayout>
             </com.google.android.material.card.MaterialCardView>
 
@@ -186,17 +175,6 @@
                         android:layout_centerHorizontal="true"
                         android:layout_marginTop="8dp"
                         android:text="Add Step"
-                        app:cornerRadius="18dp" />
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/editRecipes_removeInstruction_btn"
-                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_below="@id/editRecipes_addInstruction_btn"
-                        android:layout_centerHorizontal="true"
-                        android:layout_marginTop="8dp"
-                        android:text="Remove Step"
                         app:cornerRadius="18dp" />
                 </RelativeLayout>
             </com.google.android.material.card.MaterialCardView>

@@ -42,6 +42,17 @@
             android:layout_marginTop="8dp"
             android:entries="@array/ingredient_quantity_type" />
 
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/rv_edit_recipe_ingredient_removeIngredient_btn"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/rv_edit_recipe_ingredient_quantity_spinner"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="6dp"
+            android:text="Remove ingredient"
+            app:cornerRadius="18dp" />
+
     </RelativeLayout>
 
 

@@ -15,6 +15,7 @@ import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.google.android.material.button.MaterialButton;
 import com.rokudoz.irecipe.Models.Ingredient;
 import com.rokudoz.irecipe.Models.Instruction;
 import com.rokudoz.irecipe.R;
@@ -27,8 +28,20 @@ import java.util.Map;
 public class EditRecipeIngredientsAdapter extends RecyclerView.Adapter<EditRecipeIngredientsAdapter.EditRecipeIngredientsViewHolder> {
     private List<Ingredient> ingredientList = new ArrayList<>();
 
-    class EditRecipeIngredientsViewHolder extends RecyclerView.ViewHolder {
+    private OnItemClickListener mListener;
+
+    public interface OnItemClickListener {
+
+        void onRemoveIngredientClick(int position);
+    }
+
+    public void setOnItemClickListener(OnItemClickListener listener) {
+        mListener = listener;
+    }
+
+    class EditRecipeIngredientsViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         EditText nameEditText, quantityEditText;
+        MaterialButton removeIngredientBtn;
         Spinner quantityTypeSpinner;
 
         EditRecipeIngredientsViewHolder(View itemView) {
@@ -36,6 +49,29 @@ public class EditRecipeIngredientsAdapter extends RecyclerView.Adapter<EditRecip
             nameEditText = itemView.findViewById(R.id.rv_edit_recipe_ingredient_name_editText);
             quantityEditText = itemView.findViewById(R.id.rv_edit_recipe_ingredient_quantity_editText);
             quantityTypeSpinner = itemView.findViewById(R.id.rv_edit_recipe_ingredient_quantity_spinner);
+            removeIngredientBtn = itemView.findViewById(R.id.rv_edit_recipe_ingredient_removeIngredient_btn);
+
+            removeIngredientBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (mListener != null) {
+                        int position = getAdapterPosition();
+                        if (position != RecyclerView.NO_POSITION) {
+                            mListener.onRemoveIngredientClick(position);
+                        }
+                    }
+                }
+            });
+        }
+
+        @Override
+        public void onClick(View v) {
+            if (mListener != null) {
+                int position = getAdapterPosition();
+                if (position != RecyclerView.NO_POSITION) {
+                    mListener.onRemoveIngredientClick(position);
+                }
+            }
         }
 
     }

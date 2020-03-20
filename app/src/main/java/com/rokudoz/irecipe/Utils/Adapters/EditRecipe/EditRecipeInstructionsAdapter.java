@@ -28,6 +28,8 @@ public class EditRecipeInstructionsAdapter extends RecyclerView.Adapter<EditReci
 
     public interface OnItemClickListener {
         void onAddImageClick(int position);
+
+        void onRemoveStepClick(int position);
     }
 
     public List<Instruction> getInstructionList() {
@@ -41,7 +43,7 @@ public class EditRecipeInstructionsAdapter extends RecyclerView.Adapter<EditReci
     public class EditRecipeInstructionViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         EditText stepEditText;
         ImageView stepImage;
-        MaterialButton addPhotoBtn;
+        MaterialButton addPhotoBtn, removeStepBtn;
 
         public MyCustomEditTextListener myCustomEditTextListener;
 
@@ -50,6 +52,7 @@ public class EditRecipeInstructionsAdapter extends RecyclerView.Adapter<EditReci
             stepEditText = itemView.findViewById(R.id.rv_edit_recipe_instruction_editText);
             stepImage = itemView.findViewById(R.id.rv_edit_recipe_instruction_imageView);
             addPhotoBtn = itemView.findViewById(R.id.rv_edit_recipe_instruction_addPhoto_btn);
+            removeStepBtn = itemView.findViewById(R.id.rv_edit_recipe_instruction_removeStep_btn);
 
             this.myCustomEditTextListener = myCustomEditTextListener;
             stepEditText.addTextChangedListener(myCustomEditTextListener);
@@ -61,6 +64,17 @@ public class EditRecipeInstructionsAdapter extends RecyclerView.Adapter<EditReci
                         int position = getAdapterPosition();
                         if (position != RecyclerView.NO_POSITION) {
                             mListener.onAddImageClick(position);
+                        }
+                    }
+                }
+            });
+            removeStepBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (mListener != null) {
+                        int position = getAdapterPosition();
+                        if (position != RecyclerView.NO_POSITION) {
+                            mListener.onRemoveStepClick(position);
                         }
                     }
                 }

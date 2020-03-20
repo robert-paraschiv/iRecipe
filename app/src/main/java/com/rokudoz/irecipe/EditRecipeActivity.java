@@ -64,12 +64,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class EditRecipeActivity extends AppCompatActivity implements EditRecipeInstructionsAdapter.OnItemClickListener {
+public class EditRecipeActivity extends AppCompatActivity implements EditRecipeInstructionsAdapter.OnItemClickListener
+        , EditRecipeIngredientsAdapter.OnItemClickListener {
     private static final String TAG = "EditRecipeActivity";
 
     //Components
     ImageView recipeImageView;
-    MaterialButton recipePhotoBtn, addIngredientBtn, addInstructionBtn, saveBtn, removeInstructionBtn, removeIngredientBtn;
+    MaterialButton recipePhotoBtn, addIngredientBtn, addInstructionBtn, saveBtn;
     TextInputEditText titleInputEditText, descriptionInputEditText, keywordsInputEditText;
     Spinner categorySpinner, privacySpinner;
     RecyclerView ingredientsRecyclerView, instructionsRecyclerView;
@@ -133,8 +134,6 @@ public class EditRecipeActivity extends AppCompatActivity implements EditRecipeI
         durationEditText = findViewById(R.id.editRecipes_duration_editText);
         durationTypeSpinner = findViewById(R.id.editRecipes_durationType_Spinner);
         complexitySpinner = findViewById(R.id.editRecipes_complexity_Spinner);
-        removeIngredientBtn = findViewById(R.id.editRecipes_removeIngredient_btn);
-        removeInstructionBtn = findViewById(R.id.editRecipes_removeInstruction_btn);
 
 
         if (getIntent() != null && getIntent().getStringExtra("recipe_id") != null) {
@@ -169,20 +168,6 @@ public class EditRecipeActivity extends AppCompatActivity implements EditRecipeI
                 ingredientList.add(ingredient);
                 int position = ingredientList.size();
                 editRecipeIngredientsAdapter.notifyItemInserted(position);
-            }
-        });
-        removeInstructionBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                instructionList.remove(instructionList.get(instructionList.size() - 1));
-                editRecipeInstructionsAdapter.notifyItemRemoved(instructionList.size());
-            }
-        });
-        removeIngredientBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ingredientList.remove(ingredientList.get(ingredientList.size() - 1));
-                editRecipeIngredientsAdapter.notifyItemRemoved(ingredientList.size());
             }
         });
         recipePhotoBtn.setOnClickListener(new View.OnClickListener() {
@@ -355,6 +340,12 @@ public class EditRecipeActivity extends AppCompatActivity implements EditRecipeI
         String keywordEt = keywordsInputEditText.getText().toString();
         final List<String> keywords = Arrays.asList(keywordEt.split("\\s*,\\s*"));
 
+
+        //Get instructions list in order
+        for (int i = 0; i < instructionList.size(); i++) {
+            instructionList.get(i).setStepNumber(i + 1);
+        }
+
         //Get ingredients list items from edit texts
         for (Ingredient ingredient : ingredientList) {
             if (!ingredient.getName().equals("") && !ingredient.getQuantity().toString().equals("")) {
@@ -511,9 +502,6 @@ public class EditRecipeActivity extends AppCompatActivity implements EditRecipeI
 
 
     private void buildRecyclerViews() {
-//        ingredientsRecyclerView.setHasFixedSize(true);
-//        instructionsRecyclerView.setHasFixedSize(true);
-
         editRecipeIngredientsAdapter = new EditRecipeIngredientsAdapter(ingredientList);
         editRecipeInstructionsAdapter = new EditRecipeInstructionsAdapter(instructionList);
 
@@ -524,6 +512,7 @@ public class EditRecipeActivity extends AppCompatActivity implements EditRecipeI
         instructionsRecyclerView.setAdapter(editRecipeInstructionsAdapter);
 
         editRecipeInstructionsAdapter.setOnItemClickListener(EditRecipeActivity.this);
+        editRecipeIngredientsAdapter.setOnItemClickListener(EditRecipeActivity.this);
     }
 
     //This function to convert DPs to pixels
@@ -563,7 +552,6 @@ public class EditRecipeActivity extends AppCompatActivity implements EditRecipeI
                             }
                         }
 
-
                         keywordsInputEditText.setText(keywords);
 
                         if (recipe.getInstruction_list() != null)
@@ -576,9 +564,6 @@ public class EditRecipeActivity extends AppCompatActivity implements EditRecipeI
                                 ingredientList.add(ingredient);
                                 editRecipeIngredientsAdapter.notifyItemInserted(ingredientList.indexOf(ingredient));
                             }
-//
-//                        editRecipeIngredientsAdapter.notifyDataSetChanged();
-//                        editRecipeInstructionsAdapter.notifyDataSetChanged();
                     }
                 }
             }
@@ -620,9 +605,6 @@ public class EditRecipeActivity extends AppCompatActivity implements EditRecipeI
                                 @Override
                                 public void onSuccess(Uri uri) {
                                     final String imageUrl = uri.toString();
-//                                    Instruction instruction = editRecipeInstructionsAdapter.getInstructionList().get(position);
-//                                    instruction.setImgUrl(imageUrl);
-//                                    instructionList.set(position, instruction);
                                     instructionList.get(position).setImgUrl(imageUrl);
                                     editRecipeInstructionsAdapter.notifyItemChanged(position);
                                     Log.d(TAG, "onSuccess: position" + position + instructionList.get(position).toString());
@@ -644,4 +626,23 @@ public class EditRecipeActivity extends AppCompatActivity implements EditRecipeI
             Toast.makeText(EditRecipeActivity.this, "No file selected", Toast.LENGTH_SHORT).show();
         }
     }
+
+    @Override
+    public void onPointerCaptureChanged(boolean hasCapture) {
+
+    }
+
+    @Override
+    public void onRemoveIngredientClick(int position) {
+        ingredientList.remove(position);
+        editRecipeIngredientsAdapter.notifyItemRemoved(position);
+    }
+
+    @Override
+    public void onRemoveStepClick(int position) {
+        instructionList.remove(position);
+        editRecipeInstructionsAdapter.notifyItemRemoved(position);
+    }
+
+
 }

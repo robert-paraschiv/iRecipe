@@ -511,7 +511,7 @@ public class AddRecipesActivity extends AppCompatActivity {
 
 
                             Recipe recipe = new Recipe(title, creator_docId, mUser.getName(), mUser.getUserProfilePicUrl(), category, description, ingredients_list, instructions_list
-                                    , keywords, imageUrls_list, complexity, finalDuration, durationType, 0f, isFavorite, privacy, 0, 0);
+                                    , keywords, imageUrls_list, complexity, finalDuration, durationType, 0f, isFavorite, privacy, 0, 0, null);
 
                             Log.d(TAG, "addRecipe: " + recipe.toString());
 
@@ -562,7 +562,7 @@ public class AddRecipesActivity extends AppCompatActivity {
             }
 
             Recipe recipe = new Recipe(title, creator_docId, mUser.getName(), mUser.getUserProfilePicUrl(), category, description, ingredients_list, instructions_list
-                    , keywords, imageUrls_list, complexity, duration, durationType, 0f, isFavorite, privacy, 0, 0);
+                    , keywords, imageUrls_list, complexity, duration, durationType, 0f, isFavorite, privacy, 0, 0, null);
 
             Log.d(TAG, "addRecipe: " + recipe.toString());
 

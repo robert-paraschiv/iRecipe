@@ -1,7 +1,9 @@
 package com.rokudoz.irecipe.Models;
 
 import com.google.firebase.firestore.Exclude;
+import com.google.firebase.firestore.ServerTimestamp;
 
+import java.util.Date;
 import java.util.List;
 
 public class Recipe implements Comparable<Recipe> {
@@ -27,6 +29,8 @@ public class Recipe implements Comparable<Recipe> {
     private Integer number_of_likes;
     private Integer number_of_comments;
 
+    private @ServerTimestamp
+    Date creation_date;
 
     public Recipe() {
         //public no-arg constructor needed
@@ -34,7 +38,7 @@ public class Recipe implements Comparable<Recipe> {
 
     public Recipe(String title, String creator_docId, String creator_name, String creator_imageUrl, String category, String description
             , List<Ingredient> ingredient_list, List<Instruction> instruction_list, List<String> keywords, List<String> imageUrls_list, String complexity
-            , Float duration, String durationType, Float avg_rating, Boolean isFavorite, String privacy, Integer number_of_likes, Integer number_of_comments) {
+            , Float duration, String durationType, Float avg_rating, Boolean isFavorite, String privacy, Integer number_of_likes, Integer number_of_comments,Date creation_date) {
 
         if (title.trim().equals("")) {
             title = "No Title";
@@ -57,6 +61,7 @@ public class Recipe implements Comparable<Recipe> {
         this.privacy = privacy;
         this.number_of_likes = number_of_likes;
         this.number_of_comments = number_of_comments;
+        this.creation_date = creation_date;
     }
 
     public Integer getNumber_of_likes() {
@@ -230,6 +235,14 @@ public class Recipe implements Comparable<Recipe> {
         this.privacy = privacy;
     }
 
+    public Date getCreation_date() {
+        return creation_date;
+    }
+
+    public void setCreation_date(Date creation_date) {
+        this.creation_date = creation_date;
+    }
+
     @Override
     public String toString() {
         return "Recipe{" +
@@ -254,6 +267,7 @@ public class Recipe implements Comparable<Recipe> {
                 ", missingIngredients=" + missingIngredients +
                 ", number_of_likes=" + number_of_likes +
                 ", number_of_comments=" + number_of_comments +
+                ", creation_date=" + creation_date +
                 '}';
     }
 

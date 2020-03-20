@@ -18,13 +18,16 @@
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Step text" />
+            android:hint="Step text"
+            android:importantForAutofill="no"
+            android:inputType="textCapSentences" />
 
         <ImageView
             android:id="@+id/rv_edit_recipe_instruction_imageView"
             android:layout_width="match_parent"
             android:layout_height="150dp"
             android:layout_below="@id/rv_edit_recipe_instruction_editText"
+            android:contentDescription="Instruction step image"
             tools:src="@color/colorPrimary" />
 
         <com.google.android.material.button.MaterialButton
@@ -34,7 +37,18 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/rv_edit_recipe_instruction_imageView"
             android:layout_centerHorizontal="true"
-            android:text="Add photo" />
+            android:text="Add photo"
+            app:cornerRadius="18dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/rv_edit_recipe_instruction_removeStep_btn"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/rv_edit_recipe_instruction_addPhoto_btn"
+            android:layout_centerHorizontal="true"
+            android:text="Remove step"
+            app:cornerRadius="18dp" />
     </RelativeLayout>
 
 </com.google.android.material.card.MaterialCardView>
