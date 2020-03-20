@@ -20,6 +20,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 import com.rokudoz.irecipe.Models.Recipe;
 import com.rokudoz.irecipe.R;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,8 +42,8 @@ public class SearchRecipeAdapter extends RecyclerView.Adapter<SearchRecipeAdapte
     }
 
     public class SearchRecipeViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        TextView tvTitle, tvDescription, tvNrOfFaves;
-        ImageView mImageView, imgFavorited;
+        TextView tvTitle, tvDescription, tvNrOfFaves, tvCreatorName;
+        ImageView mImageView, imgFavorited, privacy;
 
         public SearchRecipeViewHolder(View itemView) {
             super(itemView);
@@ -51,6 +52,8 @@ public class SearchRecipeAdapter extends RecyclerView.Adapter<SearchRecipeAdapte
             mImageView = itemView.findViewById(R.id.recipeItem_image);
             imgFavorited = itemView.findViewById(R.id.recyclerview_favorite);
             tvNrOfFaves = itemView.findViewById(R.id.recyclerview_nrOfFaves_textView);
+            tvCreatorName = itemView.findViewById(R.id.recipeItem_creator_name_textView);
+            privacy = itemView.findViewById(R.id.recycler_view_privacy);
 
             itemView.setOnClickListener(this);
         }
@@ -74,7 +77,7 @@ public class SearchRecipeAdapter extends RecyclerView.Adapter<SearchRecipeAdapte
 
     @Override
     public SearchRecipeViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.recyclerview_layout_search_recipe_item, parent, false);
+        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.recyclerview_layout_recipe_item, parent, false);
         return new SearchRecipeViewHolder(v);
     }
 
@@ -82,27 +85,17 @@ public class SearchRecipeAdapter extends RecyclerView.Adapter<SearchRecipeAdapte
     public void onBindViewHolder(@NonNull final SearchRecipeViewHolder holder, int position) {
         final Recipe currentItem = mRecipeList.get(position);
 
-        holder.tvTitle.setText(currentItem.getTitle());
-        holder.tvDescription.setText(currentItem.getDescription());
-
-        Glide.with(holder.mImageView).load(currentItem.getImageUrls_list().get(0)).centerCrop().into(holder.mImageView);
-
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        CollectionReference currentRecipeSubCollection = db.collection("Recipes").document(currentItem.getDocumentId())
-                .collection("UsersWhoFaved");
-
-        currentRecipeSubCollection.addSnapshotListener(new EventListener<QuerySnapshot>() {
-            @Override
-            public void onEvent(@javax.annotation.Nullable QuerySnapshot queryDocumentSnapshots, @javax.annotation.Nullable FirebaseFirestoreException e) {
-                if (e != null) {
-                    return;
-                }
-                currentItem.setAvg_rating((float) queryDocumentSnapshots.size());
-                if (currentItem.getAvg_rating() != null) {
-                    holder.tvNrOfFaves.setText("" + queryDocumentSnapshots.size());
-                }
-            }
-        });
+        holder.privacy.setVisibility(View.GONE);
+        if (currentItem.getTitle() != null)
+            holder.tvTitle.setText(currentItem.getTitle());
+        if (currentItem.getDescription() != null)
+            holder.tvDescription.setText(currentItem.getDescription());
+        if (currentItem.getCreator_name() != null)
+            holder.tvCreatorName.setText(currentItem.getCreator_name());
+        if (currentItem.getNumber_of_likes() != null)
+            holder.tvNrOfFaves.setText(MessageFormat.format("{0}", currentItem.getNumber_of_likes()));
+        if (currentItem.getImageUrls_list() != null)
+            Glide.with(holder.mImageView).load(currentItem.getImageUrls_list().get(0)).centerCrop().into(holder.mImageView);
 
     }
 

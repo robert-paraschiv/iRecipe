@@ -119,12 +119,14 @@ public class ConversationAdapter extends RecyclerView.Adapter<ConversationAdapte
                 holder.tvMessage.setTextColor(textView.getCurrentTextColor());
             } else if (currentItem.getType().equals("message_sent") && !currentItem.getRead()) {
                 holder.seenCheck.setVisibility(View.VISIBLE);
-                holder.seenCheck.setImageResource(R.drawable.ic_pngwave);
+                holder.seenCheck.setImageResource(R.drawable.ic_message_read_status);
+                holder.seenCheck.setColorFilter(holder.seenCheck.getResources().getColor(R.color.grey));
                 TextView textView = new TextView(holder.tvMessage.getContext());
                 holder.tvMessage.setTextColor(textView.getCurrentTextColor());
             } else if (currentItem.getType().equals("message_sent") && currentItem.getRead()) {
                 holder.seenCheck.setVisibility(View.VISIBLE);
                 holder.seenCheck.setImageResource(R.drawable.ic_message_read_status);
+                holder.seenCheck.setColorFilter(holder.seenCheck.getResources().getColor(R.color.colorPrimary));
                 TextView textView = new TextView(holder.tvMessage.getContext());
                 holder.tvMessage.setTextColor(textView.getCurrentTextColor());
             }

@@ -39,10 +39,10 @@
             tools:text="User name" />
 
         <TextView
-            android:layout_below="@id/rv_conversation_item_spacer"
             android:id="@+id/recycler_view_conversationItem_lastMessageTimeStamp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_below="@id/rv_conversation_item_spacer"
             android:layout_alignParentEnd="true"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
@@ -50,17 +50,6 @@
             android:textSize="12sp"
             tools:text="20 hours ago" />
 
-        <TextView
-            android:id="@+id/recycler_view_conversationItem_lastMessageText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/recycler_view_conversationItem_friendName"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="4dp"
-            android:layout_toEndOf="@id/recycler_view_conversationItem_lastMessageSeen"
-            android:maxLines="1"
-            tools:text="Last message text here " />
 
         <ImageView
             android:id="@+id/recycler_view_conversationItem_lastMessageSeen"
@@ -69,11 +58,22 @@
             android:layout_below="@id/recycler_view_conversationItem_friendName"
             android:layout_marginStart="4dp"
             android:layout_marginTop="8dp"
-            android:layout_marginEnd="4dp"
             android:layout_toEndOf="@id/recycler_view_conversationItem_friendImage"
             android:src="@drawable/ic_check_black_24dp"
             android:visibility="invisible"
+            tools:src="@drawable/ic_message_read_status"
             tools:visibility="visible" />
 
+        <TextView
+            android:id="@+id/recycler_view_conversationItem_lastMessageText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/recycler_view_conversationItem_friendName"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="4dp"
+            android:layout_toEndOf="@id/recycler_view_conversationItem_lastMessageSeen"
+            android:maxLines="1"
+            tools:text="Last message text here " />
     </RelativeLayout>
 </RelativeLayout>
