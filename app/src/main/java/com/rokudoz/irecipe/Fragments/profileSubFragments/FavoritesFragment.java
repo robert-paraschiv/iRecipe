@@ -38,7 +38,7 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.rokudoz.irecipe.Account.LoginActivity;
-import com.rokudoz.irecipe.Fragments.ProfileFragmentDirections;
+import com.rokudoz.irecipe.Fragments.profileSubFragments.ProfileFragmentDirections;
 import com.rokudoz.irecipe.Models.Recipe;
 import com.rokudoz.irecipe.Models.User;
 import com.rokudoz.irecipe.Models.UserWhoFaved;

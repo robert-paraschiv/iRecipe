@@ -1,4 +1,4 @@
-package com.rokudoz.irecipe.Fragments;
+package com.rokudoz.irecipe.Fragments.recipesSubFragments;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -12,14 +12,11 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
-import com.google.firebase.auth.FirebaseAuth;
 import com.rokudoz.irecipe.AddIngredientActivity;
 import com.rokudoz.irecipe.AddRecipesActivity;
-import com.rokudoz.irecipe.Fragments.recipesSubFragments.recipesBreakfastFragment;
-import com.rokudoz.irecipe.Fragments.recipesSubFragments.recipesDinnerFragment;
-import com.rokudoz.irecipe.Fragments.recipesSubFragments.recipesLunchFragment;
 import com.rokudoz.irecipe.R;
 import com.rokudoz.irecipe.Utils.Adapters.SectionsPagerAdapter;
 
@@ -47,8 +44,15 @@ public class RecipesFragment extends Fragment {
             view = inflater.inflate(R.layout.fragment_recipes, container, false);
         }
         fab_addRecipes = view.findViewById(R.id.fab_add_recipe);
-//        fab_addIngredient = view.findViewById(R.id.fab_add_ingredient);
 
+        MaterialButton searchRecipeBtn = view.findViewById(R.id.recipesFragment_searchRecipe_MaterialBtn);
+        searchRecipeBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getActivity(), SearchWithFilters.class);
+                startActivity(intent);
+            }
+        });
 
         viewPager = view.findViewById(R.id.container);
         setupViewPager(viewPager);
@@ -62,17 +66,6 @@ public class RecipesFragment extends Fragment {
                 navigateToAddRecipes();
             }
         });
-
-//        if (FirebaseAuth.getInstance().getCurrentUser().getEmail().equals("paraschivlongin@gmail.com")) {
-//            fab_addIngredient.setVisibility(View.VISIBLE);
-//            fab_addIngredient.setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View v) {
-//                    navigateToAddIngredient();
-//                }
-//            });
-//        } else
-//            fab_addIngredient.setVisibility(View.GONE);
 
 
         return view; // HAS TO BE THE LAST ONE ---------------------------------

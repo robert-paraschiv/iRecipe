@@ -86,18 +86,23 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
             if (currentItem.getRead() != null && currentItem.getRead()) {
                 Log.d(TAG, "onBindViewHolder: is read");
                 holder.readStatus.setImageResource(R.drawable.ic_message_read_status);
+                holder.readStatus.setColorFilter(holder.readStatus.getResources().getColor(R.color.colorPrimary));
             } else if (currentItem.getRead() != null && !currentItem.getRead()) {
                 holder.readStatus.setImageResource(R.drawable.ic_pngwave);
+                holder.readStatus.setColorFilter(holder.readStatus.getResources().getColor(R.color.black));
             } else if (currentItem.getRead() == null) {
                 holder.readStatus.setImageResource(R.drawable.ic_check_black_24dp);
+                holder.readStatus.setColorFilter(holder.readStatus.getResources().getColor(R.color.black));
             }
 
-            //Set params for message sent
+
+            //Reset params
             RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
             params.addRule(RelativeLayout.ALIGN_PARENT_END);
             holder.materialCardView.setLayoutParams(params);
-            holder.materialCardView.setCardBackgroundColor(ContextCompat.getColor(context, R.color.color_message_user_background));
+            holder.materialCardView.setCardBackgroundColor(ContextCompat.getColor(context, R.color.color_message_friend_background));
             holder.tvMessageText.setTextColor(ContextCompat.getColor(context, R.color.color_message_friend_text));
+
 
         } else if (currentItem.getType() != null && currentItem.getType().equals("message_received")) {
             holder.readStatus.setVisibility(View.GONE);
@@ -122,13 +127,14 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
                 });
 
             }
-
-            //Reset params
+            //Set params for message sent
             RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
             params.addRule(RelativeLayout.ALIGN_PARENT_START);
             holder.materialCardView.setLayoutParams(params);
-            holder.materialCardView.setCardBackgroundColor(ContextCompat.getColor(context, R.color.color_message_friend_background));
+            holder.materialCardView.setCardBackgroundColor(ContextCompat.getColor(context, R.color.color_message_user_background));
             holder.tvMessageText.setTextColor(ContextCompat.getColor(context, R.color.color_message_friend_text));
+
+
         }
 
         if (currentItem.getText() != null)

@@ -1,4 +1,4 @@
-package com.rokudoz.irecipe.Fragments;
+package com.rokudoz.irecipe.Fragments.profileSubFragments;
 
 import android.content.ContentResolver;
 import android.content.DialogInterface;
@@ -51,10 +51,7 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.StorageTask;
 import com.google.firebase.storage.UploadTask;
 import com.rokudoz.irecipe.AddRecipesActivity;
-import com.rokudoz.irecipe.Fragments.profileSubFragments.FavoritesFragment;
-import com.rokudoz.irecipe.Fragments.profileSubFragments.profileMyFriendList;
-import com.rokudoz.irecipe.Fragments.profileSubFragments.profileMyIngredientsFragment;
-import com.rokudoz.irecipe.Fragments.profileSubFragments.profileMyRecipesFragment;
+import com.rokudoz.irecipe.Fragments.profileSubFragments.ProfileFragmentDirections;
 import com.rokudoz.irecipe.Models.Ingredient;
 import com.rokudoz.irecipe.Models.User;
 import com.rokudoz.irecipe.R;

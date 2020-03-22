@@ -32,7 +32,7 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
-import com.rokudoz.irecipe.Fragments.ProfileFragmentDirections;
+import com.rokudoz.irecipe.Fragments.profileSubFragments.ProfileFragmentDirections;
 import com.rokudoz.irecipe.Models.Friend;
 import com.rokudoz.irecipe.Models.Ingredient;
 import com.rokudoz.irecipe.Models.Recipe;
@@ -48,19 +48,12 @@ public class SearchUserActivity extends AppCompatActivity implements SearchUserA
     private static final String TAG = "SearchUserActivity";
 
     //FireBase
-    private FirebaseAuth.AuthStateListener mAuthListener;
-    private User mUser;
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private CollectionReference recipeRef = db.collection("Recipes");
     private CollectionReference usersReference = db.collection("Users");
-    private ListenerRegistration userDetailsListener, currentSubCollectionListener, recipesListener;
-    private DocumentSnapshot mLastQueriedDocument;
 
-    private List<String> userFavRecipesList = new ArrayList<>();
     private List<String> friends_userID_list = new ArrayList<>();
     private List<Friend> friendList = new ArrayList<>();
-    private String loggedInUserDocumentId = "";
-    private String userFavDocId = "";
 
     private List<User> usersList = new ArrayList<>();
 
@@ -72,10 +65,6 @@ public class SearchUserActivity extends AppCompatActivity implements SearchUserA
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search_user);
-
-//        MaterialToolbar myToolbar = (MaterialToolbar) findViewById(R.id.searchUserActivity_my_toolbar);
-//        myToolbar.setTitle("Search User");
-//        setSupportActionBar(myToolbar);
 
         setupSearchView();
         getCurrentUserDetails();
@@ -89,8 +78,6 @@ public class SearchUserActivity extends AppCompatActivity implements SearchUserA
                 List<Ingredient> userIngredient_list = new ArrayList<>();
                 User user = documentSnapshot.toObject(User.class);
 
-                mUser = documentSnapshot.toObject(User.class);
-                loggedInUserDocumentId = documentSnapshot.getId();
                 if (!friends_userID_list.contains(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
                     friends_userID_list.add(FirebaseAuth.getInstance().getCurrentUser().getUid());
                 }

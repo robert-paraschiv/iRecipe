@@ -50,7 +50,6 @@ public class AllMessagesFragment extends Fragment implements ConversationAdapter
 
     //FireBase
     private FirebaseAuth.AuthStateListener mAuthListener;
-    private User mUser;
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private CollectionReference usersReference = db.collection("Users");
     private ListenerRegistration userConversationsListener;
@@ -70,9 +69,8 @@ public class AllMessagesFragment extends Fragment implements ConversationAdapter
         // Inflate the layout for this fragment
         if (view != null) {
             ViewGroup parent = (ViewGroup) view.getParent();
-            if (parent != null) {
+            if (parent != null)
                 parent.removeView(view);
-            }
         }
         try {
             view = inflater.inflate(R.layout.fragment_all_messages, container, false);
@@ -93,32 +91,25 @@ public class AllMessagesFragment extends Fragment implements ConversationAdapter
             }
         });
 
-//        conversationList = new ArrayList<>();
-
         buildRecyclerView();
-        getCurrentUserDetails();
+
 
         return view;
     }
 
 
-    private void getCurrentUserDetails() {
-        usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-            @Override
-            public void onSuccess(DocumentSnapshot documentSnapshot) {
-                mUser = documentSnapshot.toObject(User.class);
-                performQuery();
-            }
-        });
-
-
-    }
-
     @Override
     public void onStop() {
         super.onStop();
+        if (userConversationsListener != null)
+            userConversationsListener.remove();
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+        performQuery();
+    }
 
     private void buildRecyclerView() {
         Log.d(TAG, "buildRecyclerView: ");
@@ -135,7 +126,8 @@ public class AllMessagesFragment extends Fragment implements ConversationAdapter
 
 
     private void performQuery() {
-        usersReference.document(mUser.getUser_id()).collection("Conversations").orderBy("date", Query.Direction.DESCENDING)
+        userConversationsListener = usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).collection("Conversations")
+                .orderBy("date", Query.Direction.DESCENDING)
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
                     public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {

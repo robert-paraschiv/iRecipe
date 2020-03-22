@@ -34,7 +34,7 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
-import com.rokudoz.irecipe.Fragments.RecipesFragmentDirections;
+import com.rokudoz.irecipe.Fragments.recipesSubFragments.RecipesFragmentDirections;
 import com.rokudoz.irecipe.Models.Ingredient;
 import com.rokudoz.irecipe.Models.Recipe;
 import com.rokudoz.irecipe.Models.User;

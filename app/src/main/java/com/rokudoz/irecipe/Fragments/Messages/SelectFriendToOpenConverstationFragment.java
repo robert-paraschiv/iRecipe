@@ -27,7 +27,7 @@ import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
-import com.rokudoz.irecipe.Fragments.ProfileFragmentDirections;
+import com.rokudoz.irecipe.Fragments.profileSubFragments.ProfileFragmentDirections;
 import com.rokudoz.irecipe.Fragments.profileSubFragments.profileMyFriendList;
 import com.rokudoz.irecipe.Models.Friend;
 import com.rokudoz.irecipe.Models.User;
