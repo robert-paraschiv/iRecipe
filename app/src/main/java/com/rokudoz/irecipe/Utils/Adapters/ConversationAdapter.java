@@ -47,6 +47,8 @@ public class ConversationAdapter extends RecyclerView.Adapter<ConversationAdapte
         void onItemClick(int position);
 
         void onDeleteClick(int position);
+
+        void onPictureClick(int position);
     }
 
     public void setOnItemClickListener(OnItemClickListener listener) {
@@ -69,6 +71,18 @@ public class ConversationAdapter extends RecyclerView.Adapter<ConversationAdapte
             spacer = itemView.findViewById(R.id.rv_conversation_item_spacer);
             itemView.setOnClickListener(this);
             itemView.setOnCreateContextMenuListener(mOnCreateContextMenuListener);
+
+            mImage.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (mListener != null) {
+                        int position = getAdapterPosition();
+                        if (position != RecyclerView.NO_POSITION) {
+                            mListener.onPictureClick(position);
+                        }
+                    }
+                }
+            });
         }
 
         @Override

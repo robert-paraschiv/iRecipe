@@ -2,8 +2,11 @@ package com.rokudoz.irecipe.Fragments.Messages;
 
 
 import android.content.DialogInterface;
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
@@ -17,6 +20,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
+import com.bumptech.glide.request.target.CustomTarget;
+import com.bumptech.glide.request.transition.Transition;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.button.MaterialButton;
@@ -37,10 +44,12 @@ import com.rokudoz.irecipe.Models.Conversation;
 import com.rokudoz.irecipe.Models.User;
 import com.rokudoz.irecipe.R;
 import com.rokudoz.irecipe.Utils.Adapters.ConversationAdapter;
+import com.rokudoz.irecipe.Utils.ConversationViewDialog;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Objects;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -232,6 +241,25 @@ public class AllMessagesFragment extends Fragment implements ConversationAdapter
                 });
 
         materialAlertDialogBuilder.show();
+    }
+
+    @Override
+    public void onPictureClick(int position) {
+        final Conversation conversation = conversationList.get(position);
+        final ConversationViewDialog conversationViewDialog = new ConversationViewDialog();
+        Glide.with(Objects.requireNonNull(getActivity())).asBitmap().load(conversation.getUser_profilePic()).apply(RequestOptions.circleCropTransform())
+                .into(new CustomTarget<Bitmap>() {
+                    @Override
+                    public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+                        conversationViewDialog.showDialog(getActivity(), conversation.getUser_name(), conversation.getUserId(), resource, view);
+                    }
+
+                    @Override
+                    public void onLoadCleared(@Nullable Drawable placeholder) {
+
+                    }
+                });
+
     }
 
 }
