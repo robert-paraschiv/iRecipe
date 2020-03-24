@@ -1,12 +1,15 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:background="@color/toolbar_color"
     android:layout_width="350dp"
     android:layout_height="350dp"
     android:layout_gravity="center"
     android:orientation="vertical">
 
     <de.hdodenhof.circleimageview.CircleImageView
+        tools:src="@color/black"
+        android:layout_marginTop="4dp"
         android:id="@+id/conversationDialog_user_picture"
         android:layout_width="match_parent"
         android:layout_height="220dp"
@@ -25,7 +28,6 @@
         android:layout_marginRight="4dp"
         android:layout_marginBottom="20dp"
         android:gravity="center_horizontal"
-        android:textColor="#ff000000"
         android:textSize="18sp"
         tools:text="User Full Name" />
 

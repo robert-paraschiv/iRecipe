@@ -61,8 +61,10 @@
                             tools:src="@drawable/ic_launcher_background" />
 
                         <RelativeLayout
+                            android:id="@+id/userprofile_userLayout"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:layout_alignParentTop="true"
                             android:layout_centerHorizontal="true"
                             android:layout_toEndOf="@id/userprofileFragment_profileImage">
 
@@ -110,49 +112,49 @@
                                 android:textSize="14sp"
                                 android:visibility="gone"
                                 tools:visibility="visible" />
-                        </RelativeLayout>
 
-                        <RelativeLayout
-                            android:id="@+id/accept_decline_layout"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_below="@id/userprofileFragment_profileImage"
-                            android:layout_centerHorizontal="true"
-                            android:visibility="gone"
-                            tools:visibility="visible">
-
-                            <TextView
-                                android:id="@+id/userProfileFragment_sentYouAFriendReq"
-                                style="@style/TextAppearance.MaterialComponents.Headline3"
+                            <RelativeLayout
+                                android:id="@+id/accept_decline_layout"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
+                                android:layout_below="@id/userprofile_addFriend_MaterialButton"
                                 android:layout_centerHorizontal="true"
-                                android:layout_marginTop="8dp"
-                                android:textSize="15sp"
-                                android:text="Sent you a friend request"/>
+                                android:visibility="gone"
+                                tools:visibility="visible">
 
-                            <com.google.android.material.button.MaterialButton
-                                android:id="@+id/userprofile_acceptFriend_MaterialButton"
-                                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_below="@id/userProfileFragment_sentYouAFriendReq"
-                                android:layout_alignParentStart="true"
-                                android:layout_marginTop="8dp"
-                                android:text="Accept"
-                                android:textSize="14sp"/>
+                                <TextView
+                                    android:id="@+id/userProfileFragment_sentYouAFriendReq"
+                                    style="@style/TextAppearance.MaterialComponents.Headline3"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_centerHorizontal="true"
+                                    android:layout_marginTop="8dp"
+                                    android:text="Sent you a friend request"
+                                    android:textSize="15sp" />
 
-                            <com.google.android.material.button.MaterialButton
-                                android:id="@+id/userprofile_declineFriendReq_MaterialButton"
-                                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_below="@id/userProfileFragment_sentYouAFriendReq"
-                                android:layout_marginStart="30dp"
-                                android:layout_marginTop="8dp"
-                                android:layout_toEndOf="@id/userprofile_acceptFriend_MaterialButton"
-                                android:text="Decline"
-                                android:textSize="14sp" />
+                                <com.google.android.material.button.MaterialButton
+                                    android:id="@+id/userprofile_acceptFriend_MaterialButton"
+                                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_below="@id/userProfileFragment_sentYouAFriendReq"
+                                    android:layout_alignParentStart="true"
+                                    android:layout_marginTop="8dp"
+                                    android:text="Accept"
+                                    android:textSize="14sp" />
+
+                                <com.google.android.material.button.MaterialButton
+                                    android:id="@+id/userprofile_declineFriendReq_MaterialButton"
+                                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_below="@id/userProfileFragment_sentYouAFriendReq"
+                                    android:layout_marginStart="30dp"
+                                    android:layout_marginTop="8dp"
+                                    android:layout_toEndOf="@id/userprofile_acceptFriend_MaterialButton"
+                                    android:text="Decline"
+                                    android:textSize="14sp" />
+                            </RelativeLayout>
                         </RelativeLayout>
 
                         <com.google.android.material.button.MaterialButton
@@ -160,7 +162,7 @@
                             style="@style/Widget.MaterialComponents.Button.TextButton"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_below="@id/accept_decline_layout"
+                            android:layout_below="@id/userprofile_userLayout"
                             android:layout_centerHorizontal="true"
                             android:layout_marginTop="8dp"
                             android:text="Send a message"
