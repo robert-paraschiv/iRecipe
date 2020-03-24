@@ -86,13 +86,13 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
             if (currentItem.getRead() != null && currentItem.getRead()) {
                 Log.d(TAG, "onBindViewHolder: is read");
                 holder.readStatus.setImageResource(R.drawable.ic_message_read_status);
-                holder.readStatus.setColorFilter(holder.readStatus.getResources().getColor(R.color.colorPrimary));
+                holder.readStatus.setColorFilter(ContextCompat.getColor(context,R.color.colorPrimary));
             } else if (currentItem.getRead() != null && !currentItem.getRead()) {
                 holder.readStatus.setImageResource(R.drawable.ic_pngwave);
-                holder.readStatus.setColorFilter(holder.readStatus.getResources().getColor(R.color.black));
+                holder.readStatus.setColorFilter(ContextCompat.getColor(context,R.color.black));
             } else if (currentItem.getRead() == null) {
                 holder.readStatus.setImageResource(R.drawable.ic_check_black_24dp);
-                holder.readStatus.setColorFilter(holder.readStatus.getResources().getColor(R.color.black));
+                holder.readStatus.setColorFilter(ContextCompat.getColor(context,R.color.black));
             }
 
 

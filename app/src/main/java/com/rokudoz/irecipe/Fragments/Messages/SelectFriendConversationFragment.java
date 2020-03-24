@@ -14,9 +14,7 @@ import android.view.InflateException;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ProgressBar;
 
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -27,8 +25,6 @@ import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
-import com.rokudoz.irecipe.Fragments.profileSubFragments.ProfileFragmentDirections;
-import com.rokudoz.irecipe.Fragments.profileSubFragments.profileMyFriendList;
 import com.rokudoz.irecipe.Models.Friend;
 import com.rokudoz.irecipe.Models.User;
 import com.rokudoz.irecipe.R;
@@ -40,7 +36,7 @@ import java.util.List;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class SelectFriendToOpenConverstationFragment extends Fragment implements FriendAdapter.OnItemClickListener {
+public class SelectFriendConversationFragment extends Fragment implements FriendAdapter.OnItemClickListener {
     private static final String TAG = "SelectFriendToOpenConve";
 
     private View view;
@@ -65,7 +61,7 @@ public class SelectFriendToOpenConverstationFragment extends Fragment implements
     private DocumentSnapshot mLastQueriedDocument;
 
 
-    public SelectFriendToOpenConverstationFragment() {
+    public SelectFriendConversationFragment() {
         // Required empty public constructor
     }
 
@@ -168,7 +164,7 @@ public class SelectFriendToOpenConverstationFragment extends Fragment implements
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setAdapter(mAdapter);
 
-        mAdapter.setOnItemClickListener(SelectFriendToOpenConverstationFragment.this);
+        mAdapter.setOnItemClickListener(SelectFriendConversationFragment.this);
     }
 
     private void initializeRecyclerViewAdapterOnClicks() {
@@ -178,7 +174,7 @@ public class SelectFriendToOpenConverstationFragment extends Fragment implements
                 String id = mFriendList.get(position).getFriend_user_id();
                 Log.d(TAG, "onItemClick: CLICKED " + " id " + id);
 
-                Navigation.findNavController(view).navigate(SelectFriendToOpenConverstationFragmentDirections.actionSelectFriendToOpenConverstationFragmentToMessageFragment(id));
+                Navigation.findNavController(view).navigate(SelectFriendConversationFragmentDirections.actionSelectFriendToOpenConverstationFragmentToMessageFragment(id));
             }
         });
     }

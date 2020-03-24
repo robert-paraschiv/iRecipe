@@ -2,8 +2,10 @@ package com.rokudoz.irecipe.Utils.Adapters;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,6 +36,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 public class ConversationAdapter extends RecyclerView.Adapter<ConversationAdapter.ConversationViewHolder> {
     private List<Conversation> conversationList;
     private OnItemClickListener mListener;
+    Context context;
 
 
     public interface OnItemClickListener {
@@ -73,7 +76,8 @@ public class ConversationAdapter extends RecyclerView.Adapter<ConversationAdapte
 
     }
 
-    public ConversationAdapter(List<Conversation> conversationList) {
+    public ConversationAdapter(Context context, List<Conversation> conversationList) {
+        this.context = context;
         this.conversationList = conversationList;
     }
 
@@ -112,7 +116,7 @@ public class ConversationAdapter extends RecyclerView.Adapter<ConversationAdapte
         if (currentItem.getRead() != null && currentItem.getType() != null) {
             if (currentItem.getType().equals("message_received") && !currentItem.getRead()) {
                 holder.seenCheck.setVisibility(View.GONE);
-                holder.tvMessage.setTextColor(holder.tvMessage.getResources().getColor(R.color.colorPrimary));
+                holder.tvMessage.setTextColor(ContextCompat.getColor(context, R.color.colorPrimary));
             } else if (currentItem.getType().equals("message_received") && currentItem.getRead()) {
                 holder.seenCheck.setVisibility(View.GONE);
                 TextView textView = new TextView(holder.tvMessage.getContext());
@@ -120,13 +124,13 @@ public class ConversationAdapter extends RecyclerView.Adapter<ConversationAdapte
             } else if (currentItem.getType().equals("message_sent") && !currentItem.getRead()) {
                 holder.seenCheck.setVisibility(View.VISIBLE);
                 holder.seenCheck.setImageResource(R.drawable.ic_message_read_status);
-                holder.seenCheck.setColorFilter(holder.seenCheck.getResources().getColor(R.color.grey));
+                holder.seenCheck.setColorFilter(ContextCompat.getColor(context, R.color.grey));
                 TextView textView = new TextView(holder.tvMessage.getContext());
                 holder.tvMessage.setTextColor(textView.getCurrentTextColor());
             } else if (currentItem.getType().equals("message_sent") && currentItem.getRead()) {
                 holder.seenCheck.setVisibility(View.VISIBLE);
                 holder.seenCheck.setImageResource(R.drawable.ic_message_read_status);
-                holder.seenCheck.setColorFilter(holder.seenCheck.getResources().getColor(R.color.colorPrimary));
+                holder.seenCheck.setColorFilter(ContextCompat.getColor(context, R.color.colorPrimary));
                 TextView textView = new TextView(holder.tvMessage.getContext());
                 holder.tvMessage.setTextColor(textView.getCurrentTextColor());
             }

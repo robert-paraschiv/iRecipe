@@ -136,7 +136,6 @@ public class SearchRecipeActivity extends AppCompatActivity implements SearchRec
         mRecyclerView.setAdapter(mAdapter);
 
         mAdapter.setOnItemClickListener(this);
-        initializeRecyclerViewAdapterOnClicks();
     }
 
     @Override
@@ -271,43 +270,28 @@ public class SearchRecipeActivity extends AppCompatActivity implements SearchRec
         });
     }
 
-    private void initializeRecyclerViewAdapterOnClicks() {
-        mAdapter.setOnItemClickListener(new SearchRecipeAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(int position) {
-
-                if (coming_from.equals("AddPostActivity")){
-                    String id = mRecipeList.get(position).getDocumentId();
-                    Intent intent = new Intent(SearchRecipeActivity.this, AddPostActivity.class);
-                    intent.putExtra("post_text", postText);
-                    intent.putExtra("recipe_doc_id", id);
-                    intent.putExtra("post_imageUrl", post_imageUrl);
-                    startActivity(intent);
-                    finish();
-                }else if (coming_from.equals("EditPostActivity")){
-                    String id = mRecipeList.get(position).getDocumentId();
-                    Intent intent = new Intent(SearchRecipeActivity.this, EditPostActivity.class);
-                    intent.putExtra("post_id", postID);
-                    intent.putExtra("post_imageUrl", post_imageUrl);
-                    intent.putExtra("post_text", post_text);
-                    intent.putExtra("post_privacy", post_privacy);
-                    intent.putExtra("post_referencedRecipe", id);
-                    startActivity(intent);
-                    finish();
-                }
-
-            }
-
-            @Override
-            public void onFavoriteClick(int position) {
-
-            }
-        });
-    }
-
-
     @Override
     public void onItemClick(int position) {
+
+        if (coming_from.equals("AddPostActivity")){
+            String id = mRecipeList.get(position).getDocumentId();
+            Intent intent = new Intent(SearchRecipeActivity.this, AddPostActivity.class);
+            intent.putExtra("post_text", postText);
+            intent.putExtra("recipe_doc_id", id);
+            intent.putExtra("post_imageUrl", post_imageUrl);
+            startActivity(intent);
+            finish();
+        }else if (coming_from.equals("EditPostActivity")){
+            String id = mRecipeList.get(position).getDocumentId();
+            Intent intent = new Intent(SearchRecipeActivity.this, EditPostActivity.class);
+            intent.putExtra("post_id", postID);
+            intent.putExtra("post_imageUrl", post_imageUrl);
+            intent.putExtra("post_text", post_text);
+            intent.putExtra("post_privacy", post_privacy);
+            intent.putExtra("post_referencedRecipe", id);
+            startActivity(intent);
+            finish();
+        }
     }
 
     @Override

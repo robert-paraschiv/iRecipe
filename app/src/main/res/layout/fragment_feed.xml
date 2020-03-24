@@ -102,16 +102,4 @@
         app:backgroundTint="@color/colorPrimary"
         app:elevation="4dp"
         app:fabCustomSize="50dp" />
-
-<!--    <com.google.android.material.floatingactionbutton.FloatingActionButton-->
-<!--        android:id="@+id/fab_calendar_schedule"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:layout_alignParentStart="true"-->
-<!--        android:layout_alignParentBottom="true"-->
-<!--        android:layout_margin="16dp"-->
-<!--        android:src="@drawable/ic_today_black_24dp"-->
-<!--        app:backgroundTint="@color/colorPrimary"-->
-<!--        app:elevation="4dp"-->
-<!--        app:fabCustomSize="50dp" />-->
 </RelativeLayout>

@@ -202,10 +202,15 @@
         <action
             android:id="@+id/action_allMessagesFragment_to_selectFriendToOpenConverstationFragment"
             app:destination="@id/selectFriendToOpenConverstationFragment" />
+        <action
+            android:id="@+id/action_allMessagesFragment_to_feedFragment"
+            app:destination="@id/feedFragment"
+            app:enterAnim="@anim/slide_in_left"
+            app:popUpTo="@id/feedFragment" />
     </fragment>
     <fragment
         android:id="@+id/selectFriendToOpenConverstationFragment"
-        android:name="com.rokudoz.irecipe.Fragments.Messages.SelectFriendToOpenConverstationFragment"
+        android:name="com.rokudoz.irecipe.Fragments.Messages.SelectFriendConversationFragment"
         android:label="fragment_select_friend_to_open_converstation"
         tools:layout="@layout/fragment_select_friend_to_open_converstation" >
         <action
@@ -224,6 +229,11 @@
         <action
             android:id="@+id/action_messageFragment_to_userProfileFragment2"
             app:destination="@id/userProfileFragment2" />
+        <action
+            android:id="@+id/action_messageFragment_to_allMessagesFragment"
+            app:destination="@id/allMessagesFragment"
+            app:enterAnim="@anim/slide_in_left"
+            app:popUpTo="@id/allMessagesFragment" />
     </fragment>
     <fragment
         android:id="@+id/postComments"

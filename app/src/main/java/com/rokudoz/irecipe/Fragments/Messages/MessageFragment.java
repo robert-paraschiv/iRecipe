@@ -53,6 +53,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -87,7 +88,7 @@ public class MessageFragment extends Fragment {
     private ImageView friendImage;
     private TextView friendName, friendOnlineStatus;
     private TextInputEditText textInputEditText;
-    private MaterialButton sendButton;
+    private MaterialButton sendButton, backBtn;
 
     private View view;
     private String friendUserId = "";
@@ -109,6 +110,7 @@ public class MessageFragment extends Fragment {
     private List<DocumentSnapshot> messagesDocumentSnapshots = new ArrayList<>();
     private DocumentSnapshot mLastQueriedDocument;
     private boolean gotMessagesFirstTime = false;
+    private ListenerRegistration messagesListener, currentUserDetailsListener, friendDetailsListener;
 
     public MessageFragment() {
         // Required empty public constructor
@@ -125,6 +127,7 @@ public class MessageFragment extends Fragment {
         gotMessagesFirstTime = false;
         mediaPlayer = MediaPlayer.create(getContext(), R.raw.insight);
 
+        backBtn = view.findViewById(R.id.messageFragment_backBtn);
         friendImage = view.findViewById(R.id.message_friendImage_ImageView);
         friendOnlineStatus = view.findViewById(R.id.fragment_message_onlineStatus);
         friendName = view.findViewById(R.id.message_friendName_TextView);
@@ -148,8 +151,14 @@ public class MessageFragment extends Fragment {
 
 
         buildRecyclerView();
-        getFriendDetails();
 
+
+        backBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Navigation.findNavController(view).navigate(MessageFragmentDirections.actionMessageFragmentToAllMessagesFragment());
+            }
+        });
         sendButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -191,14 +200,27 @@ public class MessageFragment extends Fragment {
             LocalBroadcastManager.getInstance(getActivity()).registerReceiver((mMessageReceiver),
                     new IntentFilter("MessageNotification")
             );
+        getFriendDetails();
         getMessages();
     }
 
     @Override
     public void onStop() {
         super.onStop();
+
+        DetachListeners();
+
         if (getActivity() != null)
             LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mMessageReceiver);
+    }
+
+    private void DetachListeners() {
+        if (messagesListener != null)
+            messagesListener.remove();
+        if (currentUserDetailsListener != null)
+            currentUserDetailsListener.remove();
+        if (friendDetailsListener != null)
+            friendDetailsListener.remove();
     }
 
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
@@ -320,44 +342,45 @@ public class MessageFragment extends Fragment {
         messageList.clear();
         messagesDocumentSnapshots.clear();
         gotMessagesFirstTime = false;
-        usersReference.document(currentUserId).collection("Conversations").document(friendUserId)
-                .collection(friendUserId).orderBy("timestamp", Query.Direction.DESCENDING).limit(NR_OF_MESSAGES_TO_LIMIT).addSnapshotListener(new EventListener<QuerySnapshot>() {
-            @Override
-            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
-                if (e != null) {
-                    Log.w(TAG, "onEvent: ", e);
-                    return;
-                }
-                if (queryDocumentSnapshots != null) {
-                    for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
-                        Message message = documentSnapshot.toObject(Message.class);
-                        message.setDocumentId(documentSnapshot.getId());
-                        if (messageList.contains(message)) {
-                            messageList.set(messageList.indexOf(message), message);
-                            //                        mAdapter.notifyDataSetChanged();
-                            mAdapter.notifyItemChanged(messageList.indexOf(message));
-                        } else {
-                            if (gotMessagesFirstTime) {
-                                messageList.add(message);
-                                mAdapter.notifyItemInserted(messageList.size() - 1);
-                                //                            mRecyclerView.smoothScrollToPosition(messageList.size() - 1);
-                                messagesDocumentSnapshots.add(documentSnapshot);
-                            } else {
-                                messageList.add(0, message);
-                                messagesDocumentSnapshots.add(0, documentSnapshot);
-                                mAdapter.notifyItemInserted(0);
-                            }
-                            mRecyclerView.smoothScrollToPosition(messageList.size() - 1);
-                        }
-                        if (queryDocumentSnapshots.getDocuments().size() != 0) {
-                            mLastQueriedDocument = messagesDocumentSnapshots.get(0);
-                        }
-                    }
-                    gotMessagesFirstTime = true;
-                }
 
-            }
-        });
+        messagesListener = usersReference.document(currentUserId).collection("Conversations").document(friendUserId)
+                .collection(friendUserId).orderBy("timestamp", Query.Direction.DESCENDING).limit(NR_OF_MESSAGES_TO_LIMIT).addSnapshotListener(new EventListener<QuerySnapshot>() {
+                    @Override
+                    public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                        if (e != null) {
+                            Log.w(TAG, "onEvent: ", e);
+                            return;
+                        }
+                        if (queryDocumentSnapshots != null) {
+                            for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                                Message message = documentSnapshot.toObject(Message.class);
+                                message.setDocumentId(documentSnapshot.getId());
+                                if (messageList.contains(message)) {
+                                    messageList.set(messageList.indexOf(message), message);
+                                    //                        mAdapter.notifyDataSetChanged();
+                                    mAdapter.notifyItemChanged(messageList.indexOf(message));
+                                } else {
+                                    if (gotMessagesFirstTime) {
+                                        messageList.add(message);
+                                        mAdapter.notifyItemInserted(messageList.size() - 1);
+                                        //                            mRecyclerView.smoothScrollToPosition(messageList.size() - 1);
+                                        messagesDocumentSnapshots.add(documentSnapshot);
+                                    } else {
+                                        messageList.add(0, message);
+                                        messagesDocumentSnapshots.add(0, documentSnapshot);
+                                        mAdapter.notifyItemInserted(0);
+                                    }
+                                    mRecyclerView.smoothScrollToPosition(messageList.size() - 1);
+                                }
+                                if (queryDocumentSnapshots.getDocuments().size() != 0) {
+                                    mLastQueriedDocument = messagesDocumentSnapshots.get(0);
+                                }
+                            }
+                            gotMessagesFirstTime = true;
+                        }
+
+                    }
+                });
     }
 
     private void getMoreMessages() {
@@ -438,8 +461,8 @@ public class MessageFragment extends Fragment {
     }
 
     private void getFriendDetails() {
-
-        usersReference.document(currentUserId).addSnapshotListener(new EventListener<DocumentSnapshot>() {
+        //Get current user details
+        currentUserDetailsListener = usersReference.document(currentUserId).addSnapshotListener(new EventListener<DocumentSnapshot>() {
             @Override
             public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
                 if (e != null) {
@@ -452,7 +475,8 @@ public class MessageFragment extends Fragment {
             }
         });
 
-        usersReference.document(friendUserId).addSnapshotListener(new EventListener<DocumentSnapshot>() {
+        //Get friend user details
+        friendDetailsListener = usersReference.document(friendUserId).addSnapshotListener(new EventListener<DocumentSnapshot>() {
             @Override
             public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
                 if (e != null) {

@@ -382,11 +382,10 @@ public class FeedFragment extends Fragment implements FeedAdapter.OnItemClickLis
                                             UserWhoFaved userWhoFaved = documentSnapshot.toObject(UserWhoFaved.class);
                                             if (userWhoFaved != null && userWhoFaved.getUserID().equals(mUser.getUser_id())) {
                                                 post.setFavorite(true);
-                                                mAdapter.notifyDataSetChanged();
                                             } else {
                                                 post.setFavorite(false);
-                                                mAdapter.notifyDataSetChanged();
                                             }
+                                            mAdapter.notifyDataSetChanged();
                                         } else {
                                             Log.d(TAG, "onEvent: NULL");
                                         }
@@ -542,9 +541,7 @@ public class FeedFragment extends Fragment implements FeedAdapter.OnItemClickLis
 
                     //check if email is verified
                     if (user.isEmailVerified()) {
-//                        Log.d(TAG, "onAuthStateChanged: signed_in: " + user.getUid());
-//                        Toast.makeText(MainActivity.this, "Authenticated with: " + user.getEmail(), Toast.LENGTH_SHORT).show();
-//                        fab.show();
+
                         addPostFab.setVisibility(View.VISIBLE);
                         addPostFab.setOnClickListener(new View.OnClickListener() {
                             @Override
@@ -552,14 +549,6 @@ public class FeedFragment extends Fragment implements FeedAdapter.OnItemClickLis
                                 navigateToAddPost();
                             }
                         });
-//                        scheduleFab.setVisibility(View.VISIBLE);
-//                        scheduleFab.setOnClickListener(new View.OnClickListener() {
-//                            @Override
-//                            public void onClick(View v) {
-//                                navigateToSchedule();
-//                            }
-//                        });
-
                         //If use is authenticated, perform query
                         getCurrentUserDetails();
                     } else {
@@ -579,9 +568,5 @@ public class FeedFragment extends Fragment implements FeedAdapter.OnItemClickLis
                 // ...
             }
         };
-    }
-
-    private void navigateToSchedule() {
-        Navigation.findNavController(view).navigate(FeedFragmentDirections.actionFeedFragmentToScheduleFragment());
     }
 }

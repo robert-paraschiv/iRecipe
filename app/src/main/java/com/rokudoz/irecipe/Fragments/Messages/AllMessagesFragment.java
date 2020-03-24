@@ -17,6 +17,7 @@ import android.view.ViewGroup;
 
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
@@ -91,6 +92,14 @@ public class AllMessagesFragment extends Fragment implements ConversationAdapter
             }
         });
 
+        MaterialButton backBtn = view.findViewById(R.id.allMessages_backBtn);
+        backBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Navigation.findNavController(view).navigate(AllMessagesFragmentDirections.actionAllMessagesFragmentToFeedFragment());
+            }
+        });
+
         buildRecyclerView();
 
 
@@ -116,7 +125,7 @@ public class AllMessagesFragment extends Fragment implements ConversationAdapter
         mRecyclerView.setHasFixedSize(true);
         mLayoutManager = new LinearLayoutManager(getContext());
 
-        mAdapter = new ConversationAdapter(conversationList);
+        mAdapter = new ConversationAdapter(getContext(), conversationList);
 
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setAdapter(mAdapter);

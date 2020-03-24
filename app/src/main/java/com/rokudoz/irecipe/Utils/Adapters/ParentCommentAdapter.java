@@ -174,6 +174,14 @@ public class ParentCommentAdapter extends RecyclerView.Adapter<ParentCommentAdap
 
             }
         });
+        holder.mImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Bundle args = new Bundle();
+                args.putString("documentID", currentItem.getUser_id());
+                Navigation.findNavController(v).navigate(R.id.userProfileFragment2, args);
+            }
+        });
 
         // EDIT COMMENT
         if (currentItem.getComment_for_type() == null || !currentItem.getUser_id().equals(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
