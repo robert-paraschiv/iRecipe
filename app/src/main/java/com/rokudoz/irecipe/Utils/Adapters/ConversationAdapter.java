@@ -6,7 +6,10 @@ import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Context;
+import android.util.Log;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -34,6 +37,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 
 public class ConversationAdapter extends RecyclerView.Adapter<ConversationAdapter.ConversationViewHolder> {
+    private static final String TAG = "ConversationAdapter";
     private List<Conversation> conversationList;
     private OnItemClickListener mListener;
     Context context;
@@ -41,6 +45,8 @@ public class ConversationAdapter extends RecyclerView.Adapter<ConversationAdapte
 
     public interface OnItemClickListener {
         void onItemClick(int position);
+
+        void onDeleteClick(int position);
     }
 
     public void setOnItemClickListener(OnItemClickListener listener) {
@@ -62,6 +68,7 @@ public class ConversationAdapter extends RecyclerView.Adapter<ConversationAdapte
             seenCheck = itemView.findViewById(R.id.recycler_view_conversationItem_lastMessageSeen);
             spacer = itemView.findViewById(R.id.rv_conversation_item_spacer);
             itemView.setOnClickListener(this);
+            itemView.setOnCreateContextMenuListener(mOnCreateContextMenuListener);
         }
 
         @Override
@@ -73,6 +80,30 @@ public class ConversationAdapter extends RecyclerView.Adapter<ConversationAdapte
                 }
             }
         }
+
+        private final View.OnCreateContextMenuListener mOnCreateContextMenuListener = new View.OnCreateContextMenuListener() {
+            @Override
+            public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+                if (conversationList != null) {
+                    MenuItem deleteAction = menu.add("Delete conversation");
+                    deleteAction.setOnMenuItemClickListener(onDeleteClickListener);
+                }
+            }
+        };
+
+        private final MenuItem.OnMenuItemClickListener onDeleteClickListener = new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                if (mListener != null) {
+                    int position = getAdapterPosition();
+                    if (position != RecyclerView.NO_POSITION) {
+                        Log.d(TAG, "onMenuItemClick: " + item.getOrder());
+                        mListener.onDeleteClick(position);
+                    }
+                }
+                return true;
+            }
+        };
 
     }
 

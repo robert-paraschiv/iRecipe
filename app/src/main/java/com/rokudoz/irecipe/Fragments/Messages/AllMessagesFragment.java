@@ -1,6 +1,7 @@
 package com.rokudoz.irecipe.Fragments.Messages;
 
 
+import android.content.DialogInterface;
 import android.os.Bundle;
 
 import androidx.annotation.Nullable;
@@ -14,10 +15,12 @@ import android.view.InflateException;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
@@ -29,6 +32,7 @@ import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.WriteBatch;
 import com.rokudoz.irecipe.Models.Conversation;
 import com.rokudoz.irecipe.Models.User;
 import com.rokudoz.irecipe.R;
@@ -175,4 +179,59 @@ public class AllMessagesFragment extends Fragment implements ConversationAdapter
 
         Navigation.findNavController(view).navigate(AllMessagesFragmentDirections.actionAllMessagesFragmentToMessageFragment(id));
     }
+
+    @Override
+    public void onDeleteClick(final int position) {
+        final Conversation conversation = conversationList.get(position);
+
+        MaterialAlertDialogBuilder materialAlertDialogBuilder = new MaterialAlertDialogBuilder(getActivity()
+                , R.style.ThemeOverlay_MaterialComponents_MaterialAlertDialog_Centered);
+        materialAlertDialogBuilder.setMessage("You will lose all the messages with this user. Are you sure you want to delete this conversation? ");
+        materialAlertDialogBuilder.setCancelable(true);
+        materialAlertDialogBuilder.setPositiveButton(
+                "Yes",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        //Delete conversation
+                        usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).collection("Conversations")
+                                .document(conversation.getUserId()).collection(conversation.getUserId()).get()
+                                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                                    @Override
+                                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                                        WriteBatch batch = db.batch();
+                                        for (DocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                                            batch.delete(documentSnapshot.getReference());
+                                        }
+                                        batch.commit().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                            @Override
+                                            public void onSuccess(Void aVoid) {
+                                                usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).collection("Conversations")
+                                                        .document(conversation.getUserId()).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                    @Override
+                                                    public void onSuccess(Void aVoid) {
+                                                        Toast.makeText(getContext(), "Deleted conversation", Toast.LENGTH_SHORT).show();
+                                                        conversationList.remove(position);
+                                                        mAdapter.notifyItemRemoved(position);
+                                                    }
+                                                });
+                                            }
+                                        });
+                                    }
+                                });
+
+                        dialog.cancel();
+                    }
+                });
+
+        materialAlertDialogBuilder.setNegativeButton(
+                "No",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.cancel();
+                    }
+                });
+
+        materialAlertDialogBuilder.show();
+    }
+
 }
