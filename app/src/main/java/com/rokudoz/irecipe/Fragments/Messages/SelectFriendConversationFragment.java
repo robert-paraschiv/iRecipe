@@ -88,9 +88,14 @@ public class SelectFriendConversationFragment extends Fragment implements Friend
 
 
         buildRecyclerView();
-        getCurrentUserDetails();
 
         return view;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        getCurrentUserDetails();
     }
 
     @Override
@@ -111,7 +116,6 @@ public class SelectFriendConversationFragment extends Fragment implements Friend
     }
 
     private void getCurrentUserDetails() {
-
         userDetailsListener = usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).addSnapshotListener(new EventListener<DocumentSnapshot>() {
             @Override
             public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
@@ -126,7 +130,6 @@ public class SelectFriendConversationFragment extends Fragment implements Friend
     }
 
     private void performQuery() {
-        initializeRecyclerViewAdapterOnClicks();
 
         List<String> acceptedStatusList = new ArrayList<>();
         acceptedStatusList.add("friends");
@@ -145,10 +148,9 @@ public class SelectFriendConversationFragment extends Fragment implements Friend
                             Friend friend = documentSnapshot.toObject(Friend.class);
                             if (!mFriendList.contains(friend)) {
                                 mFriendList.add(friend);
+                                mAdapter.notifyItemInserted(mFriendList.size() - 1);
                             }
                         }
-
-                        mAdapter.notifyDataSetChanged();
                     }
                 });
 
@@ -167,20 +169,12 @@ public class SelectFriendConversationFragment extends Fragment implements Friend
         mAdapter.setOnItemClickListener(SelectFriendConversationFragment.this);
     }
 
-    private void initializeRecyclerViewAdapterOnClicks() {
-        mAdapter.setOnItemClickListener(new FriendAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(int position) {
-                String id = mFriendList.get(position).getFriend_user_id();
-                Log.d(TAG, "onItemClick: CLICKED " + " id " + id);
-
-                Navigation.findNavController(view).navigate(SelectFriendConversationFragmentDirections.actionSelectFriendToOpenConverstationFragmentToMessageFragment(id));
-            }
-        });
-    }
-
     @Override
     public void onItemClick(int position) {
+        String id = mFriendList.get(position).getFriend_user_id();
+        Log.d(TAG, "onItemClick: CLICKED " + " id " + id);
 
+        Navigation.findNavController(view)
+                .navigate(SelectFriendConversationFragmentDirections.actionSelectFriendToOpenConverstationFragmentToMessageFragment(id));
     }
 }

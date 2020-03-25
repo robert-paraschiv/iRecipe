@@ -5,13 +5,13 @@ import com.google.firebase.firestore.ServerTimestamp;
 
 import java.util.Date;
 
-public class FavoritePost {
+public class FavoriteRecipe {
     private String documentId;
 
     private @ServerTimestamp
     Date timeStamp;
 
-    public FavoritePost(Date timeStamp) {
+    public FavoriteRecipe(Date timeStamp) {
         this.timeStamp = timeStamp;
     }
 

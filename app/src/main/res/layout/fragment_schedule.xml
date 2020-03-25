@@ -45,43 +45,53 @@
                     </RelativeLayout>
                 </com.google.android.material.appbar.MaterialToolbar>
 
-                <RelativeLayout
-                    android:id="@+id/scheduleFragment_month_RelLayout"
+
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/scheduleFragment_calendarCard"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_below="@id/scheduleFragment_toolbar"
-                    android:background="@color/toolbar_color">
+                    android:layout_margin="4dp"
+                    app:cardCornerRadius="18dp">
 
-                    <TextView
-                        android:id="@+id/scheduleFragment_month_textView"
-                        android:layout_width="wrap_content"
+                    <RelativeLayout
+                        android:id="@+id/scheduleFragment_month_RelLayout"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_centerHorizontal="true"
-                        android:layout_marginTop="8dp"
-                        android:layout_marginBottom="8dp"
-                        tools:text="March, 2020" />
-                </RelativeLayout>
+                        android:background="@color/toolbar_color">
 
+                        <TextView
+                            android:id="@+id/scheduleFragment_month_textView"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerHorizontal="true"
+                            android:layout_marginTop="4dp"
+                            android:layout_marginBottom="8dp"
+                            tools:text="March, 2020" />
 
-                <com.github.sundeepk.compactcalendarview.CompactCalendarView
-                    android:id="@+id/scheduleFragment_calendarView"
-                    android:layout_width="match_parent"
-                    android:layout_height="300dp"
-                    android:layout_below="@id/scheduleFragment_month_RelLayout"
-                    android:padding="10dp"
-                    app:compactCalendarBackgroundColor="@color/calendar_backgroundColor"
-                    app:compactCalendarCurrentDayBackgroundColor="@color/calendar_currentDayBackgroundColor"
-                    app:compactCalendarCurrentSelectedDayBackgroundColor="@color/calendar_currentSelectedDayBackgroundColor"
-                    app:compactCalendarMultiEventIndicatorColor="@color/calendar_multiEventIndicatorColor"
-                    app:compactCalendarTargetHeight="250dp"
-                    app:compactCalendarTextColor="@color/calendar_textColor"
-                    app:compactCalendarTextSize="14sp" />
+                        <com.github.sundeepk.compactcalendarview.CompactCalendarView
+                            android:id="@+id/scheduleFragment_calendarView"
+                            android:layout_width="match_parent"
+                            android:layout_height="300dp"
+                            android:layout_below="@id/scheduleFragment_month_textView"
+                            android:padding="10dp"
+                            app:compactCalendarBackgroundColor="@color/calendar_backgroundColor"
+                            app:compactCalendarCurrentDayBackgroundColor="@color/calendar_currentDayBackgroundColor"
+                            app:compactCalendarCurrentSelectedDayBackgroundColor="@color/calendar_currentSelectedDayBackgroundColor"
+                            app:compactCalendarMultiEventIndicatorColor="@color/calendar_multiEventIndicatorColor"
+                            app:compactCalendarTargetHeight="250dp"
+                            app:compactCalendarTextColor="@color/calendar_textColor"
+                            app:compactCalendarTextSize="14sp" />
+                    </RelativeLayout>
+
+                </com.google.android.material.card.MaterialCardView>
+
 
                 <TextView
                     android:id="@+id/scheduleFragment_nrEventsTV"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_below="@id/scheduleFragment_calendarView"
+                    android:layout_below="@id/scheduleFragment_calendarCard"
                     android:layout_centerHorizontal="true"
                     tools:text="YAH BOYE" />
 

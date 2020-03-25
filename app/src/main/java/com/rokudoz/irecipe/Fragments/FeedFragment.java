@@ -28,6 +28,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -79,6 +80,7 @@ public class FeedFragment extends Fragment implements FeedAdapter.OnItemClickLis
     private CollectionReference postsRef = db.collection("Posts");
     private CollectionReference usersReference = db.collection("Users");
     private CollectionReference recipesRef = db.collection("Recipes");
+    private ListenerRegistration currentUserDetailsListener, referencedRecipeListener, likesListener, friendListListener, mainQueryListener;
 
     //Ads
     private AdLoader adLoader;
@@ -111,6 +113,13 @@ public class FeedFragment extends Fragment implements FeedAdapter.OnItemClickLis
                 BottomNavigationView navBar = getActivity().findViewById(R.id.bottom_navigation);
                 navBar.setVisibility(View.VISIBLE);
             }
+            TextView toolbarTv = view.findViewById(R.id.feedFragment_toolbar_titleTv);
+            toolbarTv.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mRecyclerView.scrollToPosition(0);
+                }
+            });
 
             mUser = new User();
             pbLoading = view.findViewById(R.id.homeFragment_pbLoading);
@@ -194,12 +203,12 @@ public class FeedFragment extends Fragment implements FeedAdapter.OnItemClickLis
 
         if (indexOfAdToLoad < nativeAds.size()) {
             mPostList.add(mPostList.size(), nativeAds.get(indexOfAdToLoad));
-            mAdapter.notifyDataSetChanged();
+            mAdapter.notifyItemInserted(mPostList.size() - 1);
             indexOfAdToLoad++;
         } else {
             indexOfAdToLoad = 0;
             mPostList.add(mPostList.size(), nativeAds.get(indexOfAdToLoad));
-            mAdapter.notifyDataSetChanged();
+            mAdapter.notifyItemInserted(mPostList.size() - 1);
         }
 
 
@@ -214,6 +223,10 @@ public class FeedFragment extends Fragment implements FeedAdapter.OnItemClickLis
     public void onStart() {
         super.onStart();
         FirebaseAuth.getInstance().addAuthStateListener(mAuthListener);
+
+        if (FirebaseAuth.getInstance().getCurrentUser() != null)
+            getCurrentUserDetails();
+
         if (FirebaseAuth.getInstance().getCurrentUser() != null)
             getUnreadConversationNr();
     }
@@ -225,6 +238,20 @@ public class FeedFragment extends Fragment implements FeedAdapter.OnItemClickLis
         if (mAuthListener != null) {
             FirebaseAuth.getInstance().removeAuthStateListener(mAuthListener);
         }
+        detachListeners();
+    }
+
+    private void detachListeners() {
+        if (mainQueryListener != null)
+            mainQueryListener.remove();
+        if (referencedRecipeListener != null)
+            referencedRecipeListener.remove();
+        if (currentUserDetailsListener != null)
+            currentUserDetailsListener.remove();
+        if (likesListener != null)
+            likesListener.remove();
+        if (friendListListener != null)
+            friendListListener.remove();
     }
 
 
@@ -276,7 +303,7 @@ public class FeedFragment extends Fragment implements FeedAdapter.OnItemClickLis
     }
 
     private void getCurrentUserDetails() {
-        usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).addSnapshotListener(new EventListener<DocumentSnapshot>() {
+        currentUserDetailsListener = usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).addSnapshotListener(new EventListener<DocumentSnapshot>() {
             @Override
             public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
                 if (e == null && documentSnapshot != null) {
@@ -291,7 +318,7 @@ public class FeedFragment extends Fragment implements FeedAdapter.OnItemClickLis
                         friends_userID_list.add(FirebaseAuth.getInstance().getCurrentUser().getUid());
                     }
 
-                    usersReference.document(user.getUser_id()).collection("FriendList")
+                    friendListListener = usersReference.document(user.getUser_id()).collection("FriendList")
                             .addSnapshotListener(new EventListener<QuerySnapshot>() {
                                 @Override
                                 public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
@@ -360,7 +387,7 @@ public class FeedFragment extends Fragment implements FeedAdapter.OnItemClickLis
 
     private void PerformMainQuery(Query postsQuery) {
 
-        postsQuery.addSnapshotListener(new EventListener<QuerySnapshot>() {
+        mainQueryListener = postsQuery.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@javax.annotation.Nullable QuerySnapshot queryDocumentSnapshots,
                                 @javax.annotation.Nullable FirebaseFirestoreException e) {
@@ -369,8 +396,21 @@ public class FeedFragment extends Fragment implements FeedAdapter.OnItemClickLis
                         final Post post = document.toObject(Post.class);
                         post.setDocumentId(document.getId());
 
+                        if (!mPostList.contains(post)) {
+                            mPostList.add(post);
+                            nrPostsLoaded++;
+                            if (nrPostsLoaded >= 5 && !adLoader.isLoading()) {
+                                insertAdsInRecyclerView();
+                                nrPostsLoaded = 0;
+                            }
+                            mAdapter.notifyItemInserted(mPostList.size() - 1);
+                        } else {
+                            mPostList.set(mPostList.indexOf(post), post);
+                            mAdapter.notifyItemChanged(mPostList.indexOf(post));
+                        }
+
                         //Check if current user liked the post or not
-                        postsRef.document(post.getDocumentId()).collection("UsersWhoFaved").document(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                        likesListener = postsRef.document(post.getDocumentId()).collection("UsersWhoFaved").document(FirebaseAuth.getInstance().getCurrentUser().getUid())
                                 .addSnapshotListener(new EventListener<DocumentSnapshot>() {
                                     @Override
                                     public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
@@ -385,7 +425,7 @@ public class FeedFragment extends Fragment implements FeedAdapter.OnItemClickLis
                                             } else {
                                                 post.setFavorite(false);
                                             }
-                                            mAdapter.notifyDataSetChanged();
+                                            mAdapter.notifyItemChanged(mPostList.indexOf(post));
                                         } else {
                                             Log.d(TAG, "onEvent: NULL");
                                         }
@@ -393,7 +433,7 @@ public class FeedFragment extends Fragment implements FeedAdapter.OnItemClickLis
                                 });
 
                         //Get post referenced Recipe details
-                        recipesRef.document(post.getReferenced_recipe_docId()).addSnapshotListener(new EventListener<DocumentSnapshot>() {
+                        referencedRecipeListener = recipesRef.document(post.getReferenced_recipe_docId()).addSnapshotListener(new EventListener<DocumentSnapshot>() {
                             @Override
                             public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
                                 if (e != null) {
@@ -404,22 +444,12 @@ public class FeedFragment extends Fragment implements FeedAdapter.OnItemClickLis
                                     Recipe recipe = documentSnapshot.toObject(Recipe.class);
                                     post.setRecipe_name(recipe.getTitle());
                                     post.setRecipe_imageUrl(recipe.getImageUrls_list().get(0));
-                                    mAdapter.notifyDataSetChanged();
+                                    mAdapter.notifyItemChanged(mPostList.indexOf(post));
                                 }
                             }
                         });
 
-                        if (!mPostList.contains(post)) {
-                            mPostList.add(post);
-                            nrPostsLoaded++;
-                            if (nrPostsLoaded >= 5 && !adLoader.isLoading()) {
-                                insertAdsInRecyclerView();
-                                nrPostsLoaded = 0;
-                            }
-                            mAdapter.notifyDataSetChanged();
-                        } else {
-                            mPostList.set(mPostList.indexOf(post), post);
-                        }
+
                     }
 
                     if (queryDocumentSnapshots.getDocuments().size() != 0) {
@@ -436,7 +466,7 @@ public class FeedFragment extends Fragment implements FeedAdapter.OnItemClickLis
                             , false, "Everyone", null));
                     Log.d(TAG, "EMPTY: ");
                 }
-                mAdapter.notifyDataSetChanged();
+//                mAdapter.notifyDataSetChanged();
             }
         });
     }
@@ -488,7 +518,7 @@ public class FeedFragment extends Fragment implements FeedAdapter.OnItemClickLis
                     }
                 });
                 post.setFavorite(false);
-                mAdapter.notifyDataSetChanged();
+                mAdapter.notifyItemChanged(mPostList.indexOf(post));
 
             } else {
                 post.setFavorite(true);
@@ -505,7 +535,7 @@ public class FeedFragment extends Fragment implements FeedAdapter.OnItemClickLis
                     }
                 });
 
-                mAdapter.notifyDataSetChanged();
+                mAdapter.notifyItemChanged(mPostList.indexOf(post));
             }
         } else {
             if (getActivity() != null)
@@ -550,7 +580,7 @@ public class FeedFragment extends Fragment implements FeedAdapter.OnItemClickLis
                             }
                         });
                         //If use is authenticated, perform query
-                        getCurrentUserDetails();
+
                     } else {
                         Toast.makeText(getContext(), "Email is not Verified\nCheck your Inbox", Toast.LENGTH_SHORT).show();
                         FirebaseAuth.getInstance().signOut();

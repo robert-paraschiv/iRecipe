@@ -215,12 +215,18 @@ public class MessageFragment extends Fragment {
     }
 
     private void DetachListeners() {
-        if (messagesListener != null)
+        if (messagesListener != null) {
             messagesListener.remove();
-        if (currentUserDetailsListener != null)
+            messagesListener = null;
+        }
+        if (currentUserDetailsListener != null) {
             currentUserDetailsListener.remove();
-        if (friendDetailsListener != null)
+            currentUserDetailsListener = null;
+        }
+        if (friendDetailsListener != null) {
             friendDetailsListener.remove();
+            friendDetailsListener = null;
+        }
     }
 
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {

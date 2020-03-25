@@ -17,7 +17,7 @@
             android:layout_marginBottom="8dp"
             android:layout_toEndOf="@id/recycler_view_conversationItem_friendImage"
             android:contentDescription="Spacer"
-            android:src="@color/black" />
+            android:src="@color/spacer" />
 
 
         <de.hdodenhof.circleimageview.CircleImageView

@@ -34,8 +34,10 @@ import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.WriteBatch;
 import com.google.firebase.storage.FirebaseStorage;
 import com.rokudoz.irecipe.AddRecipesActivity;
+import com.rokudoz.irecipe.Models.FavoriteRecipe;
 import com.rokudoz.irecipe.Models.Ingredient;
 import com.rokudoz.irecipe.Models.Recipe;
 import com.rokudoz.irecipe.Models.User;
@@ -71,8 +73,7 @@ public class recipesLunchFragment extends Fragment implements RecipeAdapter.OnIt
     private CollectionReference recipeRef = db.collection("Recipes");
     private CollectionReference usersReference = db.collection("Users");
     private FirebaseStorage mStorageRef;
-    private ListenerRegistration userDetailsListener, userIngredientsListener, recipesListener, recipesIngredientsListener, privateRecipesListener
-            , privateRecipeIngredientsListener;
+    private ListenerRegistration userDetailsListener, userIngredientsListener, recipesListener, recipesIngredientsListener, privateRecipesListener, privateRecipeIngredientsListener;
 
     private RecyclerView mRecyclerView;
     private RecipeAdapter mAdapter;
@@ -200,7 +201,6 @@ public class recipesLunchFragment extends Fragment implements RecipeAdapter.OnIt
                         }
                         mUser = documentSnapshot.toObject(User.class);
                         loggedInUserDocumentId = documentSnapshot.getId();
-
 
 
                         PerformMainQuery();
@@ -412,7 +412,7 @@ public class recipesLunchFragment extends Fragment implements RecipeAdapter.OnIt
     public void onFavoriteClick(int position) {
         Recipe recipe = (Recipe) mRecipeList.get(position);
         String id = recipe.getDocumentId();
-        String title = recipe.getTitle();
+        final String title = recipe.getTitle();
         DocumentReference currentRecipeRef = recipeRef.document(id);
         final CollectionReference currentRecipeSubCollection = currentRecipeRef.collection("UsersWhoFaved");
 
@@ -421,20 +421,34 @@ public class recipesLunchFragment extends Fragment implements RecipeAdapter.OnIt
         if (recipe.getFavorite()) {
             recipe.setFavorite(false);
 
-            currentRecipeSubCollection.document(mUser.getUser_id()).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+            WriteBatch writeBatch = db.batch();
+            writeBatch.delete(usersReference.document(mUser.getUser_id()).collection("FavoriteRecipes").document(id));
+            writeBatch.delete(currentRecipeSubCollection.document(mUser.getUser_id()));
+
+            writeBatch.commit().addOnSuccessListener(new OnSuccessListener<Void>() {
                 @Override
                 public void onSuccess(Void aVoid) {
                     Toast.makeText(getContext(), "Removed from favorites", Toast.LENGTH_SHORT).show();
                 }
             });
+
         } else {
             recipe.setFavorite(true);
             UserWhoFaved userWhoFaved = new UserWhoFaved(mUser.getUser_id(), mUser.getName(), mUser.getUserProfilePicUrl(), null);
-            currentRecipeSubCollection.document(mUser.getUser_id()).set(userWhoFaved);
-            Toast.makeText(getContext(), "Added " + title + " to favorites", Toast.LENGTH_SHORT).show();
-        }
+            FavoriteRecipe favoriteRecipe = new FavoriteRecipe(null);
 
-        mAdapter.notifyDataSetChanged();
+            WriteBatch writeBatch = db.batch();
+            writeBatch.set(usersReference.document(mUser.getUser_id()).collection("FavoriteRecipes").document(id), favoriteRecipe);
+            writeBatch.set(currentRecipeSubCollection.document(mUser.getUser_id()), userWhoFaved);
+            writeBatch.commit().addOnSuccessListener(new OnSuccessListener<Void>() {
+                @Override
+                public void onSuccess(Void aVoid) {
+                    Toast.makeText(getContext(), "Added " + title + " to favorites", Toast.LENGTH_SHORT).show();
+                }
+            });
+
+        }
+        mAdapter.notifyItemChanged(position);
     }
 
 }

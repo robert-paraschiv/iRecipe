@@ -49,6 +49,13 @@
 
     </RelativeLayout>
 
+    <ProgressBar
+        android:id="@+id/allmessages_pb"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        />
+
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/allMessages_addConversation_fab"
         android:layout_width="wrap_content"

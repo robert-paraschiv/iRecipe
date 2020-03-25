@@ -58,8 +58,10 @@ import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.WriteBatch;
 import com.rokudoz.irecipe.EditRecipeActivity;
 import com.rokudoz.irecipe.Models.Comment;
+import com.rokudoz.irecipe.Models.FavoriteRecipe;
 import com.rokudoz.irecipe.Models.Ingredient;
 import com.rokudoz.irecipe.Models.Instruction;
 import com.rokudoz.irecipe.Models.Recipe;
@@ -227,7 +229,11 @@ public class RecipeDetailedFragment extends Fragment implements RecipeInstructio
                 if (isRecipeFavorite) {
                     isRecipeFavorite = false;
                     setFavoriteIcon(isRecipeFavorite);
-                    currentRecipeSubCollection.document(mUser.getUser_id()).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                    WriteBatch batch = db.batch();
+                    batch.delete(currentRecipeSubCollection.document(mUser.getUser_id()));
+                    batch.delete(usersRef.document(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                            .collection("FavoriteRecipes").document(documentID));
+                    batch.commit().addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void aVoid) {
                             if (getContext() != null)
@@ -237,10 +243,22 @@ public class RecipeDetailedFragment extends Fragment implements RecipeInstructio
                 } else {
                     isRecipeFavorite = true;
                     setFavoriteIcon(isRecipeFavorite);
+
                     UserWhoFaved userWhoFaved = new UserWhoFaved(mUser.getUser_id(), mUser.getName(), mUser.getUserProfilePicUrl(), null);
-                    currentRecipeSubCollection.document(mUser.getUser_id()).set(userWhoFaved);
-                    Toast.makeText(getContext(), "Added " + title + " to favorites", Toast.LENGTH_SHORT).show();
-                    Log.d(TAG, "onClick: ADDED + " + title + " " + documentID + " to favorites");
+                    FavoriteRecipe favoriteRecipe = new FavoriteRecipe(null);
+
+                    WriteBatch batch = db.batch();
+                    batch.set(currentRecipeSubCollection.document(mUser.getUser_id()), userWhoFaved);
+                    batch.set(usersRef.document(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                            .collection("FavoriteRecipes").document(documentID), favoriteRecipe);
+                    batch.commit().addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            Toast.makeText(getContext(), "Added " + title + " to favorites", Toast.LENGTH_SHORT).show();
+                            Log.d(TAG, "onClick: ADDED + " + title + " " + documentID + " to favorites");
+                        }
+                    });
+
                 }
             }
         });

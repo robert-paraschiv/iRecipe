@@ -18,6 +18,7 @@ import android.view.InflateException;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
@@ -58,6 +59,8 @@ public class AllMessagesFragment extends Fragment implements ConversationAdapter
     private static final String TAG = "profileMyFriendList";
     private View view;
 
+    ProgressBar progressBar;
+
     private RecyclerView mRecyclerView;
     private ConversationAdapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
@@ -92,6 +95,7 @@ public class AllMessagesFragment extends Fragment implements ConversationAdapter
             Log.e(TAG, "onCreateView: ", e);
         }
 
+        progressBar = view.findViewById(R.id.allmessages_pb);
         mRecyclerView = view.findViewById(R.id.allMessages_recycler_view);
 
         BottomNavigationView navBar = getActivity().findViewById(R.id.bottom_navigation);
@@ -123,8 +127,10 @@ public class AllMessagesFragment extends Fragment implements ConversationAdapter
     @Override
     public void onStop() {
         super.onStop();
-        if (userConversationsListener != null)
+        if (userConversationsListener != null) {
             userConversationsListener.remove();
+            userConversationsListener = null;
+        }
     }
 
     @Override
@@ -158,6 +164,7 @@ public class AllMessagesFragment extends Fragment implements ConversationAdapter
                             return;
                         }
                         if (queryDocumentSnapshots != null) {
+                            progressBar.setVisibility(View.GONE);
                             for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
                                 Conversation conversation = documentSnapshot.toObject(Conversation.class);
                                 if (!conversationList.contains(conversation)) {
@@ -221,6 +228,7 @@ public class AllMessagesFragment extends Fragment implements ConversationAdapter
                                                         Toast.makeText(getContext(), "Deleted conversation", Toast.LENGTH_SHORT).show();
                                                         conversationList.remove(position);
                                                         mAdapter.notifyItemRemoved(position);
+                                                        mAdapter.notifyItemChanged(position);
                                                     }
                                                 });
                                             }
@@ -259,7 +267,5 @@ public class AllMessagesFragment extends Fragment implements ConversationAdapter
 
                     }
                 });
-
     }
-
 }
