@@ -18,6 +18,8 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.button.MaterialButton;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.rokudoz.irecipe.Account.LoginActivity;
@@ -33,6 +35,10 @@ import static com.rokudoz.irecipe.App.SETTINGS_PREFS_NAME;
  */
 public class SettingsFragment extends Fragment {
     private static final String TAG = "SettingsFragment";
+
+    //Firebase RealTime db
+    FirebaseDatabase database = FirebaseDatabase.getInstance();
+    DatabaseReference usersRef;
 
     //Firebase
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -96,7 +102,17 @@ public class SettingsFragment extends Fragment {
         signOutBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                signOut();
+                if (FirebaseAuth.getInstance().getCurrentUser() != null) {
+                    usersRef = database.getReference("Users").child(FirebaseAuth.getInstance().getCurrentUser().getUid());
+                    usersRef.child("online").setValue(false).addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            Log.d(TAG, "onSuccess: SET user online FALSE");
+                            signOut();
+                        }
+                    });
+                }
+
             }
         });
 

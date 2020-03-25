@@ -73,7 +73,8 @@ public class recipesLunchFragment extends Fragment implements RecipeAdapter.OnIt
     private CollectionReference recipeRef = db.collection("Recipes");
     private CollectionReference usersReference = db.collection("Users");
     private FirebaseStorage mStorageRef;
-    private ListenerRegistration userDetailsListener, userIngredientsListener, recipesListener, recipesIngredientsListener, privateRecipesListener, privateRecipeIngredientsListener;
+    private ListenerRegistration userDetailsListener, userIngredientsListener, recipesListener, recipeFavListener, privateRecipesListener
+            , privateRecipeIngredientsListener, privateRecipeFavListener, recipesIngredientsListener;
 
     private RecyclerView mRecyclerView;
     private RecipeAdapter mAdapter;
@@ -105,12 +106,12 @@ public class recipesLunchFragment extends Fragment implements RecipeAdapter.OnIt
         pbLoading.setVisibility(View.VISIBLE);
         mStorageRef = FirebaseStorage.getInstance();
         buildRecyclerView();
-        getUserIngredients();
+
         return view; // HAS TO BE THE LAST ONE ---------------------------------
     }
 
     private void getUserIngredients() {
-        usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).collection("Ingredients")
+        userIngredientsListener = usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).collection("Ingredients")
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
                     public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
@@ -125,11 +126,16 @@ public class recipesLunchFragment extends Fragment implements RecipeAdapter.OnIt
                                 userIngredientList.add(ingredient);
                             }
                         }
-                        performQuery();
+                        getUserDetails();
                     }
                 });
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+        getUserIngredients();
+    }
 
     @Override
     public void onStop() {
@@ -151,6 +157,10 @@ public class recipesLunchFragment extends Fragment implements RecipeAdapter.OnIt
             recipesListener.remove();
             recipesListener = null;
         }
+        if (recipeFavListener != null) {
+            recipeFavListener.remove();
+            recipeFavListener = null;
+        }
         if (privateRecipesListener != null) {
             privateRecipesListener.remove();
             privateRecipesListener = null;
@@ -162,6 +172,10 @@ public class recipesLunchFragment extends Fragment implements RecipeAdapter.OnIt
         if (privateRecipeIngredientsListener != null) {
             privateRecipeIngredientsListener.remove();
             privateRecipeIngredientsListener = null;
+        }
+        if (privateRecipeFavListener != null) {
+            privateRecipeFavListener.remove();
+            privateRecipeFavListener = null;
         }
     }
 
@@ -190,8 +204,8 @@ public class recipesLunchFragment extends Fragment implements RecipeAdapter.OnIt
     }
 
 
-    private void performQuery() {
-        usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid())
+    private void getUserDetails() {
+        userDetailsListener = usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid())
                 .addSnapshotListener(new EventListener<DocumentSnapshot>() {
                     @Override
                     public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
@@ -220,7 +234,7 @@ public class recipesLunchFragment extends Fragment implements RecipeAdapter.OnIt
             recipesQuery = recipeRef.whereEqualTo("category", "lunch").whereEqualTo("privacy", "Everyone").limit(10).orderBy("number_of_likes", Query.Direction.DESCENDING);
         }
 
-        recipesQuery.addSnapshotListener(new EventListener<QuerySnapshot>() {
+        recipesListener = recipesQuery.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@javax.annotation.Nullable QuerySnapshot queryDocumentSnapshots,
                                 @javax.annotation.Nullable FirebaseFirestoreException e) {
@@ -253,7 +267,7 @@ public class recipesLunchFragment extends Fragment implements RecipeAdapter.OnIt
                         Log.d(TAG, "onEvent: " + recipe.getTitle() + " NR OF MISSING INGREDIENTS " + numberOfMissingIngredients);
                         if (numberOfMissingIngredients <= 3) {
                             //Check if the recipe is favorite or not
-                            recipeRef.document(recipe.getDocumentId()).collection("UsersWhoFaved").document(mUser.getUser_id())
+                            recipeFavListener = recipeRef.document(recipe.getDocumentId()).collection("UsersWhoFaved").document(mUser.getUser_id())
                                     .addSnapshotListener(new EventListener<DocumentSnapshot>() {
                                         @Override
                                         public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
@@ -313,7 +327,7 @@ public class recipesLunchFragment extends Fragment implements RecipeAdapter.OnIt
             privateRecipesQuery = recipeRef.whereEqualTo("category", "lunch").whereEqualTo("creator_docId", loggedInUserDocumentId).orderBy("number_of_likes", Query.Direction.DESCENDING);
 //                                    .limit(3);
         }
-        privateRecipesQuery.addSnapshotListener(new EventListener<QuerySnapshot>() {
+        privateRecipesListener = privateRecipesQuery.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
                 if (queryDocumentSnapshots != null) {
@@ -344,7 +358,7 @@ public class recipesLunchFragment extends Fragment implements RecipeAdapter.OnIt
                         Log.d(TAG, "onEvent: " + recipe.getTitle() + " NR OF MISSING INGREDIENTS " + numberOfMissingIngredients);
                         if (numberOfMissingIngredients <= 3) {
                             //Check if current user liked the post or not
-                            recipeRef.document(recipe.getDocumentId()).collection("UsersWhoFaved").document(mUser.getUser_id())
+                            privateRecipeFavListener = recipeRef.document(recipe.getDocumentId()).collection("UsersWhoFaved").document(mUser.getUser_id())
                                     .addSnapshotListener(new EventListener<DocumentSnapshot>() {
                                         @Override
                                         public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {

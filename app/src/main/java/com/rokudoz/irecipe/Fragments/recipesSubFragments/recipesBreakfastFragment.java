@@ -72,7 +72,8 @@ public class recipesBreakfastFragment extends Fragment implements RecipeAdapter.
     private CollectionReference recipeRef = db.collection("Recipes");
     private CollectionReference usersReference = db.collection("Users");
     private FirebaseStorage mStorageRef;
-//    private ListenerRegistration userDetailsListener, userIngredientsListener, recipesListener, privateRecipesListener, privateRecipeIngredientsListener, recipesIngredientsListener;
+    private ListenerRegistration userDetailsListener, userIngredientsListener, recipesListener,recipeFavListener, privateRecipesListener
+            , privateRecipeIngredientsListener,privateRecipeFavListener, recipesIngredientsListener;
 
     private RecyclerView mRecyclerView;
     private RecipeAdapter mAdapter;
@@ -116,7 +117,7 @@ public class recipesBreakfastFragment extends Fragment implements RecipeAdapter.
     }
 
     private void getUserIngredients() {
-        usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).collection("Ingredients")
+        userIngredientsListener = usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).collection("Ingredients")
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
                     public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
@@ -140,36 +141,44 @@ public class recipesBreakfastFragment extends Fragment implements RecipeAdapter.
     @Override
     public void onStop() {
         super.onStop();
-//        DetachFireStoreListeners();
+        DetachFireStoreListeners();
         Log.d(TAG, "onStop: ");
     }
 
-//    private void DetachFireStoreListeners() {
-//        if (userDetailsListener != null) {
-//            userDetailsListener.remove();
-//            userDetailsListener = null;
-//        }
-//        if (userIngredientsListener != null) {
-//            userIngredientsListener.remove();
-//            userIngredientsListener = null;
-//        }
-//        if (recipesListener != null) {
-//            recipesListener.remove();
-//            recipesListener = null;
-//        }
-//        if (privateRecipesListener != null) {
-//            privateRecipesListener.remove();
-//            privateRecipesListener = null;
-//        }
-//        if (recipesIngredientsListener != null) {
-//            recipesIngredientsListener.remove();
-//            recipesIngredientsListener = null;
-//        }
-//        if (privateRecipeIngredientsListener != null) {
-//            privateRecipeIngredientsListener.remove();
-//            privateRecipeIngredientsListener = null;
-//        }
-//    }
+    private void DetachFireStoreListeners() {
+        if (userDetailsListener != null) {
+            userDetailsListener.remove();
+            userDetailsListener = null;
+        }
+        if (userIngredientsListener != null) {
+            userIngredientsListener.remove();
+            userIngredientsListener = null;
+        }
+        if (recipesListener != null) {
+            recipesListener.remove();
+            recipesListener = null;
+        }
+        if (recipeFavListener != null) {
+            recipeFavListener.remove();
+            recipeFavListener = null;
+        }
+        if (privateRecipesListener != null) {
+            privateRecipesListener.remove();
+            privateRecipesListener = null;
+        }
+        if (recipesIngredientsListener != null) {
+            recipesIngredientsListener.remove();
+            recipesIngredientsListener = null;
+        }
+        if (privateRecipeIngredientsListener != null) {
+            privateRecipeIngredientsListener.remove();
+            privateRecipeIngredientsListener = null;
+        }
+        if (privateRecipeFavListener != null) {
+            privateRecipeFavListener.remove();
+            privateRecipeFavListener = null;
+        }
+    }
 
 
     private void buildRecyclerView() {
@@ -198,7 +207,7 @@ public class recipesBreakfastFragment extends Fragment implements RecipeAdapter.
 
 
     private void getCurrentUserDetails() {
-        usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid())
+        userDetailsListener = usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid())
                 .addSnapshotListener(new EventListener<DocumentSnapshot>() {
                     @Override
                     public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
@@ -227,7 +236,7 @@ public class recipesBreakfastFragment extends Fragment implements RecipeAdapter.
             recipesQuery = recipeRef.whereEqualTo("category", "breakfast").whereEqualTo("privacy", "Everyone").orderBy("number_of_likes", Query.Direction.DESCENDING).limit(10);
         }
 
-        recipesQuery.addSnapshotListener(new EventListener<QuerySnapshot>() {
+       recipesListener= recipesQuery.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@javax.annotation.Nullable QuerySnapshot queryDocumentSnapshots,
                                 @javax.annotation.Nullable FirebaseFirestoreException e) {
@@ -264,7 +273,7 @@ public class recipesBreakfastFragment extends Fragment implements RecipeAdapter.
                         Log.d(TAG, "onEvent: " + recipe.getTitle() + " NR OF MISSING INGREDIENTS " + numberOfMissingIngredients);
                         if (numberOfMissingIngredients <= 3) {
                             //Check if the recipe is favorite or not
-                            recipeRef.document(recipe.getDocumentId()).collection("UsersWhoFaved").document(mUser.getUser_id())
+                            recipeFavListener=recipeRef.document(recipe.getDocumentId()).collection("UsersWhoFaved").document(mUser.getUser_id())
                                     .addSnapshotListener(new EventListener<DocumentSnapshot>() {
                                         @Override
                                         public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
@@ -324,7 +333,7 @@ public class recipesBreakfastFragment extends Fragment implements RecipeAdapter.
             privateRecipesQuery = recipeRef.whereEqualTo("category", "breakfast").whereEqualTo("creator_docId", loggedInUserDocumentId).orderBy("number_of_likes", Query.Direction.DESCENDING);
 //                                    .limit(3);
         }
-        privateRecipesQuery.addSnapshotListener(new EventListener<QuerySnapshot>() {
+        privateRecipesListener=privateRecipesQuery.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
                 if (e != null) {
@@ -359,7 +368,7 @@ public class recipesBreakfastFragment extends Fragment implements RecipeAdapter.
                         Log.d(TAG, "onEvent: " + recipe.getTitle() + " NR OF MISSING INGREDIENTS " + numberOfMissingIngredients);
                         if (numberOfMissingIngredients <= 3) {
                             //Check if current user liked the post or not
-                            recipeRef.document(recipe.getDocumentId()).collection("UsersWhoFaved").document(mUser.getUser_id())
+                            privateRecipeFavListener=recipeRef.document(recipe.getDocumentId()).collection("UsersWhoFaved").document(mUser.getUser_id())
                                     .addSnapshotListener(new EventListener<DocumentSnapshot>() {
                                         @Override
                                         public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {

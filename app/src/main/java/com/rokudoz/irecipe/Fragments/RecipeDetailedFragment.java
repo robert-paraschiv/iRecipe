@@ -151,8 +151,7 @@ public class RecipeDetailedFragment extends Fragment implements RecipeInstructio
 
     private FirebaseAuth.AuthStateListener mAuthListener;
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
-    private ListenerRegistration currentSubCollectionListener, usersRefListener, commentListener, numberofFavListener, currentUserDetailsListener,
-            userShoppingListListener;
+    private ListenerRegistration commentListener, currentUserDetailsListener, userIngredientsListener, userShoppingListListener, recipeListener, recipeLikesListener;
     private CollectionReference recipeRef = db.collection("Recipes");
     private CollectionReference usersRef = db.collection("Users");
 
@@ -307,7 +306,7 @@ public class RecipeDetailedFragment extends Fragment implements RecipeInstructio
         });
 
         buildRecyclerView();
-        getCurrentUserDetails(view);
+
 
         return view; // HAS TO BE THE LAST ONE ---------------------------------
     }
@@ -332,6 +331,12 @@ public class RecipeDetailedFragment extends Fragment implements RecipeInstructio
     }
 
     @Override
+    public void onStart() {
+        super.onStart();
+        getCurrentUserDetails(view);
+    }
+
+    @Override
     public void onStop() {
         super.onStop();
         DetatchFirestoreListeners();
@@ -339,14 +344,6 @@ public class RecipeDetailedFragment extends Fragment implements RecipeInstructio
     }
 
     private void DetatchFirestoreListeners() {
-        if (currentSubCollectionListener != null) {
-            currentSubCollectionListener.remove();
-            currentSubCollectionListener = null;
-        }
-        if (usersRefListener != null) {
-            usersRefListener.remove();
-            usersRefListener = null;
-        }
         if (commentListener != null) {
             commentListener.remove();
             commentListener = null;
@@ -355,13 +352,21 @@ public class RecipeDetailedFragment extends Fragment implements RecipeInstructio
             currentUserDetailsListener.remove();
             currentUserDetailsListener = null;
         }
-        if (numberofFavListener != null) {
-            numberofFavListener.remove();
-            numberofFavListener = null;
+        if (userIngredientsListener != null) {
+            userIngredientsListener.remove();
+            userIngredientsListener = null;
         }
         if (userShoppingListListener != null) {
             userShoppingListListener.remove();
             userShoppingListListener = null;
+        }
+        if (recipeListener != null) {
+            recipeListener.remove();
+            recipeListener = null;
+        }
+        if (recipeLikesListener != null) {
+            recipeLikesListener.remove();
+            recipeLikesListener = null;
         }
     }
 
@@ -472,7 +477,7 @@ public class RecipeDetailedFragment extends Fragment implements RecipeInstructio
     }
 
     private void getCurrentUserDetails(final View view) {
-        usersRef.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).addSnapshotListener(new EventListener<DocumentSnapshot>() {
+        currentUserDetailsListener = usersRef.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).addSnapshotListener(new EventListener<DocumentSnapshot>() {
             @Override
             public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
                 if (e != null) {
@@ -490,7 +495,7 @@ public class RecipeDetailedFragment extends Fragment implements RecipeInstructio
     }
 
     private void getUserIngredientList(String user_id, final View view) {
-        usersRef.document(user_id).collection("Ingredients").addSnapshotListener(new EventListener<QuerySnapshot>() {
+        userIngredientsListener = usersRef.document(user_id).collection("Ingredients").addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
                 if (e != null) {
@@ -509,7 +514,7 @@ public class RecipeDetailedFragment extends Fragment implements RecipeInstructio
     }
 
     private void getUserShoppingList(final String userDocId, final View view) {
-        usersRef.document(userDocId).collection("ShoppingList").addSnapshotListener(new EventListener<QuerySnapshot>() {
+        userShoppingListListener = usersRef.document(userDocId).collection("ShoppingList").addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
                 if (e != null) {
@@ -530,7 +535,7 @@ public class RecipeDetailedFragment extends Fragment implements RecipeInstructio
     }
 
     private void getRecipeDocument(final View view) {
-        recipeRef.document(documentID).addSnapshotListener(new EventListener<DocumentSnapshot>() {
+        recipeListener = recipeRef.document(documentID).addSnapshotListener(new EventListener<DocumentSnapshot>() {
             @Override
             public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable final FirebaseFirestoreException e) {
                 if (e != null) {
@@ -550,7 +555,7 @@ public class RecipeDetailedFragment extends Fragment implements RecipeInstructio
                         tvComplexity.setText("Complexity: " + recipe.getComplexity());
                     }
                     if (recipe.getDescription() != null) {
-                        String description = recipe.getDescription();
+                        String description = recipe.getDescription().replace("\\n",System.getProperty("line.separator"));
                         tvDescription.setText(description);
                     }
                     if (recipe.getImageUrls_list() != null) {
@@ -604,7 +609,7 @@ public class RecipeDetailedFragment extends Fragment implements RecipeInstructio
                             });
 
                     //Setup nr of likes TextView
-                    recipeRef.document(documentID).collection("UsersWhoFaved").orderBy("mFaveTimestamp", Query.Direction.DESCENDING).limit(1)
+                    recipeLikesListener = recipeRef.document(documentID).collection("UsersWhoFaved").orderBy("mFaveTimestamp", Query.Direction.DESCENDING).limit(1)
                             .addSnapshotListener(new EventListener<QuerySnapshot>() {
                                 @Override
                                 public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
@@ -663,34 +668,6 @@ public class RecipeDetailedFragment extends Fragment implements RecipeInstructio
                                 Intent intent = new Intent(getActivity(), EditRecipeActivity.class);
                                 intent.putExtra("recipe_id", documentID);
                                 startActivity(intent);
-
-
-//                                MaterialAlertDialogBuilder materialAlertDialogBuilder = new MaterialAlertDialogBuilder(getActivity()
-//                                        , R.style.ThemeOverlay_MaterialComponents_MaterialAlertDialog_Centered);
-//                                materialAlertDialogBuilder.setMessage("Are you sure you want to delete your recipe?");
-//                                materialAlertDialogBuilder.setCancelable(true);
-//                                materialAlertDialogBuilder.setPositiveButton(
-//                                        "Yes",
-//                                        new DialogInterface.OnClickListener() {
-//                                            public void onClick(DialogInterface dialog, int id) {
-//                                                recipeRef.document(documentID).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
-//                                                    @Override
-//                                                    public void onSuccess(Void aVoid) {
-//                                                        Toast.makeText(getActivity(), "Successfully deleted", Toast.LENGTH_SHORT).show();
-//                                                        Navigation.findNavController(view).popBackStack();
-//                                                    }
-//                                                });
-//                                                dialog.cancel();
-//                                            }
-//                                        });
-//                                materialAlertDialogBuilder.setNegativeButton(
-//                                        "No",
-//                                        new DialogInterface.OnClickListener() {
-//                                            public void onClick(DialogInterface dialog, int id) {
-//                                                dialog.cancel();
-//                                            }
-//                                        });
-//                                materialAlertDialogBuilder.show();
                             }
                         });
                     }

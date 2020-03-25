@@ -74,8 +74,8 @@ public class recipesDinnerFragment extends Fragment implements RecipeAdapter.OnI
     private CollectionReference recipeRef = db.collection("Recipes");
     private CollectionReference usersReference = db.collection("Users");
     private FirebaseStorage mStorageRef;
-    private ListenerRegistration userDetailsListener, userIngredientsListener, recipesListener, recipesIngredientsListener, privateRecipesListener
-            , privateRecipeIngredientsListener;
+    private ListenerRegistration userDetailsListener, userIngredientsListener, recipesListener, recipeFavListener, privateRecipesListener
+            , privateRecipeIngredientsListener, privateRecipeFavListener, recipesIngredientsListener;
 
     private RecyclerView mRecyclerView;
     private RecipeAdapter mAdapter;
@@ -108,13 +108,13 @@ public class recipesDinnerFragment extends Fragment implements RecipeAdapter.OnI
         mStorageRef = FirebaseStorage.getInstance();
 
         buildRecyclerView();
-        getUserIngredients();
+
         return view; // HAS TO BE THE LAST ONE ---------------------------------
     }
 
 
     private void getUserIngredients() {
-        usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).collection("Ingredients")
+        userIngredientsListener = usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).collection("Ingredients")
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
                     public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
@@ -129,9 +129,15 @@ public class recipesDinnerFragment extends Fragment implements RecipeAdapter.OnI
                                 userIngredientList.add(ingredient);
                             }
                         }
-                        performQuery();
+                        getUserDetails();
                     }
                 });
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        getUserIngredients();
     }
 
     @Override
@@ -154,6 +160,10 @@ public class recipesDinnerFragment extends Fragment implements RecipeAdapter.OnI
             recipesListener.remove();
             recipesListener = null;
         }
+        if (recipeFavListener != null) {
+            recipeFavListener.remove();
+            recipeFavListener = null;
+        }
         if (privateRecipesListener != null) {
             privateRecipesListener.remove();
             privateRecipesListener = null;
@@ -161,6 +171,10 @@ public class recipesDinnerFragment extends Fragment implements RecipeAdapter.OnI
         if (recipesIngredientsListener != null) {
             recipesIngredientsListener.remove();
             recipesIngredientsListener = null;
+        }
+        if (privateRecipeFavListener != null) {
+            privateRecipeFavListener.remove();
+            privateRecipeFavListener = null;
         }
         if (privateRecipeIngredientsListener != null) {
             privateRecipeIngredientsListener.remove();
@@ -193,8 +207,8 @@ public class recipesDinnerFragment extends Fragment implements RecipeAdapter.OnI
     }
 
 
-    private void performQuery() {
-        usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid())
+    private void getUserDetails() {
+        userDetailsListener = usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid())
                 .addSnapshotListener(new EventListener<DocumentSnapshot>() {
                     @Override
                     public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
@@ -204,7 +218,6 @@ public class recipesDinnerFragment extends Fragment implements RecipeAdapter.OnI
                         }
                         mUser = documentSnapshot.toObject(User.class);
                         loggedInUserDocumentId = documentSnapshot.getId();
-
 
 
                         PerformMainQuery();
@@ -218,12 +231,14 @@ public class recipesDinnerFragment extends Fragment implements RecipeAdapter.OnI
     private void PerformMainQuery() {
         Query recipesQuery = null;
         if (mLastQueriedDocument != null) {
-            recipesQuery = recipeRef.whereEqualTo("category", "dinner").whereEqualTo("privacy", "Everyone").orderBy("number_of_likes", Query.Direction.DESCENDING)
+            recipesQuery = recipeRef.whereEqualTo("category", "dinner").whereEqualTo("privacy", "Everyone")
+                    .orderBy("number_of_likes", Query.Direction.DESCENDING)
                     .startAfter(mLastQueriedDocument).limit(10);
         } else {
-            recipesQuery = recipeRef.whereEqualTo("category", "dinner").whereEqualTo("privacy", "Everyone").limit(10).orderBy("number_of_likes", Query.Direction.DESCENDING);
+            recipesQuery = recipeRef.whereEqualTo("category", "dinner").whereEqualTo("privacy", "Everyone")
+                    .limit(10).orderBy("number_of_likes", Query.Direction.DESCENDING);
         }
-        recipesQuery.addSnapshotListener(new EventListener<QuerySnapshot>() {
+        recipesListener = recipesQuery.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@javax.annotation.Nullable QuerySnapshot queryDocumentSnapshots,
                                 @javax.annotation.Nullable FirebaseFirestoreException e) {
@@ -256,7 +271,7 @@ public class recipesDinnerFragment extends Fragment implements RecipeAdapter.OnI
                         Log.d(TAG, "onEvent: " + recipe.getTitle() + " NR OF MISSING INGREDIENTS " + numberOfMissingIngredients);
                         if (numberOfMissingIngredients <= 3) {
                             //Check if the recipe is favorite or not
-                            recipeRef.document(recipe.getDocumentId()).collection("UsersWhoFaved").document(mUser.getUser_id())
+                            recipeFavListener = recipeRef.document(recipe.getDocumentId()).collection("UsersWhoFaved").document(mUser.getUser_id())
                                     .addSnapshotListener(new EventListener<DocumentSnapshot>() {
                                         @Override
                                         public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
@@ -309,14 +324,16 @@ public class recipesDinnerFragment extends Fragment implements RecipeAdapter.OnI
         //Get Recipes where the recipes created by the logged in user are private
         Query privateRecipesQuery = null;
         if (mLastQueriedDocument != null) {
-            privateRecipesQuery = recipeRef.whereEqualTo("category", "dinner").whereEqualTo("creator_docId", loggedInUserDocumentId).orderBy("number_of_likes", Query.Direction.DESCENDING);
+            privateRecipesQuery = recipeRef.whereEqualTo("category", "dinner").whereEqualTo("creator_docId", loggedInUserDocumentId)
+                    .orderBy("number_of_likes", Query.Direction.DESCENDING);
 //                    .startAfter(mLastQueriedDocument); // Necessary so we don't have the same results multiple times
 //                                    .limit(3);
         } else {
-            privateRecipesQuery = recipeRef.whereEqualTo("category", "dinner").whereEqualTo("creator_docId", loggedInUserDocumentId).orderBy("number_of_likes", Query.Direction.DESCENDING);
+            privateRecipesQuery = recipeRef.whereEqualTo("category", "dinner").whereEqualTo("creator_docId", loggedInUserDocumentId)
+                    .orderBy("number_of_likes", Query.Direction.DESCENDING);
 //                                    .limit(3);
         }
-        privateRecipesQuery.addSnapshotListener(new EventListener<QuerySnapshot>() {
+        privateRecipesListener = privateRecipesQuery.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
                 if (queryDocumentSnapshots != null) {
@@ -347,7 +364,7 @@ public class recipesDinnerFragment extends Fragment implements RecipeAdapter.OnI
                         Log.d(TAG, "onEvent: " + recipe.getTitle() + " NR OF MISSING INGREDIENTS " + numberOfMissingIngredients);
                         if (numberOfMissingIngredients <= 3) {
                             //Check if current user liked the post or not
-                            recipeRef.document(recipe.getDocumentId()).collection("UsersWhoFaved").document(mUser.getUser_id())
+                            privateRecipeFavListener = recipeRef.document(recipe.getDocumentId()).collection("UsersWhoFaved").document(mUser.getUser_id())
                                     .addSnapshotListener(new EventListener<DocumentSnapshot>() {
                                         @Override
                                         public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {

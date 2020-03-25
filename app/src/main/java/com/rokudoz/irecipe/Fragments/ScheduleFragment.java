@@ -116,7 +116,7 @@ public class ScheduleFragment extends Fragment implements ScheduledMealAdapter.O
                                             } else {
                                                 Log.d(TAG, "onEvent: ADDING");
                                                 todayScheduleList.add(scheduleEvent);
-                                                scheduledMealAdapter.notifyItemInserted(todayScheduleList.size());
+                                                scheduledMealAdapter.notifyItemInserted(todayScheduleList.size()-1);
                                             }
                                             if (todayScheduleList.size() > 0) {
                                                 if (todayScheduleList.size() == 1) {
