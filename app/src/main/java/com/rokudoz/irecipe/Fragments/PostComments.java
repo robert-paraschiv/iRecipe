@@ -60,7 +60,7 @@ public class PostComments extends Fragment {
 
     private FirebaseAuth.AuthStateListener mAuthListener;
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
-    private ListenerRegistration numberofFavListener, commentListener;
+    private ListenerRegistration numberofFavListener, commentListener, userDetailsListener;
     private DocumentSnapshot mLastQueriedDocument;
 
     private CollectionReference recipeRef = db.collection("Recipes");
@@ -97,7 +97,14 @@ public class PostComments extends Fragment {
             }
         });
 
-        usersRef.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).addSnapshotListener(new EventListener<DocumentSnapshot>() {
+
+        buildRecyclerView();
+
+        return view;
+    }
+
+    private void getUserDetails() {
+        userDetailsListener = usersRef.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).addSnapshotListener(new EventListener<DocumentSnapshot>() {
             @Override
             public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
                 if (e == null && documentSnapshot != null) {
@@ -105,10 +112,13 @@ public class PostComments extends Fragment {
                 }
             }
         });
+    }
 
-        buildRecyclerView();
+    @Override
+    public void onStart() {
+        super.onStart();
+        getUserDetails();
         getCommentsFromDb();
-        return view;
     }
 
     public void onStop() {
@@ -124,6 +134,10 @@ public class PostComments extends Fragment {
         if (commentListener != null) {
             commentListener.remove();
             commentListener = null;
+        }
+        if (userDetailsListener != null) {
+            userDetailsListener.remove();
+            userDetailsListener = null;
         }
     }
 
@@ -202,7 +216,6 @@ public class PostComments extends Fragment {
                                         .get(queryDocumentSnapshots.getDocuments().size() - 1);
                             }
                         }
-                        mAdapter.notifyDataSetChanged();
                     }
                 });
     }

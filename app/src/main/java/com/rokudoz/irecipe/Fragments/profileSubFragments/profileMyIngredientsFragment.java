@@ -99,28 +99,8 @@ public class profileMyIngredientsFragment extends Fragment {
         progressBar = view.findViewById(R.id.profileMyIngredientsFragment_pbLoading);
         userIngredientList = new ArrayList<>();
 
-//        ingredientsRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-//            @Override
-//            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-//                super.onScrolled(recyclerView, dx, dy);
-//
-//                if (dy > 0) {
-//                    // Scroll Down
-//                    if (fab.isShown()) {
-//                        fab.hide();
-//                    }
-//                } else if (dy < 0) {
-//                    // Scroll Up
-//                    if (!fab.isShown()) {
-//                        fab.show();
-//                    }
-//                }
-//            }
-//        });
-
-
         buildRecyclerView();
-        getUserInfo();
+
 
         Log.d(TAG, "onCreateView: ");
         return view;
@@ -133,6 +113,12 @@ public class profileMyIngredientsFragment extends Fragment {
         ingredientsRecyclerView.setLayoutManager(ingredientsLayoutManager);
         new ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(ingredientsRecyclerView);
         ingredientsRecyclerView.setAdapter(ingredientsAdapter);
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        getUserInfo();
     }
 
     @Override

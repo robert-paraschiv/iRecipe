@@ -21,6 +21,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 public class App extends Application {
@@ -58,6 +60,13 @@ public class App extends Application {
                             @Override
                             public void onSuccess(Void aVoid) {
                                 Log.d(TAG, "onSuccess: SET user online FALSE");
+                            }
+                        });
+                        final Date date = Calendar.getInstance().getTime();
+                        userRef.child("last_seen").onDisconnect().setValue(date).addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                Log.d(TAG, "onSuccess: SET last seen " + date);
                             }
                         });
                     }

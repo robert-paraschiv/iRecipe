@@ -113,7 +113,7 @@ public class profileMyRecipesFragment extends Fragment implements RecipeWithAdsA
 
 
         buildRecyclerView();
-        getCurrentUserDetails();
+
         loadNativeAds();
         return view;
     }
@@ -170,6 +170,11 @@ public class profileMyRecipesFragment extends Fragment implements RecipeWithAdsA
         }
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+        getCurrentUserDetails();
+    }
 
     @Override
     public void onStop() {
@@ -207,7 +212,7 @@ public class profileMyRecipesFragment extends Fragment implements RecipeWithAdsA
 
                 if (!recyclerView.canScrollVertically(1)) {
                     performQuery();
-                } else if (!recyclerView.canScrollVertically(0)) {
+                } else if (!recyclerView.canScrollVertically(-1)) {
                     performQuery();
                 }
             }
@@ -244,7 +249,7 @@ public class profileMyRecipesFragment extends Fragment implements RecipeWithAdsA
 
     private void PerformMainQuery(Query recipesQuery) {
 
-        recipesQuery.addSnapshotListener(new EventListener<QuerySnapshot>() {
+        recipesListener = recipesQuery.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
                 if (e != null) {

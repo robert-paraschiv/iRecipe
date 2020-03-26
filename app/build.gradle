@@ -15,7 +15,7 @@ android {
         applicationId "com.rokudoz.irecipe"
         minSdkVersion 25
         targetSdkVersion 29
-        versionCode 24
+        versionCode 25
         versionName "1.4"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         signingConfig signingConfigs.config

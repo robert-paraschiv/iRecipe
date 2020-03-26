@@ -66,8 +66,10 @@ import com.rokudoz.irecipe.R;
 import com.rokudoz.irecipe.Utils.Adapters.MessageAdapter;
 import com.rokudoz.irecipe.Utils.DirectReplyReceiver;
 import com.rokudoz.irecipe.Utils.LinearLayoutManagerWrapper;
+import com.rokudoz.irecipe.Utils.TimeAgo;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -177,6 +179,25 @@ public class MessageFragment extends Fragment {
                         friendOnlineStatus.setText("Online");
                     } else {
                         friendOnlineStatus.setText("Offline");
+                        usersRef.child(friendUserId).child("last_seen").addValueEventListener(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                if (dataSnapshot.getValue() != null) {
+                                    Date date = dataSnapshot.getValue(Date.class);
+                                    TimeAgo timeAgo = new TimeAgo();
+                                    Log.d(TAG, "onDataChange: " + date);
+                                    if (date != null) {
+                                        friendOnlineStatus.setText(timeAgo.getTimeAgo(date.getTime()));
+                                    }
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                            }
+                        });
+
                     }
                     Log.d(TAG, "onDataChange: online= " + online);
                 } else {

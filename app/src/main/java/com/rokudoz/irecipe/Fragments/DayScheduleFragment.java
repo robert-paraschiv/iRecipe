@@ -71,6 +71,12 @@ public class DayScheduleFragment extends Fragment implements ScheduledMealAdapte
 
         buildRecyclerView();
 
+        getUserSchedule();
+        ///
+        return view;
+    }
+
+    private void getUserSchedule() {
         usersRef.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).collection("ScheduleEvents").whereEqualTo("dateString", dateString).get()
                 .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                     @Override
@@ -105,8 +111,6 @@ public class DayScheduleFragment extends Fragment implements ScheduledMealAdapte
                         Log.d(TAG, "onSuccess: " + queryDocumentSnapshots.size());
                     }
                 });
-        ///
-        return view;
     }
 
     private void buildRecyclerView() {

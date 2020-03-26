@@ -126,7 +126,7 @@ public class ProfileFragment extends Fragment {
             BottomNavigationView navBar = getActivity().findViewById(R.id.bottom_navigation);
             navBar.setVisibility(View.VISIBLE);
         }
-        getUserInfo();
+
 
         mSettingsBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -170,6 +170,12 @@ public class ProfileFragment extends Fragment {
         });
 
         return view;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        getUserInfo();
     }
 
     @Override

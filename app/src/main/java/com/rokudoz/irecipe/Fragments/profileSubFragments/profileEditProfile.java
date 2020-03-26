@@ -130,7 +130,6 @@ public class profileEditProfile extends Fragment {
         changeProfilePic_MaterialButton = view.findViewById(R.id.profileFragmentEditProfile_changeProfilePic_MaterialButton);
 
         mUser = new User();
-        getCurrentUserDetails();
 
         changeProfilePic_MaterialButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -151,6 +150,12 @@ public class profileEditProfile extends Fragment {
         });
 
         return view;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        getCurrentUserDetails();
     }
 
     @Override
@@ -198,7 +203,7 @@ public class profileEditProfile extends Fragment {
     }
 
     private void getCurrentUserDetails() {
-        usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).addSnapshotListener(new EventListener<DocumentSnapshot>() {
+        userDetailsListener=usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).addSnapshotListener(new EventListener<DocumentSnapshot>() {
             @Override
             public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
                 if (e == null && documentSnapshot != null) {

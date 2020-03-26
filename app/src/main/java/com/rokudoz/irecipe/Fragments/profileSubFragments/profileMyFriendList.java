@@ -48,7 +48,6 @@ public class profileMyFriendList extends Fragment implements FriendAdapter.OnIte
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private CollectionReference recipeRef = db.collection("Recipes");
     private CollectionReference usersReference = db.collection("Users");
-    private ListenerRegistration currentSubCollectionListener, userDetailsListener, recipesListener;
     private FirebaseStorage mStorageRef;
 
     private ArrayList<Friend> mFriendList = new ArrayList<>();
@@ -103,7 +102,6 @@ public class profileMyFriendList extends Fragment implements FriendAdapter.OnIte
 
     private void performQuery() {
         pbLoading.setVisibility(View.INVISIBLE);
-        initializeRecyclerViewAdapterOnClicks();
 
         List<String> acceptedStatusList = new ArrayList<>();
         acceptedStatusList.add("friends");
@@ -141,20 +139,11 @@ public class profileMyFriendList extends Fragment implements FriendAdapter.OnIte
         mAdapter.setOnItemClickListener(profileMyFriendList.this);
     }
 
-    private void initializeRecyclerViewAdapterOnClicks() {
-        mAdapter.setOnItemClickListener(new FriendAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(int position) {
-                String id = mFriendList.get(position).getFriend_user_id();
-                Log.d(TAG, "onItemClick: CLICKED " + " id " + id);
-
-                Navigation.findNavController(view).navigate(ProfileFragmentDirections.actionProfileFragmentToUserProfileFragment2(id));
-            }
-        });
-    }
-
     @Override
     public void onItemClick(int position) {
+        String id = mFriendList.get(position).getFriend_user_id();
+        Log.d(TAG, "onItemClick: CLICKED " + " id " + id);
 
+        Navigation.findNavController(view).navigate(ProfileFragmentDirections.actionProfileFragmentToUserProfileFragment2(id));
     }
 }

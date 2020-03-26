@@ -58,7 +58,7 @@ import java.util.Locale;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class PostDetailedFragment extends Fragment{
+public class PostDetailedFragment extends Fragment {
     private static final String TAG = "PostDetailedFragment";
 
     private static final int SECOND_MILLIS = 1000;
@@ -84,7 +84,7 @@ public class PostDetailedFragment extends Fragment{
 
     private FirebaseAuth.AuthStateListener mAuthListener;
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
-    private ListenerRegistration numberofFavListener, commentListener;
+    private ListenerRegistration commentListener, postDetailsListener, postLikedListeners, postLikesListener;
     private DocumentSnapshot mLastQueriedDocument;
 
     private CollectionReference recipeRef = db.collection("Recipes");
@@ -149,8 +149,7 @@ public class PostDetailedFragment extends Fragment{
         });
 
         buildRecyclerView();
-        getCommentsFromDb();
-        getPostDetails();
+
 
         ///////////
         return view;
@@ -165,19 +164,34 @@ public class PostDetailedFragment extends Fragment{
     }
 
     @Override
+    public void onStart() {
+        super.onStart();
+        getCommentsFromDb();
+        getPostDetails();
+    }
+
+    @Override
     public void onStop() {
         super.onStop();
         DetachFireStoreListeners();
     }
 
     private void DetachFireStoreListeners() {
-        if (numberofFavListener != null) {
-            numberofFavListener.remove();
-            numberofFavListener = null;
-        }
         if (commentListener != null) {
             commentListener.remove();
             commentListener = null;
+        }
+        if (postDetailsListener != null) {
+            postDetailsListener.remove();
+            postDetailsListener = null;
+        }
+        if (postLikedListeners != null) {
+            postLikedListeners.remove();
+            postLikedListeners = null;
+        }
+        if (postLikesListener != null) {
+            postLikesListener.remove();
+            postLikesListener = null;
         }
     }
 
@@ -185,7 +199,7 @@ public class PostDetailedFragment extends Fragment{
         String commentText = commentEditText.getText().toString();
 
         final Comment comment = new Comment(documentID, FirebaseAuth.getInstance().getCurrentUser().getUid(), mUser.getName()
-                , mUser.getUserProfilePicUrl(), commentText, "Post",null,null);
+                , mUser.getUserProfilePicUrl(), commentText, "Post", null, null);
         DocumentReference currentRecipeRef = postsRef.document(documentID);
         CollectionReference commentRef = currentRecipeRef.collection("Comments");
 
@@ -251,7 +265,7 @@ public class PostDetailedFragment extends Fragment{
     private void getPostDetails() {
         final String currentUserID = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
-        postsRef.document(documentID).addSnapshotListener(new EventListener<DocumentSnapshot>() {
+        postDetailsListener = postsRef.document(documentID).addSnapshotListener(new EventListener<DocumentSnapshot>() {
             @Override
             public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable final FirebaseFirestoreException e) {
                 if (e != null) {
@@ -299,7 +313,7 @@ public class PostDetailedFragment extends Fragment{
                         });
                     }
                     //Check if current user liked the post or not
-                    postsRef.document(post.getDocumentId()).collection("UsersWhoFaved").document(mUser.getUser_id())
+                    postLikedListeners = postsRef.document(post.getDocumentId()).collection("UsersWhoFaved").document(mUser.getUser_id())
                             .addSnapshotListener(new EventListener<DocumentSnapshot>() {
                                 @Override
                                 public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
@@ -324,55 +338,55 @@ public class PostDetailedFragment extends Fragment{
                                 }
                             });
                     //Set nr of likes TextView
-                    postsRef.document(post.getDocumentId()).collection("UsersWhoFaved").orderBy("mFaveTimestamp", Query.Direction.DESCENDING)
+                    postLikesListener = postsRef.document(post.getDocumentId()).collection("UsersWhoFaved").orderBy("mFaveTimestamp", Query.Direction.DESCENDING)
                             .limit(1).addSnapshotListener(new EventListener<QuerySnapshot>() {
-                        @Override
-                        public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
-                            if (e != null) {
-                                Log.w(TAG, "onEvent: ", e);
-                                return;
-                            }
-                            if (queryDocumentSnapshots != null && queryDocumentSnapshots.size() > 0) {
-                                UserWhoFaved userWhoFaved = queryDocumentSnapshots.getDocuments().get(0).toObject(UserWhoFaved.class);
-                                if (userWhoFaved != null) {
-                                    StringBuilder favText = new StringBuilder();
-
-                                    if (post.getNumber_of_likes() == 1) {
-                                        if (userWhoFaved.getUserID().equals(mUser.getUser_id())) {
-                                            favText.append("You like this");
-                                        } else {
-                                            favText.append(userWhoFaved.getUser_name()).append(" likes this");
-                                        }
-                                    } else if (post.getNumber_of_likes() == 2) {
-                                        if (userWhoFaved.getUserID().equals(mUser.getUser_id())) {
-                                            favText.append("You");
-                                        } else {
-                                            favText.append(userWhoFaved.getUser_name());
-                                        }
-                                        favText.append(" and ").append(post.getNumber_of_likes() - 1).append(" other");
-                                    } else if (post.getNumber_of_likes() > 2) {
-                                        if (userWhoFaved.getUserID().equals(mUser.getUser_id())) {
-                                            favText.append("You");
-                                        } else {
-                                            favText.append(userWhoFaved.getUser_name());
-                                        }
-                                        favText.append(" and ").append(post.getNumber_of_likes() - 1).append(" others");
+                                @Override
+                                public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                                    if (e != null) {
+                                        Log.w(TAG, "onEvent: ", e);
+                                        return;
                                     }
-                                    postFavoriteNumber.setText(favText);
-                                    postFavoriteNumber.setOnClickListener(new View.OnClickListener() {
-                                        @Override
-                                        public void onClick(View v) {
-                                            Navigation.findNavController(view).navigate(PostDetailedFragmentDirections
-                                                    .actionPostDetailedToUsersWhoLiked(documentID, "Posts"));
+                                    if (queryDocumentSnapshots != null && queryDocumentSnapshots.size() > 0) {
+                                        UserWhoFaved userWhoFaved = queryDocumentSnapshots.getDocuments().get(0).toObject(UserWhoFaved.class);
+                                        if (userWhoFaved != null) {
+                                            StringBuilder favText = new StringBuilder();
+
+                                            if (post.getNumber_of_likes() == 1) {
+                                                if (userWhoFaved.getUserID().equals(mUser.getUser_id())) {
+                                                    favText.append("You like this");
+                                                } else {
+                                                    favText.append(userWhoFaved.getUser_name()).append(" likes this");
+                                                }
+                                            } else if (post.getNumber_of_likes() == 2) {
+                                                if (userWhoFaved.getUserID().equals(mUser.getUser_id())) {
+                                                    favText.append("You");
+                                                } else {
+                                                    favText.append(userWhoFaved.getUser_name());
+                                                }
+                                                favText.append(" and ").append(post.getNumber_of_likes() - 1).append(" other");
+                                            } else if (post.getNumber_of_likes() > 2) {
+                                                if (userWhoFaved.getUserID().equals(mUser.getUser_id())) {
+                                                    favText.append("You");
+                                                } else {
+                                                    favText.append(userWhoFaved.getUser_name());
+                                                }
+                                                favText.append(" and ").append(post.getNumber_of_likes() - 1).append(" others");
+                                            }
+                                            postFavoriteNumber.setText(favText);
+                                            postFavoriteNumber.setOnClickListener(new View.OnClickListener() {
+                                                @Override
+                                                public void onClick(View v) {
+                                                    Navigation.findNavController(view).navigate(PostDetailedFragmentDirections
+                                                            .actionPostDetailedToUsersWhoLiked(documentID, "Posts"));
+                                                }
+                                            });
                                         }
-                                    });
+                                    } else if (queryDocumentSnapshots != null && queryDocumentSnapshots.size() == 0) {
+                                        postFavoriteNumber.setText("0");
+                                    } else
+                                        Log.d(TAG, "onEvent: NULL");
                                 }
-                            } else if (queryDocumentSnapshots != null && queryDocumentSnapshots.size() == 0) {
-                                postFavoriteNumber.setText("0");
-                            } else
-                                Log.d(TAG, "onEvent: NULL");
-                        }
-                    });
+                            });
 
                     postFavoriteIcon.setOnClickListener(new View.OnClickListener() {
                         @Override

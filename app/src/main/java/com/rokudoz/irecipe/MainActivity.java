@@ -50,6 +50,9 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
+import java.util.Calendar;
+import java.util.Date;
+
 import static com.rokudoz.irecipe.App.SETTINGS_PREFS_NAME;
 import static com.rokudoz.irecipe.Fragments.Messages.MessageFragment.messagingStyle;
 
@@ -106,6 +109,13 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onSuccess(Void aVoid) {
                     Log.d(TAG, "onSuccess: SET user online FALSE");
+                }
+            });
+            final Date date = Calendar.getInstance().getTime();
+            usersRef.child("last_seen").setValue(date).addOnSuccessListener(new OnSuccessListener<Void>() {
+                @Override
+                public void onSuccess(Void aVoid) {
+                    Log.d(TAG, "onSuccess: SET last seen " + date);
                 }
             });
         }
