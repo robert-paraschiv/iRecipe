@@ -1,6 +1,7 @@
 package com.rokudoz.irecipe.Fragments.Messages;
 
 
+import android.app.Activity;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -25,11 +26,13 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.SimpleItemAnimator;
 
+import android.os.Handler;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -79,6 +82,13 @@ import java.util.Objects;
 public class MessageFragment extends Fragment {
     private static final String TAG = "MessageFragment";
     private static int NR_OF_MESSAGES_TO_LIMIT = 20;
+
+    //
+    private final static int INTERVAL = 1000 * 60 * 1; //2 minutes
+    Handler mHandler = new Handler();
+    Date date = new Date();
+    boolean online = false;
+    TimeAgo timeAgo = new TimeAgo();
 
     //Firebase RealTime db
     private FirebaseDatabase database = FirebaseDatabase.getInstance();
@@ -158,6 +168,8 @@ public class MessageFragment extends Fragment {
         backBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (getActivity() != null)
+                    hideSoftKeyboard(getActivity());
                 Navigation.findNavController(view).navigate(MessageFragmentDirections.actionMessageFragmentToAllMessagesFragment());
             }
         });
@@ -169,34 +181,57 @@ public class MessageFragment extends Fragment {
         });
 
 
+        return view;
+    }
+
+    public static void hideSoftKeyboard(Activity activity) {
+        InputMethodManager inputMethodManager =
+                (InputMethodManager) activity.getSystemService(
+                        Activity.INPUT_METHOD_SERVICE);
+        if (activity.getCurrentFocus() != null)
+            inputMethodManager.hideSoftInputFromWindow(
+                    activity.getCurrentFocus().getWindowToken(), 0);
+    }
+
+    Runnable mHandlerTask = new Runnable() {
+        @Override
+        public void run() {
+            if (!online)
+                checkLastSeen();
+            mHandler.postDelayed(mHandlerTask, INTERVAL);
+        }
+    };
+
+    private void checkLastSeen() {
+        Log.d(TAG, "checkLastSeen: " + date);
+        if (date != null) {
+            friendOnlineStatus.setVisibility(View.VISIBLE);
+            friendOnlineStatus.setText(timeAgo.getTimeAgo(date.getTime()));
+        }
+    }
+
+    void startRepeatingTask() {
+        mHandlerTask.run();
+    }
+
+    void stopRepeatingTask() {
+        mHandler.removeCallbacks(mHandlerTask);
+    }
+
+    private void getFriendStatus() {
         //Friend Online Status
         usersRef.child(friendUserId).child("online").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot.getValue(Boolean.class) != null) {
-                    boolean online = dataSnapshot.getValue(Boolean.class);
+                    online = dataSnapshot.getValue(Boolean.class);
                     if (online) {
+                        friendOnlineStatus.setVisibility(View.VISIBLE);
                         friendOnlineStatus.setText("Online");
+                        stopRepeatingTask();
                     } else {
-                        friendOnlineStatus.setText("Offline");
-                        usersRef.child(friendUserId).child("last_seen").addValueEventListener(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                if (dataSnapshot.getValue() != null) {
-                                    Date date = dataSnapshot.getValue(Date.class);
-                                    TimeAgo timeAgo = new TimeAgo();
-                                    Log.d(TAG, "onDataChange: " + date);
-                                    if (date != null) {
-                                        friendOnlineStatus.setText(timeAgo.getTimeAgo(date.getTime()));
-                                    }
-                                }
-                            }
-
-                            @Override
-                            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                            }
-                        });
+//                        friendOnlineStatus.setText("Offline");
+                        startRepeatingTask();
 
                     }
                     Log.d(TAG, "onDataChange: online= " + online);
@@ -210,8 +245,24 @@ public class MessageFragment extends Fragment {
                 Log.w(TAG, "Failed to read value.", databaseError.toException());
             }
         });
+        usersRef.child(friendUserId).child("last_seen").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.getValue(Date.class) != null) {
+                    date = dataSnapshot.getValue(Date.class);
+                    Log.d(TAG, "onDataChange: " + date + "|| " + date.getTime() + "   ||| " + System.currentTimeMillis());
+                    if (date != null && !online) {
+                        friendOnlineStatus.setVisibility(View.VISIBLE);
+                        friendOnlineStatus.setText(timeAgo.getTimeAgo(date.getTime()));
+                    }
+                }
+            }
 
-        return view;
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Log.w(TAG, "Failed to read value.", databaseError.toException());
+            }
+        });
     }
 
     @Override
@@ -221,6 +272,7 @@ public class MessageFragment extends Fragment {
             LocalBroadcastManager.getInstance(getActivity()).registerReceiver((mMessageReceiver),
                     new IntentFilter("MessageNotification")
             );
+        getFriendStatus();
         getFriendDetails();
         getMessages();
     }
@@ -339,6 +391,7 @@ public class MessageFragment extends Fragment {
             }
         });
     }
+
 
     private void buildRecyclerView() {
         Log.d(TAG, "buildRecyclerView: ");

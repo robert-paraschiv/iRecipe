@@ -14,7 +14,7 @@
     <color name="toolbar_color">#fafafa</color>
     <color name="navigationColor">#000000</color>
 
-    <color name="spacer">#000000</color>
+    <color name="spacer">#1b1b1b</color>
 
     <color name="calendar_backgroundColor">#fafafa</color>
     <color name="calendar_currentDayBackgroundColor">#0064b7</color>

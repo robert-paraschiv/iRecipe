@@ -52,6 +52,9 @@
                     tools:text="Friend name" />
 
                 <TextView
+                    android:visibility="invisible"
+                    tools:visibility="visible"
+                    android:layout_marginTop="-3dp"
                     android:id="@+id/fragment_message_onlineStatus"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"

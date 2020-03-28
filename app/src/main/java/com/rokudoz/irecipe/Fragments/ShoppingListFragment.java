@@ -94,8 +94,14 @@ public class ShoppingListFragment extends Fragment {
         mEmptyBasketBtn = view.findViewById(R.id.empty_basket_btn);
         ingredientsCheckBoxLinearLayout = view.findViewById(R.id.ingredients_checkBox_linearLayout);
         addIngredientToListFab = view.findViewById(R.id.fab_add_ingredient_toShoppingList);
-        getUserIngredients();
+
         return view;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        getUserIngredients();
     }
 
     @Override

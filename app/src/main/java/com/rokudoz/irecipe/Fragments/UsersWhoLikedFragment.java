@@ -53,6 +53,7 @@ public class UsersWhoLikedFragment extends Fragment implements UserWhoLikedAdapt
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private CollectionReference recipeRef = db.collection("Recipes");
     private CollectionReference usersReference = db.collection("Users");
+    private ListenerRegistration likesListener;
 
 
     private List<UserWhoFaved> mUsersWhoFavedList = new ArrayList<>();
@@ -84,12 +85,27 @@ public class UsersWhoLikedFragment extends Fragment implements UserWhoLikedAdapt
         category = usersWhoLikedFragmentArgs.getCategory();
 
         buildRecyclerView();
-        getLikes();
+
         return view;
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+        getLikes();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (likesListener != null) {
+            likesListener.remove();
+            likesListener = null;
+        }
+    }
+
     private void getLikes() {
-        db.collection(category).document(documentID).collection("UsersWhoFaved").addSnapshotListener(new EventListener<QuerySnapshot>() {
+        likesListener = db.collection(category).document(documentID).collection("UsersWhoFaved").addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
                 if (e == null && queryDocumentSnapshots != null) {

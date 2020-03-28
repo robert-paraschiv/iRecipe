@@ -17,6 +17,7 @@ import android.widget.TextView;
 
 import com.github.sundeepk.compactcalendarview.CompactCalendarView;
 import com.github.sundeepk.compactcalendarview.domain.Event;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -86,12 +87,12 @@ public class ScheduleFragment extends Fragment implements ScheduledMealAdapter.O
         monthTextView.setText(currentMonthString);
 
         buildRecyclerView();
-
-        usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).collection("ScheduleEvents").addSnapshotListener(new EventListener<QuerySnapshot>() {
+        usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).collection("ScheduleEvents").get()
+                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
             @Override
-            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
-                if (e != null || queryDocumentSnapshots == null) {
-                    Log.e(TAG, "onEvent: ", e);
+            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                if (queryDocumentSnapshots == null) {
+                    Log.e(TAG, "onEvent: ");
                     return;
                 }
                 for (DocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
@@ -159,11 +160,8 @@ public class ScheduleFragment extends Fragment implements ScheduledMealAdapter.O
                         }
                     }
                 }
-
-
             }
         });
-
 
         calendarView.setListener(new CompactCalendarView.CompactCalendarViewListener() {
             @Override
@@ -193,6 +191,7 @@ public class ScheduleFragment extends Fragment implements ScheduledMealAdapter.O
 
     @Override
     public void onItemClick(int position) {
-        Navigation.findNavController(view).navigate(ScheduleFragmentDirections.actionScheduleFragmentToRecipeDetailedFragment(todayScheduleList.get(position).getRecipeID()));
+        Navigation.findNavController(view).navigate(ScheduleFragmentDirections
+                .actionScheduleFragmentToRecipeDetailedFragment(todayScheduleList.get(position).getRecipeID()));
     }
 }
