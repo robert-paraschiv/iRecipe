@@ -2,6 +2,7 @@ package com.rokudoz.irecipe.Utils.Adapters;
 
 import android.content.Context;
 import android.content.res.ColorStateList;
+import android.content.res.Resources;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,7 +23,9 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.WriteBatch;
 import com.rokudoz.irecipe.Models.Message;
 import com.rokudoz.irecipe.R;
+import com.rokudoz.irecipe.Utils.TimeAgo;
 
+import java.sql.Time;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -34,11 +37,6 @@ import java.util.Random;
 
 
 public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageViewHolder> {
-
-    private static final int SECOND_MILLIS = 1000;
-    private static final int MINUTE_MILLIS = 60 * SECOND_MILLIS;
-    private static final int HOUR_MILLIS = 60 * MINUTE_MILLIS;
-    private static final int DAY_MILLIS = 24 * HOUR_MILLIS;
 
     private Context context;
     private List<Message> messageList;
@@ -57,6 +55,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
             tvMessageTimeStamp = itemView.findViewById(R.id.recycler_view_messageItem_MessageTimeStamp);
             materialCardView = itemView.findViewById(R.id.recycler_view_messageItem_layout);
             readStatus = itemView.findViewById(R.id.recycler_view_messageItem_ReadStatus);
+            tvMessageText.setMaxWidth((int) (Resources.getSystem().getDisplayMetrics().widthPixels * 0.7));
         }
 
     }
@@ -86,13 +85,13 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
             if (currentItem.getRead() != null && currentItem.getRead()) {
                 Log.d(TAG, "onBindViewHolder: is read");
                 holder.readStatus.setImageResource(R.drawable.ic_message_read_status);
-                holder.readStatus.setColorFilter(ContextCompat.getColor(context,R.color.colorPrimary));
+                holder.readStatus.setColorFilter(ContextCompat.getColor(context, R.color.colorPrimary));
             } else if (currentItem.getRead() != null && !currentItem.getRead()) {
                 holder.readStatus.setImageResource(R.drawable.ic_pngwave);
-                holder.readStatus.setColorFilter(ContextCompat.getColor(context,R.color.black));
+                holder.readStatus.setColorFilter(ContextCompat.getColor(context, R.color.black));
             } else if (currentItem.getRead() == null) {
                 holder.readStatus.setImageResource(R.drawable.ic_check_black_24dp);
-                holder.readStatus.setColorFilter(ContextCompat.getColor(context,R.color.black));
+                holder.readStatus.setColorFilter(ContextCompat.getColor(context, R.color.black));
             }
 
 
@@ -143,55 +142,26 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
         if (currentItem.getTimestamp() != null) {
             Date date = currentItem.getTimestamp();
             long time = date.getTime();
-            String timeAgo = getTimeAgo(time);
+            TimeAgo timeAgo = new TimeAgo();
+            String timeAgoString = timeAgo.getTimeAgo(time);
             if (currentItem.getTimestamp() != null && !currentItem.getTimestamp().toString().equals("")) {
                 DateFormat smallDateFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
                 String timeString = smallDateFormat.format(date);
-                if (timeAgo != null) {
-                    if (timeAgo.equals("just now") || timeAgo.equals("a minute ago") || timeAgo.contains("hours ago") || timeAgo.equals("an hour ago")) {
-                        holder.tvMessageTimeStamp.setText(getTimeAgo(time));
-                    } else if (timeAgo.equals("yesterday")) {
+                if (timeAgoString != null) {
+                    if (timeAgoString.equals("just now") || timeAgoString.equals("a minute ago") || timeAgoString.contains("hours ago") || timeAgoString.equals("an hour ago")) {
+                        holder.tvMessageTimeStamp.setText(timeAgo.getTimeAgo(time));
+                    } else if (timeAgoString.equals("yesterday")) {
                         holder.tvMessageTimeStamp.setText(String.format("yesterday, %s", timeString));
-                    } else if (timeAgo.contains("minutes ago")) {
-                        holder.tvMessageTimeStamp.setText(getTimeAgo(time));
+                    } else if (timeAgoString.contains("minutes ago")) {
+                        holder.tvMessageTimeStamp.setText(timeAgo.getTimeAgo(time));
                     } else
-                        holder.tvMessageTimeStamp.setText(String.format("%s, %s", timeAgo, timeString));
+                        holder.tvMessageTimeStamp.setText(String.format("%s, %s", timeAgo.getTimeAgo(time), timeString));
                 } else {
                     holder.tvMessageTimeStamp.setText("");
                 }
             }
         } else {
             holder.tvMessageTimeStamp.setText("");
-        }
-    }
-
-    public String getTimeAgo(long time) {
-        if (time < 1000000000000L) {
-            // if timestamp given in seconds, convert to millis
-            time *= 1000;
-        }
-
-        long now = System.currentTimeMillis();
-        if (time > now || time <= 0) {
-            return null;
-        }
-
-        // TODO: localize
-        final long diff = now - time;
-        if (diff < MINUTE_MILLIS) {
-            return "just now";
-        } else if (diff < 2 * MINUTE_MILLIS) {
-            return "a minute ago";
-        } else if (diff < 50 * MINUTE_MILLIS) {
-            return diff / MINUTE_MILLIS + " minutes ago";
-        } else if (diff < 90 * MINUTE_MILLIS) {
-            return "an hour ago";
-        } else if (diff < 24 * HOUR_MILLIS) {
-            return diff / HOUR_MILLIS + " hours ago";
-        } else if (diff < 48 * HOUR_MILLIS) {
-            return "yesterday";
-        } else {
-            return diff / DAY_MILLIS + " days ago";
         }
     }
 

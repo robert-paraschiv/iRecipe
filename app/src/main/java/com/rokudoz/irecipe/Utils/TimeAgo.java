@@ -16,7 +16,7 @@ public class TimeAgo {
             time *= 1000;
         }
 
-        long now = System.currentTimeMillis()+30000;
+        long now = System.currentTimeMillis() + 30000;
         if (time > now || time <= 0) {
             return null;
         }
