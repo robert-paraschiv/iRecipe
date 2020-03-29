@@ -19,6 +19,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.WriteBatch;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.rokudoz.irecipe.Fragments.PostDetailedFragmentDirections;
@@ -98,58 +99,19 @@ public class EditPostActivity extends AppCompatActivity {
                 updatePost.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-//                        String creator_id = FirebaseAuth.getInstance().getCurrentUser().getUid();
-//                        Post post = new Post(post_referencedRecipe,creator_id,postTextEditText.getText().toString(),post_imageUrl
-//                                ,false,privacy_spinner.getSelectedItem().toString(),null);
-//
-//                        postsRef.document(postID).set(post).addOnSuccessListener(new OnSuccessListener<Void>() {
-//                            @Override
-//                            public void onSuccess(Void aVoid) {
-//                                Toast.makeText(EditPostActivity.this, "Successfully updated your post", Toast.LENGTH_SHORT).show();
-//
-//                                Intent intent = new Intent(EditPostActivity.this, MainActivity.class);
-//                                startActivity(intent);
-//                                finish();
-//                            }
-//                        });
-
-                        postsRef.document(postID).update("privacy", privacy_spinner.getSelectedItem().toString()).addOnSuccessListener(new OnSuccessListener<Void>() {
+                        WriteBatch batch = db.batch();
+                        batch.update(postsRef.document(postID), "privacy", privacy_spinner.getSelectedItem().toString());
+                        batch.update(postsRef.document(postID), "referenced_recipe_docId", post_referencedRecipe);
+                        batch.update(postsRef.document(postID), "text", postTextEditText.getText().toString());
+                        batch.commit().addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
                             public void onSuccess(Void aVoid) {
-                                updatedfields++;
-                                if (updatedfields == 3) {
-                                    Toast.makeText(EditPostActivity.this, "Successfully updated your post", Toast.LENGTH_SHORT).show();
-                                    Intent intent = new Intent(EditPostActivity.this, MainActivity.class);
-                                    startActivity(intent);
-                                    finish();
-                                }
+                                Toast.makeText(EditPostActivity.this, "Successfully updated your post", Toast.LENGTH_SHORT).show();
+                                Intent intent = new Intent(EditPostActivity.this, MainActivity.class);
+                                startActivity(intent);
+                                finish();
                             }
                         });
-                        postsRef.document(postID).update("referenced_recipe_docId", post_referencedRecipe).addOnSuccessListener(new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void aVoid) {
-                                updatedfields++;
-                                if (updatedfields == 3) {
-                                    Toast.makeText(EditPostActivity.this, "Successfully updated your post", Toast.LENGTH_SHORT).show();
-                                    Intent intent = new Intent(EditPostActivity.this, MainActivity.class);
-                                    startActivity(intent);
-                                    finish();
-                                }
-                            }
-                        });
-                        postsRef.document(postID).update("text", postTextEditText.getText().toString()).addOnSuccessListener(new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void aVoid) {
-                                updatedfields++;
-                                if (updatedfields == 3) {
-                                    Toast.makeText(EditPostActivity.this, "Successfully updated your post", Toast.LENGTH_SHORT).show();
-                                    Intent intent = new Intent(EditPostActivity.this, MainActivity.class);
-                                    startActivity(intent);
-                                    finish();
-                                }
-                            }
-                        });
-
                     }
                 });
             }

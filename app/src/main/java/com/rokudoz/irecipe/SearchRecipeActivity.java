@@ -233,7 +233,7 @@ public class SearchRecipeActivity extends AppCompatActivity implements SearchRec
 
     private void PerformMainQuery(Query notesQuery) {
 
-        recipesListener = notesQuery.addSnapshotListener(new EventListener<QuerySnapshot>() {
+        recipesListener = notesQuery.addSnapshotListener(SearchRecipeActivity.this, new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@javax.annotation.Nullable QuerySnapshot queryDocumentSnapshots,
                                 @javax.annotation.Nullable FirebaseFirestoreException e) {
@@ -273,7 +273,7 @@ public class SearchRecipeActivity extends AppCompatActivity implements SearchRec
     @Override
     public void onItemClick(int position) {
 
-        if (coming_from.equals("AddPostActivity")){
+        if (coming_from.equals("AddPostActivity")) {
             String id = mRecipeList.get(position).getDocumentId();
             Intent intent = new Intent(SearchRecipeActivity.this, AddPostActivity.class);
             intent.putExtra("post_text", postText);
@@ -281,7 +281,7 @@ public class SearchRecipeActivity extends AppCompatActivity implements SearchRec
             intent.putExtra("post_imageUrl", post_imageUrl);
             startActivity(intent);
             finish();
-        }else if (coming_from.equals("EditPostActivity")){
+        } else if (coming_from.equals("EditPostActivity")) {
             String id = mRecipeList.get(position).getDocumentId();
             Intent intent = new Intent(SearchRecipeActivity.this, EditPostActivity.class);
             intent.putExtra("post_id", postID);

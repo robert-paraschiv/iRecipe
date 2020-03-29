@@ -189,18 +189,19 @@ public class AddRecipesActivity extends AppCompatActivity implements EditRecipeI
     }
 
     private void getCurrentUserDetails() {
-        usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).addSnapshotListener(new EventListener<DocumentSnapshot>() {
-            @Override
-            public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
-                if (e != null) {
-                    Log.e(TAG, "onEvent: ", e);
-                    return;
-                }
-                if (documentSnapshot != null) {
-                    mUser = documentSnapshot.toObject(User.class);
-                }
-            }
-        });
+        usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                .addSnapshotListener(AddRecipesActivity.this, new EventListener<DocumentSnapshot>() {
+                    @Override
+                    public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
+                        if (e != null) {
+                            Log.e(TAG, "onEvent: ", e);
+                            return;
+                        }
+                        if (documentSnapshot != null) {
+                            mUser = documentSnapshot.toObject(User.class);
+                        }
+                    }
+                });
     }
 
     private void openFileChooser(int position) {

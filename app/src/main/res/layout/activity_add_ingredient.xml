@@ -9,9 +9,8 @@
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="40dp"
-        app:title="Add Ingredient"
-        />
+        android:layout_height="@dimen/actionBar_size"
+        app:title="Add Ingredient" />
 
     <com.google.android.material.textfield.TextInputEditText
         android:id="@+id/textinput_ingredientName"

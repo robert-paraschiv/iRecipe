@@ -137,18 +137,19 @@ public class AddPostActivity extends AppCompatActivity {
             }
         });
 
-        usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).addSnapshotListener(new EventListener<DocumentSnapshot>() {
-            @Override
-            public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
-                if (e != null) {
-                    Log.w(TAG, "onEvent: ", e);
-                    return;
-                }
-                if (documentSnapshot != null) {
-                    mUser = documentSnapshot.toObject(User.class);
-                }
-            }
-        });
+        usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                .addSnapshotListener(AddPostActivity.this, new EventListener<DocumentSnapshot>() {
+                    @Override
+                    public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
+                        if (e != null) {
+                            Log.w(TAG, "onEvent: ", e);
+                            return;
+                        }
+                        if (documentSnapshot != null) {
+                            mUser = documentSnapshot.toObject(User.class);
+                        }
+                    }
+                });
     }
 
 

@@ -110,7 +110,7 @@ public class SearchUserActivity extends AppCompatActivity implements SearchUserA
             mAdapter.notifyDataSetChanged();
         } else {
             Query query = usersReference.orderBy("name").startAfter(filter).endAt(filter + "\uf8ff");
-            query.addSnapshotListener(new EventListener<QuerySnapshot>() {
+            query.addSnapshotListener(SearchUserActivity.this, new EventListener<QuerySnapshot>() {
                 @Override
                 public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
                     if (e == null && queryDocumentSnapshots != null && queryDocumentSnapshots.size() > 0) {
@@ -129,7 +129,7 @@ public class SearchUserActivity extends AppCompatActivity implements SearchUserA
 
     }
 
-    private void setupSearchView(){
+    private void setupSearchView() {
         SearchView searchView = findViewById(R.id.searchUser_SearchView);
         searchView.setIconified(false);
         searchView.requestFocus();

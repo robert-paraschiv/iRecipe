@@ -50,7 +50,7 @@ public class AddIngredientActivity extends AppCompatActivity {
 
         textInputEditText = findViewById(R.id.textinput_ingredientName);
         MaterialButton addIngredientBtn = findViewById(R.id.materialBtn_addIngredientToDb);
-        ingredientsReference.document("ingredient_categories").addSnapshotListener(new EventListener<DocumentSnapshot>() {
+        ingredientsReference.document("ingredient_categories").addSnapshotListener(AddIngredientActivity.this, new EventListener<DocumentSnapshot>() {
             @Override
             public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
                 if (e == null && documentSnapshot != null) {
@@ -79,12 +79,12 @@ public class AddIngredientActivity extends AppCompatActivity {
 
                                 ingredientsReference.document("ingredient_list").update("ingredient_list", ingredient_list)
                                         .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                    @Override
-                                    public void onSuccess(Void aVoid) {
-                                        Log.d(TAG, "onSuccess: updated ingredient_List");
+                                            @Override
+                                            public void onSuccess(Void aVoid) {
+                                                Log.d(TAG, "onSuccess: updated ingredient_List");
 
-                                    }
-                                });
+                                            }
+                                        });
                                 ingredientsReference.get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                                     @Override
                                     public void onSuccess(QuerySnapshot queryDocumentSnapshots) {

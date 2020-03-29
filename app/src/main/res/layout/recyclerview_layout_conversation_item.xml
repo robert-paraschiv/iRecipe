@@ -28,6 +28,7 @@
             tools:src="@color/black" />
 
         <TextView
+            android:textColor="@color/calendar_textColor"
             android:id="@+id/recycler_view_conversationItem_friendName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

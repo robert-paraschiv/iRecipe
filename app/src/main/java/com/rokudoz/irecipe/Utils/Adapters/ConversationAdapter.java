@@ -159,25 +159,30 @@ public class ConversationAdapter extends RecyclerView.Adapter<ConversationAdapte
             holder.tvMessage.setText(currentItem.getText());
         }
         if (currentItem.getRead() != null && currentItem.getType() != null) {
-            if (currentItem.getType().equals("message_received") && !currentItem.getRead()) {
+            if (currentItem.getType().equals("message_received") && !currentItem.getRead()) { // last message is received and not read
                 holder.seenCheck.setVisibility(View.GONE);
                 holder.tvMessage.setTextColor(ContextCompat.getColor(context, R.color.colorPrimary));
-            } else if (currentItem.getType().equals("message_received") && currentItem.getRead()) {
+                holder.tvTimeStamp.setTextColor(ContextCompat.getColor(context, R.color.colorPrimary));
+                holder.tvName.setTextColor(ContextCompat.getColor(context, R.color.colorPrimary));
+            } else if (currentItem.getType().equals("message_received") && currentItem.getRead()) { // last message is received and read
                 holder.seenCheck.setVisibility(View.GONE);
-                TextView textView = new TextView(holder.tvMessage.getContext());
-                holder.tvMessage.setTextColor(textView.getCurrentTextColor());
-            } else if (currentItem.getType().equals("message_sent") && !currentItem.getRead()) {
+                holder.tvMessage.setTextColor(ContextCompat.getColor(context, R.color.calendar_textColor));
+                holder.tvTimeStamp.setTextColor(ContextCompat.getColor(context, R.color.calendar_textColor));
+                holder.tvName.setTextColor(ContextCompat.getColor(context, R.color.calendar_textColor));
+            } else if (currentItem.getType().equals("message_sent") && !currentItem.getRead()) { // last message is sent and not read
                 holder.seenCheck.setVisibility(View.VISIBLE);
                 holder.seenCheck.setImageResource(R.drawable.ic_message_read_status);
                 holder.seenCheck.setColorFilter(ContextCompat.getColor(context, R.color.grey));
-                TextView textView = new TextView(holder.tvMessage.getContext());
-                holder.tvMessage.setTextColor(textView.getCurrentTextColor());
-            } else if (currentItem.getType().equals("message_sent") && currentItem.getRead()) {
+                holder.tvMessage.setTextColor(ContextCompat.getColor(context, R.color.calendar_textColor));
+                holder.tvTimeStamp.setTextColor(ContextCompat.getColor(context, R.color.calendar_textColor));
+                holder.tvName.setTextColor(ContextCompat.getColor(context, R.color.calendar_textColor));
+            } else if (currentItem.getType().equals("message_sent") && currentItem.getRead()) { // last message is sent and read
                 holder.seenCheck.setVisibility(View.VISIBLE);
                 holder.seenCheck.setImageResource(R.drawable.ic_message_read_status);
                 holder.seenCheck.setColorFilter(ContextCompat.getColor(context, R.color.colorPrimary));
-                TextView textView = new TextView(holder.tvMessage.getContext());
-                holder.tvMessage.setTextColor(textView.getCurrentTextColor());
+                holder.tvMessage.setTextColor(ContextCompat.getColor(context, R.color.calendar_textColor));
+                holder.tvTimeStamp.setTextColor(ContextCompat.getColor(context, R.color.calendar_textColor));
+                holder.tvName.setTextColor(ContextCompat.getColor(context, R.color.calendar_textColor));
             }
         }
     }
