@@ -10,7 +10,6 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.webkit.MimeTypeMap;
@@ -34,16 +33,12 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.StorageTask;
 import com.google.firebase.storage.UploadTask;
-import com.rokudoz.irecipe.Models.Ingredient;
 import com.rokudoz.irecipe.Models.Post;
-import com.rokudoz.irecipe.Models.Recipe;
 import com.rokudoz.irecipe.Models.User;
 import com.rokudoz.irecipe.Utils.RotateBitmap;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 public class AddPostActivity extends AppCompatActivity {
     private static final String TAG = "AddPostActivity";
@@ -104,7 +99,7 @@ public class AddPostActivity extends AppCompatActivity {
         searchRecipeBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(AddPostActivity.this, SearchRecipeActivity.class);
+                Intent intent = new Intent(AddPostActivity.this, SelectRecipeActivity.class);
                 intent.putExtra("coming_from", "AddPostActivity");
                 intent.putExtra("post_text", descriptionInputText.getText().toString());
                 intent.putExtra("post_imageUrl", postPicUrl);

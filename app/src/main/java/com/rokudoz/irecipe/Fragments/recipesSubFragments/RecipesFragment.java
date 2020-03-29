@@ -18,6 +18,7 @@ import com.google.android.material.tabs.TabLayout;
 import com.rokudoz.irecipe.AddIngredientActivity;
 import com.rokudoz.irecipe.AddRecipesActivity;
 import com.rokudoz.irecipe.R;
+import com.rokudoz.irecipe.SearchRecipeActivity;
 import com.rokudoz.irecipe.Utils.Adapters.SectionsPagerAdapter;
 
 public class RecipesFragment extends Fragment {
@@ -49,7 +50,7 @@ public class RecipesFragment extends Fragment {
         searchRecipeBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getActivity(), SearchWithFilters.class);
+                Intent intent = new Intent(getActivity(), SearchRecipeActivity.class);
                 startActivity(intent);
             }
         });

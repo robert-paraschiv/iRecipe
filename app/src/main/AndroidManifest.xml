@@ -13,7 +13,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".Fragments.recipesSubFragments.SearchWithFilters"></activity>
+        <activity android:name=".SearchRecipeActivity"></activity>
         <activity android:name=".EditRecipeActivity" />
         <activity
             android:name=".SearchUserActivity"
@@ -22,7 +22,7 @@
             android:name=".EditPostActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".SearchRecipeActivity"
+            android:name=".SelectRecipeActivity"
             android:screenOrientation="portrait" />
         <activity
             android:name=".AddPostActivity"

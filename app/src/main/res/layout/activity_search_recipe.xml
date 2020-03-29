@@ -7,16 +7,39 @@
     tools:context=".SearchRecipeActivity">
 
     <com.google.android.material.appbar.MaterialToolbar
-        android:id="@+id/my_toolbar"
+        android:id="@+id/searchRecipeActivity_my_toolbar"
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize" />
+        android:layout_height="?attr/actionBarSize">
+
+        <SearchView
+            android:id="@+id/searchUser_SearchView"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:closeIcon="@drawable/ic_close"
+            android:inputType="textCapWords"
+            android:searchHintIcon="@drawable/ic_search_black_24dp"
+            android:searchIcon="@drawable/ic_search_black_24dp" />
+    </com.google.android.material.appbar.MaterialToolbar>
+
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/searchActivity_recycler_view"
+        android:id="@+id/searchRecipeActivity_recycler_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/my_toolbar"
+        android:layout_below="@id/searchRecipeActivity_my_toolbar"
         android:padding="4dp"
         android:scrollbars="vertical" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/searchRecipeFilter_filterFab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_margin="16dp"
+        android:src="@drawable/ic_baseline_filter_list_24"
+        app:backgroundTint="@color/colorPrimary"
+        app:elevation="4dp"
+        app:fabCustomSize="50dp" />
 
 </RelativeLayout>

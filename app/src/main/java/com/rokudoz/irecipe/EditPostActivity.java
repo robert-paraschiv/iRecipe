@@ -1,7 +1,6 @@
 package com.rokudoz.irecipe;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.navigation.Navigation;
 
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -16,14 +15,9 @@ import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.WriteBatch;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
-import com.rokudoz.irecipe.Fragments.PostDetailedFragmentDirections;
-import com.rokudoz.irecipe.Models.Post;
 
 public class EditPostActivity extends AppCompatActivity {
 
@@ -139,7 +133,7 @@ public class EditPostActivity extends AppCompatActivity {
                 changeRecipe.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Intent intent = new Intent(EditPostActivity.this, SearchRecipeActivity.class);
+                        Intent intent = new Intent(EditPostActivity.this, SelectRecipeActivity.class);
                         intent.putExtra("coming_from", "EditPostActivity");
                         intent.putExtra("post_id", postID);
                         intent.putExtra("post_imageUrl", post_imageUrl);
