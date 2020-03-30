@@ -42,7 +42,6 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.WriteBatch;
 import com.rokudoz.irecipe.Models.Conversation;
-import com.rokudoz.irecipe.Models.User;
 import com.rokudoz.irecipe.R;
 import com.rokudoz.irecipe.Utils.Adapters.ConversationAdapter;
 import com.rokudoz.irecipe.Utils.ConversationViewDialog;

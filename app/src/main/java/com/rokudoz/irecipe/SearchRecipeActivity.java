@@ -2,11 +2,13 @@ package com.rokudoz.irecipe;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -14,6 +16,7 @@ import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.SearchView;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -23,22 +26,28 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.rokudoz.irecipe.Models.Friend;
 import com.rokudoz.irecipe.Models.Recipe;
+import com.rokudoz.irecipe.Utils.Adapters.SearchFilterDialog;
 import com.rokudoz.irecipe.Utils.Adapters.SearchRecipeAdapter;
+import com.rokudoz.irecipe.Utils.ConversationViewDialog;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
-public class SearchRecipeActivity extends AppCompatActivity implements SearchRecipeAdapter.OnItemClickListener {
+import static com.rokudoz.irecipe.App.SETTINGS_PREFS_NAME;
+
+public class SearchRecipeActivity extends AppCompatActivity implements SearchRecipeAdapter.OnItemClickListener, SearchFilterDialog.SearchFilterDialogListener {
     private static final String TAG = "SearchRecipeActivity";
+
+    public static final String FILTER_PREFS_NAME = "FilterPrefs";
+
 
     //FireBase
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private CollectionReference recipeRef = db.collection("Recipes");
     private CollectionReference usersReference = db.collection("Users");
 
-    private List<String> friends_userID_list = new ArrayList<>();
-    private List<Friend> friendList = new ArrayList<>();
-
+    FloatingActionButton filterFab;
     private List<Recipe> recipeList = new ArrayList<>();
 
     private RecyclerView mRecyclerView;
@@ -50,9 +59,19 @@ public class SearchRecipeActivity extends AppCompatActivity implements SearchRec
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search_recipe);
 
+        filterFab = findViewById(R.id.searchRecipeFilter_filterFab);
+        filterFab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                SearchFilterDialog searchFilterDialog = new SearchFilterDialog();
+                searchFilterDialog.show(getSupportFragmentManager(), "Filter dialog");
+
+            }
+        });
         setupSearchView();
         buildRecyclerView();
     }
+
 
     private void buildRecyclerView() {
         mRecyclerView = findViewById(R.id.searchRecipeActivity_recycler_view);
@@ -108,7 +127,53 @@ public class SearchRecipeActivity extends AppCompatActivity implements SearchRec
             recipeList.clear();
             mAdapter.notifyDataSetChanged();
         } else {
-            Query query = recipeRef.orderBy("title").startAfter(filter).endAt(filter + "\uf8ff");
+            SharedPreferences sharedPreferences = getSharedPreferences(FILTER_PREFS_NAME, MODE_PRIVATE);
+            Boolean breakfast = sharedPreferences.getBoolean("Breakfast", false);
+            Boolean lunch = sharedPreferences.getBoolean("Lunch", false);
+            Boolean dinner = sharedPreferences.getBoolean("Dinner", false);
+            Boolean fixIngredients = sharedPreferences.getBoolean("FixIngredients", false);
+
+            Query query = null;
+
+            if (breakfast && lunch && dinner) {
+                List<String> categories = new ArrayList<>();
+                categories.add("breakfast");
+                categories.add("lunch");
+                categories.add("dinner");
+                query = recipeRef.orderBy("title").startAfter(filter).endAt(filter + "\uf8ff").whereIn("category", categories);
+
+            } else if (!breakfast && lunch && dinner) {
+                List<String> categories = new ArrayList<>();
+                categories.add("lunch");
+                categories.add("dinner");
+                query = recipeRef.orderBy("title").startAfter(filter).endAt(filter + "\uf8ff").whereIn("category", categories);
+
+            } else if (breakfast && lunch && !dinner) {
+                List<String> categories = new ArrayList<>();
+                categories.add("breakfast");
+                categories.add("lunch");
+                query = recipeRef.orderBy("title").startAfter(filter).endAt(filter + "\uf8ff").whereIn("category", categories);
+
+            } else if (breakfast && !lunch && dinner) {
+                List<String> categories = new ArrayList<>();
+                categories.add("breakfast");
+                categories.add("dinner");
+                query = recipeRef.orderBy("title").startAfter(filter).endAt(filter + "\uf8ff").whereIn("category", categories);
+
+            } else if (breakfast && !lunch && !dinner) {
+                query = recipeRef.orderBy("title").startAfter(filter).endAt(filter + "\uf8ff")
+                        .whereEqualTo("category", "breakfast");
+            } else if (!breakfast && lunch && !dinner) {
+                query = recipeRef.orderBy("title").startAfter(filter).endAt(filter + "\uf8ff")
+                        .whereEqualTo("category", "lunch");
+            } else if (!breakfast && !lunch && dinner) {
+                query = recipeRef.orderBy("title").startAfter(filter).endAt(filter + "\uf8ff")
+                        .whereEqualTo("category", "dinner");
+            } else if (!breakfast && !lunch && !dinner) {
+                query = recipeRef.orderBy("title").startAfter(filter).endAt(filter + "\uf8ff");
+            }
+
+
             query.addSnapshotListener(new EventListener<QuerySnapshot>() {
                 @Override
                 public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
@@ -143,5 +208,18 @@ public class SearchRecipeActivity extends AppCompatActivity implements SearchRec
     @Override
     public void onFavoriteClick(int position) {
 
+    }
+
+    @Override
+    public void applyFilter(Boolean breakfast, Boolean lunch, Boolean dinner, Boolean fixIngredients) {
+        Log.d(TAG, "applyFilter: " + breakfast + " " + lunch + " " + dinner + " " + fixIngredients);
+
+        final SharedPreferences.Editor sharedPrefsEditor = this.getSharedPreferences(FILTER_PREFS_NAME, MODE_PRIVATE).edit();
+
+        sharedPrefsEditor.putBoolean("Breakfast", breakfast);
+        sharedPrefsEditor.putBoolean("Lunch", lunch);
+        sharedPrefsEditor.putBoolean("Dinner", dinner);
+        sharedPrefsEditor.putBoolean("FixIngredients", fixIngredients);
+        sharedPrefsEditor.apply();
     }
 }
