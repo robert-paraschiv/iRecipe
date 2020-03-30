@@ -36,7 +36,7 @@ import java.util.Objects;
 
 import static com.rokudoz.irecipe.App.SETTINGS_PREFS_NAME;
 
-public class SearchRecipeActivity extends AppCompatActivity implements SearchRecipeAdapter.OnItemClickListener, SearchFilterDialog.SearchFilterDialogListener {
+public class SearchRecipeActivity extends AppCompatActivity implements SearchRecipeAdapter.OnItemClickListener {
     private static final String TAG = "SearchRecipeActivity";
 
     public static final String FILTER_PREFS_NAME = "FilterPrefs";
@@ -64,7 +64,7 @@ public class SearchRecipeActivity extends AppCompatActivity implements SearchRec
             @Override
             public void onClick(View v) {
                 SearchFilterDialog searchFilterDialog = new SearchFilterDialog();
-                searchFilterDialog.show(getSupportFragmentManager(), "Filter dialog");
+                searchFilterDialog.showDialog(SearchRecipeActivity.this);
 
             }
         });
@@ -127,6 +127,7 @@ public class SearchRecipeActivity extends AppCompatActivity implements SearchRec
             recipeList.clear();
             mAdapter.notifyDataSetChanged();
         } else {
+
             SharedPreferences sharedPreferences = getSharedPreferences(FILTER_PREFS_NAME, MODE_PRIVATE);
             Boolean breakfast = sharedPreferences.getBoolean("Breakfast", false);
             Boolean lunch = sharedPreferences.getBoolean("Lunch", false);
@@ -172,6 +173,7 @@ public class SearchRecipeActivity extends AppCompatActivity implements SearchRec
             } else if (!breakfast && !lunch && !dinner) {
                 query = recipeRef.orderBy("title").startAfter(filter).endAt(filter + "\uf8ff");
             }
+            Log.d(TAG, "applyFilter: " + breakfast + " " + lunch + " " + dinner + " " + fixIngredients);
 
 
             query.addSnapshotListener(new EventListener<QuerySnapshot>() {
@@ -208,18 +210,5 @@ public class SearchRecipeActivity extends AppCompatActivity implements SearchRec
     @Override
     public void onFavoriteClick(int position) {
 
-    }
-
-    @Override
-    public void applyFilter(Boolean breakfast, Boolean lunch, Boolean dinner, Boolean fixIngredients) {
-        Log.d(TAG, "applyFilter: " + breakfast + " " + lunch + " " + dinner + " " + fixIngredients);
-
-        final SharedPreferences.Editor sharedPrefsEditor = this.getSharedPreferences(FILTER_PREFS_NAME, MODE_PRIVATE).edit();
-
-        sharedPrefsEditor.putBoolean("Breakfast", breakfast);
-        sharedPrefsEditor.putBoolean("Lunch", lunch);
-        sharedPrefsEditor.putBoolean("Dinner", dinner);
-        sharedPrefsEditor.putBoolean("FixIngredients", fixIngredients);
-        sharedPrefsEditor.apply();
     }
 }

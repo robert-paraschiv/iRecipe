@@ -22,13 +22,13 @@ public class ConversationViewDialog {
         dialog.setCancelable(true);
         dialog.setContentView(R.layout.dialog_conversation);
 
-        TextView text = (TextView) dialog.findViewById(R.id.conversationDialog_user_name);
+        TextView text = dialog.findViewById(R.id.conversationDialog_user_name);
         text.setText(userName);
 
-        ImageView imageView = (ImageView) dialog.findViewById(R.id.conversationDialog_user_picture);
+        ImageView imageView = dialog.findViewById(R.id.conversationDialog_user_picture);
         imageView.setImageBitmap(userPictureBitmap);
 
-        Button dialogButton = (Button) dialog.findViewById(R.id.conversationDialog_viewProfileBtn);
+        Button dialogButton = dialog.findViewById(R.id.conversationDialog_viewProfileBtn);
         dialogButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
