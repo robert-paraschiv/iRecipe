@@ -62,7 +62,7 @@
                     android:layout_below="@id/message_friendName_TextView"
                     android:layout_marginStart="8dp"
                     android:layout_toEndOf="@id/message_friendImage_ImageView"
-                    android:textSize="13sp"
+                    android:textSize="12sp"
                     tools:text="Online" />
             </RelativeLayout>
         </RelativeLayout>

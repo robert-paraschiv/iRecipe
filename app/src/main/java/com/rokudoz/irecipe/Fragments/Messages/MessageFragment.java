@@ -27,7 +27,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.SimpleItemAnimator;
 
 import android.os.Handler;
-import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -69,7 +68,7 @@ import com.rokudoz.irecipe.R;
 import com.rokudoz.irecipe.Utils.Adapters.MessageAdapter;
 import com.rokudoz.irecipe.Utils.DirectReplyReceiver;
 import com.rokudoz.irecipe.Utils.LinearLayoutManagerWrapper;
-import com.rokudoz.irecipe.Utils.TimeAgo;
+import com.rokudoz.irecipe.Utils.LastSeen;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -88,7 +87,7 @@ public class MessageFragment extends Fragment {
     Handler mHandler = new Handler();
     Date date = new Date();
     boolean online = false;
-    TimeAgo timeAgo = new TimeAgo();
+    LastSeen lastSeen = new LastSeen();
 
     //Firebase RealTime db
     private FirebaseDatabase database = FirebaseDatabase.getInstance();
@@ -206,7 +205,7 @@ public class MessageFragment extends Fragment {
         Log.d(TAG, "checkLastSeen: " + date);
         if (date != null) {
             friendOnlineStatus.setVisibility(View.VISIBLE);
-            friendOnlineStatus.setText(timeAgo.getTimeAgo(date.getTime()));
+            friendOnlineStatus.setText(lastSeen.getLastSeen(date.getTime()));
         }
     }
 
@@ -253,7 +252,7 @@ public class MessageFragment extends Fragment {
                     Log.d(TAG, "onDataChange: " + date + "|| " + date.getTime() + "   ||| " + System.currentTimeMillis());
                     if (date != null && !online) {
                         friendOnlineStatus.setVisibility(View.VISIBLE);
-                        friendOnlineStatus.setText(timeAgo.getTimeAgo(date.getTime()));
+                        friendOnlineStatus.setText(lastSeen.getLastSeen(date.getTime()));
                     }
                 }
             }
