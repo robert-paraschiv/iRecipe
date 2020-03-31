@@ -1,7 +1,11 @@
 package com.rokudoz.irecipe.Utils;
 
+import android.text.format.DateUtils;
+
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.Locale;
 
@@ -24,18 +28,19 @@ public class LastSeen {
         if (time > now || time <= 0) {
             return null;
         }
-        Date date = new Date(time);
-        DateFormat dateFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
+        Date timeStampDate = new Date(time);
+        DateFormat hourFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
         DateFormat dayFormat = new SimpleDateFormat("E", Locale.getDefault());
+
 
         // TODO: localize
         final long diff = now - time;
-        if (diff < 24 * HOUR_MILLIS) {
-            return "last seen today at " + dateFormat.format(date);
+        if (diff < 24 * HOUR_MILLIS && dayFormat.format(now).equals(dayFormat.format(timeStampDate))) {
+            return "last seen today at " + hourFormat.format(timeStampDate);
         } else if (diff < 48 * HOUR_MILLIS) {
-            return "last seen yesterday at " + dateFormat.format(date);
+            return "last seen yesterday at " + hourFormat.format(timeStampDate);
         } else if (diff < 7 * DAY_MILLIS) {
-            return "last seen " + dayFormat.format(time) + " at " + dateFormat.format(time);
+            return "last seen " + dayFormat.format(timeStampDate) + " at " + hourFormat.format(timeStampDate);
         } else
             return "last seen " + diff / DAY_MILLIS + " days ago";
     }

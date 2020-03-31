@@ -85,7 +85,7 @@ public class MessageFragment extends Fragment {
     //
     private final static int INTERVAL = 1000 * 60 * 1; //2 minutes
     Handler mHandler = new Handler();
-    Date date = new Date();
+    long date = 0L;
     boolean online = false;
     LastSeen lastSeen = new LastSeen();
 
@@ -203,9 +203,9 @@ public class MessageFragment extends Fragment {
 
     private void checkLastSeen() {
         Log.d(TAG, "checkLastSeen: " + date);
-        if (date != null) {
+        if (date != 0) {
             friendOnlineStatus.setVisibility(View.VISIBLE);
-            friendOnlineStatus.setText(lastSeen.getLastSeen(date.getTime()));
+            friendOnlineStatus.setText(lastSeen.getLastSeen(date));
         }
     }
 
@@ -247,12 +247,12 @@ public class MessageFragment extends Fragment {
         usersRef.child(friendUserId).child("last_seen").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if (dataSnapshot.getValue(Date.class) != null) {
-                    date = dataSnapshot.getValue(Date.class);
-                    Log.d(TAG, "onDataChange: " + date + "|| " + date.getTime() + "   ||| " + System.currentTimeMillis());
-                    if (date != null && !online) {
+                if (dataSnapshot != null && dataSnapshot.getValue(Long.class) != null) {
+                    date = dataSnapshot.getValue(Long.class);
+                    Log.d(TAG, "onDataChange: " + date + "|| " + date + "   ||| " + System.currentTimeMillis());
+                    if (date != 0 && !online) {
                         friendOnlineStatus.setVisibility(View.VISIBLE);
-                        friendOnlineStatus.setText(lastSeen.getLastSeen(date.getTime()));
+                        friendOnlineStatus.setText(lastSeen.getLastSeen(date));
                     }
                 }
             }

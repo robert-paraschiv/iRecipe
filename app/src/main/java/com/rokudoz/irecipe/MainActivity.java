@@ -12,12 +12,14 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ServerValue;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.rokudoz.irecipe.Fragments.FeedFragmentDirections;
 import com.rokudoz.irecipe.Fragments.Messages.MessageFragment;
 import com.rokudoz.irecipe.Models.User;
+import com.rokudoz.irecipe.Models.UserLastSeen;
 import com.rokudoz.irecipe.Utils.DirectReplyReceiver;
 
 import androidx.annotation.NonNull;
@@ -90,7 +92,8 @@ public class MainActivity extends AppCompatActivity {
         );
         if (FirebaseAuth.getInstance().getCurrentUser() != null) {
             usersRef = database.getReference("Users").child(FirebaseAuth.getInstance().getCurrentUser().getUid());
-            usersRef.child("online").setValue(true).addOnSuccessListener(new OnSuccessListener<Void>() {
+            UserLastSeen userLastSeen = new UserLastSeen(true, ServerValue.TIMESTAMP);
+            usersRef.setValue(userLastSeen).addOnSuccessListener(new OnSuccessListener<Void>() {
                 @Override
                 public void onSuccess(Void aVoid) {
                     Log.d(TAG, "onSuccess: SET user online TRUE");
@@ -105,17 +108,11 @@ public class MainActivity extends AppCompatActivity {
         LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReceiver);
         if (FirebaseAuth.getInstance().getCurrentUser() != null) {
             usersRef = database.getReference("Users").child(FirebaseAuth.getInstance().getCurrentUser().getUid());
-            usersRef.child("online").setValue(false).addOnSuccessListener(new OnSuccessListener<Void>() {
+            UserLastSeen userLastSeen = new UserLastSeen(false, ServerValue.TIMESTAMP);
+            usersRef.setValue(userLastSeen).addOnSuccessListener(new OnSuccessListener<Void>() {
                 @Override
                 public void onSuccess(Void aVoid) {
                     Log.d(TAG, "onSuccess: SET user online FALSE");
-                }
-            });
-            final Date date = Calendar.getInstance().getTime();
-            usersRef.child("last_seen").setValue(date).addOnSuccessListener(new OnSuccessListener<Void>() {
-                @Override
-                public void onSuccess(Void aVoid) {
-                    Log.d(TAG, "onSuccess: SET last seen " + date);
                 }
             });
         }
