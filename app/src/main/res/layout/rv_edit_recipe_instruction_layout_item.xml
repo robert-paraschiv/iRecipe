@@ -20,7 +20,8 @@
             android:layout_height="wrap_content"
             android:hint="Step text"
             android:importantForAutofill="no"
-            android:inputType="textCapSentences" />
+            android:imeOptions="flagNoExtractUi"
+            android:inputType="textMultiLine" />
 
         <ImageView
             android:id="@+id/rv_edit_recipe_instruction_imageView"

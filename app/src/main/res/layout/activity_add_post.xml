@@ -62,7 +62,8 @@
                     android:id="@+id/addPost_description_editText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="textCapSentences" />
+                    android:inputType="textMultiLine"
+                    android:imeOptions="flagNoExtractUi"/>
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.button.MaterialButton
