@@ -61,7 +61,7 @@
             android:layout_below="@id/recycler_view_postItem_recipeName"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="6dp"
-            app:cardCornerRadius="18dp">
+            app:cardCornerRadius="12dp">
 
             <ImageView
                 android:id="@+id/postItem_image"

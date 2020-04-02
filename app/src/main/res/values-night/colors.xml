@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#0091ea</color>
-    <color name="colorPrimaryDark">#0064b7</color>
+    <color name="colorPrimary">#00b0ff</color>
+    <color name="colorPrimaryDark">#0081cb</color>
     <color name="colorPrimaryLight">#64c1ff</color>
     <color name="colorSecondary">#0091ea</color>
     <color name="grey">#c7c7c7</color>
     <color name="black">#000000</color>
-    <color name="background">#fafafa</color>
+    <color name="background">#1D1D1D</color>
     <color name="message_unread_red">#fc0303</color>
     <color name="color_message_friend_background">#424242</color>
     <color name="color_message_user_background">#0064b7</color>
@@ -14,7 +14,11 @@
     <color name="toolbar_color">#212121</color>
     <color name="navigationColor">#000000</color>
 
+    <color name="fragment_background_color">#262626</color>
+
     <color name="spacer">#bdbdbd</color>
+
+    <color name="icon_tint_color">#bdbdbd</color>
 
     <color name="calendar_backgroundColor">#212121</color>
     <color name="calendar_currentDayBackgroundColor">#0064b7</color>
