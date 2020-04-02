@@ -10,22 +10,21 @@
         android:id="@+id/recycler_view_messageItem_layout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="4dp"
         android:elevation="4dp"
         app:cardBackgroundColor="@color/color_message_friend_background"
         app:cardCornerRadius="14dp">
 
         <RelativeLayout
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="4dp">
+            android:layout_height="wrap_content">
 
             <TextView
                 android:id="@+id/recycler_view_messageItem_Text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_marginStart="4dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="4dp"
+
                 android:maxWidth="300dp"
                 android:textColor="@color/black"
                 tools:text="Last message text here \nyeahhhhhhhhhhhhhhhhhhhhhhhhhh
@@ -37,8 +36,8 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/recycler_view_messageItem_Text"
                 android:layout_marginStart="-8dp"
-                android:layout_marginTop="12dp"
                 android:layout_marginEnd="4dp"
+                android:layout_marginBottom="4dp"
                 android:layout_toEndOf="@id/recycler_view_messageItem_Text"
                 android:textSize="10sp"
                 tools:text="20:40" />
@@ -48,7 +47,9 @@
                 android:layout_width="20dp"
                 android:layout_height="20dp"
                 android:layout_below="@id/recycler_view_messageItem_Text"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="-4dp"
+                android:layout_marginEnd="4dp"
+                android:layout_marginBottom="4dp"
                 android:layout_toEndOf="@id/recycler_view_messageItem_MessageTimeStamp"
                 android:src="@drawable/ic_check_black_24dp"
                 android:visibility="invisible"

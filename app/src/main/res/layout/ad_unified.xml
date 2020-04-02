@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -78,25 +78,19 @@
                 android:textSize="12sp"
                 tools:text="Ad body here with much info lol lmao what the fuck why is this so long maybe even two rows of text for some reason" />
 
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/adMedia_card"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/ad_body"
-                android:layout_marginTop="5dp"
-                app:cardCornerRadius="18dp">
 
                 <com.google.android.gms.ads.formats.MediaView
+                    android:layout_below="@id/ad_body"
+                    android:layout_marginTop="5dp"
                     android:id="@+id/ad_media"
                     android:layout_width="match_parent"
                     android:layout_height="250dp" />
-            </com.google.android.material.card.MaterialCardView>
 
             <RelativeLayout
                 android:id="@+id/pricecard"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/adMedia_card">
+                android:layout_below="@id/ad_media">
 
                 <TextView
                     android:id="@+id/ad_store"
@@ -145,4 +139,4 @@
         </RelativeLayout>
     </com.google.android.gms.ads.formats.UnifiedNativeAdView>
 
-</com.google.android.material.card.MaterialCardView>
+</RelativeLayout>

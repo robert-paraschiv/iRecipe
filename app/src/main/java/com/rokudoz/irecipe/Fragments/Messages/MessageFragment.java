@@ -247,7 +247,7 @@ public class MessageFragment extends Fragment {
         usersRef.child(friendUserId).child("last_seen").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if (dataSnapshot != null && dataSnapshot.getValue(Long.class) != null) {
+                if (dataSnapshot.getValue(Long.class) != null) {
                     date = dataSnapshot.getValue(Long.class);
                     Log.d(TAG, "onDataChange: " + date + "|| " + date + "   ||| " + System.currentTimeMillis());
                     if (date != 0 && !online) {
