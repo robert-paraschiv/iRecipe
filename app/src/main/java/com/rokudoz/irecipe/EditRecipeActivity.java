@@ -340,6 +340,13 @@ public class EditRecipeActivity extends AppCompatActivity implements EditRecipeI
         String keywordEt = keywordsInputEditText.getText().toString();
         final List<String> keywords = Arrays.asList(keywordEt.split("\\s*,\\s*"));
 
+        final EditText portionsEditText = findViewById(R.id.editRecipes_portionsEditText);
+        if (portionsEditText.getText().toString().trim().equals("")) {
+            Toast.makeText(this, "Please tell us how many portions this recipe is for", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        final Integer portions = Integer.parseInt(portionsEditText.getText().toString());
 
         //Get instructions list in order
         for (int i = 0; i < instructionList.size(); i++) {
@@ -435,6 +442,7 @@ public class EditRecipeActivity extends AppCompatActivity implements EditRecipeI
                             batch.update(documentReference, "duration", finalDuration);
                             batch.update(documentReference, "durationType", durationType);
                             batch.update(documentReference, "privacy", privacy);
+                            batch.update(documentReference, "portions", portions);
                             batch.commit().addOnSuccessListener(new OnSuccessListener<Void>() {
                                 @Override
                                 public void onSuccess(Void aVoid) {
@@ -481,6 +489,7 @@ public class EditRecipeActivity extends AppCompatActivity implements EditRecipeI
             batch.update(documentReference, "duration", duration);
             batch.update(documentReference, "durationType", durationType);
             batch.update(documentReference, "privacy", privacy);
+            batch.update(documentReference, "portions", portions);
             batch.commit().addOnSuccessListener(new OnSuccessListener<Void>() {
                 @Override
                 public void onSuccess(Void aVoid) {
