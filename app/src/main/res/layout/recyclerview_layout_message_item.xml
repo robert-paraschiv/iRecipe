@@ -12,7 +12,7 @@
         android:layout_height="wrap_content"
         android:elevation="4dp"
         app:cardBackgroundColor="@color/color_message_friend_background"
-        app:cardCornerRadius="14dp">
+        app:cardCornerRadius="12dp">
 
         <RelativeLayout
             android:layout_width="wrap_content"

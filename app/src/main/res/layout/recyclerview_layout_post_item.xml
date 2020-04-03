@@ -1,13 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginStart="4dp"
-    android:layout_marginEnd="4dp"
     android:layout_marginTop="8dp"
-    android:layout_marginBottom="8dp">
+    android:layout_marginEnd="4dp"
+    android:layout_marginBottom="8dp"
+    android:elevation="4dp"
+    app:cardCornerRadius="12dp">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -24,13 +26,14 @@
 
         <TextView
             android:id="@+id/postItem_creator_name_textView"
-            style="@style/TextAppearance.MaterialComponents.Subtitle2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="@id/postItem_creator_image"
             android:layout_marginStart="4dp"
             android:layout_marginTop="2dp"
             android:layout_toEndOf="@id/postItem_creator_image"
+            android:fontFamily="@font/nunito_sans_semibold"
+            android:textColor="@color/calendar_textColor"
             tools:text="Creator Name" />
 
         <TextView
@@ -41,6 +44,7 @@
             android:layout_centerVertical="true"
             android:layout_marginStart="4dp"
             android:layout_toEndOf="@id/postItem_creator_image"
+            android:fontFamily="@font/nunito_sans"
             android:textSize="12sp"
             tools:text="Recipe name here" />
 
@@ -51,6 +55,7 @@
             android:layout_alignParentEnd="true"
             android:layout_marginTop="12dp"
             android:layout_marginEnd="8dp"
+            android:fontFamily="@font/nunito_sans"
             android:textSize="10sp"
             tools:text="30 hours ago" />
 
@@ -86,6 +91,7 @@
                 android:layout_marginTop="14dp"
                 android:layout_marginEnd="4dp"
                 android:layout_toEndOf="@id/recycler_view_postItem_favorite"
+                android:fontFamily="@font/nunito_sans"
                 tools:text="88" />
 
             <ImageView
@@ -126,6 +132,7 @@
                 android:layout_marginTop="14dp"
                 android:layout_marginEnd="8dp"
                 android:layout_toStartOf="@id/postItem_comment"
+                android:fontFamily="@font/nunito_sans"
                 tools:text="88" />
 
             <ImageView
@@ -143,13 +150,17 @@
 
         <TextView
             android:id="@+id/postItem_description_text_view"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/recycler_view_relativeLayout"
             android:layout_alignParentStart="true"
-            android:layout_marginStart="12dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
             android:layout_marginEnd="8dp"
-            tools:text="Description" />
+            android:layout_marginBottom="8dp"
+            android:fontFamily="@font/nunito_sans"
+            android:maxLines="5"
+            tools:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum" />
 
     </RelativeLayout>
-</RelativeLayout>
+</com.google.android.material.card.MaterialCardView>

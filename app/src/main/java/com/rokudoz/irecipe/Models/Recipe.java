@@ -14,6 +14,7 @@ public class Recipe implements Comparable<Recipe> {
     private String creator_imageUrl;
     private String category;
     private String description;
+    private Integer portions;
     private List<Ingredient> ingredient_list;
     private List<Instruction> instruction_list;
     private List<String> keywords;
@@ -36,7 +37,7 @@ public class Recipe implements Comparable<Recipe> {
         //public no-arg constructor needed
     }
 
-    public Recipe(String title, String creator_docId, String creator_name, String creator_imageUrl, String category, String description
+    public Recipe(String title, String creator_docId, String creator_name, String creator_imageUrl, String category, String description,Integer portions
             , List<Ingredient> ingredient_list, List<Instruction> instruction_list, List<String> keywords, List<String> imageUrls_list, String complexity
             , Float duration, String durationType, Float avg_rating, Boolean isFavorite, String privacy, Integer number_of_likes, Integer number_of_comments,Date creation_date) {
 
@@ -49,6 +50,7 @@ public class Recipe implements Comparable<Recipe> {
         this.creator_imageUrl = creator_imageUrl;
         this.category = category;
         this.description = description;
+        this.portions = portions;
         this.ingredient_list = ingredient_list;
         this.instruction_list = instruction_list;
         this.keywords = keywords;
@@ -179,6 +181,14 @@ public class Recipe implements Comparable<Recipe> {
         this.description = description;
     }
 
+    public Integer getPortions() {
+        return portions;
+    }
+
+    public void setPortions(Integer portions) {
+        this.portions = portions;
+    }
+
     public List<String> getKeywords() {
         return keywords;
     }
@@ -253,6 +263,7 @@ public class Recipe implements Comparable<Recipe> {
                 ", creator_imageUrl='" + creator_imageUrl + '\'' +
                 ", category='" + category + '\'' +
                 ", description='" + description + '\'' +
+                ", portions=" + portions +
                 ", ingredient_list=" + ingredient_list +
                 ", instruction_list=" + instruction_list +
                 ", keywords=" + keywords +

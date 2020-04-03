@@ -141,8 +141,8 @@
                 android:layout_below="@+id/missing_ingredientsNumber"
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="8dp"
-                tools:text="Description Here lmao it can have more text                      \n
-                 than you think lol wtf" />
+                tools:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla placerat magna in felis dignissim rhoncus. In nec tortor sit amet nisi blandit blandit. Mauris et venenatis massa, eu feugiat ligula. Sed faucibus vel felis ut accumsan. Curabitur sed euismod ante. Vestibulum vestibulum ligula et orci feugiat lobortis. Etiam vel lorem rhoncus, congue ipsum sit amet, lobortis erat. Morbi suscipit, ex eget accumsan pulvinar, felis ipsum maximus enim, sit amet maximus nisl orci a dolor. Donec faucibus nunc nisl. Sed vestibulum, quam eget accumsan lacinia, lectus lacus sodales odio, eu dapibus dolor ante non lectus. Morbi in interdum augue, et vehicula odio. Quisque sed aliquam sapien, non feugiat lacus." />
+
 
             <ImageView
                 android:id="@+id/imageview_favorite_icon"
@@ -192,6 +192,7 @@
                     android:layout_height="match_parent"
                     android:orientation="vertical">
 
+
                     <TextView
                         android:id="@+id/tvIngredientsList"
                         android:layout_width="wrap_content"
@@ -201,11 +202,45 @@
                         android:text="Ingredients"
                         android:textSize="18sp" />
 
+                    <LinearLayout
+                        android:id="@+id/recipeDetailed_portionsLayout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:gravity="center_horizontal"
+                        android:orientation="horizontal"
+                        android:visibility="invisible"
+                        tools:visibility="visible">
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/recipeDetailed_decreasePortionsBtn"
+                            style="@style/Widget.MaterialComponents.Button.TextButton"
+                            android:layout_width="60dp"
+                            android:layout_height="wrap_content"
+                            app:icon="@drawable/ic_baseline_arrow_back_24" />
+
+                        <TextView
+                            android:id="@+id/recipeDetailed_portionsNumberTv"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_marginStart="12dp"
+                            android:layout_marginEnd="12dp"
+                            tools:text="4 portions" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/recipeDetailed_increasePortionsBtn"
+                            style="@style/Widget.MaterialComponents.Button.TextButton"
+                            android:layout_width="60dp"
+                            android:layout_height="wrap_content"
+                            app:icon="@drawable/ic_baseline_arrow_forward_24" />
+                    </LinearLayout>
+
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/recipeDetailed_ingredients_recycler_view"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:layout_marginTop="8dp"
+                        android:layout_marginTop="2dp"
                         android:transitionName="example_transition" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>

@@ -34,6 +34,7 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
@@ -112,6 +113,10 @@ public class RecipeDetailedFragment extends Fragment implements RecipeInstructio
     private List<Ingredient> userShoppingIngredientList = new ArrayList<>();
     private List<Ingredient> userIngredientList = new ArrayList<>();
 
+    private Recipe mRecipe = new Recipe();
+
+    private LinearLayout portionsLayout;
+
 
     private ViewPager viewPager;
     private RecipeDetailedViewPagerAdapter recipeDetailedViewPagerAdapter;
@@ -131,7 +136,7 @@ public class RecipeDetailedFragment extends Fragment implements RecipeInstructio
     private NestedScrollView nestedScrollView;
 
     private MaterialButton mEditRecipeBtn;
-    private TextView tvTitle, tvDescription, mFavoriteNumber, tvMissingIngredientsNumber, tvCreatorName, tvDuration, tvComplexity;
+    private TextView tvTitle, tvDescription, mFavoriteNumber, tvMissingIngredientsNumber, tvCreatorName, tvDuration, tvComplexity, tvPortions;
     private ImageView mFavoriteIcon;
     private CircleImageView mCreatorImage;
     private Button mAddCommentBtn;
@@ -139,6 +144,7 @@ public class RecipeDetailedFragment extends Fragment implements RecipeInstructio
     private FloatingActionButton fab_AddToSchedule;
     private EditText mCommentEditText;
     private List<Ingredient> recipeIngredientList = new ArrayList<>();
+    private List<Ingredient> recipeIngredientsForOnePortion = new ArrayList<>();
     private List<Instruction> recipeInstructionList = new ArrayList<>();
     private ArrayList<Comment> commentList = new ArrayList<>();
     private Integer numberOfFav;
@@ -181,6 +187,8 @@ public class RecipeDetailedFragment extends Fragment implements RecipeInstructio
         mCreatorImage = view.findViewById(R.id.recipeDetailed_creatorImage_ImageView);
         tvDuration = view.findViewById(R.id.recipeDetailed_duration);
         tvComplexity = view.findViewById(R.id.recipeDetailed_complexity);
+        tvPortions = view.findViewById(R.id.recipeDetailed_portionsNumberTv);
+        portionsLayout = view.findViewById(R.id.recipeDetailed_portionsLayout);
         mAddMissingIngredientsFAB.hide();
 
         RecipeDetailedFragmentArgs recipeDetailedFragmentArgs = RecipeDetailedFragmentArgs.fromBundle(getArguments());
@@ -302,6 +310,45 @@ public class RecipeDetailedFragment extends Fragment implements RecipeInstructio
                 }, mYear, mMonth, mDate);
                 datePickerDialog.show();
 
+            }
+        });
+
+        //Portioning
+        MaterialButton increasePortions = view.findViewById(R.id.recipeDetailed_increasePortionsBtn);
+        MaterialButton decreasePortions = view.findViewById(R.id.recipeDetailed_decreasePortionsBtn);
+
+        increasePortions.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mRecipe.setPortions(mRecipe.getPortions() + 1);
+                recipeIngredientList.clear();
+                for (int i = 0; i < recipeIngredientsForOnePortion.size(); i++) {
+                    Ingredient ing = recipeIngredientsForOnePortion.get(i);
+
+                    Ingredient ingredient = new Ingredient(ing.getName(), ing.getCategory()
+                            , recipeIngredientsForOnePortion.get(i).getQuantity() * mRecipe.getPortions(), ing.getQuantity_type(), ing.getOwned());
+                    recipeIngredientList.add(ingredient);
+                }
+                ingredientsAdapter.notifyDataSetChanged();
+                tvPortions.setText(mRecipe.getPortions() + " portions");
+            }
+        });
+        decreasePortions.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mRecipe.getPortions() > 1) {
+                    mRecipe.setPortions(mRecipe.getPortions() - 1);
+                    recipeIngredientList.clear();
+                    for (int i = 0; i < recipeIngredientsForOnePortion.size(); i++) {
+                        Ingredient ing = recipeIngredientsForOnePortion.get(i);
+
+                        Ingredient ingredient = new Ingredient(ing.getName(), ing.getCategory()
+                                , recipeIngredientsForOnePortion.get(i).getQuantity() * mRecipe.getPortions(), ing.getQuantity_type(), ing.getOwned());
+                        recipeIngredientList.add(ingredient);
+                    }
+                    ingredientsAdapter.notifyDataSetChanged();
+                    tvPortions.setText(mRecipe.getPortions() + " portions");
+                }
             }
         });
 
@@ -544,6 +591,15 @@ public class RecipeDetailedFragment extends Fragment implements RecipeInstructio
                 }
                 if (documentSnapshot != null) {
                     final Recipe recipe = documentSnapshot.toObject(Recipe.class);
+                    recipe.setDocumentId(documentID);
+                    mRecipe = recipe;
+                    if (recipe.getPortions() != null) {
+                        portionsLayout.setVisibility(View.VISIBLE);
+                        tvPortions.setText(recipe.getPortions() + " portions");
+                    } else {
+                        tvPortions.setText("0 portions");
+                        portionsLayout.setVisibility(View.GONE);
+                    }
                     if (recipe.getTitle() != null) {
                         title = recipe.getTitle();
                         tvTitle.setText(title);
@@ -555,7 +611,7 @@ public class RecipeDetailedFragment extends Fragment implements RecipeInstructio
                         tvComplexity.setText("Complexity: " + recipe.getComplexity());
                     }
                     if (recipe.getDescription() != null) {
-                        String description = recipe.getDescription().replace("\\n",System.getProperty("line.separator"));
+                        String description = recipe.getDescription().replace("\\n", System.getProperty("line.separator"));
                         tvDescription.setText(description);
                     }
                     if (recipe.getImageUrls_list() != null) {
@@ -568,6 +624,9 @@ public class RecipeDetailedFragment extends Fragment implements RecipeInstructio
                         List<Ingredient> ingredientList = recipe.getIngredient_list();
                         for (Ingredient ingredient : ingredientList) {
                             if (!recipeIngredientList.contains(ingredient)) {
+                                if (recipe.getPortions() != null && recipe.getPortions() != 0)
+                                    recipeIngredientsForOnePortion.add(new Ingredient(ingredient.getName(), ingredient.getCategory()
+                                            , ingredient.getQuantity() / recipe.getPortions(), ingredient.getQuantity_type(), ingredient.getOwned()));
                                 recipeIngredientList.add(ingredient);
                                 ingredientsAdapter.notifyDataSetChanged();
                             }

@@ -74,7 +74,7 @@ public class AddRecipesActivity extends AppCompatActivity implements EditRecipeI
     TextInputEditText titleInputEditText, descriptionInputEditText, keywordsInputEditText;
     Spinner categorySpinner, privacySpinner;
     RecyclerView ingredientsRecyclerView, instructionsRecyclerView;
-    EditText durationEditText;
+    EditText durationEditText, portionsEditText;
     AppCompatSpinner durationTypeSpinner, complexitySpinner;
 
     ProgressDialog pd;
@@ -134,7 +134,7 @@ public class AddRecipesActivity extends AppCompatActivity implements EditRecipeI
         durationEditText = findViewById(R.id.addRecipe_duration_editText);
         durationTypeSpinner = findViewById(R.id.addRecipe_durationType_Spinner);
         complexitySpinner = findViewById(R.id.addRecipe_complexity_Spinner);
-
+        portionsEditText = findViewById(R.id.addrecipes_portionsEditText);
 
         getCurrentUserDetails();
 
@@ -350,6 +350,9 @@ public class AddRecipesActivity extends AppCompatActivity implements EditRecipeI
         } else if (Objects.requireNonNull(keywordsInputEditText.getText()).toString().trim().equals("")) {
             Toast.makeText(this, "Please choose a few keywords for the recipe", Toast.LENGTH_SHORT).show();
             return;
+        } else if (portionsEditText.getText().toString().trim().equals("")) {
+            Toast.makeText(this, "Please tell us how many portions this recipe is for", Toast.LENGTH_SHORT).show();
+            return;
         }
 
         final String title = titleInputEditText.getText().toString();
@@ -368,6 +371,7 @@ public class AddRecipesActivity extends AppCompatActivity implements EditRecipeI
         final String durationType = durationTypeSpinner.getSelectedItem().toString();
         Log.d(TAG, "addRecipe: " + creator_docId);
 
+        final Integer recipePortions = Integer.parseInt(portionsEditText.getText().toString());
 
         String keywordEt = keywordsInputEditText.getText().toString();
         final List<String> keywords = Arrays.asList(keywordEt.split("\\s*,\\s*"));
@@ -459,7 +463,7 @@ public class AddRecipesActivity extends AppCompatActivity implements EditRecipeI
 
                             }
 
-                            Recipe recipe = new Recipe(title, creator_docId, mUser.getName(), mUser.getUserProfilePicUrl(), category, description
+                            Recipe recipe = new Recipe(title, creator_docId, mUser.getName(), mUser.getUserProfilePicUrl(), category, description, recipePortions
                                     , ingredients_list, instructionList, keywords, imageUrls_list, complexity, finalDuration1, durationType
                                     , 0f, false, privacy, 0, 0, null);
 
@@ -499,7 +503,7 @@ public class AddRecipesActivity extends AppCompatActivity implements EditRecipeI
             // All the ingredients are in db with category, proceed to upload
             pd.show();
 
-            Recipe recipe = new Recipe(title, creator_docId, mUser.getName(), mUser.getUserProfilePicUrl(), category, description
+            Recipe recipe = new Recipe(title, creator_docId, mUser.getName(), mUser.getUserProfilePicUrl(), category, description, recipePortions
                     , ingredients_list, instructionList, keywords, imageUrls_list, complexity, duration, durationType
                     , 0f, false, privacy, 0, 0, null);
 

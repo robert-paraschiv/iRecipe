@@ -51,7 +51,7 @@
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="16dp"
                 android:text="Choose Photo"
-                app:cornerRadius="18dp" />
+                app:cornerRadius="@dimen/buttonCornerRadius" />
 
             <com.google.android.material.textfield.TextInputLayout
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
@@ -96,15 +96,15 @@
                     android:id="@+id/editRecipes_description_editText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="textCapSentences" />
+                    android:inputType="textMultiLine"
+                    android:imeOptions="flagNoExtractUi"/>
             </com.google.android.material.textfield.TextInputLayout>
 
-            <com.google.android.material.card.MaterialCardView
+            <RelativeLayout
                 android:id="@+id/editRecipes_ingredientsLayout_materialCardView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                app:cardCornerRadius="18dp">
+                android:layout_marginTop="8dp">
 
                 <RelativeLayout
                     android:layout_width="match_parent"
@@ -120,11 +120,31 @@
                         android:textSize="18sp"
                         android:textStyle="bold" />
 
+                    <TextView
+                        android:id="@+id/editRecipes_howMany"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/editRecipes_ingredientsTitle_tv"
+                        android:layout_marginTop="16dp"
+                        android:layout_marginStart="4dp"
+                        android:text="How many portions is this recipe and ingredients for?"
+                        android:textSize="15sp" />
+
+                    <EditText
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        android:id="@+id/editRecipes_portionsEditText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/editRecipes_howMany"
+                        android:layout_marginBottom="8dp"
+                        android:hint="Portions number"
+                        android:inputType="number" />
+
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/editRecipe_ingredients_recyclerview"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:layout_below="@id/editRecipes_ingredientsTitle_tv" />
+                        android:layout_below="@id/editRecipes_portionsEditText" />
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/editRecipes_addIngredient_btn"
@@ -135,16 +155,15 @@
                         android:layout_centerHorizontal="true"
                         android:layout_marginTop="8dp"
                         android:text="Add Ingredient"
-                        app:cornerRadius="18dp" />
+                        app:cornerRadius="@dimen/buttonCornerRadius" />
                 </RelativeLayout>
-            </com.google.android.material.card.MaterialCardView>
+            </RelativeLayout>
 
-            <com.google.android.material.card.MaterialCardView
+            <RelativeLayout
                 android:id="@+id/editRecipes_instructionsLayout_materialCardView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                app:cardCornerRadius="18dp">
+                android:layout_marginTop="8dp">
 
                 <RelativeLayout
                     android:layout_width="match_parent"
@@ -175,9 +194,9 @@
                         android:layout_centerHorizontal="true"
                         android:layout_marginTop="8dp"
                         android:text="Add Step"
-                        app:cornerRadius="18dp" />
+                        app:cornerRadius="@dimen/buttonCornerRadius" />
                 </RelativeLayout>
-            </com.google.android.material.card.MaterialCardView>
+            </RelativeLayout>
 
             <TextView
                 android:layout_width="match_parent"
@@ -273,7 +292,7 @@
                 android:layout_gravity="bottom|center_horizontal"
                 android:layout_marginTop="16dp"
                 android:text="Save"
-                app:cornerRadius="18dp" />
+                app:cornerRadius="@dimen/buttonCornerRadius" />
 
         </LinearLayout>
     </LinearLayout>

@@ -20,7 +20,7 @@
                 android:id="@+id/recycler_view_recipeItem_Image_CardView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:cardCornerRadius="18dp">
+                app:cardCornerRadius="12dp">
 
                 <ImageView
                     android:id="@+id/recipeItem_image"
