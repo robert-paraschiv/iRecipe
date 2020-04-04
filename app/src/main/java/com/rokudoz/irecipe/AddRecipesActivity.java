@@ -1,6 +1,7 @@
 package com.rokudoz.irecipe;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.ContentResolver;
 import android.content.DialogInterface;
@@ -11,6 +12,7 @@ import android.net.Uri;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatSpinner;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -20,11 +22,13 @@ import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.webkit.MimeTypeMap;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -34,6 +38,7 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.android.material.dialog.MaterialDialogs;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
@@ -407,6 +412,9 @@ public class AddRecipesActivity extends AppCompatActivity implements EditRecipeI
         // If there are any ingredients without category in db, ask the user
         if (ingredients_without_category.size() > 0) {
 
+            LinearLayout rootLayout = new LinearLayout(this);
+            rootLayout.setOrientation(LinearLayout.VERTICAL);
+            ScrollView scrollView = new ScrollView(this);
             //Create a dialog to ask the user the category of the ingredient if there is one that isn't in db
             final LinearLayout linearLayout = new LinearLayout(AddRecipesActivity.this);
             linearLayout.setOrientation(LinearLayout.VERTICAL);
@@ -436,68 +444,66 @@ public class AddRecipesActivity extends AppCompatActivity implements EditRecipeI
                 linearLayout.addView(spinner);
             }
 
+            MaterialButton materialButton = new MaterialButton(this);
+            materialButton.setText("Continue");
+            linearLayout.addView(materialButton);
+            scrollView.addView(linearLayout);
+            rootLayout.addView(scrollView);
 
-            MaterialAlertDialogBuilder materialAlertDialogBuilder = new MaterialAlertDialogBuilder(AddRecipesActivity.this
-                    , R.style.ThemeOverlay_MaterialComponents_MaterialAlertDialog_Centered);
-            materialAlertDialogBuilder.setView(linearLayout);
-            materialAlertDialogBuilder.setMessage("This ingredient isn't in our Database yet, please specify the category");
-            materialAlertDialogBuilder.setCancelable(true);
             final Float finalDuration1 = duration;
-            materialAlertDialogBuilder.setPositiveButton(
-                    "Confirm",
-                    new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            //
-                            for (int i = 0; i < category_spinner_list.size(); i++) {
-                                ingredients_without_category.get(i).setCategory(category_spinner_list.get(i).getSelectedItem().toString());
-                                ingredients_without_category.get(i).setQuantity(0f);
-                                ingredients_without_category.get(i).setQuantity_type("g");
-                                ingredients_list.add(ingredients_without_category.get(i));
 
-                                ingredientsReference.add(ingredients_without_category.get(i)).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                                    @Override
-                                    public void onSuccess(DocumentReference documentReference) {
-                                        Log.d(TAG, "onSuccess: added ingredient to db");
-                                    }
-                                });
 
+            final Dialog materialAlertDialogBuilder = new Dialog(AddRecipesActivity.this
+                    , R.style.ThemeOverlay_MaterialComponents_MaterialAlertDialog_Centered);
+            materialAlertDialogBuilder.setContentView(rootLayout);
+            materialAlertDialogBuilder.setTitle("This ingredient isn't in our Database yet, please specify the category");
+            materialAlertDialogBuilder.setCancelable(true);
+            materialButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                    //
+                    for (int i = 0; i < category_spinner_list.size(); i++) {
+                        ingredients_without_category.get(i).setCategory(category_spinner_list.get(i).getSelectedItem().toString());
+                        ingredients_without_category.get(i).setQuantity(0f);
+                        ingredients_without_category.get(i).setQuantity_type("g");
+                        ingredients_list.add(ingredients_without_category.get(i));
+
+                        ingredientsReference.add(ingredients_without_category.get(i)).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                            @Override
+                            public void onSuccess(DocumentReference documentReference) {
+                                Log.d(TAG, "onSuccess: added ingredient to db");
                             }
+                        });
 
-                            Recipe recipe = new Recipe(title, creator_docId, mUser.getName(), mUser.getUserProfilePicUrl(), category, description, recipePortions
-                                    , ingredients_list, instructionList, keywords, imageUrls_list, complexity, finalDuration1, durationType
-                                    , 0f, false, privacy, 0, 0, null);
+                    }
 
-                            pd.show();
-                            // Upload recipe to db
-                            recipesReference.add(recipe).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                                @Override
-                                public void onSuccess(DocumentReference documentReference) {
-                                    pd.hide();
-                                    Toast.makeText(AddRecipesActivity.this, "Succesfully added " + title + " to the recipes list", Toast.LENGTH_SHORT).show();
-                                    Intent intent = new Intent(AddRecipesActivity.this, MainActivity.class);
-                                    intent.putExtra("recipe_id", documentReference.getId());
-                                    startActivity(intent);
-                                    finish();
-                                }
-                            }).addOnFailureListener(new OnFailureListener() {
-                                @Override
-                                public void onFailure(@NonNull Exception e) {
-                                    Toast.makeText(AddRecipesActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
-                                }
-                            });
+                    Recipe recipe = new Recipe(title, creator_docId, mUser.getName(), mUser.getUserProfilePicUrl(), category, description, recipePortions
+                            , ingredients_list, instructionList, keywords, imageUrls_list, complexity, finalDuration1, durationType
+                            , 0f, false, privacy, 0, 0, null);
 
-                            dialog.cancel();
+                    pd.show();
+                    // Upload recipe to db
+                    recipesReference.add(recipe).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                        @Override
+                        public void onSuccess(DocumentReference documentReference) {
+                            pd.hide();
+                            Toast.makeText(AddRecipesActivity.this, "Succesfully added " + title + " to the recipes list", Toast.LENGTH_SHORT).show();
+                            Intent intent = new Intent(AddRecipesActivity.this, MainActivity.class);
+                            intent.putExtra("recipe_id", documentReference.getId());
+                            startActivity(intent);
+                            finish();
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Toast.makeText(AddRecipesActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
                         }
                     });
 
-            materialAlertDialogBuilder.setNegativeButton(
-                    "Cancel",
-                    new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            dialog.cancel();
-                        }
-                    });
-
+                    materialAlertDialogBuilder.cancel();
+                }
+            });
             materialAlertDialogBuilder.show();
         } else {
             // All the ingredients are in db with category, proceed to upload
@@ -613,6 +619,25 @@ public class AddRecipesActivity extends AppCompatActivity implements EditRecipeI
     @Override
     public void onPointerCaptureChanged(boolean hasCapture) {
 
+    }
+
+    private void addIngredientTest(String name) {
+        Ingredient ingredient = new Ingredient();
+        ingredient.setName(name);
+        ingredient.setQuantity(3f);
+        ingredient.setOwned(false);
+        ingredientList.add(ingredient);
+        int position = ingredientList.size();
+        editRecipeIngredientsAdapter.notifyItemInserted(position);
+    }
+
+    private void addInstructionTest(String text) {
+        Instruction instruction = new Instruction();
+        instruction.setText(text);
+        instruction.setStepNumber(instructionList.size() + 1);
+        instructionList.add(instruction);
+        int position = instructionList.size();
+        editRecipeInstructionsAdapter.notifyItemInserted(position);
     }
 
     @Override
