@@ -30,16 +30,12 @@ import java.util.Objects;
 import javax.annotation.Nullable;
 
 public class UpdateRecipesActivity extends AppCompatActivity {
-
     private static final String TAG = "UpdateRecipesActivity";
-    private List<Recipe> recipeList = new ArrayList<>();
 
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private CollectionReference recipesReference = db.collection("Recipes");
-    private CollectionReference ingredientsReference = db.collection("Ingredients");
+    private CollectionReference postsRef = db.collection("Posts");
 
-    int totalRecipesToUpdate = 0;
-    int recipesUpdated = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,46 +47,7 @@ public class UpdateRecipesActivity extends AppCompatActivity {
         updateBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                GetRecipesList();
-            }
-        });
-    }
 
-
-    private void UpdateRecipes() {
-        for (final Recipe recipe : recipeList) {
-            recipe.setComplexity("Easy");
-            recipe.setDuration(5f);
-            recipe.setDurationType("Minutes");
-
-            recipesReference.document(recipe.getDocumentId()).set(recipe).addOnSuccessListener(new OnSuccessListener<Void>() {
-                @Override
-                public void onSuccess(Void aVoid) {
-                    Log.d(TAG, "onSuccess: Updated " + recipe.getTitle());
-                    recipesUpdated++;
-                    if (recipesUpdated == totalRecipesToUpdate) {
-                        Toast.makeText(UpdateRecipesActivity.this, "Updated all of the recipes", Toast.LENGTH_SHORT).show();
-                    }
-                }
-            });
-        }
-    }
-
-    private void GetRecipesList() {
-        recipesReference.get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-            @Override
-            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                if (queryDocumentSnapshots != null) {
-                    for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
-                        Recipe recipe = documentSnapshot.toObject(Recipe.class);
-                        recipe.setDocumentId(documentSnapshot.getId());
-                        if (!recipeList.contains(recipe)) {
-                            recipeList.add(recipe);
-                        }
-                    }
-                    totalRecipesToUpdate = queryDocumentSnapshots.size();
-                    UpdateRecipes();
-                }
             }
         });
     }

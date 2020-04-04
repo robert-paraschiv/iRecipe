@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -8,8 +8,7 @@
     android:layout_marginTop="8dp"
     android:layout_marginEnd="4dp"
     android:layout_marginBottom="8dp"
-    android:elevation="4dp"
-    app:cardCornerRadius="12dp">
+    android:elevation="4dp">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -32,7 +31,7 @@
             android:layout_marginStart="4dp"
             android:layout_marginTop="2dp"
             android:layout_toEndOf="@id/postItem_creator_image"
-            android:fontFamily="@font/nunito_sans_semibold"
+            android:fontFamily="@font/open_sans_semibold"
             android:textColor="@color/calendar_textColor"
             tools:text="Creator Name" />
 
@@ -44,7 +43,7 @@
             android:layout_centerVertical="true"
             android:layout_marginStart="4dp"
             android:layout_toEndOf="@id/postItem_creator_image"
-            android:fontFamily="@font/nunito_sans"
+            android:fontFamily="@font/open_sans"
             android:textSize="12sp"
             tools:text="Recipe name here" />
 
@@ -55,7 +54,7 @@
             android:layout_alignParentEnd="true"
             android:layout_marginTop="12dp"
             android:layout_marginEnd="8dp"
-            android:fontFamily="@font/nunito_sans"
+            android:fontFamily="@font/open_sans"
             android:textSize="10sp"
             tools:text="30 hours ago" />
 
@@ -91,7 +90,7 @@
                 android:layout_marginTop="14dp"
                 android:layout_marginEnd="4dp"
                 android:layout_toEndOf="@id/recycler_view_postItem_favorite"
-                android:fontFamily="@font/nunito_sans"
+                android:fontFamily="@font/open_sans"
                 tools:text="88" />
 
             <ImageView
@@ -132,7 +131,7 @@
                 android:layout_marginTop="14dp"
                 android:layout_marginEnd="8dp"
                 android:layout_toStartOf="@id/postItem_comment"
-                android:fontFamily="@font/nunito_sans"
+                android:fontFamily="@font/open_sans"
                 tools:text="88" />
 
             <ImageView
@@ -158,9 +157,9 @@
             android:layout_marginTop="8dp"
             android:layout_marginEnd="8dp"
             android:layout_marginBottom="8dp"
-            android:fontFamily="@font/nunito_sans"
-            android:maxLines="5"
+            android:fontFamily="@font/lato"
+            android:maxLines="3"
             tools:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum" />
 
     </RelativeLayout>
-</com.google.android.material.card.MaterialCardView>
+</RelativeLayout>

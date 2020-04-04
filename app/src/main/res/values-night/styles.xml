@@ -9,9 +9,11 @@
         <item name="android:windowContentTransitions">true</item>
         <item name="colorSecondary">@color/colorSecondary</item>
         <item name="android:navigationBarColor">@color/navigationColor</item>
+        <item name="fontFamily">@font/open_sans_semibold</item>
 <!--        <item name="android:statusBarColor">@color/statusBarColor</item>-->
 <!--        <item name="android:windowLightStatusBar">true</item>-->
     </style>
+
 
     <style name="CustomActivityAnimation" parent="@android:style/Animation.Activity">
         <item name="android:activityOpenEnterAnimation">@anim/fade_in</item>
@@ -20,9 +22,5 @@
         <item name="android:activityCloseExitAnimation">@anim/fade_out</item>
     </style>
 
-    <style name="AlertDialogCustom" parent="@android:style/Theme.Dialog">
-        <item name="android:windowNoTitle">true</item>
-        <item name="android:windowBackground">@android:color/transparent</item>
-    </style>
 
 </resources>

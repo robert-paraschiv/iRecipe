@@ -608,7 +608,7 @@ public class RecipeDetailedFragment extends Fragment implements RecipeInstructio
                         tvDuration.setText("" + recipe.getDuration() + " " + recipe.getDurationType());
                     }
                     if (recipe.getComplexity() != null) {
-                        tvComplexity.setText("Complexity: " + recipe.getComplexity());
+                        tvComplexity.setText(recipe.getComplexity());
                     }
                     if (recipe.getDescription() != null) {
                         String description = recipe.getDescription().replace("\\n", System.getProperty("line.separator"));

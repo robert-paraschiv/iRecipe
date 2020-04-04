@@ -228,10 +228,12 @@ public class recipesLunchFragment extends Fragment implements RecipeAdapter.OnIt
     private void PerformMainQuery() {
         Query recipesQuery = null;
         if (mLastQueriedDocument != null) {
-            recipesQuery = recipeRef.whereEqualTo("category", "lunch").whereEqualTo("privacy", "Everyone").orderBy("number_of_likes", Query.Direction.DESCENDING)
+            recipesQuery = recipeRef.whereEqualTo("category", "lunch").whereEqualTo("privacy", "Everyone")
+                    .orderBy("number_of_likes", Query.Direction.DESCENDING)
                     .startAfter(mLastQueriedDocument).limit(10);
         } else {
-            recipesQuery = recipeRef.whereEqualTo("category", "lunch").whereEqualTo("privacy", "Everyone").limit(10).orderBy("number_of_likes", Query.Direction.DESCENDING);
+            recipesQuery = recipeRef.whereEqualTo("category", "lunch").whereEqualTo("privacy", "Everyone").limit(10)
+                    .orderBy("number_of_likes", Query.Direction.DESCENDING);
         }
 
         recipesListener = recipesQuery.addSnapshotListener(new EventListener<QuerySnapshot>() {
@@ -300,7 +302,7 @@ public class recipesLunchFragment extends Fragment implements RecipeAdapter.OnIt
                                 recipe.setMissingIngredients(missingIngredients);
                                 mRecipeList.set(mRecipeList.indexOf(recipe), recipe);
                             }
-                            Collections.sort(mRecipeList);
+//                            Collections.sort(mRecipeList);
                             mAdapter.notifyDataSetChanged();
                         }
                     }
@@ -320,11 +322,13 @@ public class recipesLunchFragment extends Fragment implements RecipeAdapter.OnIt
         //Get Recipes where the recipes created by the logged in user are private
         Query privateRecipesQuery = null;
         if (mLastQueriedDocument != null) {
-            privateRecipesQuery = recipeRef.whereEqualTo("category", "lunch").whereEqualTo("creator_docId", loggedInUserDocumentId).orderBy("number_of_likes", Query.Direction.DESCENDING);
+            privateRecipesQuery = recipeRef.whereEqualTo("category", "lunch").whereEqualTo("creator_docId", loggedInUserDocumentId)
+                    .orderBy("number_of_likes", Query.Direction.DESCENDING);
 //                    .startAfter(mLastQueriedDocument); // Necessary so we don't have the same results multiple times
 //                                    .limit(3);
         } else {
-            privateRecipesQuery = recipeRef.whereEqualTo("category", "lunch").whereEqualTo("creator_docId", loggedInUserDocumentId).orderBy("number_of_likes", Query.Direction.DESCENDING);
+            privateRecipesQuery = recipeRef.whereEqualTo("category", "lunch").whereEqualTo("creator_docId", loggedInUserDocumentId)
+                    .orderBy("number_of_likes", Query.Direction.DESCENDING);
 //                                    .limit(3);
         }
         privateRecipesListener = privateRecipesQuery.addSnapshotListener(new EventListener<QuerySnapshot>() {
@@ -391,7 +395,7 @@ public class recipesLunchFragment extends Fragment implements RecipeAdapter.OnIt
                                 recipe.setMissingIngredients(missingIngredients);
                                 mRecipeList.set(mRecipeList.indexOf(recipe), recipe);
                             }
-                            Collections.sort(mRecipeList);
+//                            Collections.sort(mRecipeList);
                             mAdapter.notifyDataSetChanged();
                         }
 

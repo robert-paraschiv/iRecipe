@@ -304,7 +304,7 @@ public class recipesDinnerFragment extends Fragment implements RecipeAdapter.OnI
                                 recipe.setMissingIngredients(missingIngredients);
                                 mRecipeList.set(mRecipeList.indexOf(recipe), recipe);
                             }
-                            Collections.sort(mRecipeList);
+//                            Collections.sort(mRecipeList);
                             mAdapter.notifyDataSetChanged();
                         }
                     }
@@ -397,7 +397,7 @@ public class recipesDinnerFragment extends Fragment implements RecipeAdapter.OnI
                                 recipe.setMissingIngredients(missingIngredients);
                                 mRecipeList.set(mRecipeList.indexOf(recipe), recipe);
                             }
-                            Collections.sort(mRecipeList);
+//                            Collections.sort(mRecipeList);
                             mAdapter.notifyDataSetChanged();
                         }
 

@@ -359,7 +359,7 @@ public class ProfileFragment extends Fragment {
             //Compress image
             Bitmap bitmap = imageBitmap;
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 75, baos);
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 85, baos);
             byte[] data = baos.toByteArray();
 
             //Upload image to FireStore Storage

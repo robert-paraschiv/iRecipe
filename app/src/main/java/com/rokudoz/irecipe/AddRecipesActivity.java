@@ -275,7 +275,7 @@ public class AddRecipesActivity extends AppCompatActivity implements EditRecipeI
                 e.printStackTrace();
             }
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 35, baos);
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 75, baos);
             byte[] data = baos.toByteArray();
 
             mUploadTask = fileReference.putBytes(data)

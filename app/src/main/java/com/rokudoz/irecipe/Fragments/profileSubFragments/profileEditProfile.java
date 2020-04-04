@@ -294,7 +294,7 @@ public class profileEditProfile extends Fragment {
                 e.printStackTrace();
             }
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 75, baos);
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 85, baos);
             byte[] data = baos.toByteArray();
 
             //Upload image to FireStore Storage

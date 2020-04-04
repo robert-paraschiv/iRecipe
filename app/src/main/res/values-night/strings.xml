@@ -28,7 +28,11 @@
         <item>kg</item>
         <item>ml</item>
         <item>l</item>
+        <item>pinch</item>
         <item>pieces</item>
+        <item>tablespoons</item>
+        <item>teaspoons</item>
+        <item>cups</item>
     </string-array>
     <string-array name="recipe_category">
         <item>breakfast</item>

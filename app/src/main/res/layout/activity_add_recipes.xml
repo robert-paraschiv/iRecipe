@@ -71,7 +71,7 @@
                 android:id="@+id/addRecipes_category_tv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="14dp"
+                android:layout_marginStart="4dp"
                 android:layout_marginTop="8dp"
                 android:text="Category"
                 android:textSize="18sp"
@@ -81,7 +81,6 @@
                 android:id="@+id/addRecipes_category_spinner"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
                 android:layout_marginTop="4dp"
                 android:entries="@array/recipe_category"
                 android:spinnerMode="dropdown" />
