@@ -10,7 +10,7 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:orientation="vertical">
 
 
@@ -72,7 +72,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="4dp"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="16dp"
                 android:text="Category"
                 android:textSize="18sp"
                 android:textStyle="bold" />
@@ -89,7 +89,7 @@
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
+                android:layout_marginTop="16dp"
                 android:hint="Description">
 
                 <com.google.android.material.textfield.TextInputEditText
@@ -111,41 +111,43 @@
                     android:layout_height="match_parent">
 
                     <TextView
-                        android:id="@+id/addRecipes_ingredientsTitle_tv"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="14dp"
-                        android:layout_marginTop="8dp"
-                        android:text="Ingredients"
-                        android:textSize="18sp"
-                        android:textStyle="bold" />
-
-                    <TextView
                         android:id="@+id/addrecipes_howMany"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_below="@id/addRecipes_ingredientsTitle_tv"
-                        android:layout_marginTop="16dp"
                         android:layout_marginStart="4dp"
+                        android:layout_marginTop="16dp"
                         android:text="How many portions is this recipe and ingredients for?"
                         android:textSize="15sp" />
 
                     <EditText
-                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        android:layout_marginTop="8dp"
                         android:id="@+id/addrecipes_portionsEditText"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_below="@id/addrecipes_howMany"
-                        android:layout_marginBottom="8dp"
-                        android:hint="Portions number"
+                        android:hint="Portions"
                         android:inputType="number" />
 
 
+                    <TextView
+                        android:layout_below="@id/addrecipes_portionsEditText"
+                        android:id="@+id/addRecipes_ingredientsTitle_tv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="14dp"
+                        android:layout_marginTop="16dp"
+                        android:text="Ingredients"
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
+
+
                     <androidx.recyclerview.widget.RecyclerView
+                        android:layout_marginTop="16dp"
                         android:id="@+id/addRecipes_ingredients_recyclerview"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:layout_below="@id/addrecipes_portionsEditText" />
+                        android:layout_below="@id/addRecipes_ingredientsTitle_tv" />
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/addRecipes_addIngredient_btn"
@@ -203,7 +205,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:layout_marginTop="14dp"
+                android:layout_marginTop="16dp"
                 android:text="How much does it take to make this ?"
                 android:textSize="18sp"
                 android:textStyle="bold" />
@@ -211,10 +213,11 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
+                android:layout_marginTop="8dp"
                 android:orientation="horizontal">
 
                 <EditText
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:id="@+id/addRecipe_duration_editText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -233,7 +236,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="14dp"
+                android:layout_marginTop="16dp"
                 android:text="How hard do you think it is to make this ?"
                 android:textSize="18sp"
                 android:textStyle="bold" />
@@ -251,7 +254,7 @@
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="14dp"
+                android:layout_marginTop="16dp"
                 android:hint="Keywords">
 
                 <com.google.android.material.textfield.TextInputEditText
@@ -264,7 +267,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="14dp"
+                android:layout_marginTop="16dp"
                 android:layout_marginBottom="8dp"
                 android:text="Who can see this recipe"
                 android:textSize="18sp"

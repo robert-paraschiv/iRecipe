@@ -23,32 +23,34 @@
         android:orientation="horizontal">
 
         <TextView
-            android:fontFamily="@font/open_sans"
-            android:textSize="15sp"
-            android:id="@+id/ingredient_item_Name_TextView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:maxLines="1"
-            tools:text="Ingredient name" />
-
-        <TextView
-            android:fontFamily="@font/open_sans"
-            android:textSize="15sp"
             android:id="@+id/ingredient_item_quantity_TextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
+            android:fontFamily="@font/open_sans"
+            android:textSize="15sp"
             tools:text="55" />
 
         <TextView
-            android:fontFamily="@font/open_sans"
-            android:textSize="15sp"
             android:id="@+id/ingredient_item_quantity_type_TextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
+            android:fontFamily="@font/open_sans"
+            android:textSize="15sp"
             tools:text="g" />
+
+        <TextView
+            android:id="@+id/ingredient_item_Name_TextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:fontFamily="@font/open_sans"
+            android:maxLines="1"
+            android:textSize="15sp"
+            tools:text="Ingredient name" />
+
+
     </LinearLayout>
 
 

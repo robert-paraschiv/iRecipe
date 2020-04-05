@@ -539,18 +539,8 @@ public class AddRecipesActivity extends AppCompatActivity implements EditRecipeI
         editRecipeInstructionsAdapter.setOnItemClickListener(AddRecipesActivity.this);
         editRecipeIngredientsAdapter.setOnItemClickListener(AddRecipesActivity.this);
 
-//        addInstruction();
-//        addIngredient();
-        addInstructionTest("eeeeee");
-        addIngredientTest("a");
-        addIngredientTest("b");
-        addIngredientTest("c");
-        addIngredientTest("d");
-        addIngredientTest("e");
-        addIngredientTest("f");
-        addIngredientTest("g");
-        addIngredientTest("h");
-        addIngredientTest("i");
+        addInstruction();
+        addIngredient();
     }
 
     //This function to convert DPs to pixels

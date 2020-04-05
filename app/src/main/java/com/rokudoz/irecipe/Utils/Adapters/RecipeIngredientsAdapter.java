@@ -15,6 +15,7 @@ import com.rokudoz.irecipe.R;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 
@@ -57,8 +58,10 @@ public class RecipeIngredientsAdapter extends RecyclerView.Adapter<RecipeIngredi
 
         if (currentItem.getName() != null)
             holder.tvIngredientName.setText(currentItem.getName());
-        if (currentItem.getQuantity() != null)
-            holder.tvIngredientQuantity.setText(currentItem.getQuantity().toString());
+        if (currentItem.getQuantity() != null){
+            String quantity = String.format(Locale.US, "%.1f", currentItem.getQuantity());
+            holder.tvIngredientQuantity.setText(quantity);
+        }
         if (currentItem.getQuantity_type() != null)
             holder.tvQuantityType.setText(currentItem.getQuantity_type());
     }

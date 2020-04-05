@@ -310,6 +310,10 @@ public class FeedFragment extends Fragment implements FeedAdapter.OnItemClickLis
                     List<Ingredient> userIngredient_list = new ArrayList<>();
                     final User user = documentSnapshot.toObject(User.class);
 
+                    if (user == null) {
+                        return;
+                    }
+
                     mUser = documentSnapshot.toObject(User.class);
                     loggedInUserDocumentId = documentSnapshot.getId();
 
@@ -441,9 +445,12 @@ public class FeedFragment extends Fragment implements FeedAdapter.OnItemClickLis
                                 }
                                 if (documentSnapshot != null) {
                                     Recipe recipe = documentSnapshot.toObject(Recipe.class);
-                                    post.setRecipe_name(recipe.getTitle());
-                                    post.setRecipe_imageUrl(recipe.getImageUrls_list().get(0));
-                                    mAdapter.notifyItemChanged(mPostList.indexOf(post));
+                                    if (recipe != null) {
+                                        post.setRecipe_name(recipe.getTitle());
+                                        post.setRecipe_imageUrl(recipe.getImageUrls_list().get(0));
+                                        mAdapter.notifyItemChanged(mPostList.indexOf(post));
+                                    }
+
                                 }
                             }
                         });
