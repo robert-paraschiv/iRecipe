@@ -51,6 +51,7 @@ import java.util.Objects;
 
 public class recipesBreakfastFragment extends Fragment implements RecipeAdapter.OnItemClickListener {
     private static final String TAG = "recipesBreakfastFragment";
+    private static final int NR_OF_MISSING_INGREDIENTS = 10;
 
     public View view;
 
@@ -200,6 +201,10 @@ public class recipesBreakfastFragment extends Fragment implements RecipeAdapter.
                     PerformMainQuery();
                     Log.d(TAG, "onScrollStateChanged: CANT SCROLL");
                 }
+                if (!recyclerView.canScrollVertically(-1)) {
+                    PerformMainQuery();
+                    Log.d(TAG, "onScrollStateChanged: CANT SCROLL");
+                }
             }
         });
     }
@@ -272,7 +277,7 @@ public class recipesBreakfastFragment extends Fragment implements RecipeAdapter.
                             }
                         }
                         Log.d(TAG, "onEvent: " + recipe.getTitle() + " NR OF MISSING INGREDIENTS " + numberOfMissingIngredients);
-                        if (numberOfMissingIngredients <= 3) {
+                        if (numberOfMissingIngredients <= NR_OF_MISSING_INGREDIENTS) {
                             //Check if the recipe is favorite or not
                             recipeFavListener = recipeRef.document(recipe.getDocumentId()).collection("UsersWhoFaved").document(mUser.getUser_id())
                                     .addSnapshotListener(new EventListener<DocumentSnapshot>() {
@@ -369,7 +374,7 @@ public class recipesBreakfastFragment extends Fragment implements RecipeAdapter.
                             }
                         }
                         Log.d(TAG, "onEvent: " + recipe.getTitle() + " NR OF MISSING INGREDIENTS " + numberOfMissingIngredients);
-                        if (numberOfMissingIngredients <= 3) {
+                        if (numberOfMissingIngredients <= NR_OF_MISSING_INGREDIENTS) {
                             //Check if current user liked the post or not
                             privateRecipeFavListener = recipeRef.document(recipe.getDocumentId()).collection("UsersWhoFaved").document(mUser.getUser_id())
                                     .addSnapshotListener(new EventListener<DocumentSnapshot>() {

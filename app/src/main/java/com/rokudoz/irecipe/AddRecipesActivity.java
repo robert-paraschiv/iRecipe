@@ -21,6 +21,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.MimeTypeMap;
@@ -412,11 +413,9 @@ public class AddRecipesActivity extends AppCompatActivity implements EditRecipeI
         // If there are any ingredients without category in db, ask the user
         if (ingredients_without_category.size() > 0) {
 
-            LinearLayout rootLayout = new LinearLayout(this);
-            rootLayout.setOrientation(LinearLayout.VERTICAL);
-            ScrollView scrollView = new ScrollView(this);
+            final View rootView = LayoutInflater.from(this).inflate(R.layout.dialog_add_recipe_ingredients_unknown, null);
             //Create a dialog to ask the user the category of the ingredient if there is one that isn't in db
-            final LinearLayout linearLayout = new LinearLayout(AddRecipesActivity.this);
+            final LinearLayout linearLayout = rootView.findViewById(R.id.dialog_add_recipes_linearLayout);
             linearLayout.setOrientation(LinearLayout.VERTICAL);
             final List<Spinner> category_spinner_list = new ArrayList<>();
             //create an adapter to describe how the items are displayed, adapters are used in several places in android.
@@ -444,19 +443,14 @@ public class AddRecipesActivity extends AppCompatActivity implements EditRecipeI
                 linearLayout.addView(spinner);
             }
 
-            MaterialButton materialButton = new MaterialButton(this);
-            materialButton.setText("Continue");
-            linearLayout.addView(materialButton);
-            scrollView.addView(linearLayout);
-            rootLayout.addView(scrollView);
+            MaterialButton materialButton = rootView.findViewById(R.id.dialog_add_recipes_continueBtn);
 
             final Float finalDuration1 = duration;
 
 
             final Dialog materialAlertDialogBuilder = new Dialog(AddRecipesActivity.this
                     , R.style.ThemeOverlay_MaterialComponents_MaterialAlertDialog_Centered);
-            materialAlertDialogBuilder.setContentView(rootLayout);
-            materialAlertDialogBuilder.setTitle("This ingredient isn't in our Database yet, please specify the category");
+            materialAlertDialogBuilder.setContentView(rootView);
             materialAlertDialogBuilder.setCancelable(true);
             materialButton.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -465,8 +459,6 @@ public class AddRecipesActivity extends AppCompatActivity implements EditRecipeI
                     //
                     for (int i = 0; i < category_spinner_list.size(); i++) {
                         ingredients_without_category.get(i).setCategory(category_spinner_list.get(i).getSelectedItem().toString());
-                        ingredients_without_category.get(i).setQuantity(0f);
-                        ingredients_without_category.get(i).setQuantity_type("g");
                         ingredients_list.add(ingredients_without_category.get(i));
 
                         ingredientsReference.add(ingredients_without_category.get(i)).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
@@ -547,8 +539,18 @@ public class AddRecipesActivity extends AppCompatActivity implements EditRecipeI
         editRecipeInstructionsAdapter.setOnItemClickListener(AddRecipesActivity.this);
         editRecipeIngredientsAdapter.setOnItemClickListener(AddRecipesActivity.this);
 
-        addInstruction();
-        addIngredient();
+//        addInstruction();
+//        addIngredient();
+        addInstructionTest("eeeeee");
+        addIngredientTest("a");
+        addIngredientTest("b");
+        addIngredientTest("c");
+        addIngredientTest("d");
+        addIngredientTest("e");
+        addIngredientTest("f");
+        addIngredientTest("g");
+        addIngredientTest("h");
+        addIngredientTest("i");
     }
 
     //This function to convert DPs to pixels

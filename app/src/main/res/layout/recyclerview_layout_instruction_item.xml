@@ -16,6 +16,8 @@
         android:src="@color/black" />
 
     <TextView
+        android:fontFamily="@font/open_sans"
+        android:textSize="15sp"
         android:id="@+id/step_item_StepText_TextView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

@@ -414,8 +414,6 @@ public class EditRecipeActivity extends AppCompatActivity implements EditRecipeI
                             //
                             for (int i = 0; i < category_spinner_list.size(); i++) {
                                 ingredients_without_category.get(i).setCategory(category_spinner_list.get(i).getSelectedItem().toString());
-                                ingredients_without_category.get(i).setQuantity(0f);
-                                ingredients_without_category.get(i).setQuantity_type("g");
                                 ingredients_list.add(ingredients_without_category.get(i));
 
                                 ingredientsReference.add(ingredients_without_category.get(i)).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
