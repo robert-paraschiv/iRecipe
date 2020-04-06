@@ -21,6 +21,7 @@ import com.rokudoz.irecipe.Models.Instruction;
 import com.rokudoz.irecipe.R;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -89,11 +90,16 @@ public class EditRecipeIngredientsAdapter extends RecyclerView.Adapter<EditRecip
     @Override
     public void onBindViewHolder(@NonNull final EditRecipeIngredientsViewHolder holder, final int position) {
         final Ingredient currentItem = ingredientList.get(position);
+        final String[] ingredientSpinnerItems = holder.quantityTypeSpinner.getResources().getStringArray(R.array.ingredient_quantity_type);
+        final List<String> ingredientSpinnerItemsList = Arrays.asList(ingredientSpinnerItems);
 
         if (currentItem.getName() != null)
             holder.nameEditText.setText(currentItem.getName());
         if (currentItem.getQuantity() != null)
             holder.quantityEditText.setText(currentItem.getQuantity().toString());
+        if (currentItem.getQuantity_type() != null) {
+            holder.quantityTypeSpinner.setSelection(ingredientSpinnerItemsList.indexOf(currentItem.getQuantity_type()));
+        }
 
         holder.nameEditText.addTextChangedListener(new TextWatcher() {
             @Override
@@ -119,7 +125,8 @@ public class EditRecipeIngredientsAdapter extends RecyclerView.Adapter<EditRecip
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                ingredientList.get(position).setQuantity(Float.parseFloat(s.toString()));
+                if (s != null && !s.toString().equals(""))
+                    ingredientList.get(position).setQuantity(Float.parseFloat(s.toString()));
             }
 
             @Override
@@ -127,7 +134,7 @@ public class EditRecipeIngredientsAdapter extends RecyclerView.Adapter<EditRecip
 
             }
         });
-        final String[] ingredientSpinnerItems = holder.quantityTypeSpinner.getResources().getStringArray(R.array.ingredient_quantity_type);
+
         holder.quantityTypeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int i, long id) {

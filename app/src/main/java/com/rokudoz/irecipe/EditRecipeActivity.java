@@ -60,6 +60,7 @@ import com.rokudoz.irecipe.Utils.RotateBitmap;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -74,7 +75,7 @@ public class EditRecipeActivity extends AppCompatActivity implements EditRecipeI
     TextInputEditText titleInputEditText, descriptionInputEditText, keywordsInputEditText;
     Spinner categorySpinner, privacySpinner;
     RecyclerView ingredientsRecyclerView, instructionsRecyclerView;
-    EditText durationEditText;
+    EditText durationEditText, portionsEditText;
     AppCompatSpinner durationTypeSpinner, complexitySpinner;
 
     ProgressDialog pd;
@@ -134,7 +135,7 @@ public class EditRecipeActivity extends AppCompatActivity implements EditRecipeI
         durationEditText = findViewById(R.id.editRecipes_duration_editText);
         durationTypeSpinner = findViewById(R.id.editRecipes_durationType_Spinner);
         complexitySpinner = findViewById(R.id.editRecipes_complexity_Spinner);
-
+        portionsEditText = findViewById(R.id.editRecipes_portionsEditText);
 
         if (getIntent() != null && getIntent().getStringExtra("recipe_id") != null) {
             recipe_id = getIntent().getStringExtra("recipe_id");
@@ -340,7 +341,6 @@ public class EditRecipeActivity extends AppCompatActivity implements EditRecipeI
         String keywordEt = keywordsInputEditText.getText().toString();
         final List<String> keywords = Arrays.asList(keywordEt.split("\\s*,\\s*"));
 
-        final EditText portionsEditText = findViewById(R.id.editRecipes_portionsEditText);
         if (portionsEditText.getText().toString().trim().equals("")) {
             Toast.makeText(this, "Please tell us how many portions this recipe is for", Toast.LENGTH_SHORT).show();
             return;
@@ -543,7 +543,10 @@ public class EditRecipeActivity extends AppCompatActivity implements EditRecipeI
 
                         titleInputEditText.setText(recipe.getTitle());
                         descriptionInputEditText.setText(recipe.getDescription());
-                        durationEditText.setText(recipe.getDuration().toString());
+                        durationEditText.setText(MessageFormat.format("{0}", recipe.getDuration()));
+                        List<String> durationArray = Arrays.asList(getResources().getStringArray(R.array.DurationType));
+                        durationTypeSpinner.setSelection(durationArray.indexOf(recipe.getDurationType()));
+                        portionsEditText.setText(MessageFormat.format("{0}", recipe.getPortions()));
 
                         String keywords = "";
 

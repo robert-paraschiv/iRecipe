@@ -17,13 +17,13 @@
             android:layout_height="wrap_content">
 
             <com.google.android.material.button.MaterialButton
-                app:iconGravity="start"
                 android:id="@+id/messageFragment_backBtn"
                 style="@style/Widget.MaterialComponents.Button.TextButton"
                 android:layout_width="50dp"
                 android:layout_height="wrap_content"
                 android:layout_alignParentStart="true"
-                app:icon="@drawable/ic_baseline_arrow_back_24" />
+                app:icon="@drawable/ic_baseline_arrow_back_24"
+                app:iconGravity="start" />
 
             <RelativeLayout
                 android:id="@+id/relLayout1"
@@ -41,7 +41,6 @@
                     tools:src="@color/colorPrimaryDark" />
 
                 <TextView
-                    android:textSize="16sp"
                     android:id="@+id/message_friendName_TextView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -50,20 +49,21 @@
                     android:layout_marginEnd="8dp"
                     android:layout_toEndOf="@id/message_friendImage_ImageView"
                     android:textColor="@color/color_message_friend_text"
+                    android:textSize="16sp"
                     tools:text="Friend name" />
 
                 <TextView
-                    android:layout_marginTop="-2dp"
-                    android:visibility="invisible"
-                    tools:visibility="visible"
                     android:id="@+id/fragment_message_onlineStatus"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_below="@id/message_friendName_TextView"
                     android:layout_marginStart="8dp"
+                    android:layout_marginTop="-2dp"
                     android:layout_toEndOf="@id/message_friendImage_ImageView"
                     android:textSize="12sp"
-                    tools:text="Online" />
+                    android:visibility="invisible"
+                    tools:text="Online"
+                    tools:visibility="visible" />
             </RelativeLayout>
         </RelativeLayout>
     </com.google.android.material.appbar.MaterialToolbar>
@@ -74,15 +74,16 @@
         android:layout_height="match_parent"
         android:layout_above="@id/message_text_layout"
         android:layout_below="@id/message_toolbar"
-        android:layout_margin="4dp" />
+        android:padding="4dp" />
 
     <RelativeLayout
         android:id="@+id/message_text_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_marginTop="4dp"
-        android:layout_marginBottom="4dp">
+        android:layout_marginBottom="4dp"
+        android:clipToPadding="false"
+        android:padding="4dp">
 
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/message_input_card"
