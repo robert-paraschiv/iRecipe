@@ -287,7 +287,7 @@ public class RecipeDetailedFragment extends Fragment implements RecipeInstructio
                         TimePickerDialog timePickerDialog = new TimePickerDialog(getActivity(), new TimePickerDialog.OnTimeSetListener() {
                             @Override
                             public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-                                final DateFormat dateFormat = new SimpleDateFormat("dd, MMMM, YYYY", Locale.getDefault());
+                                final DateFormat dateFormat = new SimpleDateFormat("dd MMMM YYYY", Locale.getDefault());
 
                                 final Date date = new GregorianCalendar(year, month, dayOfMonth, hourOfDay, minute).getTime();
 

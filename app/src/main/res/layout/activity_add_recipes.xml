@@ -150,6 +150,7 @@
                         android:layout_below="@id/addRecipes_ingredientsTitle_tv" />
 
                     <com.google.android.material.button.MaterialButton
+                        app:icon="@drawable/ic_fb_plus"
                         android:id="@+id/addRecipes_addIngredient_btn"
                         style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                         android:layout_width="wrap_content"
@@ -157,7 +158,7 @@
                         android:layout_below="@+id/addRecipes_ingredients_recyclerview"
                         android:layout_centerHorizontal="true"
                         android:layout_marginTop="8dp"
-                        android:text="Add New Ingredient"
+                        android:text="Ingredient"
                         app:cornerRadius="@dimen/buttonCornerRadius" />
                 </RelativeLayout>
             </RelativeLayout>
@@ -189,14 +190,15 @@
                         android:layout_below="@id/addRecipes_instructionsTitle_tv" />
 
                     <com.google.android.material.button.MaterialButton
+                        app:icon="@drawable/ic_fb_plus"
                         android:id="@+id/addRecipes_addInstruction_btn"
-                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        style="@style/Widget.MaterialComponents.Button.TextButton"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_below="@id/addRecipes_instructions_recyclerview"
                         android:layout_centerHorizontal="true"
                         android:layout_marginTop="8dp"
-                        android:text="Add Step"
+                        android:text="Step"
                         app:cornerRadius="@dimen/buttonCornerRadius" />
                 </RelativeLayout>
             </RelativeLayout>

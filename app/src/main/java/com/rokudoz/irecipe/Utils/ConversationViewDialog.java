@@ -13,11 +13,12 @@ import android.widget.TextView;
 
 import androidx.navigation.Navigation;
 
+import com.bumptech.glide.Glide;
 import com.rokudoz.irecipe.R;
 
 public class ConversationViewDialog {
 
-    public void showDialog(Activity activity, String userName, final String userId, Bitmap userPictureBitmap, final View view) {
+    public void showDialog(Activity activity, String userName, final String userId, String userPicUrl, final View view) {
         final Dialog dialog = new Dialog(activity);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setCancelable(true);
@@ -28,7 +29,7 @@ public class ConversationViewDialog {
         text.setText(userName);
 
         ImageView imageView = dialog.findViewById(R.id.conversationDialog_user_picture);
-        imageView.setImageBitmap(userPictureBitmap);
+        Glide.with(activity).load(userPicUrl).centerInside().into(imageView);
 
         Button dialogButton = dialog.findViewById(R.id.conversationDialog_viewProfileBtn);
         dialogButton.setOnClickListener(new View.OnClickListener() {

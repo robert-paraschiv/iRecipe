@@ -50,7 +50,7 @@
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="16dp"
                 android:text="Choose Photo"
-                app:cornerRadius="18dp" />
+                app:cornerRadius="@dimen/buttonCornerRadius" />
 
             <com.google.android.material.textfield.TextInputLayout
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
@@ -74,7 +74,7 @@
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="16dp"
                 android:text="Select recipe used"
-                app:cornerRadius="18dp" />
+                app:cornerRadius="@dimen/buttonCornerRadius" />
 
             <TextView
                 android:layout_width="match_parent"
@@ -101,7 +101,7 @@
                 android:layout_gravity="bottom|center_horizontal"
                 android:layout_marginTop="16dp"
                 android:text="Publish"
-                app:cornerRadius="18dp" />
+                app:cornerRadius="@dimen/buttonCornerRadius" />
 
         </LinearLayout>
     </LinearLayout>

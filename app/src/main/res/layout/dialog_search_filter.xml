@@ -56,7 +56,7 @@
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="8dp"
             android:text="Apply"
-            app:cornerRadius="18dp" />
+            app:cornerRadius="@dimen/buttonCornerRadius" />
 
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

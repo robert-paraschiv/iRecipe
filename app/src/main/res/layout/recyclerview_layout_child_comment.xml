@@ -69,6 +69,7 @@
                     android:maxLines="4" />
 
                 <com.google.android.material.button.MaterialButton
+                    app:cornerRadius="@dimen/buttonCornerRadius"
                     android:id="@+id/comment_rv_comment_save"
                     style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                     android:layout_width="wrap_content"
@@ -79,6 +80,7 @@
                     android:textAllCaps="false" />
 
                 <com.google.android.material.button.MaterialButton
+                    app:cornerRadius="@dimen/buttonCornerRadius"
                     android:id="@+id/comment_rv_comment_cancel"
                     style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                     android:layout_width="wrap_content"
@@ -91,7 +93,7 @@
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/comment_rv_comment_delete"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    style="@style/Widget.MaterialComponents.Button.TextButton"
                     android:layout_width="wrap_content"
                     android:layout_height="40dp"
                     android:layout_below="@id/comment_rv_comment_editText"

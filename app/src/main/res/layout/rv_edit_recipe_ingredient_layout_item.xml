@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="4dp"
+    android:elevation="2dp"
     app:cardCornerRadius="18dp">
 
     <RelativeLayout
@@ -43,6 +44,7 @@
             android:entries="@array/ingredient_quantity_type" />
 
         <com.google.android.material.button.MaterialButton
+            app:icon="@drawable/ic_delete_black_24dp"
             android:id="@+id/rv_edit_recipe_ingredient_removeIngredient_btn"
             style="@style/Widget.MaterialComponents.Button.TextButton"
             android:layout_width="wrap_content"
@@ -50,7 +52,7 @@
             android:layout_below="@id/rv_edit_recipe_ingredient_quantity_spinner"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="6dp"
-            android:text="Remove ingredient"
+            android:text="Ingredient"
             app:cornerRadius="18dp" />
 
     </RelativeLayout>

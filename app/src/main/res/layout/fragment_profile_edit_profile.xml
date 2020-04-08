@@ -114,6 +114,7 @@
             android:spinnerMode="dropdown" />
 
         <com.google.android.material.button.MaterialButton
+            app:cornerRadius="@dimen/buttonCornerRadius"
             android:id="@+id/profileFragmentEditProfile_save_MaterialButton"
             style="@style/Widget.MaterialComponents.Button.OutlinedButton"
             android:layout_width="wrap_content"

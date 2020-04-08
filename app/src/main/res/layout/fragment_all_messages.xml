@@ -12,8 +12,7 @@
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/allMessages_toolbar"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/actionBar_size"
-            android:background="@color/toolbar_color">
+            android:layout_height="@dimen/actionBar_size">
 
             <RelativeLayout
                 android:layout_width="match_parent"

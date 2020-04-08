@@ -114,8 +114,10 @@ public class EditRecipeInstructionsAdapter extends RecyclerView.Adapter<EditReci
             holder.stepImage.setVisibility(View.VISIBLE);
             Glide.with(holder.stepImage).load(currentItem.getImgUrl()).centerCrop().into(holder.stepImage);
             holder.addPhotoBtn.setText("Change Photo");
+            holder.addPhotoBtn.setIconResource(R.drawable.ic_add_a_photo_black_24dp);
         } else {
-            holder.addPhotoBtn.setText("Add Photo");
+            holder.addPhotoBtn.setText("Photo");
+            holder.addPhotoBtn.setIconResource(R.drawable.ic_fb_plus);
             holder.stepImage.setVisibility(View.GONE);
         }
 

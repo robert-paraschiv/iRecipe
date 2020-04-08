@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".Fragments.PostComments">
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -13,45 +14,54 @@
             android:id="@+id/commentFragment_recycler_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_margin="4dp"
             android:layout_above="@id/commentFragment_text_layout"
-            />
+            android:layout_margin="4dp" />
+
         <RelativeLayout
+            android:id="@+id/commentFragment_text_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/commentFragment_text_layout"
             android:layout_alignParentBottom="true"
             android:layout_marginBottom="4dp"
-            >
+            android:clipToPadding="false"
+            android:padding="4dp">
+
             <com.google.android.material.card.MaterialCardView
+                android:id="@+id/commentFragment_input_card"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="70dp"
-                android:layout_marginStart="4dp"
-                app:cardCornerRadius="18dp"
-                android:id="@+id/commentFragment_input_card"
                 android:layout_centerVertical="true"
-                >
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="70dp"
+                app:cardCornerRadius="18dp">
+
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/commentFragment_input_TextInput"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginEnd="8dp"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:inputType="textCapSentences"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginEnd="8dp"
                     android:hint="Comment"
-                    />
+                    android:inputType="textCapSentences" />
             </com.google.android.material.card.MaterialCardView>
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/commentFragment_send_MaterialBtn"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="50dp"
+                android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
-                android:layout_marginEnd="8dp"
-                app:icon="@drawable/ic_send_black_24dp"
                 android:layout_centerVertical="true"
-                style="@style/Widget.MaterialComponents.Button.TextButton"
-                />
+                android:layout_marginEnd="8dp"
+                app:cardCornerRadius="30dp">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/commentFragment_send_MaterialBtn"
+                    style="@style/Widget.MaterialComponents.Button.TextButton"
+                    android:layout_width="40dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    app:icon="@drawable/ic_send_black_24dp" />
+            </com.google.android.material.card.MaterialCardView>
         </RelativeLayout>
 
     </RelativeLayout>

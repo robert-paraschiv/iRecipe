@@ -254,17 +254,6 @@ public class AllMessagesFragment extends Fragment implements ConversationAdapter
     public void onPictureClick(int position) {
         final Conversation conversation = conversationList.get(position);
         final ConversationViewDialog conversationViewDialog = new ConversationViewDialog();
-        Glide.with(Objects.requireNonNull(getActivity())).asBitmap().load(conversation.getUser_profilePic()).apply(RequestOptions.circleCropTransform())
-                .into(new CustomTarget<Bitmap>() {
-                    @Override
-                    public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
-                        conversationViewDialog.showDialog(getActivity(), conversation.getUser_name(), conversation.getUserId(), resource, view);
-                    }
-
-                    @Override
-                    public void onLoadCleared(@Nullable Drawable placeholder) {
-
-                    }
-                });
+        conversationViewDialog.showDialog(getActivity(), conversation.getUser_name(), conversation.getUserId(), conversation.getUser_profilePic(), view);
     }
 }

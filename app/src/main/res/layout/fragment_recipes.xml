@@ -63,7 +63,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/fragmentHomeAppBarLayout"
         android:layout_margin="4dp"
-        app:cardCornerRadius="18dp"
+        app:cardCornerRadius="12dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <com.google.android.material.appbar.AppBarLayout

@@ -527,7 +527,8 @@ public class UserProfileFragment extends Fragment implements PostAdapter.OnItemC
     @Override
     public void onItemClick(int position) {
         String id = mPostList.get(position).getDocumentId();
-        Navigation.findNavController(view).navigate(UserProfileFragmentDirections.actionUserProfileFragment2ToPostDetailed(id));
+        if (id != null && !id.equals(""))
+            Navigation.findNavController(view).navigate(UserProfileFragmentDirections.actionUserProfileFragment2ToPostDetailed(id));
     }
 
     @Override

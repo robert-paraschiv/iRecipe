@@ -100,6 +100,7 @@
                                 tools:text="Description" />
 
                             <com.google.android.material.button.MaterialButton
+                                app:cornerRadius="@dimen/buttonCornerRadius"
                                 android:id="@+id/userprofile_addFriend_MaterialButton"
                                 style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                                 android:layout_width="wrap_content"
@@ -133,6 +134,7 @@
                                     android:textSize="15sp" />
 
                                 <com.google.android.material.button.MaterialButton
+                                    app:cornerRadius="@dimen/buttonCornerRadius"
                                     android:id="@+id/userprofile_acceptFriend_MaterialButton"
                                     style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                                     android:layout_width="wrap_content"
@@ -144,6 +146,7 @@
                                     android:textSize="14sp" />
 
                                 <com.google.android.material.button.MaterialButton
+                                    app:cornerRadius="@dimen/buttonCornerRadius"
                                     android:id="@+id/userprofile_declineFriendReq_MaterialButton"
                                     style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                                     android:layout_width="wrap_content"
@@ -187,7 +190,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="4dp"
-            app:cardCornerRadius="18dp">
+            app:cardCornerRadius="12dp">
 
             <RelativeLayout
                 android:layout_width="match_parent"

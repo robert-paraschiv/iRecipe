@@ -1,46 +1,53 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:background="@color/toolbar_color"
     android:layout_width="350dp"
-    android:layout_height="350dp"
+    android:layout_height="450dp"
     android:layout_gravity="center"
-    android:orientation="vertical">
+    android:background="@color/toolbar_color"
+    android:elevation="2dp"
+    android:orientation="vertical"
+    app:cardCornerRadius="18dp">
 
-    <de.hdodenhof.circleimageview.CircleImageView
-        tools:src="@color/black"
-        android:layout_marginTop="4dp"
-        android:id="@+id/conversationDialog_user_picture"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="220dp"
-        android:contentDescription="Profile picture"
-        android:gravity="center"
-        android:scaleType="centerCrop" />
+        android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/conversationDialog_user_name"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/conversationDialog_user_picture"
-        android:layout_centerHorizontal="true"
-        android:layout_marginLeft="4dp"
-        android:layout_marginTop="20dp"
-        android:layout_marginRight="4dp"
-        android:layout_marginBottom="20dp"
-        android:gravity="center_horizontal"
-        android:textSize="18sp"
-        tools:text="User Full Name" />
+        <ImageView
+            android:id="@+id/conversationDialog_user_picture"
+            android:layout_width="match_parent"
+            android:layout_height="330dp"
+            android:contentDescription="Profile picture"
+            android:gravity="center"
+            android:scaleType="centerCrop"
+            tools:src="@color/black" />
 
-    <Button
-        android:id="@+id/conversationDialog_viewProfileBtn"
-        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/conversationDialog_user_name"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="20dp"
-        android:gravity="center_vertical|center_horizontal"
-        android:text="View Profile"
-        app:cornerRadius="18dp" />
+        <TextView
+            android:id="@+id/conversationDialog_user_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/conversationDialog_user_picture"
+            android:layout_centerHorizontal="true"
+            android:layout_marginLeft="4dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginRight="4dp"
+            android:layout_marginBottom="20dp"
+            android:gravity="center_horizontal"
+            android:textColor="@color/calendar_textColor"
+            android:textSize="18sp"
+            tools:text="User Full Name" />
 
-</RelativeLayout>
+        <Button
+            android:id="@+id/conversationDialog_viewProfileBtn"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/conversationDialog_user_name"
+            android:layout_centerHorizontal="true"
+            android:gravity="center_vertical|center_horizontal"
+            android:text="View Profile"
+            app:cornerRadius="@dimen/buttonCornerRadius" />
+    </RelativeLayout>
+
+
+</com.google.android.material.card.MaterialCardView>

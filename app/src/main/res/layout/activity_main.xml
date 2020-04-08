@@ -20,6 +20,7 @@
         app:navGraph="@navigation/nav_graph" />
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:elevation="2dp"
         android:id="@+id/bottom_navigation"
         android:layout_width="match_parent"
         android:layout_height="45dp"

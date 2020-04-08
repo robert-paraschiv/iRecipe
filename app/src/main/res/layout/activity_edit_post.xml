@@ -16,8 +16,31 @@
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/actionBar_size"
-            app:title="Edit Post" />
+            android:layout_height="@dimen/actionBar_size">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <TextView
+                    style="@style/TextAppearance.MaterialComponents.Headline6"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:text="Edit Post" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/editPost_delete_btn"
+                    style="@style/Widget.MaterialComponents.Button.TextButton"
+                    android:layout_width="40dp"
+                    android:layout_height="45dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginEnd="8dp"
+                    app:cornerRadius="@dimen/buttonCornerRadius"
+                    app:icon="@drawable/ic_delete_black_24dp" />
+            </RelativeLayout>
+
+        </com.google.android.material.appbar.MaterialToolbar>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -52,8 +75,8 @@
                     android:id="@+id/editPost_description_editText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="textMultiLine"
-                    android:imeOptions="flagNoExtractUi"/>
+                    android:imeOptions="flagNoExtractUi"
+                    android:inputType="textMultiLine" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.button.MaterialButton
@@ -64,7 +87,7 @@
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="16dp"
                 android:text="Select recipe used"
-                app:cornerRadius="18dp" />
+                app:cornerRadius="@dimen/buttonCornerRadius" />
 
             <TextView
                 android:layout_width="match_parent"
@@ -91,16 +114,7 @@
                 android:layout_gravity="bottom|center_horizontal"
                 android:layout_marginTop="16dp"
                 android:text="Update"
-                app:cornerRadius="18dp" />
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/editPost_delete_btn"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="bottom|center_horizontal"
-                android:layout_marginTop="16dp"
-                android:text="Delete post"
-                app:cornerRadius="18dp" />
+                app:cornerRadius="@dimen/buttonCornerRadius" />
 
         </LinearLayout>
     </LinearLayout>

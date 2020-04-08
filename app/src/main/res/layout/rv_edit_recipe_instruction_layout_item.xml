@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="4dp"
+    android:elevation="2dp"
     app:cardCornerRadius="18dp">
 
     <RelativeLayout
@@ -19,8 +20,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Step text"
-            android:importantForAutofill="no"
             android:imeOptions="flagNoExtractUi"
+            android:importantForAutofill="no"
             android:inputType="textMultiLine" />
 
         <ImageView
@@ -31,25 +32,32 @@
             android:contentDescription="Instruction step image"
             tools:src="@color/colorPrimary" />
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/rv_edit_recipe_instruction_addPhoto_btn"
-            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+        <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/rv_edit_recipe_instruction_imageView"
-            android:layout_centerHorizontal="true"
-            android:text="Add photo"
-            app:cornerRadius="18dp" />
+            android:layout_centerHorizontal="true">
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/rv_edit_recipe_instruction_removeStep_btn"
-            style="@style/Widget.MaterialComponents.Button.TextButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/rv_edit_recipe_instruction_addPhoto_btn"
-            android:layout_centerHorizontal="true"
-            android:text="Remove step"
-            app:cornerRadius="18dp" />
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/rv_edit_recipe_instruction_addPhoto_btn"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Photo"
+                app:cornerRadius="@dimen/buttonCornerRadius"
+                app:icon="@drawable/ic_fb_plus" />
+
+            <com.google.android.material.button.MaterialButton
+                app:icon="@drawable/ic_delete_black_24dp"
+                android:id="@+id/rv_edit_recipe_instruction_removeStep_btn"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toEndOf="@id/rv_edit_recipe_instruction_addPhoto_btn"
+                android:text="Step"
+                app:cornerRadius="18dp" />
+        </RelativeLayout>
+
     </RelativeLayout>
 
 </com.google.android.material.card.MaterialCardView>

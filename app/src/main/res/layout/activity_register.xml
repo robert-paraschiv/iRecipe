@@ -98,7 +98,7 @@
             android:background="@drawable/white_onclick_grey"
             android:padding="12dp"
             android:text="Register"
-            app:cornerRadius="18dp" />
+            app:cornerRadius="@dimen/buttonCornerRadius" />
 
     </LinearLayout>
 

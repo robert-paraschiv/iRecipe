@@ -9,8 +9,7 @@
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/message_toolbar"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/actionBar_size"
-        android:background="@color/toolbar_color">
+        android:layout_height="@dimen/actionBar_size">
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -95,6 +94,7 @@
             app:cardCornerRadius="30dp">
 
             <com.google.android.material.textfield.TextInputEditText
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:id="@+id/message_input_TextInput"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"

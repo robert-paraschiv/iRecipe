@@ -16,8 +16,9 @@
         android:id="@+id/ingredients_checkbox_scrollView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_above="@id/empty_basket_btn"
         android:layout_below="@id/toolbar"
-        android:layout_marginTop="12dp">
+        android:layout_marginTop="4dp">
 
         <LinearLayout
             android:id="@+id/ingredients_checkBox_linearLayout"
@@ -34,10 +35,10 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="10dp"
+        android:layout_marginBottom="8dp"
         android:text="Empty basket"
         android:visibility="invisible"
-        app:cornerRadius="18dp"
+        app:cornerRadius="@dimen/buttonCornerRadius"
         tools:visibility="visible" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton

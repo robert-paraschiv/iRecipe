@@ -81,7 +81,7 @@ public class ScheduleFragment extends Fragment implements ScheduledMealAdapter.O
         final Date currentDate = new Date();
 
         final DateFormat smallDateFormat = new SimpleDateFormat("MMMM, YYYY", Locale.getDefault());
-        final DateFormat dateFormat = new SimpleDateFormat("dd, MMMM, YYYY", Locale.getDefault());
+        final DateFormat dateFormat = new SimpleDateFormat("dd MMMM YYYY", Locale.getDefault());
         final String currentDateString = dateFormat.format(currentDate);
         String currentMonthString = smallDateFormat.format(calendarView.getFirstDayOfCurrentMonth());
         monthTextView.setText(currentMonthString);
