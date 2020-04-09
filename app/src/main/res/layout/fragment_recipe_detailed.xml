@@ -8,12 +8,13 @@
     android:fitsSystemWindows="true">
 
     <com.google.android.material.appbar.AppBarLayout
-        android:id="@+id/toolbar"
+        android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@null">
 
         <com.google.android.material.appbar.CollapsingToolbarLayout
+            android:id="@+id/collapsingToolbarLayout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@null"
@@ -28,6 +29,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="500dp"
                 app:layout_collapseMode="parallax" />
+
 
         </com.google.android.material.appbar.CollapsingToolbarLayout>
     </com.google.android.material.appbar.AppBarLayout>
@@ -44,305 +46,360 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <ImageView
-                android:id="@+id/imageview_favorite_icon"
-                android:layout_width="33dp"
-                android:layout_height="33dp"
-                android:layout_alignParentStart="true"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="8dp"
-                android:src="@drawable/ic_favorite_border_black_24dp" />
-
-            <TextView
-                android:id="@+id/recipeDetailed_numberOfFaved"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="4dp"
-                android:layout_marginTop="14dp"
-                android:layout_toStartOf="@id/recipeDetailed_creatorImage_ImageView"
-                android:layout_toEndOf="@id/imageview_favorite_icon"
-                tools:text="88" />
-
-
-            <de.hdodenhof.circleimageview.CircleImageView
-                android:id="@+id/recipeDetailed_creatorImage_ImageView"
-                android:layout_width="33dp"
-                android:layout_height="33dp"
-                android:layout_marginTop="8dp"
-                android:layout_marginEnd="8dp"
-                android:layout_toStartOf="@id/recipeDetailed_creatorName_TextView"
-                tools:src="@color/colorPrimaryDark" />
-
-            <TextView
-                android:id="@+id/recipeDetailed_creatorName_TextView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_marginTop="14dp"
-                android:layout_marginEnd="8dp"
-                tools:text="Creator name" />
-
-
-            <TextView
-                android:id="@+id/tvTitle"
-                style="@style/TextAppearance.MaterialComponents.Headline6"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/recipeDetailed_creatorImage_ImageView"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="4dp"
-                android:layout_marginEnd="16dp"
-                android:maxLines="1"
-                tools:text="TitleHere" />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/recipeDetailed_editRecipe_MaterialBtn"
-                style="@style/Widget.MaterialComponents.Button.TextButton"
-                android:layout_width="33dp"
-                android:layout_height="33dp"
-                android:layout_below="@id/recipeDetailed_creatorImage_ImageView"
-                android:layout_alignParentEnd="true"
-                android:layout_marginTop="4dp"
-                android:layout_marginEnd="8dp"
-                android:visibility="invisible"
-                app:cornerRadius="18dp"
-                app:icon="@drawable/ic_edit_black_24dp"
-                tools:visibility="visible" />
-
-            <TextView
-                android:id="@+id/missing_ingredientsNumber"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/tvTitle"
-                android:layout_centerHorizontal="true"
-                android:layout_marginTop="8dp"
-                tools:text="Missing 2 ingredients" />
-
-            <TextView
-                android:id="@+id/tvDescription"
-                style="@style/TextAppearance.AppCompat"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/missing_ingredientsNumber"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="8dp"
-                tools:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla placerat magna in felis dignissim rhoncus. In nec tortor sit amet nisi blandit blandit. Mauris et venenatis massa, eu feugiat ligula. Sed faucibus vel felis ut accumsan. Curabitur sed euismod ante. Vestibulum vestibulum ligula et orci feugiat lobortis. Etiam vel lorem rhoncus, congue ipsum sit amet, lobortis erat. Morbi suscipit, ex eget accumsan pulvinar, felis ipsum maximus enim, sit amet maximus nisl orci a dolor. Donec faucibus nunc nisl. Sed vestibulum, quam eget accumsan lacinia, lectus lacus sodales odio, eu dapibus dolor ante non lectus. Morbi in interdum augue, et vehicula odio. Quisque sed aliquam sapien, non feugiat lacus." />
-
-
-            <LinearLayout
-                android:id="@+id/recipeDetailed_complexityLayout"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/tvDescription"
-                android:layout_centerHorizontal="true"
-                android:layout_marginTop="16dp"
-                android:orientation="horizontal">
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="16dp"
-                    android:gravity="center_horizontal"
-                    android:orientation="vertical">
-
-                    <ImageView
-                        android:id="@+id/recipeDetailed_watch"
-                        android:layout_width="25dp"
-                        android:layout_height="25dp"
-                        android:src="@drawable/ic_outline_watch_later_24" />
-
-                    <TextView
-                        android:id="@+id/recipeDetailed_duration"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="3dp"
-                        tools:text="333335" />
-                </LinearLayout>
-
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_horizontal"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:id="@+id/recipeDetailed_complexityDumb"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:text="Complexity" />
-
-                    <TextView
-                        android:id="@+id/recipeDetailed_complexity"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        tools:text="Easy" />
-                </LinearLayout>
-
-            </LinearLayout>
-
-
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/recipeDetailed_ingredients_Card"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/recipeDetailed_complexityLayout"
-                android:layout_marginStart="4dp"
-                android:layout_marginTop="20dp"
-                android:layout_marginEnd="4dp"
-                app:cardCornerRadius="18dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="vertical">
-
-
-                    <TextView
-                        android:id="@+id/tvIngredientsList"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:layout_marginTop="8dp"
-                        android:text="Ingredients"
-                        android:textSize="18sp" />
-
-                    <LinearLayout
-                        android:id="@+id/recipeDetailed_portionsLayout"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:gravity="center_horizontal"
-                        android:orientation="horizontal"
-                        android:visibility="invisible"
-                        tools:visibility="visible">
-
-                        <com.google.android.material.button.MaterialButton
-                            android:id="@+id/recipeDetailed_decreasePortionsBtn"
-                            style="@style/Widget.MaterialComponents.Button.TextButton"
-                            android:layout_width="60dp"
-                            android:layout_height="wrap_content"
-                            app:icon="@drawable/ic_baseline_arrow_back_24" />
-
-                        <TextView
-                            android:id="@+id/recipeDetailed_portionsNumberTv"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center"
-                            android:layout_marginStart="12dp"
-                            android:layout_marginEnd="12dp"
-                            tools:text="4 portions" />
-
-                        <com.google.android.material.button.MaterialButton
-                            android:id="@+id/recipeDetailed_increasePortionsBtn"
-                            style="@style/Widget.MaterialComponents.Button.TextButton"
-                            android:layout_width="60dp"
-                            android:layout_height="wrap_content"
-                            app:icon="@drawable/ic_baseline_arrow_forward_24" />
-                    </LinearLayout>
-
-                    <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/recipeDetailed_ingredients_recycler_view"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_marginTop="2dp"
-                        android:transitionName="example_transition" />
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
-
-
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/recipeDetailed_instruction_Card"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/recipeDetailed_ingredients_Card"
-                android:layout_marginStart="4dp"
-                android:layout_marginTop="20dp"
-                android:layout_marginEnd="4dp"
-                android:layout_marginBottom="4dp"
-                app:cardCornerRadius="18dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:id="@+id/recipeDetailed_instructions_TextView"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="12dp"
-                        android:layout_marginBottom="8dp"
-                        android:text="Instructions step by step"
-                        android:textSize="18sp" />
-
-                    <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/recipeDetailed_instructions_recycler_view"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_marginTop="8dp"
-                        android:transitionName="example_transition" />
-                </LinearLayout>
-
-            </com.google.android.material.card.MaterialCardView>
-
             <RelativeLayout
-                android:id="@+id/recipeDetailed_text_layout"
+                android:id="@+id/recipeDetailed_TitleLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/recipeDetailed_instruction_Card"
-                android:layout_marginTop="8dp"
-                android:layout_marginBottom="8dp">
+                android:layout_gravity="bottom"
+                android:layout_marginBottom="8dp"
+                android:clipToPadding="false"
+                android:padding="4dp">
 
                 <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/commentFragment_input_card"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:layout_marginStart="4dp"
-                    android:layout_marginEnd="70dp"
-                    app:cardCornerRadius="18dp">
+                    android:layout_centerHorizontal="true"
+                    android:elevation="4dp"
+                    app:cardCornerRadius="8dp">
 
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/recipeDetailed_et_commentInput"
+                    <RelativeLayout
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_marginStart="8dp"
-                        android:layout_marginEnd="8dp"
-                        android:hint="Comment"
-                        android:inputType="textCapSentences" />
+                        android:layout_height="wrap_content"
+                        android:padding="8dp">
+
+                        <TextView
+                            android:id="@+id/tvTitle"
+                            style="@style/TextAppearance.MaterialComponents.Headline6"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerHorizontal="true"
+                            android:maxLines="1"
+                            tools:text="Avocado Deviled Eggs" />
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@id/tvTitle"
+                            android:layout_centerHorizontal="true"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:id="@+id/recipeDetailed_creatorName_TextView"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center_vertical"
+                                tools:text="FoodifyTest" />
+
+                            <de.hdodenhof.circleimageview.CircleImageView
+                                android:id="@+id/recipeDetailed_creatorImage_ImageView"
+                                android:layout_width="33dp"
+                                android:layout_height="33dp"
+                                android:layout_marginStart="8dp"
+                                tools:src="@color/colorPrimaryDark" />
+
+                        </LinearLayout>
+
+                    </RelativeLayout>
                 </com.google.android.material.card.MaterialCardView>
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/recipeDetailed_addComment_btn"
-                    style="@style/Widget.MaterialComponents.Button.TextButton"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:layout_alignParentEnd="true"
-                    android:layout_centerVertical="true"
-                    android:layout_marginEnd="8dp"
-                    app:icon="@drawable/ic_send_black_24dp" />
             </RelativeLayout>
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/comment_recycler_view"
+            <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_below="@id/recipeDetailed_text_layout"
-                android:layout_marginTop="10dp"
-                android:transitionName="example_transition" />
+                android:layout_height="wrap_content"
+                android:layout_below="@id/recipeDetailed_TitleLayout">
+
+
+                <ImageView
+                    android:id="@+id/imageview_favorite_icon"
+                    android:layout_width="33dp"
+                    android:layout_height="33dp"
+                    android:layout_alignParentStart="true"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="8dp"
+                    android:src="@drawable/ic_favorite_border_black_24dp" />
+
+                <TextView
+                    android:id="@+id/recipeDetailed_numberOfFaved"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="4dp"
+                    android:layout_marginTop="14dp"
+                    android:layout_toEndOf="@id/imageview_favorite_icon"
+                    tools:text="88" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/recipeDetailed_editRecipe_MaterialBtn"
+                    style="@style/Widget.MaterialComponents.Button.TextButton"
+                    android:layout_width="33dp"
+                    android:layout_height="33dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginEnd="8dp"
+                    android:visibility="invisible"
+                    app:cornerRadius="18dp"
+                    app:icon="@drawable/ic_edit_black_24dp"
+                    tools:visibility="visible" />
+
+                <TextView
+                    android:id="@+id/missing_ingredientsNumber"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/recipeDetailed_numberOfFaved"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginTop="16dp"
+                    tools:text="Missing 2 ingredients" />
+
+                <TextView
+                    android:id="@+id/tvDescription"
+                    style="@style/TextAppearance.AppCompat"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/missing_ingredientsNumber"
+                    android:layout_margin="16dp"
+                    tools:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla placerat magna in felis dignissim rhoncus. In nec tortor sit amet nisi blandit blandit. Mauris et venenatis massa, eu feugiat ligula. Sed faucibus vel felis ut accumsan. Curabitur sed euismod ante. Vestibulum vestibulum ligula et orci feugiat lobortis. Etiam vel lorem rhoncus, congue ipsum sit amet, lobortis erat. Morbi suscipit, ex eget accumsan pulvinar, felis ipsum maximus enim, sit amet maximus nisl orci a dolor. Donec faucibus nunc nisl. Sed vestibulum, quam eget accumsan lacinia, lectus lacus sodales odio, eu dapibus dolor ante non lectus. Morbi in interdum augue, et vehicula odio. Quisque sed aliquam sapien, non feugiat lacus." />
+
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="0.15dp"
+                    android:layout_below="@id/tvDescription"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:src="@color/spacer" />
+
+                <LinearLayout
+                    android:id="@+id/recipeDetailed_complexityLayout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/tvDescription"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginTop="16dp"
+                    android:orientation="horizontal">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="16dp"
+                        android:gravity="center_horizontal"
+                        android:orientation="vertical">
+
+                        <ImageView
+                            android:id="@+id/recipeDetailed_watch"
+                            android:layout_width="25dp"
+                            android:layout_height="25dp"
+                            android:src="@drawable/ic_outline_watch_later_24" />
+
+                        <TextView
+                            android:id="@+id/recipeDetailed_duration"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="3dp"
+                            tools:text="333335" />
+                    </LinearLayout>
+
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_horizontal"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/recipeDetailed_complexityDumb"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:text="Complexity" />
+
+                        <TextView
+                            android:id="@+id/recipeDetailed_complexity"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            tools:text="Easy" />
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="0.15dp"
+                    android:layout_below="@id/recipeDetailed_complexityLayout"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:src="@color/spacer" />
+
+
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/recipeDetailed_ingredients_Card"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/recipeDetailed_complexityLayout"
+                    android:layout_marginStart="4dp"
+                    android:layout_marginTop="30dp"
+                    android:layout_marginEnd="4dp"
+                    android:elevation="2dp"
+                    android:padding="4dp"
+                    app:cardCornerRadius="18dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical">
+
+
+                        <TextView
+                            android:id="@+id/tvIngredientsList"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:layout_marginTop="8dp"
+                            android:text="Ingredients"
+                            android:textSize="18sp" />
+
+                        <LinearLayout
+                            android:id="@+id/recipeDetailed_portionsLayout"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:gravity="center_horizontal"
+                            android:orientation="horizontal"
+                            android:visibility="invisible"
+                            tools:visibility="visible">
+
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/recipeDetailed_decreasePortionsBtn"
+                                style="@style/Widget.MaterialComponents.Button.TextButton"
+                                android:layout_width="60dp"
+                                android:layout_height="wrap_content"
+                                app:icon="@drawable/ic_baseline_arrow_back_24" />
+
+                            <TextView
+                                android:id="@+id/recipeDetailed_portionsNumberTv"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center"
+                                android:layout_marginStart="12dp"
+                                android:layout_marginEnd="12dp"
+                                tools:text="4 portions" />
+
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/recipeDetailed_increasePortionsBtn"
+                                style="@style/Widget.MaterialComponents.Button.TextButton"
+                                android:layout_width="60dp"
+                                android:layout_height="wrap_content"
+                                app:icon="@drawable/ic_baseline_arrow_forward_24" />
+                        </LinearLayout>
+
+                        <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/recipeDetailed_ingredients_recycler_view"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_marginTop="2dp"
+                            android:transitionName="example_transition" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/recipeDetailed_instruction_Card"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/recipeDetailed_ingredients_Card"
+                    android:layout_marginStart="4dp"
+                    android:layout_marginTop="30dp"
+                    android:layout_marginEnd="4dp"
+                    android:layout_marginBottom="4dp"
+                    android:elevation="2dp"
+                    android:padding="4dp"
+                    app:cardCornerRadius="18dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/recipeDetailed_instructions_TextView"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="12dp"
+                            android:layout_marginBottom="8dp"
+                            android:text="Instructions step by step"
+                            android:textSize="18sp" />
+
+                        <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/recipeDetailed_instructions_recycler_view"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_marginTop="8dp"
+                            android:transitionName="example_transition" />
+                    </LinearLayout>
+
+                </com.google.android.material.card.MaterialCardView>
+
+                <RelativeLayout
+                    android:id="@+id/recipeDetailed_text_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/recipeDetailed_instruction_Card"
+                    android:layout_marginTop="18dp"
+                    android:layout_marginBottom="8dp"
+                    android:clipToPadding="false"
+                    android:padding="4dp">
+
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/commentFragment_input_card"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_marginStart="4dp"
+                        android:layout_marginEnd="70dp"
+                        app:cardCornerRadius="18dp">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/recipeDetailed_et_commentInput"
+                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_marginStart="8dp"
+                            android:layout_marginEnd="8dp"
+                            android:hint="Comment"
+                            android:inputType="textCapSentences" />
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/recipeDetailed_addComment_btn"
+                        style="@style/Widget.MaterialComponents.Button.TextButton"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
+                        android:layout_marginEnd="8dp"
+                        app:icon="@drawable/ic_send_black_24dp" />
+                </RelativeLayout>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/comment_recycler_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_below="@id/recipeDetailed_text_layout"
+                    android:layout_marginTop="10dp"
+                    android:transitionName="example_transition" />
+
+                <ImageView
+                    android:id="@+id/expanded_image"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:contentDescription="Expanded image"
+                    android:visibility="invisible" />
+
+            </RelativeLayout>
         </RelativeLayout>
 
     </androidx.core.widget.NestedScrollView>
-
-    <ImageView
-        android:id="@+id/expanded_image"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:contentDescription="Expanded image"
-        android:visibility="invisible" />
 
 
     <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton

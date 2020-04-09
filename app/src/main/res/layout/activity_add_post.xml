@@ -53,6 +53,7 @@
                 app:cornerRadius="@dimen/buttonCornerRadius" />
 
             <com.google.android.material.textfield.TextInputLayout
+                android:layout_marginTop="16dp"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -80,7 +81,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="4dp"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="16dp"
                 android:layout_marginBottom="8dp"
                 android:text="Who can see this post?"
                 android:textSize="18sp"

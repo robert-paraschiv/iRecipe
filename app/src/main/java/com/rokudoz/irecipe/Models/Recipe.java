@@ -20,7 +20,7 @@ public class Recipe implements Comparable<Recipe> {
     private List<String> keywords;
     private List<String> imageUrls_list;
     private String complexity;
-    private Float duration;
+    private Integer duration;
     private String durationType;
     private Float avg_rating;
     private Boolean isFavorite;
@@ -39,7 +39,7 @@ public class Recipe implements Comparable<Recipe> {
 
     public Recipe(String title, String creator_docId, String creator_name, String creator_imageUrl, String category, String description,Integer portions
             , List<Ingredient> ingredient_list, List<Instruction> instruction_list, List<String> keywords, List<String> imageUrls_list, String complexity
-            , Float duration, String durationType, Float avg_rating, Boolean isFavorite, String privacy, Integer number_of_likes, Integer number_of_comments,Date creation_date) {
+            , Integer duration, String durationType, Float avg_rating, Boolean isFavorite, String privacy, Integer number_of_likes, Integer number_of_comments,Date creation_date) {
 
         if (title.trim().equals("")) {
             title = "No Title";
@@ -133,11 +133,11 @@ public class Recipe implements Comparable<Recipe> {
         this.complexity = complexity;
     }
 
-    public Float getDuration() {
+    public Integer getDuration() {
         return duration;
     }
 
-    public void setDuration(Float duration) {
+    public void setDuration(Integer duration) {
         this.duration = duration;
     }
 

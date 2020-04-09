@@ -331,9 +331,9 @@ public class EditRecipeActivity extends AppCompatActivity implements EditRecipeI
         final List<Ingredient> ingredients_without_category = new ArrayList<>();
         final String privacy = privacySpinner.getSelectedItem().toString();
         final String complexity = complexitySpinner.getSelectedItem().toString();
-        Float duration = 0f;
+        Integer duration = 0;
         if (!durationEditText.getText().toString().trim().equals(""))
-            duration = Float.parseFloat(durationEditText.getText().toString());
+            duration = Integer.parseInt(durationEditText.getText().toString());
         final String durationType = durationTypeSpinner.getSelectedItem().toString();
         Log.d(TAG, "addRecipe: " + creator_docId);
 
@@ -405,7 +405,7 @@ public class EditRecipeActivity extends AppCompatActivity implements EditRecipeI
             materialAlertDialogBuilder.setView(linearLayout);
             materialAlertDialogBuilder.setMessage("This ingredient isn't in our Database yet, please specify the category");
             materialAlertDialogBuilder.setCancelable(true);
-            final Float finalDuration = duration;
+            final Integer finalDuration = duration;
             final List<String> finalImageUrls_list = imageUrls_list;
             materialAlertDialogBuilder.setPositiveButton(
                     "Confirm",

@@ -31,7 +31,7 @@ public class RecipeInstructionsAdapter extends RecyclerView.Adapter<RecipeInstru
     }
 
     public class RecipeInstructionViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        TextView tvStepText;
+        TextView tvStepText, tvStepNumber;
         ImageView stepImage, spacer;
 
         public RecipeInstructionViewHolder(View itemView) {
@@ -39,6 +39,7 @@ public class RecipeInstructionsAdapter extends RecyclerView.Adapter<RecipeInstru
             tvStepText = itemView.findViewById(R.id.step_item_StepText_TextView);
             stepImage = itemView.findViewById(R.id.stepItem_image);
             spacer = itemView.findViewById(R.id.rv_layout_instruction_spacer);
+            tvStepNumber = itemView.findViewById(R.id.stepNumber);
 
             stepImage.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -83,6 +84,8 @@ public class RecipeInstructionsAdapter extends RecyclerView.Adapter<RecipeInstru
         } else {
             holder.spacer.setVisibility(View.VISIBLE);
         }
+        if (currentItem.getStepNumber() != null)
+            holder.tvStepNumber.setText("Step " + currentItem.getStepNumber());
 
         if (currentItem.getText() != null)
             holder.tvStepText.setText(currentItem.getText());

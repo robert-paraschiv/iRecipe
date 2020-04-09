@@ -58,12 +58,40 @@ public class RecipeIngredientsAdapter extends RecyclerView.Adapter<RecipeIngredi
 
         if (currentItem.getName() != null)
             holder.tvIngredientName.setText(currentItem.getName());
-        if (currentItem.getQuantity() != null){
-            String quantity = String.format(Locale.US, "%.1f", currentItem.getQuantity());
-            holder.tvIngredientQuantity.setText(quantity);
+
+        if (currentItem.getQuantity() != null && currentItem.getQuantity_type() != null) {
+            if (currentItem.getQuantity() == 1f) {
+                holder.tvIngredientQuantity.setText("1");
+                if (currentItem.getQuantity_type().equals("cups") ||
+                        currentItem.getQuantity_type().equals("pieces") ||
+                        currentItem.getQuantity_type().equals("tablespoons") ||
+                        currentItem.getQuantity_type().equals("teaspoons")) {
+
+                    holder.tvQuantityType.setText(removeLastChar(currentItem.getQuantity_type()));
+                } else {
+                    holder.tvQuantityType.setText(currentItem.getQuantity_type());
+                }
+            } else {
+                if (hasDecimals(currentItem.getQuantity())) {
+                    String quantity = String.format(Locale.US, "%.1f", currentItem.getQuantity());
+                    holder.tvIngredientQuantity.setText(quantity);
+                } else {
+                    String quantity = "" + Math.round(currentItem.getQuantity());
+                    holder.tvIngredientQuantity.setText(quantity);
+                }
+
+                holder.tvQuantityType.setText(currentItem.getQuantity_type());
+            }
         }
-        if (currentItem.getQuantity_type() != null)
-            holder.tvQuantityType.setText(currentItem.getQuantity_type());
+
+    }
+
+    private boolean hasDecimals(Float num) {
+        return (num % 1) != 0;
+    }
+
+    private static String removeLastChar(String str) {
+        return str.substring(0, str.length() - 1);
     }
 
     @Override

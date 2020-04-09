@@ -6,6 +6,7 @@
     android:layout_height="wrap_content"
     android:padding="4dp">
 
+
     <ImageView
         android:id="@+id/rv_layout_instruction_spacer"
         android:layout_width="match_parent"
@@ -16,15 +17,24 @@
         android:src="@color/spacer" />
 
     <TextView
-        android:fontFamily="@font/open_sans"
-        android:textSize="15sp"
-        android:id="@+id/step_item_StepText_TextView"
-        android:layout_width="match_parent"
+        android:id="@+id/stepNumber"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/rv_layout_instruction_spacer"
         android:layout_marginStart="8dp"
         android:layout_marginTop="4dp"
         android:layout_marginEnd="8dp"
+        tools:text="Step 1" />
+
+    <TextView
+        android:id="@+id/step_item_StepText_TextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/stepNumber"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="8dp"
+        android:textSize="15sp"
         tools:text="You cook the shit out of it and then you put it in the oven
 \nand then you also fuck it up untill it's burn out" />
 

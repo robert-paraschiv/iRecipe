@@ -371,9 +371,9 @@ public class AddRecipesActivity extends AppCompatActivity implements EditRecipeI
         final List<Ingredient> ingredients_without_category = new ArrayList<>();
         final String privacy = privacySpinner.getSelectedItem().toString();
         final String complexity = complexitySpinner.getSelectedItem().toString();
-        Float duration = 0f;
+        Integer duration = 0;
         if (!durationEditText.getText().toString().trim().equals(""))
-            duration = Float.parseFloat(durationEditText.getText().toString());
+            duration = Integer.parseInt(durationEditText.getText().toString());
         final String durationType = durationTypeSpinner.getSelectedItem().toString();
         Log.d(TAG, "addRecipe: " + creator_docId);
 
@@ -445,7 +445,7 @@ public class AddRecipesActivity extends AppCompatActivity implements EditRecipeI
 
             MaterialButton materialButton = rootView.findViewById(R.id.dialog_add_recipes_continueBtn);
 
-            final Float finalDuration1 = duration;
+            final Integer finalDuration1 = duration;
 
 
             final Dialog materialAlertDialogBuilder = new Dialog(AddRecipesActivity.this

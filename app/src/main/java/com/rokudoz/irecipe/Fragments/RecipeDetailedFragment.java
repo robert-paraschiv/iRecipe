@@ -371,7 +371,6 @@ public class RecipeDetailedFragment extends Fragment implements RecipeInstructio
     }
 
     private void setupViewPager(View view) {
-
         viewPager = view.findViewById(R.id.view_pager);
         recipeDetailedViewPagerAdapter = new RecipeDetailedViewPagerAdapter(getContext(), imageUrls);
         viewPager.setAdapter(recipeDetailedViewPagerAdapter);
@@ -668,7 +667,8 @@ public class RecipeDetailedFragment extends Fragment implements RecipeInstructio
                             });
 
                     //Setup nr of likes TextView
-                    recipeLikesListener = recipeRef.document(documentID).collection("UsersWhoFaved").orderBy("mFaveTimestamp", Query.Direction.DESCENDING).limit(1)
+                    recipeLikesListener = recipeRef.document(documentID).collection("UsersWhoFaved")
+                            .orderBy("mFaveTimestamp", Query.Direction.DESCENDING).limit(1)
                             .addSnapshotListener(new EventListener<QuerySnapshot>() {
                                 @Override
                                 public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
@@ -718,7 +718,7 @@ public class RecipeDetailedFragment extends Fragment implements RecipeInstructio
                                 }
                             });
 
-                    ////////////////////////////////////////////////////////// LOGIC TO GET RECIPES INGREDIENTS AND INSTRUCTIONS HERE
+                    //Edit recipe
                     if (recipe.getCreator_docId() != null && recipe.getCreator_docId().equals(mUser.getUser_id())) {
                         mEditRecipeBtn.setVisibility(View.VISIBLE);
                         mEditRecipeBtn.setOnClickListener(new View.OnClickListener() {
@@ -732,7 +732,7 @@ public class RecipeDetailedFragment extends Fragment implements RecipeInstructio
                     }
 
                     if (recipe.getCreator_name() != null && recipe.getCreator_imageUrl() != null) {
-                        tvCreatorName.setText(recipe.getCreator_name());
+                        tvCreatorName.setText("by " + recipe.getCreator_name());
                         Glide.with(mCreatorImage).load(recipe.getCreator_imageUrl()).centerCrop().into(mCreatorImage);
 
                         tvCreatorName.setOnClickListener(new View.OnClickListener() {
