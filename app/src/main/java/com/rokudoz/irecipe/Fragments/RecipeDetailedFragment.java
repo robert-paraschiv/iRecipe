@@ -77,6 +77,7 @@ import com.rokudoz.irecipe.Utils.Adapters.RecipeDetailedViewPagerAdapter;
 import com.rokudoz.irecipe.Utils.ScheduleNotifReceiver;
 
 import java.text.DateFormat;
+import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -136,7 +137,7 @@ public class RecipeDetailedFragment extends Fragment implements RecipeInstructio
     private NestedScrollView nestedScrollView;
 
     private MaterialButton mEditRecipeBtn;
-    private TextView tvTitle, tvDescription, mFavoriteNumber, tvMissingIngredientsNumber, tvCreatorName, tvDuration, tvComplexity, tvPortions;
+    private TextView tvTitle, tvDescription, mFavoriteNumber, tvMissingIngredientsNumber, tvCreatorName, tvDuration, tvComplexity, tvPortions, tvImageNumber;
     private ImageView mFavoriteIcon;
     private CircleImageView mCreatorImage;
     private Button mAddCommentBtn;
@@ -189,6 +190,7 @@ public class RecipeDetailedFragment extends Fragment implements RecipeInstructio
         tvComplexity = view.findViewById(R.id.recipeDetailed_complexity);
         tvPortions = view.findViewById(R.id.recipeDetailed_portionsNumberTv);
         portionsLayout = view.findViewById(R.id.recipeDetailed_portionsLayout);
+        tvImageNumber = view.findViewById(R.id.viewPager_selection);
         mAddMissingIngredientsFAB.hide();
 
         RecipeDetailedFragmentArgs recipeDetailedFragmentArgs = RecipeDetailedFragmentArgs.fromBundle(getArguments());
@@ -374,6 +376,25 @@ public class RecipeDetailedFragment extends Fragment implements RecipeInstructio
         viewPager = view.findViewById(R.id.view_pager);
         recipeDetailedViewPagerAdapter = new RecipeDetailedViewPagerAdapter(getContext(), imageUrls);
         viewPager.setAdapter(recipeDetailedViewPagerAdapter);
+
+        tvImageNumber.setText(MessageFormat.format("1 / {0}", imageUrls.size()));
+
+        viewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                Log.d(TAG, "onPageSelected: " + position + 1 + " / " + imageUrls.size());
+                tvImageNumber.setText(MessageFormat.format("{0} / {1}", position + 1, imageUrls.size()));
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
     }
 
     @Override

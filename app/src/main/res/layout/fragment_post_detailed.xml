@@ -90,8 +90,8 @@
                 android:layout_below="@id/postDetailed_ImageView_Card"
                 android:layout_marginStart="4dp"
                 android:layout_marginTop="14dp"
-                android:layout_toEndOf="@id/postDetailed_imageView_favorite_icon"
                 android:layout_toStartOf="@id/postDetailed_recipeLayout"
+                android:layout_toEndOf="@id/postDetailed_imageView_favorite_icon"
                 tools:text="88" />
 
             <RelativeLayout
@@ -104,11 +104,11 @@
 
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/postDetailed_recipeImage_CardView"
-                    android:layout_toEndOf="@id/postDetailed_recipe_name_TextView"
                     android:layout_width="50dp"
                     android:layout_height="35dp"
-                    android:layout_marginEnd="8dp"
                     android:layout_marginTop="4dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_toEndOf="@id/postDetailed_recipe_name_TextView"
                     app:cardCornerRadius="8dp">
 
                     <ImageView
@@ -155,16 +155,23 @@
                 app:icon="@drawable/ic_edit_black_24dp"
                 tools:visibility="visible" />
 
-
-            <EditText
-                android:id="@+id/postDetailed_et_commentInput"
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/postFragment_input_card"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/postDetailed_tvDescription"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="20dp"
                 android:layout_toStartOf="@+id/postDetailed_addComment_btn"
-                android:hint="Comment here" />
+                app:cardCornerRadius="30dp">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/postDetailed_et_commentInput"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Comment here" />
+            </com.google.android.material.card.MaterialCardView>
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/postDetailed_addComment_btn"
@@ -183,7 +190,7 @@
                 android:id="@+id/postDetailed_comment_recycler_view"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_below="@id/postDetailed_et_commentInput"
+                android:layout_below="@id/postFragment_input_card"
                 android:layout_marginTop="10dp"
                 android:transitionName="example_transition" />
         </RelativeLayout>
