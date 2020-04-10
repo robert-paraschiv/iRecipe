@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:clipToPadding="false"
+    android:padding="4dp">
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/rv_message_card"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="4dp"
+        android:elevation="2dp"
+        app:cardBackgroundColor="@color/color_message_friend_background"
+        app:cardCornerRadius="12dp">
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:id="@+id/rv_message_image"
+                android:layout_width="250dp"
+                android:layout_height="150dp"
+                tools:src="@color/colorPrimary" />
+
+            <TextView
+                android:id="@+id/rv_message_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/rv_message_image"
+                android:layout_centerHorizontal="true"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="4dp"
+                android:maxWidth="250dp"
+                android:textColor="@color/black"
+                tools:text="Recipe title" />
+
+            <TextView
+                android:id="@+id/rv_message_timestamp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/rv_message_title"
+                android:layout_alignEnd="@id/rv_message_image"
+                android:paddingEnd="30dp"
+                android:layout_marginBottom="4dp"
+                android:textSize="10sp"
+                tools:text="20:40" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/rv_message_ReadStatus"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_below="@id/rv_message_title"
+                android:layout_alignEnd="@id/rv_message_image"
+                android:layout_marginTop="-4dp"
+                android:layout_marginEnd="4dp"
+                android:layout_marginBottom="4dp"
+                android:src="@drawable/ic_check_black_24dp"
+                android:visibility="invisible"
+                tools:visibility="visible" />
+
+        </RelativeLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+</RelativeLayout>

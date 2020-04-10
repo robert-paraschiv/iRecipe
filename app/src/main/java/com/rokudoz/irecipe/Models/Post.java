@@ -24,8 +24,9 @@ public class Post {
     private @ServerTimestamp
     Date creation_date;
 
-    public Post(String referenced_recipe_docId, String creatorId, String creator_name, String creator_imageUrl, Integer number_of_likes, Integer number_of_comments,String text, String imageUrl, Boolean isFavorite, String privacy
+    public Post(String documentId, String referenced_recipe_docId, String creatorId, String creator_name, String creator_imageUrl, Integer number_of_likes, Integer number_of_comments, String text, String imageUrl, Boolean isFavorite, String privacy
             , Date creation_date) {
+        this.documentId = documentId;
         this.referenced_recipe_docId = referenced_recipe_docId;
         this.creatorId = creatorId;
         this.creator_name = creator_name;
@@ -75,7 +76,6 @@ public class Post {
         this.number_of_likes = number_of_likes;
     }
 
-    @Exclude
     public String getDocumentId() {
         return documentId;
     }

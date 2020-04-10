@@ -78,7 +78,7 @@ import java.util.Objects;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class MessageFragment extends Fragment {
+public class MessageFragment extends Fragment implements MessageAdapter.OnItemClickListener {
     private static final String TAG = "MessageFragment";
     private static int NR_OF_MESSAGES_TO_LIMIT = 20;
 
@@ -403,6 +403,8 @@ public class MessageFragment extends Fragment {
         mRecyclerView.setAdapter(mAdapter);
         ((SimpleItemAnimator) Objects.requireNonNull(mRecyclerView.getItemAnimator())).setSupportsChangeAnimations(false);
 
+        mAdapter.setOnItemClickListener(MessageFragment.this);
+
         mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
@@ -503,9 +505,9 @@ public class MessageFragment extends Fragment {
         } else {
             String text = textInputEditText.getText().toString();
             final Message messageForCurrentUser = new Message(currentUserId, friendUserId, text, "message_sent", null, false,
-                    "message", null,null);
+                    "message", null, null);
             final Message messageForFriendUser = new Message(currentUserId, friendUserId, text, "message_received", null, false
-                    , "message", null,null);
+                    , "message", null, null);
 
             final Conversation conversationForCurrentUser = new Conversation(friendUserId, userFriend.getName(), userFriend.getUserProfilePicUrl(), text
                     , "message_sent", null, false);
@@ -576,6 +578,16 @@ public class MessageFragment extends Fragment {
         });
     }
 
+    @Override
+    public void onPostRecipeMessageClick(int position) {
+        if (messageList.get(position).getPost() != null && messageList.get(position).getRecipe() == null) {
+            Navigation.findNavController(view).navigate(MessageFragmentDirections
+                    .actionMessageFragmentToPostDetailed(messageList.get(position).getPost().getDocumentId()));
+        }else if (messageList.get(position).getPost() == null && messageList.get(position).getRecipe() != null){
+            Navigation.findNavController(view).navigate(MessageFragmentDirections
+                    .actionMessageFragmentToRecipeDetailedFragment(messageList.get(position).getRecipe().getDocumentId()));
+        }
+    }
 }
 
 

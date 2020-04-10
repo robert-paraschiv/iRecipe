@@ -1,5 +1,6 @@
 package com.rokudoz.irecipe.Fragments;
 
+import android.app.ProgressDialog;
 import android.os.Bundle;
 
 import androidx.annotation.Nullable;
@@ -244,6 +245,10 @@ public class ShareToFragment extends Fragment implements ConversationAdapter.OnI
 
 
     private void sendMessage(final String friendUserId, final String currentUserId) {
+        final ProgressDialog progressDialog = new ProgressDialog(getActivity());
+        progressDialog.setTitle("Sending...");
+        progressDialog.setCancelable(false);
+        progressDialog.show();
         usersReference.document(friendUserId).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
             @Override
             public void onSuccess(DocumentSnapshot documentSnapshot) {
@@ -283,6 +288,7 @@ public class ShareToFragment extends Fragment implements ConversationAdapter.OnI
                                 @Override
                                 public void onSuccess(Void aVoid) {
                                     Log.d(TAG, "onSuccess: added message");
+                                    progressDialog.cancel();
                                     Navigation.findNavController(view).navigate(ShareToFragmentDirections.actionShareToFragmentToMessageFragment(friendUserId));
                                 }
                             });
@@ -322,7 +328,7 @@ public class ShareToFragment extends Fragment implements ConversationAdapter.OnI
                                 @Override
                                 public void onSuccess(Void aVoid) {
                                     Log.d(TAG, "onSuccess: added message");
-
+                                    progressDialog.cancel();
                                     Navigation.findNavController(view).navigate(ShareToFragmentDirections.actionShareToFragmentToMessageFragment(friendUserId));
                                 }
                             });

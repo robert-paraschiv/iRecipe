@@ -470,7 +470,7 @@ public class AddRecipesActivity extends AppCompatActivity implements EditRecipeI
 
                     }
 
-                    Recipe recipe = new Recipe(title, creator_docId, mUser.getName(), mUser.getUserProfilePicUrl(), category, description, recipePortions
+                    Recipe recipe = new Recipe(null, title, creator_docId, mUser.getName(), mUser.getUserProfilePicUrl(), category, description, recipePortions
                             , ingredients_list, instructionList, keywords, imageUrls_list, complexity, finalDuration1, durationType
                             , 0f, false, privacy, 0, 0, null);
 
@@ -501,7 +501,7 @@ public class AddRecipesActivity extends AppCompatActivity implements EditRecipeI
             // All the ingredients are in db with category, proceed to upload
             pd.show();
 
-            Recipe recipe = new Recipe(title, creator_docId, mUser.getName(), mUser.getUserProfilePicUrl(), category, description, recipePortions
+            Recipe recipe = new Recipe(null, title, creator_docId, mUser.getName(), mUser.getUserProfilePicUrl(), category, description, recipePortions
                     , ingredients_list, instructionList, keywords, imageUrls_list, complexity, duration, durationType
                     , 0f, false, privacy, 0, 0, null);
 

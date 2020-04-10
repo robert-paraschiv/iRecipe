@@ -513,7 +513,7 @@ public class UserProfileFragment extends Fragment implements PostAdapter.OnItemC
                     Log.d(TAG, "onEvent: Querry result is null");
                 }
                 if (mPostList.isEmpty()) {
-                    mPostList.add(new Post("", "", "", "", 0, 0
+                    mPostList.add(new Post(null, "", "", "", "", 0, 0
                             , "This user hasn't posted anything yet :)", ""
                             , false, "Everyone", null));
                     Log.d(TAG, "EMPTY: ");

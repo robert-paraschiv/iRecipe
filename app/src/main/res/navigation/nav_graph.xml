@@ -240,6 +240,12 @@
             app:destination="@id/allMessagesFragment"
             app:enterAnim="@anim/slide_in_left"
             app:popUpTo="@id/allMessagesFragment" />
+        <action
+            android:id="@+id/action_messageFragment_to_recipeDetailedFragment"
+            app:destination="@id/recipeDetailedFragment" />
+        <action
+            android:id="@+id/action_messageFragment_to_postDetailed"
+            app:destination="@id/postDetailed" />
     </fragment>
     <fragment
         android:id="@+id/postComments"

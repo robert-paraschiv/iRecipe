@@ -37,13 +37,14 @@ public class Recipe implements Comparable<Recipe> {
         //public no-arg constructor needed
     }
 
-    public Recipe(String title, String creator_docId, String creator_name, String creator_imageUrl, String category, String description,Integer portions
+    public Recipe(String documentId, String title, String creator_docId, String creator_name, String creator_imageUrl, String category, String description, Integer portions
             , List<Ingredient> ingredient_list, List<Instruction> instruction_list, List<String> keywords, List<String> imageUrls_list, String complexity
-            , Integer duration, String durationType, Float avg_rating, Boolean isFavorite, String privacy, Integer number_of_likes, Integer number_of_comments,Date creation_date) {
+            , Integer duration, String durationType, Float avg_rating, Boolean isFavorite, String privacy, Integer number_of_likes, Integer number_of_comments, Date creation_date) {
 
         if (title.trim().equals("")) {
             title = "No Title";
         }
+        this.documentId = documentId;
         this.title = title;
         this.creator_docId = creator_docId;
         this.creator_name = creator_name;
@@ -82,7 +83,6 @@ public class Recipe implements Comparable<Recipe> {
         this.number_of_comments = number_of_comments;
     }
 
-    @Exclude
     public String getDocumentId() {
         return documentId;
     }
