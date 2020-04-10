@@ -26,7 +26,7 @@ public class LastSeen {
 
         long now = System.currentTimeMillis() + 30000;
         if (time > now || time <= 0) {
-            return null;
+            return "last seen just now";
         }
         Date timeStampDate = new Date(time);
         DateFormat hourFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());

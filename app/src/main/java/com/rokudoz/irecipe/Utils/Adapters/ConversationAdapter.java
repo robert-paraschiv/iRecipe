@@ -44,7 +44,7 @@ public class ConversationAdapter extends RecyclerView.Adapter<ConversationAdapte
 
 
     public interface OnItemClickListener {
-        void onItemClick(int position);
+        void onConversationClick(int position);
 
         void onDeleteClick(int position);
 
@@ -90,7 +90,7 @@ public class ConversationAdapter extends RecyclerView.Adapter<ConversationAdapte
             if (mListener != null) {
                 int position = getAdapterPosition();
                 if (position != RecyclerView.NO_POSITION) {
-                    mListener.onItemClick(position);
+                    mListener.onConversationClick(position);
                 }
             }
         }

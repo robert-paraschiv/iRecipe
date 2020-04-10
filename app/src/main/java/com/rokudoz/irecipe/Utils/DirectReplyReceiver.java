@@ -91,9 +91,9 @@ public class DirectReplyReceiver extends BroadcastReceiver {
                                             userFriend = documentSnapshot.toObject(User.class);
 
                                             final com.rokudoz.irecipe.Models.Message messageForCurrentUser = new com.rokudoz.irecipe.Models.Message(currentUserId, friend_id, text
-                                                    , "message_sent", null, false);
+                                                    , "message_sent", null, false, "message", null, null);
                                             final com.rokudoz.irecipe.Models.Message messageForFriendUser = new Message(currentUserId, friend_id, text, "message_received"
-                                                    , null, false);
+                                                    , null, false, "message", null, null);
 
                                             final Conversation conversationForCurrentUser = new Conversation(friend_id, userFriend.getName(), userFriend.getUserProfilePicUrl(), text
                                                     , "message_sent", null, false);

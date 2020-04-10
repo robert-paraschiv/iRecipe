@@ -18,7 +18,7 @@ public class TimeAgo {
 
         long now = System.currentTimeMillis() + 30000;
         if (time > now || time <= 0) {
-            return null;
+            return "just now";
         }
 
         // TODO: localize

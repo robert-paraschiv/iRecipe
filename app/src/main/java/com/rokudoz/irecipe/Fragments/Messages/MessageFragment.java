@@ -502,8 +502,10 @@ public class MessageFragment extends Fragment {
             Toast.makeText(getActivity(), "Can't send empty message", Toast.LENGTH_SHORT).show();
         } else {
             String text = textInputEditText.getText().toString();
-            final Message messageForCurrentUser = new Message(currentUserId, friendUserId, text, "message_sent", null, false);
-            final Message messageForFriendUser = new Message(currentUserId, friendUserId, text, "message_received", null, false);
+            final Message messageForCurrentUser = new Message(currentUserId, friendUserId, text, "message_sent", null, false,
+                    "message", null,null);
+            final Message messageForFriendUser = new Message(currentUserId, friendUserId, text, "message_received", null, false
+                    , "message", null,null);
 
             final Conversation conversationForCurrentUser = new Conversation(friendUserId, userFriend.getName(), userFriend.getUserProfilePicUrl(), text
                     , "message_sent", null, false);

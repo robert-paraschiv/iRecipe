@@ -119,6 +119,9 @@
         <action
             android:id="@+id/action_recipeDetailedFragment_to_profileFragment"
             app:destination="@id/profileFragment" />
+        <action
+            android:id="@+id/action_recipeDetailedFragment_to_shareToFragment"
+            app:destination="@id/shareToFragment" />
 
 
     </fragment>
@@ -186,6 +189,9 @@
         <action
             android:id="@+id/action_postDetailed_to_profileFragment"
             app:destination="@id/profileFragment" />
+        <action
+            android:id="@+id/action_postDetailed_to_shareToFragment"
+            app:destination="@id/shareToFragment" />
     </fragment>
     <fragment
         android:id="@+id/allMessagesFragment"
@@ -288,5 +294,22 @@
         <action
             android:id="@+id/action_dayScheduleFragment_to_recipeDetailedFragment"
             app:destination="@id/recipeDetailedFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/shareToFragment"
+        android:name="com.rokudoz.irecipe.Fragments.ShareToFragment"
+        android:label="fragment_share_to"
+        tools:layout="@layout/fragment_share_to" >
+        <argument
+            android:name="documentID"
+            app:argType="string" />
+        <argument
+            android:name="type"
+            app:argType="string" />
+        <action
+            android:id="@+id/action_shareToFragment_to_messageFragment"
+            app:destination="@id/messageFragment"
+            app:popUpTo="@id/feedFragment"
+            app:popUpToInclusive="false" />
     </fragment>
 </navigation>

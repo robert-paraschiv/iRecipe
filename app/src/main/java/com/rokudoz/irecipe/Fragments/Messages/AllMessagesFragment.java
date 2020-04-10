@@ -188,7 +188,7 @@ public class AllMessagesFragment extends Fragment implements ConversationAdapter
     }
 
     @Override
-    public void onItemClick(int position) {
+    public void onConversationClick(int position) {
         String id = conversationList.get(position).getUserId();
         Log.d(TAG, "onItemClick: CLICKED " + " id " + id);
 

@@ -67,7 +67,7 @@ public class PostDetailedFragment extends Fragment {
     private static final int DAY_MILLIS = 24 * HOUR_MILLIS;
 
 
-    private ImageView postImage, recipeImage, postFavoriteIcon;
+    private ImageView postImage, recipeImage, postFavoriteIcon, sharePostIcon;
     private CircleImageView creatorImage;
     private TextView creatorName, postDescription, postCreationDate, recipeTitle, postFavoriteNumber;
     private MaterialButton editPostBtn, addCommentBtn;
@@ -118,9 +118,16 @@ public class PostDetailedFragment extends Fragment {
         commentEditText = view.findViewById(R.id.postDetailed_et_commentInput);
         commentRecyclerView = view.findViewById(R.id.postDetailed_comment_recycler_view);
         recipeLayout = view.findViewById(R.id.postDetailed_recipeLayout);
+        sharePostIcon = view.findViewById(R.id.postDetailed_imageView_send_post_imageview);
 
         PostDetailedFragmentArgs postDetailedFragmentArgs = PostDetailedFragmentArgs.fromBundle(getArguments());
         documentID = postDetailedFragmentArgs.getDocumentID();
+        sharePostIcon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Navigation.findNavController(view).navigate(PostDetailedFragmentDirections.actionPostDetailedToShareToFragment(documentID, "post"));
+            }
+        });
 
         BottomNavigationView navBar = getActivity().findViewById(R.id.bottom_navigation);
         navBar.setVisibility(View.VISIBLE);

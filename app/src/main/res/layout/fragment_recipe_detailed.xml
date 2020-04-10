@@ -133,13 +133,22 @@
                     android:layout_marginTop="8dp"
                     android:src="@drawable/ic_favorite_border_black_24dp" />
 
+                <ImageView
+                    android:id="@+id/imageview_share"
+                    android:layout_width="33dp"
+                    android:layout_height="33dp"
+                    android:layout_marginStart="12dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_toEndOf="@id/imageview_favorite_icon"
+                    android:src="@drawable/ic_outline_share_24" />
+
                 <TextView
                     android:id="@+id/recipeDetailed_numberOfFaved"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="4dp"
-                    android:layout_marginTop="14dp"
-                    android:layout_toEndOf="@id/imageview_favorite_icon"
+                    android:layout_below="@id/imageview_favorite_icon"
+                    android:layout_marginStart="14dp"
+                    android:layout_marginTop="4dp"
                     tools:text="88" />
 
                 <com.google.android.material.button.MaterialButton

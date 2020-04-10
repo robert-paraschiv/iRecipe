@@ -170,7 +170,7 @@ public class SelectFriendConversationFragment extends Fragment implements Friend
     }
 
     @Override
-    public void onItemClick(int position) {
+    public void onFriendClick(int position) {
         String id = mFriendList.get(position).getFriend_user_id();
         Log.d(TAG, "onItemClick: CLICKED " + " id " + id);
 

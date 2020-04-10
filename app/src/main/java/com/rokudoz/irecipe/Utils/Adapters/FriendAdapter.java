@@ -29,7 +29,7 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.FriendView
     TextView friendReqReceivedTv;
 
     public interface OnItemClickListener {
-        void onItemClick(int position);
+        void onFriendClick(int position);
     }
 
     public void setOnItemClickListener(OnItemClickListener listener) {
@@ -55,7 +55,7 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.FriendView
             if (mListener != null) {
                 int position = getAdapterPosition();
                 if (position != RecyclerView.NO_POSITION) {
-                    mListener.onItemClick(position);
+                    mListener.onFriendClick(position);
                 }
             }
         }

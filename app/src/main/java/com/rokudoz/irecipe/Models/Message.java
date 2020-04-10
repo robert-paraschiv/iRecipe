@@ -12,17 +12,23 @@ public class Message {
     private String receiver_id;
     private String type;
     private Boolean read;
+    private String messageType;
+    private Recipe recipe;
+    private Post post;
 
     private @ServerTimestamp
     Date timestamp;
 
-    public Message(String sender_id, String receiver_id,String text, String type, Date timestamp,Boolean read) {
+    public Message(String sender_id, String receiver_id, String text, String type, Date timestamp, Boolean read, String messageType, Recipe recipe, Post post) {
         this.sender_id = sender_id;
         this.receiver_id = receiver_id;
         this.text = text;
         this.type = type;
         this.timestamp = timestamp;
         this.read = read;
+        this.messageType = messageType;
+        this.recipe = recipe;
+        this.post = post;
     }
 
     public Message() {
@@ -83,6 +89,30 @@ public class Message {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public String getMessageType() {
+        return messageType;
+    }
+
+    public void setMessageType(String messageType) {
+        this.messageType = messageType;
+    }
+
+    public Recipe getRecipe() {
+        return recipe;
+    }
+
+    public void setRecipe(Recipe recipe) {
+        this.recipe = recipe;
+    }
+
+    public Post getPost() {
+        return post;
+    }
+
+    public void setPost(Post post) {
+        this.post = post;
     }
 
     @Override

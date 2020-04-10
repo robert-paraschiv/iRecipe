@@ -95,55 +95,60 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 break;
             case POST_ITEM_VIEW_TYPE:
                 PostItemViewHolder postItemViewHolder = (PostItemViewHolder) holder;
-                Post currentItem = (Post) itemList.get(position);
-
-
-                postItemViewHolder.tvDescription.setText(currentItem.getText());
-                if (!currentItem.getImageUrl().equals("")) {
-
-                    Glide.with(postItemViewHolder.mImageView.getContext()).load(currentItem.getImageUrl()).centerCrop().into(postItemViewHolder.mImageView);
-                }
-
-                if (currentItem.getCreation_date() != null) {
-                    Date date = currentItem.getCreation_date();
-                    if (date != null) {
-                        DateFormat dateFormat = new SimpleDateFormat("HH:mm, d MMM", Locale.getDefault());
-                        String creationDate = dateFormat.format(date);
-                        long time = date.getTime();
-                        if (currentItem.getCreation_date() != null && !currentItem.getCreation_date().equals("")) {
-                            postItemViewHolder.creationDate.setText(getTimeAgo(time));
-                        }
-                    }
-                }
-
-                if (currentItem.getFavorite() != null) {
-                    boolean fav = currentItem.getFavorite();
-                    if (fav)
-                        postItemViewHolder.imgFavorited.setImageResource(R.drawable.ic_favorite_red_24dp);
-                    else
-                        postItemViewHolder.imgFavorited.setImageResource(R.drawable.ic_favorite_border_black_24dp);
-                }
-                if (currentItem.getCreator_name() != null) {
-                    postItemViewHolder.creatorName.setText(currentItem.getCreator_name());
-                }
-                if (currentItem.getCreator_imageUrl() != null && !currentItem.getCreator_imageUrl().equals("")) {
-                    Glide.with(postItemViewHolder.creatorImage).load(currentItem.getCreator_imageUrl()).centerCrop().into(postItemViewHolder.creatorImage);
-                }
-                if (currentItem.getNumber_of_likes() != null) {
-                    postItemViewHolder.tvNrOfFaves.setText("" + currentItem.getNumber_of_likes());
-                }
-                if (currentItem.getNumber_of_comments() != null) {
-                    postItemViewHolder.tvNumberOfComments.setText("" + currentItem.getNumber_of_comments());
-                }
-                if (currentItem.getRecipe_name() != null && !currentItem.getRecipe_name().equals("")) {
-                    postItemViewHolder.recipeNameTv.setText("Recipe: " + currentItem.getRecipe_name());
-                }
-                if (currentItem.getRecipe_imageUrl() != null && !currentItem.getRecipe_imageUrl().equals("")) {
-//            Glide.with(holder.recipeImage).load(currentItem.getRecipe_imageUrl()).centerCrop().into(holder.recipeImage);
-                }
+                populatePostView(position, postItemViewHolder);
+                break;
 
         }
 
+    }
+
+    private void populatePostView(int position, PostItemViewHolder postItemViewHolder) {
+        Post currentItem = (Post) itemList.get(position);
+
+
+        postItemViewHolder.tvDescription.setText(currentItem.getText());
+        if (!currentItem.getImageUrl().equals("")) {
+
+            Glide.with(postItemViewHolder.mImageView.getContext()).load(currentItem.getImageUrl()).centerCrop().into(postItemViewHolder.mImageView);
+        }
+
+        if (currentItem.getCreation_date() != null) {
+            Date date = currentItem.getCreation_date();
+            if (date != null) {
+                DateFormat dateFormat = new SimpleDateFormat("HH:mm, d MMM", Locale.getDefault());
+                String creationDate = dateFormat.format(date);
+                long time = date.getTime();
+                if (currentItem.getCreation_date() != null && !currentItem.getCreation_date().equals("")) {
+                    postItemViewHolder.creationDate.setText(getTimeAgo(time));
+                }
+            }
+        }
+
+        if (currentItem.getFavorite() != null) {
+            boolean fav = currentItem.getFavorite();
+            if (fav)
+                postItemViewHolder.imgFavorited.setImageResource(R.drawable.ic_favorite_red_24dp);
+            else
+                postItemViewHolder.imgFavorited.setImageResource(R.drawable.ic_favorite_border_black_24dp);
+        }
+        if (currentItem.getCreator_name() != null) {
+            postItemViewHolder.creatorName.setText(currentItem.getCreator_name());
+        }
+        if (currentItem.getCreator_imageUrl() != null && !currentItem.getCreator_imageUrl().equals("")) {
+            Glide.with(postItemViewHolder.creatorImage).load(currentItem.getCreator_imageUrl()).centerCrop().into(postItemViewHolder.creatorImage);
+        }
+        if (currentItem.getNumber_of_likes() != null) {
+            postItemViewHolder.tvNrOfFaves.setText("" + currentItem.getNumber_of_likes());
+        }
+        if (currentItem.getNumber_of_comments() != null) {
+            postItemViewHolder.tvNumberOfComments.setText("" + currentItem.getNumber_of_comments());
+        }
+        if (currentItem.getRecipe_name() != null && !currentItem.getRecipe_name().equals("")) {
+            postItemViewHolder.recipeNameTv.setText("Recipe: " + currentItem.getRecipe_name());
+        }
+        if (currentItem.getRecipe_imageUrl() != null && !currentItem.getRecipe_imageUrl().equals("")) {
+//            Glide.with(holder.recipeImage).load(currentItem.getRecipe_imageUrl()).centerCrop().into(holder.recipeImage);
+        }
     }
 
     private void populateNativeAdView(UnifiedNativeAd unifiedNativeAd, UnifiedNativeAdView adView) {

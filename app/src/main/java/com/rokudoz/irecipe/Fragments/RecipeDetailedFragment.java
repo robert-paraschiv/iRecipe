@@ -138,7 +138,7 @@ public class RecipeDetailedFragment extends Fragment implements RecipeInstructio
 
     private MaterialButton mEditRecipeBtn;
     private TextView tvTitle, tvDescription, mFavoriteNumber, tvMissingIngredientsNumber, tvCreatorName, tvDuration, tvComplexity, tvPortions, tvImageNumber;
-    private ImageView mFavoriteIcon;
+    private ImageView mFavoriteIcon, shareRecipeIcon;
     private CircleImageView mCreatorImage;
     private Button mAddCommentBtn;
     private ExtendedFloatingActionButton mAddMissingIngredientsFAB;
@@ -191,6 +191,7 @@ public class RecipeDetailedFragment extends Fragment implements RecipeInstructio
         tvPortions = view.findViewById(R.id.recipeDetailed_portionsNumberTv);
         portionsLayout = view.findViewById(R.id.recipeDetailed_portionsLayout);
         tvImageNumber = view.findViewById(R.id.viewPager_selection);
+        shareRecipeIcon = view.findViewById(R.id.imageview_share);
         mAddMissingIngredientsFAB.hide();
 
         RecipeDetailedFragmentArgs recipeDetailedFragmentArgs = RecipeDetailedFragmentArgs.fromBundle(getArguments());
@@ -465,6 +466,13 @@ public class RecipeDetailedFragment extends Fragment implements RecipeInstructio
 
     private void getRecipeArgsPassed(RecipeDetailedFragmentArgs recipeDetailedFragmentArgs) {
         documentID = recipeDetailedFragmentArgs.getDocumentID();
+        shareRecipeIcon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Navigation.findNavController(view).navigate(RecipeDetailedFragmentDirections
+                        .actionRecipeDetailedFragmentToShareToFragment(documentID, "recipe"));
+            }
+        });
     }
 
     private void setFavoriteIcon(Boolean isFavorite) {
