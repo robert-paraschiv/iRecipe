@@ -81,10 +81,6 @@ public class SelectRecipeActivity extends AppCompatActivity implements SearchRec
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_select_recipe);
 
-        MaterialToolbar myToolbar = (MaterialToolbar) findViewById(R.id.my_toolbar);
-        myToolbar.setTitle("Select Recipe");
-        setSupportActionBar(myToolbar);
-
         if (getIntent() != null) {
             coming_from = getIntent().getStringExtra("coming_from");
 
@@ -117,6 +113,7 @@ public class SelectRecipeActivity extends AppCompatActivity implements SearchRec
 
         }
 
+        setUpSearchView();
 
         mStorageRef = FirebaseStorage.getInstance();
 
@@ -124,30 +121,9 @@ public class SelectRecipeActivity extends AppCompatActivity implements SearchRec
 //        buildRecyclerView();
     }
 
-
-    private void buildRecyclerView() {
-        mRecyclerView = findViewById(R.id.searchActivity_recycler_view);
-        mRecyclerView.setHasFixedSize(true);
-        mLayoutManager = new LinearLayoutManager(this);
-
-        mAdapter = new SearchRecipeAdapter(mRecipeList);
-
-        mRecyclerView.setLayoutManager(mLayoutManager);
-        mRecyclerView.setAdapter(mAdapter);
-
-        mAdapter.setOnItemClickListener(this);
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater menuInflater = getMenuInflater();
-        menuInflater.inflate(R.menu.search_recipe_menu, menu);
-
-        MenuItem searchItem = menu.findItem(R.id.action_search);
-        SearchView searchView = (SearchView) searchItem.getActionView();
-        searchView.setImeOptions(EditorInfo.IME_ACTION_DONE);
-        searchView.setBackgroundResource(R.drawable.rounded_card);
-        searchView.setPadding(12,12,12,12);
+    private void setUpSearchView() {
+        SearchView searchView = findViewById(R.id.selectRecipeActivity_SearchView);
+        searchView.requestFocus();
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -170,8 +146,20 @@ public class SelectRecipeActivity extends AppCompatActivity implements SearchRec
                 }
             }
         });
+    }
 
-        return true;
+
+    private void buildRecyclerView() {
+        mRecyclerView = findViewById(R.id.searchActivity_recycler_view);
+        mRecyclerView.setHasFixedSize(true);
+        mLayoutManager = new LinearLayoutManager(this);
+
+        mAdapter = new SearchRecipeAdapter(mRecipeList);
+
+        mRecyclerView.setLayoutManager(mLayoutManager);
+        mRecyclerView.setAdapter(mAdapter);
+
+        mAdapter.setOnItemClickListener(this);
     }
 
     private void showInputMethod(View view) {

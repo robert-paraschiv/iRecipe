@@ -14,7 +14,7 @@
     <color name="toolbar_color">#212121</color>
     <color name="navigationColor">#000000</color>
 
-    <color name="fragment_background_color">#262626</color>
+    <color name="fragment_background_color">#151515</color>
 
     <color name="spacer">#bdbdbd</color>
 
@@ -26,5 +26,6 @@
     <color name="calendar_multiEventIndicatorColor">#fff</color>
     <color name="calendar_textColor">#fff</color>
     <color name="input_card_color">#616161</color>
-    <color name="status_bar_color">#0f0f0f</color>
+    <color name="input_card_stroke_color">#1a1a1a</color>
+    <color name="status_bar_color">#171717</color>
 </resources>
