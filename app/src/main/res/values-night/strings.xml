@@ -44,4 +44,5 @@
 
     <string name="admob_app_id">ca-app-pub-3327926907082370~2155596069</string>
     <string name="admob_unit_id">ca-app-pub-3327926907082370/3525882439</string>
+    <string name="admob_BannerAd_unit_id">ca-app-pub-3327926907082370/9098427255</string>
 </resources>

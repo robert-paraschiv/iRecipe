@@ -2,10 +2,10 @@
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/profileFragment_rootLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/fragment_background_color"
-    android:id="@+id/profileFragment_rootLayout"
     android:fitsSystemWindows="true">
 
     <com.google.android.material.appbar.AppBarLayout
@@ -16,7 +16,7 @@
         <com.google.android.material.appbar.CollapsingToolbarLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="?colorSurface"
+            android:background="@color/fragment_background_color"
             android:fitsSystemWindows="true"
             app:expandedTitleGravity="top"
             app:expandedTitleMarginEnd="64dp"
@@ -31,9 +31,11 @@
                     android:id="@+id/toolbar"
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/actionBar_size">
+
                     <RelativeLayout
                         android:layout_width="match_parent"
                         android:layout_height="match_parent">
+
                         <TextView
                             style="@style/TextAppearance.MaterialComponents.Headline6"
                             android:layout_width="wrap_content"
@@ -47,9 +49,10 @@
                             android:layout_width="35dp"
                             android:layout_height="35dp"
                             android:layout_alignParentEnd="true"
+                            android:layout_centerVertical="true"
                             android:layout_marginEnd="4dp"
-                            app:icon="@drawable/ic_settings_applications_black_24dp"
-                            android:textSize="12sp" />
+                            android:textSize="12sp"
+                            app:icon="@drawable/ic_outline_settings_applications_24" />
 
                     </RelativeLayout>
                 </com.google.android.material.appbar.MaterialToolbar>
@@ -168,9 +171,9 @@
         android:id="@+id/profileFragment_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"
         android:layout_below="@id/profileFragment_TabLayout_MaterialCard"
-        android:layout_marginTop="40dp" />
+        android:layout_marginTop="40dp"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -178,7 +181,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
+        android:layout_margin="16dp"
+        android:backgroundTint="@color/colorPrimary"
         android:src="@drawable/ic_fb_plus"
-        android:layout_margin="8dp"/>
+        app:elevation="4dp"
+        app:fabCustomSize="50dp" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

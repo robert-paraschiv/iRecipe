@@ -6,6 +6,8 @@ import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.transition.Transition;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -62,6 +64,7 @@ import static com.rokudoz.irecipe.Fragments.Messages.MessageFragment.messagingSt
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
 
+    private AdView mBannerAd;
 
     //Firebase RealTime db
     FirebaseDatabase database = FirebaseDatabase.getInstance();
@@ -79,7 +82,16 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         MobileAds.initialize(this, getResources().getString(R.string.admob_app_id));
+
+        mBannerAd = findViewById(R.id.banner_adView);
+        AdRequest adRequest = new AdRequest.Builder()
+                .addTestDevice("2F1C484BD502BA7D51AC78D75751AFE0") // Mi 9T Pro
+                .addTestDevice("B141CB779F883EF84EA9A32A7D068B76") // RedMi 5 Plus
+                .addTestDevice(AdRequest.DEVICE_ID_EMULATOR).build();
+
+        mBannerAd.loadAd(adRequest);
 
         setUpNavigation();
     }

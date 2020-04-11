@@ -171,7 +171,8 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@id/recipeDetailed_numberOfFaved"
                     android:layout_centerHorizontal="true"
-                    android:layout_marginTop="16dp"
+                    android:layout_marginTop="24dp"
+                    android:textSize="12sp"
                     tools:text="Missing 2 ingredients" />
 
                 <TextView

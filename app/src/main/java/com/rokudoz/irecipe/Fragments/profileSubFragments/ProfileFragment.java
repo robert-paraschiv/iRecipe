@@ -125,6 +125,7 @@ public class ProfileFragment extends Fragment {
         if (getActivity() != null) {
             BottomNavigationView navBar = getActivity().findViewById(R.id.bottom_navigation);
             navBar.setVisibility(View.VISIBLE);
+            getActivity().findViewById(R.id.banner_cardView).setVisibility(View.INVISIBLE);
         }
 
 

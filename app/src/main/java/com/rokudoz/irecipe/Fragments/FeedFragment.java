@@ -112,6 +112,7 @@ public class FeedFragment extends Fragment implements FeedAdapter.OnItemClickLis
             if (getActivity() != null) {
                 BottomNavigationView navBar = getActivity().findViewById(R.id.bottom_navigation);
                 navBar.setVisibility(View.VISIBLE);
+                getActivity().findViewById(R.id.banner_cardView).setVisibility(View.INVISIBLE);
             }
             TextView toolbarTv = view.findViewById(R.id.feedFragment_toolbar_titleTv);
             toolbarTv.setOnClickListener(new View.OnClickListener() {

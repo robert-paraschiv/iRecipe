@@ -12,6 +12,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
@@ -54,6 +55,12 @@ public class RecipesFragment extends Fragment {
                 startActivity(intent);
             }
         });
+
+        if (getActivity() != null) {
+            BottomNavigationView navBar = getActivity().findViewById(R.id.bottom_navigation);
+            navBar.setVisibility(View.VISIBLE);
+            getActivity().findViewById(R.id.banner_cardView).setVisibility(View.INVISIBLE);
+        }
 
         viewPager = view.findViewById(R.id.container);
         setupViewPager(viewPager);

@@ -13,7 +13,7 @@ android {
     compileSdkVersion 29
     defaultConfig {
         applicationId "com.rokudoz.irecipe"
-        minSdkVersion 25
+        minSdkVersion 27
         targetSdkVersion 29
         versionCode 37
         versionName "1.4"

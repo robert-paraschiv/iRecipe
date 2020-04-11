@@ -21,16 +21,32 @@
         app:navGraph="@navigation/nav_graph" />
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:background="@color/status_bar_color"
-        android:elevation="2dp"
         android:id="@+id/bottom_navigation"
         android:layout_width="match_parent"
         android:layout_height="45dp"
         android:layout_alignParentBottom="true"
+        android:background="@color/bottom_nav_bar_color"
+        android:elevation="4dp"
         app:itemHorizontalTranslationEnabled="false"
         app:itemIconTint="@drawable/selector_bottombar_item"
         app:itemTextColor="@drawable/selector_bottombar_text"
         app:labelVisibilityMode="unlabeled"
         app:menu="@menu/bottom_navigation" />
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/banner_cardView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true">
+
+        <com.google.android.gms.ads.AdView xmlns:ads="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/banner_adView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            ads:adSize="BANNER"
+            ads:adUnitId="@string/admob_BannerAd_unit_id" />
+    </com.google.android.material.card.MaterialCardView>
+
 
 </RelativeLayout>

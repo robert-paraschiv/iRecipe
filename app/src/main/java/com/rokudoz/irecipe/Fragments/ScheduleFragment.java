@@ -18,6 +18,7 @@ import android.widget.TextView;
 import com.github.sundeepk.compactcalendarview.CompactCalendarView;
 import com.github.sundeepk.compactcalendarview.domain.Event;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -77,6 +78,12 @@ public class ScheduleFragment extends Fragment implements ScheduledMealAdapter.O
         currentDayNREvents = view.findViewById(R.id.scheduleFragment_nrEventsTV);
         recyclerView = view.findViewById(R.id.scheduleFragment_recyclerView);
 
+        if (getActivity() != null) {
+            BottomNavigationView navBar = getActivity().findViewById(R.id.bottom_navigation);
+            navBar.setVisibility(View.VISIBLE);
+            getActivity().findViewById(R.id.banner_cardView).setVisibility(View.INVISIBLE);
+        }
+
 
         final Date currentDate = new Date();
 
@@ -89,79 +96,79 @@ public class ScheduleFragment extends Fragment implements ScheduledMealAdapter.O
         buildRecyclerView();
         usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).collection("ScheduleEvents").get()
                 .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-            @Override
-            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                if (queryDocumentSnapshots == null) {
-                    Log.e(TAG, "onEvent: ");
-                    return;
-                }
-                for (DocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
-                    final ScheduledMeal scheduleEvent = documentSnapshot.toObject(ScheduledMeal.class);
-                    if (scheduleEvent != null) {
-                        scheduleEvent.setDocumentID(documentSnapshot.getId());
-                        if (!scheduleEventList.contains(scheduleEvent))
-                            scheduleEventList.add(scheduleEvent);
-                        if (currentDateString.equals(scheduleEvent.getDateString())) {
-                            recipesRef.document(scheduleEvent.getRecipeID()).addSnapshotListener(new EventListener<DocumentSnapshot>() {
-                                @Override
-                                public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
-                                    if (e == null && documentSnapshot != null) {
-                                        Recipe recipe = documentSnapshot.toObject(Recipe.class);
-                                        if (recipe != null) {
-                                            scheduleEvent.setMealPicture(recipe.getImageUrls_list().get(0));
-                                            scheduleEvent.setMealTitle(recipe.getTitle());
-                                            if (todayScheduleList.contains(scheduleEvent)) {
-                                                Log.d(TAG, "onEvent: SETTING");
-                                                todayScheduleList.set(todayScheduleList.indexOf(scheduleEvent), scheduleEvent);
-                                                scheduledMealAdapter.notifyItemChanged(todayScheduleList.indexOf(scheduleEvent));
-                                            } else {
-                                                Log.d(TAG, "onEvent: ADDING");
-                                                todayScheduleList.add(scheduleEvent);
-                                                scheduledMealAdapter.notifyItemInserted(todayScheduleList.size()-1);
-                                            }
-                                            if (todayScheduleList.size() > 0) {
-                                                if (todayScheduleList.size() == 1) {
-                                                    currentDayNREvents.setText("You've scheduled 1 meal for today");
-                                                } else {
-                                                    currentDayNREvents.setText("You've scheduled " + todayScheduleList.size() + " meals for today");
-                                                }
+                    @Override
+                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                        if (queryDocumentSnapshots == null) {
+                            Log.e(TAG, "onEvent: ");
+                            return;
+                        }
+                        for (DocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                            final ScheduledMeal scheduleEvent = documentSnapshot.toObject(ScheduledMeal.class);
+                            if (scheduleEvent != null) {
+                                scheduleEvent.setDocumentID(documentSnapshot.getId());
+                                if (!scheduleEventList.contains(scheduleEvent))
+                                    scheduleEventList.add(scheduleEvent);
+                                if (currentDateString.equals(scheduleEvent.getDateString())) {
+                                    recipesRef.document(scheduleEvent.getRecipeID()).addSnapshotListener(new EventListener<DocumentSnapshot>() {
+                                        @Override
+                                        public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
+                                            if (e == null && documentSnapshot != null) {
+                                                Recipe recipe = documentSnapshot.toObject(Recipe.class);
+                                                if (recipe != null) {
+                                                    scheduleEvent.setMealPicture(recipe.getImageUrls_list().get(0));
+                                                    scheduleEvent.setMealTitle(recipe.getTitle());
+                                                    if (todayScheduleList.contains(scheduleEvent)) {
+                                                        Log.d(TAG, "onEvent: SETTING");
+                                                        todayScheduleList.set(todayScheduleList.indexOf(scheduleEvent), scheduleEvent);
+                                                        scheduledMealAdapter.notifyItemChanged(todayScheduleList.indexOf(scheduleEvent));
+                                                    } else {
+                                                        Log.d(TAG, "onEvent: ADDING");
+                                                        todayScheduleList.add(scheduleEvent);
+                                                        scheduledMealAdapter.notifyItemInserted(todayScheduleList.size() - 1);
+                                                    }
+                                                    if (todayScheduleList.size() > 0) {
+                                                        if (todayScheduleList.size() == 1) {
+                                                            currentDayNREvents.setText("You've scheduled 1 meal for today");
+                                                        } else {
+                                                            currentDayNREvents.setText("You've scheduled " + todayScheduleList.size() + " meals for today");
+                                                        }
 
-                                            } else {
-                                                currentDayNREvents.setText("No meals planned for today");
-                                            }
-                                        } else
-                                            Log.d(TAG, "onEvent: RECIPE NULL");
-                                    } else
-                                        Log.d(TAG, "onEvent: FIAL");
+                                                    } else {
+                                                        currentDayNREvents.setText("No meals planned for today");
+                                                    }
+                                                } else
+                                                    Log.d(TAG, "onEvent: RECIPE NULL");
+                                            } else
+                                                Log.d(TAG, "onEvent: FIAL");
+                                        }
+                                    });
                                 }
-                            });
-                        }
 
-                    }
+                            }
 
-                }
-                calendarView.removeAllEvents();
-                for (ScheduledMeal event : scheduleEventList) {
-                    switch (event.getMealType()) {
-                        case "breakfast": {
-                            Event eventToAdd = new Event(Color.GREEN, event.getDate().getTime(), event.getRecipeID());
-                            calendarView.addEvent(eventToAdd);
-                            break;
                         }
-                        case "lunch": {
-                            Event eventToAdd = new Event(Color.BLUE, event.getDate().getTime(), event.getRecipeID());
-                            calendarView.addEvent(eventToAdd);
-                            break;
-                        }
-                        case "dinner": {
-                            Event eventToAdd = new Event(Color.RED, event.getDate().getTime(), event.getRecipeID());
-                            calendarView.addEvent(eventToAdd);
-                            break;
+                        calendarView.removeAllEvents();
+                        for (ScheduledMeal event : scheduleEventList) {
+                            switch (event.getMealType()) {
+                                case "breakfast": {
+                                    Event eventToAdd = new Event(Color.GREEN, event.getDate().getTime(), event.getRecipeID());
+                                    calendarView.addEvent(eventToAdd);
+                                    break;
+                                }
+                                case "lunch": {
+                                    Event eventToAdd = new Event(Color.BLUE, event.getDate().getTime(), event.getRecipeID());
+                                    calendarView.addEvent(eventToAdd);
+                                    break;
+                                }
+                                case "dinner": {
+                                    Event eventToAdd = new Event(Color.RED, event.getDate().getTime(), event.getRecipeID());
+                                    calendarView.addEvent(eventToAdd);
+                                    break;
+                                }
+                            }
                         }
                     }
-                }
-            }
-        });
+                });
 
         calendarView.setListener(new CompactCalendarView.CompactCalendarViewListener() {
             @Override

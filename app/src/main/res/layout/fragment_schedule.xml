@@ -16,7 +16,7 @@
         <com.google.android.material.appbar.CollapsingToolbarLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="?colorSurface"
+            android:background="@color/fragment_background_color"
             android:fitsSystemWindows="true"
             app:expandedTitleGravity="top"
             app:expandedTitleMarginEnd="64dp"
@@ -58,8 +58,7 @@
                     <RelativeLayout
                         android:id="@+id/scheduleFragment_month_RelLayout"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:background="@color/toolbar_color">
+                        android:layout_height="wrap_content">
 
                         <TextView
                             android:id="@+id/scheduleFragment_month_textView"
@@ -76,7 +75,6 @@
                             android:layout_height="300dp"
                             android:layout_below="@id/scheduleFragment_month_textView"
                             android:padding="10dp"
-                            app:compactCalendarBackgroundColor="@color/calendar_backgroundColor"
                             app:compactCalendarCurrentDayBackgroundColor="@color/calendar_currentDayBackgroundColor"
                             app:compactCalendarCurrentSelectedDayBackgroundColor="@color/calendar_currentSelectedDayBackgroundColor"
                             app:compactCalendarMultiEventIndicatorColor="@color/calendar_multiEventIndicatorColor"

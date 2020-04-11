@@ -129,8 +129,11 @@ public class PostDetailedFragment extends Fragment {
             }
         });
 
-        BottomNavigationView navBar = getActivity().findViewById(R.id.bottom_navigation);
-        navBar.setVisibility(View.VISIBLE);
+        if (getActivity() != null) {
+            BottomNavigationView navBar = getActivity().findViewById(R.id.bottom_navigation);
+            navBar.setVisibility(View.INVISIBLE);
+            getActivity().findViewById(R.id.banner_cardView).setVisibility(View.VISIBLE);
+        }
 
         DocumentReference currentRecipeRef = postsRef.document(documentID);
         final CollectionReference currentRecipeSubCollection = currentRecipeRef.collection("UsersWhoFaved");

@@ -12,7 +12,7 @@
     <color name="color_message_user_background">#0064b7</color>
     <color name="color_message_friend_text">#ffffff</color>
     <color name="toolbar_color">#212121</color>
-    <color name="navigationColor">#000000</color>
+    <color name="navigationColor">#171717</color>
 
     <color name="fragment_background_color">#151515</color>
 
@@ -25,7 +25,8 @@
     <color name="calendar_currentSelectedDayBackgroundColor">#0091ea</color>
     <color name="calendar_multiEventIndicatorColor">#fff</color>
     <color name="calendar_textColor">#fff</color>
-    <color name="input_card_color">#616161</color>
+    <color name="input_card_color">#656565</color>
     <color name="input_card_stroke_color">#1a1a1a</color>
     <color name="status_bar_color">#171717</color>
+    <color name="bottom_nav_bar_color">#1f1f1f</color>
 </resources>
