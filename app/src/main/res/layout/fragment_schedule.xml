@@ -75,6 +75,7 @@
                             android:layout_height="300dp"
                             android:layout_below="@id/scheduleFragment_month_textView"
                             android:padding="10dp"
+                            app:compactCalendarBackgroundColor="@color/calendar_backgroundColor"
                             app:compactCalendarCurrentDayBackgroundColor="@color/calendar_currentDayBackgroundColor"
                             app:compactCalendarCurrentSelectedDayBackgroundColor="@color/calendar_currentSelectedDayBackgroundColor"
                             app:compactCalendarMultiEventIndicatorColor="@color/calendar_multiEventIndicatorColor"

@@ -97,8 +97,11 @@ public class AllMessagesFragment extends Fragment implements ConversationAdapter
         progressBar = view.findViewById(R.id.allmessages_pb);
         mRecyclerView = view.findViewById(R.id.allMessages_recycler_view);
 
-        BottomNavigationView navBar = getActivity().findViewById(R.id.bottom_navigation);
-        navBar.setVisibility(View.GONE);
+        if (getActivity() != null) {
+            BottomNavigationView navBar = getActivity().findViewById(R.id.bottom_navigation);
+            navBar.setVisibility(View.VISIBLE);
+            getActivity().findViewById(R.id.banner_cardView).setVisibility(View.INVISIBLE);
+        }
 
         FloatingActionButton openSelectFriend = view.findViewById(R.id.allMessages_addConversation_fab);
         openSelectFriend.setOnClickListener(new View.OnClickListener() {

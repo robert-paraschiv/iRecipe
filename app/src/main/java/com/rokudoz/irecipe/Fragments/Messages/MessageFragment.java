@@ -157,8 +157,12 @@ public class MessageFragment extends Fragment implements MessageAdapter.OnItemCl
                 Navigation.findNavController(view).navigate(MessageFragmentDirections.actionMessageFragmentToUserProfileFragment2(friendUserId));
             }
         });
-        BottomNavigationView navBar = getActivity().findViewById(R.id.bottom_navigation);
-        navBar.setVisibility(View.GONE);
+
+        if (getActivity() != null) {
+            BottomNavigationView navBar = getActivity().findViewById(R.id.bottom_navigation);
+            navBar.setVisibility(View.VISIBLE);
+            getActivity().findViewById(R.id.banner_cardView).setVisibility(View.INVISIBLE);
+        }
 
 
         buildRecyclerView();

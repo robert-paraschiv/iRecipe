@@ -157,8 +157,6 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         String currentUserId = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
 
         if (currentItem.getType() != null && currentItem.getType().equals("message_sent")) {
-
-            holder.tvMessageTimeStamp.setPadding(0, 0, 60, 0);
             holder.readStatus.setVisibility(View.VISIBLE);
             if (currentItem.getRead() != null && currentItem.getRead()) {
                 Log.d(TAG, "onBindViewHolder: is read");
@@ -183,7 +181,6 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
         } else if (currentItem.getType() != null && currentItem.getType().equals("message_received")) {
             holder.readStatus.setVisibility(View.GONE);
-            holder.tvMessageTimeStamp.setPadding(0, 0, 15, 0);
             if (currentItem.getRead() != null && !currentItem.getRead()) {
                 WriteBatch batch = db.batch();
                 batch.update(usersReference.document(currentUserId).collection("Conversations").document(currentItem.getSender_id()).collection(currentItem.getSender_id())

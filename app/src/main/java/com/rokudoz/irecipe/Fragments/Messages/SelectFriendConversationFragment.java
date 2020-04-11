@@ -15,6 +15,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -79,6 +80,12 @@ public class SelectFriendConversationFragment extends Fragment implements Friend
             view = inflater.inflate(R.layout.fragment_select_friend_to_open_converstation, container, false);
         } catch (InflateException e) {
             Log.e(TAG, "onCreateView: ", e);
+        }
+
+        if (getActivity() != null) {
+            BottomNavigationView navBar = getActivity().findViewById(R.id.bottom_navigation);
+            navBar.setVisibility(View.VISIBLE);
+            getActivity().findViewById(R.id.banner_cardView).setVisibility(View.INVISIBLE);
         }
 
         mUser = new User();
