@@ -131,9 +131,7 @@ public class SearchUserActivity extends AppCompatActivity implements SearchUserA
 
     private void setupSearchView() {
         SearchView searchView = findViewById(R.id.searchUser_SearchView);
-        searchView.setIconified(false);
         searchView.requestFocus();
-        searchView.setImeOptions(EditorInfo.IME_ACTION_DONE);
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {

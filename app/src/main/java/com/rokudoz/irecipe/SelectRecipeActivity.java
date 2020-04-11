@@ -146,6 +146,8 @@ public class SelectRecipeActivity extends AppCompatActivity implements SearchRec
         MenuItem searchItem = menu.findItem(R.id.action_search);
         SearchView searchView = (SearchView) searchItem.getActionView();
         searchView.setImeOptions(EditorInfo.IME_ACTION_DONE);
+        searchView.setBackgroundResource(R.drawable.rounded_card);
+        searchView.setPadding(12,12,12,12);
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {

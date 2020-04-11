@@ -12,11 +12,15 @@
         android:layout_height="?attr/actionBarSize">
 
         <SearchView
-            android:id="@+id/searchUser_SearchView"
+            android:id="@+id/searchRecipe_SearchView"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
+            android:background="@drawable/rounded_card"
             android:closeIcon="@drawable/ic_close"
+            android:iconifiedByDefault="false"
+            android:imeOptions="actionDone"
             android:inputType="textCapWords"
+            android:padding="4dp"
             android:searchHintIcon="@drawable/ic_search_black_24dp"
             android:searchIcon="@drawable/ic_search_black_24dp" />
     </com.google.android.material.appbar.MaterialToolbar>
