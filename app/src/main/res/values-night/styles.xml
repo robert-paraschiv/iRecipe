@@ -10,8 +10,8 @@
         <item name="colorSecondary">@color/colorSecondary</item>
         <item name="android:navigationBarColor">@color/navigationColor</item>
         <item name="fontFamily">@font/open_sans_semibold</item>
-<!--        <item name="android:statusBarColor">@color/statusBarColor</item>-->
-<!--        <item name="android:windowLightStatusBar">true</item>-->
+        <item name="android:statusBarColor">@color/status_bar_color</item>
+        <item name="android:windowLightStatusBar">false</item>
     </style>
 
 

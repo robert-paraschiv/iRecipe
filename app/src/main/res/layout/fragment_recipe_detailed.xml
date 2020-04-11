@@ -373,14 +373,14 @@
                     android:clipToPadding="false"
                     android:padding="4dp">
 
-                    <com.google.android.material.card.MaterialCardView
+                    <RelativeLayout
                         android:id="@+id/commentFragment_input_card"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
                         android:layout_marginStart="4dp"
                         android:layout_marginEnd="70dp"
-                        app:cardCornerRadius="30dp">
+                        android:background="@drawable/rounded_card">
 
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/recipeDetailed_et_commentInput"
@@ -391,7 +391,7 @@
                             android:layout_marginEnd="8dp"
                             android:hint="Comment"
                             android:inputType="textCapSentences" />
-                    </com.google.android.material.card.MaterialCardView>
+                    </RelativeLayout>
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/recipeDetailed_addComment_btn"

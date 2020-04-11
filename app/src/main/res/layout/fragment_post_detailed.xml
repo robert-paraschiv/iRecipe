@@ -165,42 +165,60 @@
                 app:icon="@drawable/ic_edit_black_24dp"
                 tools:visibility="visible" />
 
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/postFragment_input_card"
+            <RelativeLayout
+                android:id="@+id/postFragment_text_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/postDetailed_tvDescription"
-                android:layout_marginStart="8dp"
                 android:layout_marginTop="20dp"
-                android:layout_toStartOf="@+id/postDetailed_addComment_btn"
-                app:cardCornerRadius="30dp">
+                android:layout_marginBottom="4dp"
+                android:clipToPadding="false"
+                android:padding="4dp">
 
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/postDetailed_et_commentInput"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                <RelativeLayout
+                    android:id="@+id/postDetailed_input_card"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Comment here" />
-            </com.google.android.material.card.MaterialCardView>
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="4dp"
+                    android:layout_marginEnd="70dp"
+                    android:background="@drawable/rounded_card"
+                    android:elevation="0dp">
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/postDetailed_addComment_btn"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/postDetailed_tvDescription"
-                android:layout_alignParentEnd="true"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="20dp"
-                android:layout_marginEnd="16dp"
-                android:text="Post"
-                app:cornerRadius="@dimen/buttonCornerRadius" />
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/postDetailed_et_commentInput"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginStart="8dp"
+                        android:layout_marginEnd="8dp"
+                        android:hint="Comment"
+                        android:inputType="textCapSentences" />
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:layout_width="50dp"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginEnd="8dp"
+                    android:background="@drawable/rounded_card"
+                    android:gravity="center">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/postDetailed_addComment_btn"
+                        style="@style/Widget.MaterialComponents.Button.TextButton"
+                        android:layout_width="40dp"
+                        android:layout_height="wrap_content"
+                        app:icon="@drawable/ic_send_black_24dp" />
+                </RelativeLayout>
+            </RelativeLayout>
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/postDetailed_comment_recycler_view"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_below="@id/postFragment_input_card"
+                android:layout_below="@id/postFragment_text_layout"
                 android:layout_marginTop="10dp"
                 android:transitionName="example_transition" />
         </RelativeLayout>
