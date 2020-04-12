@@ -427,11 +427,13 @@ public class MessageFragment extends Fragment implements MessageAdapter.OnItemCl
                 }
                 DateFormat dateFormat = new SimpleDateFormat("MMMM dd, YYYY", Locale.getDefault());
                 Message currentMessage = messageList.get(linearLayoutManager.findLastCompletelyVisibleItemPosition());
-                dateTV.setText(dateFormat.format(currentMessage.getTimestamp()));
-                if (dateFormat.format(System.currentTimeMillis()).equals(dateFormat.format(currentMessage.getTimestamp()))) {
-                    dateCard.setVisibility(View.INVISIBLE);
-                } else {
-                    dateCard.setVisibility(View.VISIBLE);
+                if (currentMessage.getTimestamp() != null) {
+                    dateTV.setText(dateFormat.format(currentMessage.getTimestamp()));
+                    if (dateFormat.format(System.currentTimeMillis()).equals(dateFormat.format(currentMessage.getTimestamp()))) {
+                        dateCard.setVisibility(View.INVISIBLE);
+                    } else {
+                        dateCard.setVisibility(View.VISIBLE);
+                    }
                 }
             }
         });
