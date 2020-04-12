@@ -43,6 +43,7 @@ import com.bumptech.glide.request.transition.Transition;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -70,9 +71,12 @@ import com.rokudoz.irecipe.Utils.DirectReplyReceiver;
 import com.rokudoz.irecipe.Utils.LinearLayoutManagerWrapper;
 import com.rokudoz.irecipe.Utils.LastSeen;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 
 /**
@@ -97,9 +101,11 @@ public class MessageFragment extends Fragment implements MessageAdapter.OnItemCl
     private MediaPlayer mediaPlayer;
 
     private ImageView friendImage;
-    private TextView friendName, friendOnlineStatus;
+    private TextView friendName, friendOnlineStatus, dateTV;
     private TextInputEditText textInputEditText;
     private MaterialButton sendButton, backBtn;
+
+    private MaterialCardView dateCard;
 
     private View view;
     private String friendUserId = "";
@@ -145,6 +151,8 @@ public class MessageFragment extends Fragment implements MessageAdapter.OnItemCl
         textInputEditText = view.findViewById(R.id.message_input_TextInput);
         sendButton = view.findViewById(R.id.message_send_MaterialBtn);
         mRecyclerView = view.findViewById(R.id.message_recycler_view);
+        dateTV = view.findViewById(R.id.messageFragment_dateTV);
+        dateCard = view.findViewById(R.id.messageFragment_date_card);
 
         MessageFragmentArgs messageFragmentArgs = MessageFragmentArgs.fromBundle(getArguments());
         friendUserId = messageFragmentArgs.getUserId();
@@ -160,8 +168,8 @@ public class MessageFragment extends Fragment implements MessageAdapter.OnItemCl
 
         if (getActivity() != null) {
             BottomNavigationView navBar = getActivity().findViewById(R.id.bottom_navigation);
-            navBar.setVisibility(View.VISIBLE);
-            getActivity().findViewById(R.id.banner_cardView).setVisibility(View.INVISIBLE);
+            navBar.setVisibility(View.GONE);
+            getActivity().findViewById(R.id.banner_cardView).setVisibility(View.GONE);
         }
 
 
@@ -417,7 +425,14 @@ public class MessageFragment extends Fragment implements MessageAdapter.OnItemCl
                     if (gotMessagesFirstTime)
                         getMoreMessages();
                 }
-
+                DateFormat dateFormat = new SimpleDateFormat("MMMM dd, YYYY", Locale.getDefault());
+                Message currentMessage = messageList.get(linearLayoutManager.findLastCompletelyVisibleItemPosition());
+                dateTV.setText(dateFormat.format(currentMessage.getTimestamp()));
+                if (dateFormat.format(System.currentTimeMillis()).equals(dateFormat.format(currentMessage.getTimestamp()))) {
+                    dateCard.setVisibility(View.INVISIBLE);
+                } else {
+                    dateCard.setVisibility(View.VISIBLE);
+                }
             }
         });
     }
@@ -587,7 +602,7 @@ public class MessageFragment extends Fragment implements MessageAdapter.OnItemCl
         if (messageList.get(position).getPost() != null && messageList.get(position).getRecipe() == null) {
             Navigation.findNavController(view).navigate(MessageFragmentDirections
                     .actionMessageFragmentToPostDetailed(messageList.get(position).getPost().getDocumentId()));
-        }else if (messageList.get(position).getPost() == null && messageList.get(position).getRecipe() != null){
+        } else if (messageList.get(position).getPost() == null && messageList.get(position).getRecipe() != null) {
             Navigation.findNavController(view).navigate(MessageFragmentDirections
                     .actionMessageFragmentToRecipeDetailedFragment(messageList.get(position).getRecipe().getDocumentId()));
         }

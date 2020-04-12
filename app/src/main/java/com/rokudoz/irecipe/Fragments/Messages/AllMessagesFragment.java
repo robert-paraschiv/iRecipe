@@ -99,8 +99,8 @@ public class AllMessagesFragment extends Fragment implements ConversationAdapter
 
         if (getActivity() != null) {
             BottomNavigationView navBar = getActivity().findViewById(R.id.bottom_navigation);
-            navBar.setVisibility(View.VISIBLE);
-            getActivity().findViewById(R.id.banner_cardView).setVisibility(View.INVISIBLE);
+            navBar.setVisibility(View.GONE);
+            getActivity().findViewById(R.id.banner_cardView).setVisibility(View.GONE);
         }
 
         FloatingActionButton openSelectFriend = view.findViewById(R.id.allMessages_addConversation_fab);

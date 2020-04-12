@@ -14,7 +14,7 @@
     <color name="toolbar_color">#212121</color>
     <color name="navigationColor">#1f1f1f</color>
 
-    <color name="fragment_background_color">#151515</color>
+    <color name="fragment_background_color">#202020</color>
 
     <color name="spacer">#bdbdbd</color>
 
@@ -25,9 +25,9 @@
     <color name="calendar_currentSelectedDayBackgroundColor">#0091ea</color>
     <color name="calendar_multiEventIndicatorColor">#fff</color>
     <color name="calendar_textColor">#fff</color>
-    <color name="input_card_color">#656565</color>
-    <color name="input_card_stroke_color">#1a1a1a</color>
-    <color name="status_bar_color">#171717</color>
-    <color name="bottom_nav_bar_color">#1f1f1f</color>
-    <color name="messageFragment_toolbar_color">#171717</color>
+    <color name="input_card_color">#171717</color>
+    <color name="input_card_stroke_color">#0f0f0f</color>
+    <color name="status_bar_color">#1d1d1d</color>
+    <color name="bottom_nav_bar_color">#171717</color>
+    <color name="messageFragment_toolbar_color">#1d1d1d</color>
 </resources>

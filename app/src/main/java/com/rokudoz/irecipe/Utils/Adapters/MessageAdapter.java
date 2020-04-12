@@ -220,18 +220,19 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             if (currentItem.getTimestamp() != null && !currentItem.getTimestamp().toString().equals("")) {
                 DateFormat smallDateFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
                 String timeString = smallDateFormat.format(date);
-                if (timeAgoString != null) {
-                    if (timeAgoString.equals("just now") || timeAgoString.equals("a minute ago") || timeAgoString.contains("hours ago") || timeAgoString.equals("an hour ago")) {
-                        holder.tvMessageTimeStamp.setText(timeAgo.getTimeAgo(time));
-                    } else if (timeAgoString.equals("yesterday")) {
-                        holder.tvMessageTimeStamp.setText(String.format("yesterday, %s", timeString));
-                    } else if (timeAgoString.contains("minutes ago")) {
-                        holder.tvMessageTimeStamp.setText(timeAgo.getTimeAgo(time));
-                    } else
-                        holder.tvMessageTimeStamp.setText(String.format("%s, %s", timeAgo.getTimeAgo(time), timeString));
-                } else {
-                    holder.tvMessageTimeStamp.setText("");
-                }
+                holder.tvMessageTimeStamp.setText(timeString);
+//                if (timeAgoString != null) {
+//                    if (timeAgoString.equals("just now") || timeAgoString.equals("a minute ago") || timeAgoString.contains("hours ago") || timeAgoString.equals("an hour ago")) {
+//                        holder.tvMessageTimeStamp.setText(timeAgo.getTimeAgo(time));
+//                    } else if (timeAgoString.equals("yesterday")) {
+//                        holder.tvMessageTimeStamp.setText(String.format("yesterday, %s", timeString));
+//                    } else if (timeAgoString.contains("minutes ago")) {
+//                        holder.tvMessageTimeStamp.setText(timeAgo.getTimeAgo(time));
+//                    } else
+//                        holder.tvMessageTimeStamp.setText(String.format("%s, %s", timeAgo.getTimeAgo(time), timeString));
+//                } else {
+//                    holder.tvMessageTimeStamp.setText("");
+//                }
             }
         } else {
             holder.tvMessageTimeStamp.setText("");
@@ -311,18 +312,19 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             if (currentItem.getTimestamp() != null && !currentItem.getTimestamp().toString().equals("")) {
                 DateFormat smallDateFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
                 String timeString = smallDateFormat.format(date);
-                if (timeAgoString != null) {
-                    if (timeAgoString.equals("just now") || timeAgoString.equals("a minute ago") || timeAgoString.contains("hours ago") || timeAgoString.equals("an hour ago")) {
-                        holder.tvMessageTimeStamp.setText(timeAgo.getTimeAgo(time));
-                    } else if (timeAgoString.equals("yesterday")) {
-                        holder.tvMessageTimeStamp.setText(String.format("yesterday, %s", timeString));
-                    } else if (timeAgoString.contains("minutes ago")) {
-                        holder.tvMessageTimeStamp.setText(timeAgo.getTimeAgo(time));
-                    } else
-                        holder.tvMessageTimeStamp.setText(String.format("%s, %s", timeAgo.getTimeAgo(time), timeString));
-                } else {
-                    holder.tvMessageTimeStamp.setText("");
-                }
+                holder.tvMessageTimeStamp.setText(timeString);
+//                if (timeAgoString != null) {
+//                    if (timeAgoString.equals("just now") || timeAgoString.equals("a minute ago") || timeAgoString.contains("hours ago") || timeAgoString.equals("an hour ago")) {
+//                        holder.tvMessageTimeStamp.setText(timeAgo.getTimeAgo(time));
+//                    } else if (timeAgoString.equals("yesterday")) {
+//                        holder.tvMessageTimeStamp.setText(String.format("yesterday, %s", timeString));
+//                    } else if (timeAgoString.contains("minutes ago")) {
+//                        holder.tvMessageTimeStamp.setText(timeAgo.getTimeAgo(time));
+//                    } else
+//                        holder.tvMessageTimeStamp.setText(String.format("%s, %s", timeAgo.getTimeAgo(time), timeString));
+//                } else {
+//                    holder.tvMessageTimeStamp.setText("");
+//                }
             }
         } else {
             holder.tvMessageTimeStamp.setText("");
