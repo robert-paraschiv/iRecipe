@@ -218,7 +218,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:hint="Duration"
-                    android:inputType="number"
+                    android:inputType="numberDecimal"
                     android:maxWidth="150dp" />
 
                 <androidx.appcompat.widget.AppCompatSpinner

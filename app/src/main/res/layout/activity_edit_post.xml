@@ -5,8 +5,8 @@
     android:id="@+id/addRecipes_scrollView"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fillViewport="true"
     android:background="@color/fragment_background_color"
+    android:fillViewport="true"
     tools:context=".EditPostActivity">
 
     <LinearLayout
@@ -63,13 +63,14 @@
                     android:layout_height="200dp"
                     android:layout_centerHorizontal="true"
                     android:scaleType="centerCrop"
-                    tools:src="@drawable/ic_launcher_background" />
+                    tools:src="@drawable/ic_image_black_24dp" />
             </com.google.android.material.card.MaterialCardView>
 
             <com.google.android.material.textfield.TextInputLayout
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
                 android:hint="Post description">
 
                 <com.google.android.material.textfield.TextInputEditText
@@ -94,7 +95,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="4dp"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="16dp"
                 android:layout_marginBottom="8dp"
                 android:text="Who can see this post?"
                 android:textSize="18sp"

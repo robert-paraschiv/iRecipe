@@ -48,14 +48,14 @@
                 app:icon="@drawable/ic_fb_plus" />
 
             <com.google.android.material.button.MaterialButton
-                app:icon="@drawable/ic_delete_black_24dp"
                 android:id="@+id/rv_edit_recipe_instruction_removeStep_btn"
                 style="@style/Widget.MaterialComponents.Button.TextButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_toEndOf="@id/rv_edit_recipe_instruction_addPhoto_btn"
                 android:text="Step"
-                app:cornerRadius="18dp" />
+                app:cornerRadius="18dp"
+                app:icon="@drawable/ic_delete_black_24dp" />
         </RelativeLayout>
 
     </RelativeLayout>

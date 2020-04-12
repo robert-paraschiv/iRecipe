@@ -15,7 +15,7 @@
         <com.google.android.material.appbar.CollapsingToolbarLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="?colorSurface"
+            android:background="@color/fragment_background_color"
             android:fitsSystemWindows="true"
             app:expandedTitleGravity="top"
             app:expandedTitleMarginEnd="64dp"

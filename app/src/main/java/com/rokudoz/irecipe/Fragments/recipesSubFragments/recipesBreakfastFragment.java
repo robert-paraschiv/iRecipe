@@ -49,9 +49,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
+import static com.rokudoz.irecipe.Fragments.recipesSubFragments.RecipesFragment.NR_OF_MISSING_INGREDIENTS;
+
 public class recipesBreakfastFragment extends Fragment implements RecipeAdapter.OnItemClickListener {
     private static final String TAG = "recipesBreakfastFragment";
-    private static final int NR_OF_MISSING_INGREDIENTS = 10;
+
 
     public View view;
 

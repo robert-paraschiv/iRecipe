@@ -24,6 +24,7 @@ import com.rokudoz.irecipe.Utils.Adapters.SectionsPagerAdapter;
 
 public class RecipesFragment extends Fragment {
     private static final String TAG = "RecipesFragment";
+    public static final int NR_OF_MISSING_INGREDIENTS = 30;
 
     public View view;
     private FloatingActionButton fab_addRecipes;

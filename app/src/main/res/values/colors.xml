@@ -30,4 +30,6 @@
     <color name="status_bar_color">#f1f1f1</color>
     <color name="bottom_nav_bar_color">#fafafa</color>
     <color name="messageFragment_toolbar_color">#f4f4f4</color>
+    <color name="post_rounded_card_background_color">#ffffff</color>
+    <color name="post_rounded_card_stroke_color">#f1f1f1</color>
 </resources>
