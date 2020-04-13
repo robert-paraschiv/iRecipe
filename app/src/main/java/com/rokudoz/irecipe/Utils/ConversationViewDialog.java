@@ -14,6 +14,7 @@ import android.widget.TextView;
 import androidx.navigation.Navigation;
 
 import com.bumptech.glide.Glide;
+import com.google.android.material.button.MaterialButton;
 import com.rokudoz.irecipe.R;
 
 public class ConversationViewDialog {
@@ -31,13 +32,24 @@ public class ConversationViewDialog {
         ImageView imageView = dialog.findViewById(R.id.conversationDialog_user_picture);
         Glide.with(activity).load(userPicUrl).centerInside().into(imageView);
 
-        Button dialogButton = dialog.findViewById(R.id.conversationDialog_viewProfileBtn);
-        dialogButton.setOnClickListener(new View.OnClickListener() {
+        Button viewProfileBtn = dialog.findViewById(R.id.conversationDialog_viewProfileBtn);
+        MaterialButton sendMessageBtn = dialog.findViewById(R.id.conversationDialog_sendMessageBtn);
+
+        viewProfileBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Bundle args = new Bundle();
                 args.putString("documentID", userId);
                 Navigation.findNavController(view).navigate(R.id.userProfileFragment2, args);
+                dialog.dismiss();
+            }
+        });
+        sendMessageBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Bundle args = new Bundle();
+                args.putString("user_id", userId);
+                Navigation.findNavController(view).navigate(R.id.messageFragment, args);
                 dialog.dismiss();
             }
         });

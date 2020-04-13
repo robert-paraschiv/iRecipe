@@ -13,6 +13,7 @@
         <item name="fontFamily">@font/open_sans_semibold</item>
         <item name="android:statusBarColor">@color/status_bar_color</item>
         <item name="android:windowLightStatusBar">true</item>
+        <item name="colorSurface">@color/surface_color</item>
     </style>
 
 
@@ -22,6 +23,5 @@
         <item name="android:activityCloseEnterAnimation">@anim/fade_in</item>
         <item name="android:activityCloseExitAnimation">@anim/fade_out</item>
     </style>
-
 
 </resources>

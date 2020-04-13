@@ -375,7 +375,7 @@ public class MessageFragment extends Fragment implements MessageAdapter.OnItemCl
                                                 .setSmallIcon(R.mipmap.ic_launcher_foreground)
                                                 .setStyle(messagingStyle)
                                                 .addAction(replyAction)
-                                                .setColor(Color.BLUE)
+                                                .setColor(getResources().getColor(R.color.notification_color, getActivity().getTheme()))
                                                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                                                 .setCategory(NotificationCompat.CATEGORY_MESSAGE)
                                                 .setAutoCancel(true);
@@ -426,15 +426,19 @@ public class MessageFragment extends Fragment implements MessageAdapter.OnItemCl
                         getMoreMessages();
                 }
                 DateFormat dateFormat = new SimpleDateFormat("MMMM dd, YYYY", Locale.getDefault());
-                Message currentMessage = messageList.get(linearLayoutManager.findLastCompletelyVisibleItemPosition());
-                if (currentMessage.getTimestamp() != null) {
-                    dateTV.setText(dateFormat.format(currentMessage.getTimestamp()));
-                    if (dateFormat.format(System.currentTimeMillis()).equals(dateFormat.format(currentMessage.getTimestamp()))) {
-                        dateCard.setVisibility(View.INVISIBLE);
-                    } else {
-                        dateCard.setVisibility(View.VISIBLE);
+
+                if (linearLayoutManager.findLastCompletelyVisibleItemPosition() >= 0){
+                    Message currentMessage = messageList.get(linearLayoutManager.findLastCompletelyVisibleItemPosition());
+                    if (currentMessage.getTimestamp() != null) {
+                        dateTV.setText(dateFormat.format(currentMessage.getTimestamp()));
+                        if (dateFormat.format(System.currentTimeMillis()).equals(dateFormat.format(currentMessage.getTimestamp()))) {
+                            dateCard.setVisibility(View.INVISIBLE);
+                        } else {
+                            dateCard.setVisibility(View.VISIBLE);
+                        }
                     }
                 }
+
             }
         });
     }

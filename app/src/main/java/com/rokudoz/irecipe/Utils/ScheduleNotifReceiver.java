@@ -23,7 +23,7 @@ public class ScheduleNotifReceiver extends BroadcastReceiver {
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, App.CHANNEL_COMMENTS)
                 .setSmallIcon(R.mipmap.ic_launcher_foreground)
-                .setColor(Color.BLUE)
+                .setColor(context.getResources().getColor(R.color.notification_color, context.getTheme()))
                 .setContentTitle("Time to cook")
                 .setContentText("You've planned to cook " + recipe_title + " for " + recipe_category)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)

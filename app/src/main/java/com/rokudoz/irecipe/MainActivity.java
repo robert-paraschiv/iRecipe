@@ -193,7 +193,7 @@ public class MainActivity extends AppCompatActivity {
                                         .setSmallIcon(R.mipmap.ic_launcher_foreground)
                                         .setStyle(messagingStyle)
                                         .addAction(replyAction)
-                                        .setColor(Color.BLUE)
+                                        .setColor(getResources().getColor(R.color.notification_color, getTheme()))
                                         .setPriority(NotificationCompat.PRIORITY_HIGH)
                                         .setCategory(NotificationCompat.CATEGORY_MESSAGE)
                                         .setAutoCancel(true);

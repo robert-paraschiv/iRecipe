@@ -16,6 +16,7 @@ import android.widget.RadioGroup;
 
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.appbar.MaterialToolbar;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.button.MaterialButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
@@ -60,6 +61,13 @@ public class SettingsFragment extends Fragment {
 
         RadioGroup appThemeRadioGroup = view.findViewById(R.id.settings_appTheme_radioGroup);
         MaterialButton signOutBtn = view.findViewById(R.id.settings_logOut);
+
+        if (getActivity() != null) {
+            BottomNavigationView navBar = getActivity().findViewById(R.id.bottom_navigation);
+            navBar.setVisibility(View.INVISIBLE);
+            getActivity().findViewById(R.id.banner_cardView).setVisibility(View.VISIBLE);
+        }
+
 
         SharedPreferences sharedPreferences = this.getActivity().getSharedPreferences(SETTINGS_PREFS_NAME, MODE_PRIVATE);
         int darkMode = sharedPreferences.getInt("NightMode", AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);

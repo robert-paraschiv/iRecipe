@@ -76,7 +76,7 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
 
             NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext(), App.CHANNEL_COMMENTS)
                     .setSmallIcon(R.mipmap.ic_launcher_foreground)
-                    .setColor(Color.BLUE)
+                    .setColor(getResources().getColor(R.color.colorPrimary, getTheme()))
                     .setContentTitle(messageTitle)
                     .setContentText(messageBody)
                     .setPriority(NotificationCompat.PRIORITY_DEFAULT)
@@ -170,7 +170,7 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
                                                     .setSmallIcon(R.mipmap.ic_launcher_foreground)
                                                     .setStyle(messagingStyle)
                                                     .addAction(replyAction)
-                                                    .setColor(Color.BLUE)
+                                                    .setColor(getResources().getColor(R.color.notification_color, getTheme()))
                                                     .setPriority(NotificationCompat.PRIORITY_HIGH)
                                                     .setCategory(NotificationCompat.CATEGORY_MESSAGE)
                                                     .setAutoCancel(true);

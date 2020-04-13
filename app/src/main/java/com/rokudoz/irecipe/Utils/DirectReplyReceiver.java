@@ -138,7 +138,7 @@ public class DirectReplyReceiver extends BroadcastReceiver {
                                                                                 .setSmallIcon(R.mipmap.ic_launcher_foreground)
                                                                                 .setStyle(messagingStyle)
                                                                                 .setContentText(text)
-                                                                                .setColor(Color.BLUE)
+                                                                                .setColor(context.getResources().getColor(R.color.notification_color, context.getTheme()))
                                                                                 .setAutoCancel(true)
                                                                                 .setTimeoutAfter(100)
                                                                                 .build();
