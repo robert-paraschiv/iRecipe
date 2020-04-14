@@ -21,7 +21,7 @@
 
     <color name="icon_tint_color">#bdbdbd</color>
 
-    <color name="calendar_backgroundColor">#1e1e1e</color>
+    <color name="calendar_backgroundColor">#2b2b2b</color>
     <color name="calendar_currentDayBackgroundColor">#0064b7</color>
     <color name="calendar_currentSelectedDayBackgroundColor">#0091ea</color>
     <color name="calendar_multiEventIndicatorColor">#fff</color>
