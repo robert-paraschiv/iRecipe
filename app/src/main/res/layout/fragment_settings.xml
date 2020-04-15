@@ -25,26 +25,26 @@
 
     <RadioGroup
         android:id="@+id/settings_appTheme_radioGroup"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/selectAppTheme"
         android:layout_margin="8dp">
 
         <RadioButton
             android:id="@+id/dark_mode_follow_system"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Follow system theme" />
+            android:text="System default" />
 
         <RadioButton
             android:id="@+id/dark_mode_light"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Light mode" />
 
         <RadioButton
             android:id="@+id/dark_mode_dark"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Dark Mode" />
     </RadioGroup>

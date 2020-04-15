@@ -11,9 +11,11 @@
     <color name="color_message_friend_background">#448aff</color>
     <color name="color_message_user_background">#ffffff</color>
     <color name="color_message_friend_text">#000000</color>
-    <color name="toolbar_color">#F5F5F5</color>
+    <color name="toolbar_color">#f6f6f6</color>
     <color name="navigationColor">#fafafa</color>
     <color name="surface_color">#FFFFFF</color>
+
+    <color name="dialog_settings_background_color" >#f6f6f6</color>
 
     <color name="fragment_background_color">#f6f6f6</color>
 
@@ -21,16 +23,19 @@
 
     <color name="icon_tint_color">#1b1b1b</color>
 
+    //Calendar colors
     <color name="calendar_backgroundColor">#ffffff</color>
     <color name="calendar_currentDayBackgroundColor">#0064b7</color>
     <color name="calendar_currentSelectedDayBackgroundColor">#0091ea</color>
     <color name="calendar_multiEventIndicatorColor">#000000</color>
     <color name="calendar_textColor">#000000</color>
+
+
     <color name="input_card_color">#e5e5e5</color>
     <color name="input_card_stroke_color">#fafafa</color>
-    <color name="status_bar_color">#f1f1f1</color>
-    <color name="bottom_nav_bar_color">#fafafa</color>
-    <color name="messageFragment_toolbar_color">#f4f4f4</color>
+    <color name="status_bar_color">#f6f6f6</color>
+    <color name="bottom_nav_bar_color">#ffffff</color>
+    <color name="messageFragment_toolbar_color">#f6f6f6</color>
     <color name="post_rounded_card_background_color">#ffffff</color>
     <color name="post_rounded_card_stroke_color">#f1f1f1</color>
     <color name="notification_color">#0091ea</color>
