@@ -116,7 +116,7 @@ public class profileMyRecipesFragment extends Fragment implements RecipeWithAdsA
 
         buildRecyclerView();
 
-        loadNativeAds();
+//        loadNativeAds();
         return view;
     }
 

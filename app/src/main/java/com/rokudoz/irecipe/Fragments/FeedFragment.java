@@ -166,7 +166,7 @@ public class FeedFragment extends Fragment implements FeedAdapter.OnItemClickLis
 
 
     private void loadNativeAds() {
-        if (getActivity() != null) {
+        if (getActivity() != null && adLoader == null) {
             AdLoader.Builder builder = new AdLoader.Builder(Objects.requireNonNull(getActivity()), getResources().getString(R.string.admob_unit_id));
             adLoader = builder.forUnifiedNativeAd(new UnifiedNativeAd.OnUnifiedNativeAdLoadedListener() {
                 @Override
@@ -468,7 +468,7 @@ public class FeedFragment extends Fragment implements FeedAdapter.OnItemClickLis
                     Log.d(TAG, "onEvent: Querry result is null");
                 }
                 if (mPostList.isEmpty()) {
-                    mPostList.add(new Post(null,"", "", "", "", 0, 0
+                    mPostList.add(new Post(null, "", "", "", "", 0, 0
                             , "Add friends to see posts just like this one", ""
                             , false, "Everyone", null));
                     Log.d(TAG, "EMPTY: ");

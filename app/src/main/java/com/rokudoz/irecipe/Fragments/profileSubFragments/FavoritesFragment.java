@@ -118,7 +118,7 @@ public class FavoritesFragment extends Fragment implements RecipeWithAdsAdapter.
         mStorageRef = FirebaseStorage.getInstance();
 
         buildRecyclerView();
-        loadNativeAds();
+//        loadNativeAds();
         return view; // HAS TO BE THE LAST ONE ---------------------------------
     }
 

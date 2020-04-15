@@ -80,6 +80,8 @@ import static com.rokudoz.irecipe.App.SETTINGS_PREFS_NAME;
 public class ProfileFragment extends Fragment {
     private static final String TAG = "ProfileFragment";
 
+    private User mUser = new User();
+
     private static final int PICK_IMAGE_REQUEST = 1;
     private Uri mImageUri;
     private Bitmap imageBitmap;
@@ -173,7 +175,151 @@ public class ProfileFragment extends Fragment {
             }
         });
 
+        setUpSettingsDialog();
+
         return view;
+    }
+
+    private void setUpSettingsDialog() {
+        mSettingsBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+//                            Navigation.findNavController(view).navigate(ProfileFragmentDirections.actionProfileFragmentToSettingsFragment());
+
+
+                final SharedPreferences.Editor sharedPrefsEditor = Objects.requireNonNull(getActivity())
+                        .getSharedPreferences(SETTINGS_PREFS_NAME, MODE_PRIVATE).edit();
+                final SharedPreferences sharedPreferences = getActivity().getSharedPreferences(SETTINGS_PREFS_NAME, MODE_PRIVATE);
+
+                //Bottom sheet dialog for "Settings"
+                final View dialogView = getLayoutInflater().inflate(R.layout.dialog_settings, (ViewGroup) view, false);
+                final BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(Objects.requireNonNull(getContext()), R.style.CustomBottomSheetDialogTheme);
+
+                LinearLayout themeLinearLayout = dialogView.findViewById(R.id.dialog_settings_theme_LL);
+                TextView themeTextView = dialogView.findViewById(R.id.dialog_settings_theme_textView);
+                CircleImageView profilePic = dialogView.findViewById(R.id.dialog_settings_profilePic);
+                TextView emailTv = dialogView.findViewById(R.id.dialog_settings_email);
+                TextView name = dialogView.findViewById(R.id.dialog_settings_name);
+                MaterialButton signOutBtn = dialogView.findViewById(R.id.dialog_settings_signOut);
+                Glide.with(profilePic).load(mUser.getUserProfilePicUrl()).centerCrop().into(profilePic);
+                emailTv.setText(mUser.getEmail());
+                name.setText(mUser.getName());
+
+                bottomSheetDialog.setContentView(dialogView);
+
+                signOutBtn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+                        //Dialog for sign out
+                        MaterialAlertDialogBuilder materialAlertDialogBuilder = new MaterialAlertDialogBuilder(getActivity(),
+                                R.style.ThemeOverlay_MaterialComponents_MaterialAlertDialog_Centered);
+                        materialAlertDialogBuilder.setMessage("Are you sure you want to sign out?");
+                        materialAlertDialogBuilder.setCancelable(true);
+                        materialAlertDialogBuilder.setPositiveButton(
+                                "Yes",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(final DialogInterface dialog, int id) {
+                                        //Delete note
+                                        FirebaseAuth.getInstance().signOut();
+                                        Intent intent = new Intent(getActivity(), LoginActivity.class);
+                                        startActivity(intent);
+                                        getActivity().finish();
+                                    }
+                                });
+
+                        materialAlertDialogBuilder.setNegativeButton(
+                                "No",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+                                        dialog.cancel();
+                                    }
+                                });
+
+                        materialAlertDialogBuilder.show();
+                    }
+                });
+                bottomSheetDialog.show();
+                Window window = bottomSheetDialog.getWindow();
+                if (window != null) {
+                    window.findViewById(com.google.android.material.R.id.container).setFitsSystemWindows(false);
+                    View decorView = window.getDecorView();
+                    decorView.setSystemUiVisibility(decorView.getSystemUiVisibility() | View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR);
+                }
+
+
+                //Set theme text view from prefs
+                switch (sharedPreferences.getInt("NightMode", AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)) {
+                    case AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM:
+                        themeTextView.setText("System default");
+                        break;
+                    case AppCompatDelegate.MODE_NIGHT_NO:
+                        themeTextView.setText("Light");
+                        break;
+                    case AppCompatDelegate.MODE_NIGHT_YES:
+                        themeTextView.setText("Dark");
+                        break;
+                }
+
+                // Dialog for app theme
+                themeLinearLayout.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        View themeView = getLayoutInflater().inflate(R.layout.dialog_theme_settings, (ViewGroup) view, false);
+                        final Dialog dialog = new Dialog(getContext(), R.style.CustomBottomSheetDialogTheme);
+                        RadioGroup appThemeRadioGroup = themeView.findViewById(R.id.settings_appTheme_radioGroup);
+                        dialog.setContentView(themeView);
+                        dialog.show();
+
+                        switch (sharedPreferences.getInt("NightMode", AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)) {
+                            case AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM:
+                                appThemeRadioGroup.check(R.id.dark_mode_follow_system);
+                                break;
+                            case AppCompatDelegate.MODE_NIGHT_NO:
+                                appThemeRadioGroup.check(R.id.dark_mode_light);
+                                break;
+                            case AppCompatDelegate.MODE_NIGHT_YES:
+                                appThemeRadioGroup.check(R.id.dark_mode_dark);
+                                break;
+                        }
+                        appThemeRadioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+                            @Override
+                            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                                switch (checkedId) {
+                                    case R.id.dark_mode_follow_system:
+                                        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
+                                        sharedPrefsEditor.putInt("NightMode", AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
+                                        sharedPrefsEditor.apply();
+                                        bottomSheetDialog.cancel();
+                                        dialog.cancel();
+                                        getActivity().recreate();
+                                        break;
+                                    case R.id.dark_mode_light:
+                                        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+                                        sharedPrefsEditor.putInt("NightMode", AppCompatDelegate.MODE_NIGHT_NO);
+                                        sharedPrefsEditor.apply();
+                                        bottomSheetDialog.cancel();
+                                        dialog.cancel();
+                                        getActivity().recreate();
+                                        break;
+                                    case R.id.dark_mode_dark:
+                                        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+                                        sharedPrefsEditor.putInt("NightMode", AppCompatDelegate.MODE_NIGHT_YES);
+                                        sharedPrefsEditor.apply();
+                                        bottomSheetDialog.cancel();
+                                        dialog.cancel();
+                                        getActivity().recreate();
+                                        break;
+
+                                }
+                            }
+                        });
+
+                    }
+                });
+
+            }
+        });
     }
 
     @Override
@@ -429,6 +575,7 @@ public class ProfileFragment extends Fragment {
             public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
                 if (e == null) {
                     final User user = documentSnapshot.toObject(User.class);
+                    mUser = user;
                     userDocumentID = documentSnapshot.getId();
                     userProfilePicUrl = user.getUserProfilePicUrl();
 
@@ -442,154 +589,6 @@ public class ProfileFragment extends Fragment {
                         Glide.with(mProfileImage).load(R.drawable.ic_account_circle_black_24dp).centerCrop().into(mProfileImage);
                         Log.d(TAG, "onEvent: Empty profile pic");
                     }
-
-                    mSettingsBtn.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-//                            Navigation.findNavController(view).navigate(ProfileFragmentDirections.actionProfileFragmentToSettingsFragment());
-
-
-
-
-                            final SharedPreferences.Editor sharedPrefsEditor = Objects.requireNonNull(getActivity())
-                                    .getSharedPreferences(SETTINGS_PREFS_NAME, MODE_PRIVATE).edit();
-                            final SharedPreferences sharedPreferences = getActivity().getSharedPreferences(SETTINGS_PREFS_NAME, MODE_PRIVATE);
-
-                            //Bottom sheet dialog for "Settings"
-                            final View dialogView = getLayoutInflater().inflate(R.layout.dialog_settings, (ViewGroup) view, false);
-                            final BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(Objects.requireNonNull(getContext()), R.style.CustomBottomSheetDialogTheme);
-
-                            LinearLayout themeLinearLayout = dialogView.findViewById(R.id.dialog_settings_theme_LL);
-                            TextView themeTextView = dialogView.findViewById(R.id.dialog_settings_theme_textView);
-                            CircleImageView profilePic = dialogView.findViewById(R.id.dialog_settings_profilePic);
-                            TextView emailTv = dialogView.findViewById(R.id.dialog_settings_email);
-                            TextView name = dialogView.findViewById(R.id.dialog_settings_name);
-                            MaterialButton signOutBtn = dialogView.findViewById(R.id.dialog_settings_signOut);
-                            Glide.with(profilePic).load(user.getUserProfilePicUrl()).centerCrop().into(profilePic);
-                            emailTv.setText(user.getEmail());
-                            name.setText(user.getName());
-
-                            bottomSheetDialog.setContentView(dialogView);
-
-                            signOutBtn.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-
-                                    //Dialog for sign out
-                                    MaterialAlertDialogBuilder materialAlertDialogBuilder = new MaterialAlertDialogBuilder(getActivity(),
-                                            R.style.ThemeOverlay_MaterialComponents_MaterialAlertDialog_Centered);
-                                    materialAlertDialogBuilder.setMessage("Are you sure you want to sign out?");
-                                    materialAlertDialogBuilder.setCancelable(true);
-                                    materialAlertDialogBuilder.setPositiveButton(
-                                            "Yes",
-                                            new DialogInterface.OnClickListener() {
-                                                public void onClick(final DialogInterface dialog, int id) {
-                                                    //Delete note
-                                                    FirebaseAuth.getInstance().signOut();
-                                                    Intent intent = new Intent(getActivity(), LoginActivity.class);
-                                                    startActivity(intent);
-                                                    getActivity().finish();
-                                                }
-                                            });
-
-                                    materialAlertDialogBuilder.setNegativeButton(
-                                            "No",
-                                            new DialogInterface.OnClickListener() {
-                                                public void onClick(DialogInterface dialog, int id) {
-                                                    dialog.cancel();
-                                                }
-                                            });
-
-                                    materialAlertDialogBuilder.show();
-                                }
-                            });
-                            bottomSheetDialog.show();
-                            Window window = bottomSheetDialog.getWindow();
-                            if (window != null) {
-                                window.findViewById(com.google.android.material.R.id.container).setFitsSystemWindows(false);
-                                View decorView = window.getDecorView();
-                                decorView.setSystemUiVisibility(decorView.getSystemUiVisibility() | View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR);
-                            }
-
-
-                            //Set theme text view from prefs
-                            switch (sharedPreferences.getInt("NightMode", AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)) {
-                                case AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM:
-                                    themeTextView.setText("System default");
-                                    break;
-                                case AppCompatDelegate.MODE_NIGHT_NO:
-                                    themeTextView.setText("Light");
-                                    break;
-                                case AppCompatDelegate.MODE_NIGHT_YES:
-                                    themeTextView.setText("Dark");
-                                    break;
-                            }
-
-                            // Dialog for app theme
-                            themeLinearLayout.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    View themeView = getLayoutInflater().inflate(R.layout.dialog_theme_settings, (ViewGroup) view, false);
-                                    final Dialog dialog = new Dialog(getContext(), R.style.CustomBottomSheetDialogTheme);
-                                    RadioGroup appThemeRadioGroup = themeView.findViewById(R.id.settings_appTheme_radioGroup);
-                                    dialog.setContentView(themeView);
-                                    dialog.show();
-
-                                    switch (sharedPreferences.getInt("NightMode", AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)) {
-                                        case AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM:
-                                            appThemeRadioGroup.check(R.id.dark_mode_follow_system);
-                                            break;
-                                        case AppCompatDelegate.MODE_NIGHT_NO:
-                                            appThemeRadioGroup.check(R.id.dark_mode_light);
-                                            break;
-                                        case AppCompatDelegate.MODE_NIGHT_YES:
-                                            appThemeRadioGroup.check(R.id.dark_mode_dark);
-                                            break;
-                                    }
-                                    appThemeRadioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-                                        @Override
-                                        public void onCheckedChanged(RadioGroup group, int checkedId) {
-                                            switch (checkedId) {
-                                                case R.id.dark_mode_follow_system:
-                                                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
-                                                    sharedPrefsEditor.putInt("NightMode", AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
-                                                    sharedPrefsEditor.apply();
-                                                    bottomSheetDialog.cancel();
-                                                    dialog.cancel();
-                                                    getActivity().recreate();
-                                                    break;
-                                                case R.id.dark_mode_light:
-                                                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
-                                                    sharedPrefsEditor.putInt("NightMode", AppCompatDelegate.MODE_NIGHT_NO);
-                                                    sharedPrefsEditor.apply();
-                                                    bottomSheetDialog.cancel();
-                                                    dialog.cancel();
-                                                    getActivity().recreate();
-                                                    break;
-                                                case R.id.dark_mode_dark:
-                                                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
-                                                    sharedPrefsEditor.putInt("NightMode", AppCompatDelegate.MODE_NIGHT_YES);
-                                                    sharedPrefsEditor.apply();
-                                                    bottomSheetDialog.cancel();
-                                                    dialog.cancel();
-                                                    getActivity().recreate();
-                                                    break;
-
-                                            }
-                                        }
-                                    });
-
-                                }
-                            });
-
-
-
-
-
-
-
-                        }
-                    });
 
                     //Get categories list
                     ingredientsReference.document("ingredient_categories").addSnapshotListener(new EventListener<DocumentSnapshot>() {
