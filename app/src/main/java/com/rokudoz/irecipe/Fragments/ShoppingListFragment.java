@@ -2,15 +2,14 @@ package com.rokudoz.irecipe.Fragments;
 
 
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.res.Resources;
-import android.graphics.Paint;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.text.InputType;
 import android.util.DisplayMetrics;
@@ -18,25 +17,18 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.ListView;
-import android.widget.ProgressBar;
 import android.widget.Spinner;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.checkbox.MaterialCheckBox;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -46,28 +38,28 @@ import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
-import com.rokudoz.irecipe.Account.LoginActivity;
 import com.rokudoz.irecipe.Models.Ingredient;
-import com.rokudoz.irecipe.Models.User;
 import com.rokudoz.irecipe.R;
+import com.rokudoz.irecipe.Utils.Adapters.ShoppingListAdapter;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 public class ShoppingListFragment extends Fragment {
 
     private static final String TAG = "ShoppingListFragment";
     private FloatingActionButton addIngredientToListFab;
-    private LinearLayout ingredientsCheckBoxLinearLayout;
 
+    private ShoppingListAdapter mAdapter;
+    private RecyclerView recyclerView;
 
     private String userDocumentID = "";
-    private List<Ingredient> shoppingListIngredients = new ArrayList<>();
+    private List<Ingredient> allIngredientsList = new ArrayList<>();
     private List<Ingredient> userIngredientList = new ArrayList<>();
+    private List<Ingredient> shoppingList_withCategories;
+    private List<Ingredient> initialIngredientList = new ArrayList<>();
     private List<MaterialCheckBox> ingredientCheckBoxList = new ArrayList<>();
     private Button mEmptyBasketBtn;
     private List<String> ingredient_categories = new ArrayList<>();
@@ -91,10 +83,20 @@ public class ShoppingListFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_shopping_list, container, false);
 //        textViewData = view.findViewById(R.id.tv_data);
         mEmptyBasketBtn = view.findViewById(R.id.empty_basket_btn);
-        ingredientsCheckBoxLinearLayout = view.findViewById(R.id.ingredients_checkBox_linearLayout);
+        recyclerView = view.findViewById(R.id.shoppingListFragment_recyclerView);
         addIngredientToListFab = view.findViewById(R.id.fab_add_ingredient_toShoppingList);
 
+        shoppingList_withCategories = new ArrayList<>();
+
+        buildRecyclerView();
         return view;
+    }
+
+    private void buildRecyclerView() {
+        recyclerView.setHasFixedSize(true);
+        mAdapter = new ShoppingListAdapter(getContext(), shoppingList_withCategories);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        recyclerView.setAdapter(mAdapter);
     }
 
     @Override
@@ -107,6 +109,79 @@ public class ShoppingListFragment extends Fragment {
     public void onStop() {
         super.onStop();
         DetachFireStoreListeners();
+
+        saveIngredientsIfNecessary();
+        Log.d(TAG, "onStop: " + shoppingList_withCategories.toString());
+    }
+
+    private void saveIngredientsIfNecessary() {
+        Log.d(TAG, "saveIngredientsIfNecessary: " + userIngredientList.toString());
+
+        for (final Ingredient ingredient : shoppingList_withCategories) {
+            if (ingredient.getDocumentId() == null) {
+                if (ingredient.getQuantity() != null && ingredient.getOwned() != null) {
+                    usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).collection("ShoppingList")
+                            .add(ingredient).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                        @Override
+                        public void onSuccess(DocumentReference documentReference) {
+                            Log.d(TAG, "onSuccess: added ingredient to db " + ingredient.toString());
+                        }
+                    });
+                }
+                if (userIngredientList.contains(ingredient)
+                        && userIngredientList.get(userIngredientList.indexOf(ingredient)).getOwned() != ingredient.getOwned()) {
+                    usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).collection("Ingredients")
+                            .document(userIngredientList.get(userIngredientList.indexOf(ingredient)).getDocumentId())
+                            .update("owned", ingredient.getOwned())
+                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                    Log.d(TAG, "onSuccess: updated in user ingredients list " + ingredient.toString());
+                                }
+                            });
+                } else if (ingredient.getOwned() != null && !userIngredientList.contains(ingredient) && ingredient.getOwned()) {
+                    usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).collection("Ingredients")
+                            .add(ingredient).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                        @Override
+                        public void onSuccess(DocumentReference documentReference) {
+                            Log.d(TAG, "onSuccess: added ingredient to db " + ingredient.toString());
+                        }
+                    });
+                }
+            } else {
+                if (initialIngredientList.contains(ingredient) &&
+                        initialIngredientList.get(initialIngredientList.indexOf(ingredient)).getOwned() != ingredient.getOwned()) {
+                    usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).collection("ShoppingList")
+                            .document(ingredient.getDocumentId()).update("owned", ingredient.getOwned())
+                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                    Log.d(TAG, "onSuccess: updated ingredient in db " + ingredient.toString());
+                                }
+                            });
+                }
+                if (userIngredientList.contains(ingredient)
+                        && !userIngredientList.get(userIngredientList.indexOf(ingredient)).getOwned() && ingredient.getOwned()) {
+                    usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).collection("Ingredients")
+                            .document(userIngredientList.get(userIngredientList.indexOf(ingredient)).getDocumentId())
+                            .update("owned", ingredient.getOwned())
+                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                    Log.d(TAG, "onSuccess: updated in user ingredients list " + ingredient.toString());
+                                }
+                            });
+                } else if (!userIngredientList.contains(ingredient) && ingredient.getOwned()) {
+                    usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).collection("Ingredients")
+                            .add(ingredient).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                        @Override
+                        public void onSuccess(DocumentReference documentReference) {
+                            Log.d(TAG, "onSuccess: added ingredient to db " + ingredient.toString());
+                        }
+                    });
+                }
+            }
+        }
     }
 
     private void DetachFireStoreListeners() {
@@ -137,8 +212,9 @@ public class ShoppingListFragment extends Fragment {
                         userIngredientList.add(ingredient);
                     }
                 }
-
                 getUserShoppingList();
+
+
             }
         });
     }
@@ -157,49 +233,60 @@ public class ShoppingListFragment extends Fragment {
                     public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
                         if (e == null && documentSnapshot != null) {
                             ingredient_categories = (List<String>) documentSnapshot.get("categories");
-                            Log.d(TAG, "onEvent: " + ingredient_categories);
+                            Log.d(TAG, "onEvent: categories " + ingredient_categories);
                             categories = ingredient_categories.toArray(new String[0]);
                         }
                     }
                 });
 
-                for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
-                    Ingredient ingredient = documentSnapshot.toObject(Ingredient.class);
-                    ingredient.setDocumentId(documentSnapshot.getId());
-//                    if (userIngredientList.contains(ingredient) && userIngredientList.get(userIngredientList.indexOf(ingredient)).getOwned()) {
-//                        ingredient.setOwned(true);
-//                    }
-                    if (!shoppingListIngredients.contains(ingredient)) {
-                        shoppingListIngredients.add(ingredient);
+
+                List<Ingredient> ingredientList = new ArrayList<>();
+
+                for (QueryDocumentSnapshot queryDocumentSnapshot : Objects.requireNonNull(queryDocumentSnapshots)) {
+                    if (!Objects.requireNonNull(queryDocumentSnapshot).getId().equals("ingredient_list")) {
+                        Ingredient ingredient = queryDocumentSnapshot.toObject(Ingredient.class);
+                        ingredient.setDocumentId(queryDocumentSnapshot.getId());
+                        initialIngredientList.add(new Ingredient(ingredient.getName(), ingredient.getCategory(), ingredient.getQuantity(),
+                                ingredient.getQuantity_type(), ingredient.getOwned()));
+                        if (!allIngredientsList.contains(ingredient)) {
+                            allIngredientsList.add(ingredient);
+                        } else if (allIngredientsList.contains(ingredient)) {
+                            allIngredientsList.set(allIngredientsList.indexOf(ingredient), ingredient);
+                        }
+
+                        Collections.sort(allIngredientsList);
                     }
                 }
 
-                List<String> checkboxNames = new ArrayList<>();
-                List<String> ingredientCategoryList = new ArrayList<>();
-
-                //setup ingredient names so that they don't duplicate later
-                for (MaterialCheckBox materialCheckBox : ingredientCheckBoxList) {
-                    checkboxNames.add(materialCheckBox.getText().toString());
+                for (Ingredient ingredientt : allIngredientsList) {
+                    if (!ingredientList.contains(ingredientt))
+                        ingredientList.add(ingredientt);
                 }
-                //Setup categories
-                for (Ingredient ing : shoppingListIngredients) {
-                    if (!ingredientCategoryList.contains(ing.getCategory())) {
-                        ingredientCategoryList.add(ing.getCategory());
+                Collections.sort(ingredientList);
+
+                final List<String> categorylist = new ArrayList<>();
+                for (Ingredient ing : ingredientList) {
+                    if (!categorylist.contains(ing.getCategory()))
+                        categorylist.add(ing.getCategory());
+                }
+                for (String categoryName : categorylist) {
+                    Ingredient categoryIngredient = new Ingredient();
+                    categoryIngredient.setName(categoryName);
+                    categoryIngredient.setCategory_name(categoryName);
+                    categoryIngredient.setCategory(categoryName);
+                    if (!shoppingList_withCategories.contains(categoryIngredient))
+                        shoppingList_withCategories.add(categoryIngredient);
+                    for (Ingredient ingredient : ingredientList) {
+                        if (ingredient.getCategory().equals(categoryName) && !shoppingList_withCategories.contains(ingredient)) {
+                            shoppingList_withCategories.add(shoppingList_withCategories.indexOf(categoryIngredient) + 1, ingredient);
+                        }
                     }
-                }
-                Collections.sort(ingredientCategoryList);
 
-                
-                for (String category : ingredientCategoryList) {
-                    List<Ingredient> ingredientsByCategoryList = new ArrayList<>();
-                    for (Ingredient ing : shoppingListIngredients) {
-                        if (ing.getCategory().equals(category) && !checkboxNames.contains(ing.getName()))
-                            ingredientsByCategoryList.add(ing);
-                    }
-                    addCategoryOfIngredientsLayout(ingredientsByCategoryList, category);
                 }
+                mAdapter.notifyDataSetChanged();
 
-                if (shoppingListIngredients.size() > 0 && queryDocumentSnapshots.size() > 0) {
+
+                if (allIngredientsList.size() > 0 && queryDocumentSnapshots.size() > 0) {
                     mEmptyBasketBtn.setVisibility(View.VISIBLE);
                     Log.d(TAG, "onEvent: NOT EMPTY" + " docs " + queryDocumentSnapshots.size());
                 } else {
@@ -210,7 +297,7 @@ public class ShoppingListFragment extends Fragment {
                 mEmptyBasketBtn.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        for (final Ingredient ingToDelete : shoppingListIngredients) {
+                        for (final Ingredient ingToDelete : allIngredientsList) {
                             usersReference.document(userDocumentID).collection("ShoppingList").document(ingToDelete.getDocumentId())
                                     .delete().addOnSuccessListener(new OnSuccessListener<Void>() {
                                 @Override
@@ -220,8 +307,8 @@ public class ShoppingListFragment extends Fragment {
                                 }
                             });
                         }
-                        ingredientsCheckBoxLinearLayout.removeAllViews();
-                        shoppingListIngredients.clear();
+                        shoppingList_withCategories.clear();
+                        mAdapter.notifyDataSetChanged();
                         mEmptyBasketBtn.setVisibility(View.GONE);
                     }
                 });
@@ -280,7 +367,7 @@ public class ShoppingListFragment extends Fragment {
                                         if (input.getText().toString().trim().equals("")) {
                                             Toast.makeText(getActivity(), "You need to write the name of what you want to add to the shopping list", Toast.LENGTH_SHORT).show();
                                         } else {
-                                            if (shoppingListIngredients.contains(ingredient)) {
+                                            if (shoppingList_withCategories.contains(ingredient)) {
                                                 Toast.makeText(getActivity(), "" + input.getText().toString() + " is already in your shopping list", Toast.LENGTH_SHORT).show();
                                             } else {
                                                 usersReference.document(userDocumentID).collection("ShoppingList").add(ingredient).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
@@ -311,84 +398,6 @@ public class ShoppingListFragment extends Fragment {
                 });
             }
         });
-    }
-
-
-    private void addCategoryOfIngredientsLayout(List<Ingredient> ingredientList, String categoryName) {
-        if (getActivity() != null && !ingredientList.isEmpty()) {
-            Log.d(TAG, "addCategoryOfIngredientsLayout: ");
-            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT
-            );
-            params.setMargins(0, 4, 0, 4);
-
-            final LinearLayout linearLayout = new LinearLayout(getActivity());
-            linearLayout.setOrientation(LinearLayout.VERTICAL);
-            linearLayout.setLayoutParams(params);
-
-            TextView categoryNameTextView = new TextView(getActivity());
-            categoryNameTextView.setText(categoryName);
-            categoryNameTextView.setTextSize(12);
-//            categoryNameTextView.setTypeface(Typeface.DEFAULT_BOLD);
-            categoryNameTextView.setTextAppearance(R.style.TextAppearance_MaterialComponents_Headline6);
-            categoryNameTextView.setPadding(convertDpToPixel(8), 4, 0, 0);
-            linearLayout.addView(categoryNameTextView);
-
-            for (Ingredient ingredient : ingredientList) {
-                addIngredientCheckBox(ingredient, linearLayout);
-            }
-            ingredientsCheckBoxLinearLayout.addView(linearLayout);
-        }
-    }
-
-
-    private void addIngredientCheckBox(final Ingredient ingredient, LinearLayout linearLayout) {
-        if (getActivity() != null) {
-
-            final LinearLayout localLinearLayout = new LinearLayout(getActivity());
-            localLinearLayout.setOrientation(LinearLayout.HORIZONTAL);
-//            localLinearLayout.setLayoutParams(params);
-
-            final MaterialCheckBox materialCheckBox = new MaterialCheckBox(getActivity());
-            materialCheckBox.setText(ingredient.getName());
-            materialCheckBox.setChecked(ingredient.getOwned());
-            if (ingredient.getOwned()) {
-                materialCheckBox.setPaintFlags(materialCheckBox.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
-            }
-
-            materialCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                @Override
-                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                    shoppingListIngredients.get(shoppingListIngredients.indexOf(ingredient)).setOwned(isChecked);
-                    usersReference.document(userDocumentID).collection("ShoppingList").document(ingredient.getDocumentId()).set(ingredient);
-                    if (isChecked) {
-                        if (userIngredientList.contains(ingredient)) {
-                            if (!userIngredientList.get(userIngredientList.indexOf(ingredient)).getOwned()) {
-                                usersReference.document(userDocumentID).collection("Ingredients")
-                                        .document(userIngredientList.get(userIngredientList.indexOf(ingredient)).getDocumentId()).set(ingredient);
-                                materialCheckBox.setPaintFlags(materialCheckBox.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
-                            }
-                        } else {
-                            usersReference.document(userDocumentID).collection("Ingredients")
-                                    .document(ingredient.getDocumentId()).set(ingredient);
-
-                        }
-                    } else {
-                        materialCheckBox.setPaintFlags(materialCheckBox.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
-                    }
-                }
-            });
-            TextView textView = new TextView(getContext());
-            textView.setPadding(8, 1, 0, 0);
-            textView.setText(String.format("%s %s", ingredient.getQuantity(), ingredient.getQuantity_type()));
-            localLinearLayout.addView(materialCheckBox);
-            localLinearLayout.addView(textView);
-
-            linearLayout.addView(localLinearLayout);
-
-            ingredientCheckBoxList.add(materialCheckBox);
-        }
     }
 
     //This function to convert DPs to pixels

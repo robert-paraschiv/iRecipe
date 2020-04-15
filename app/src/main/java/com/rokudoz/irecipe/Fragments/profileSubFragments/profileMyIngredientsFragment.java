@@ -201,17 +201,23 @@ public class profileMyIngredientsFragment extends Fragment {
                                     categorylist.add(ing.getCategory());
                             }
                             for (String categoryName : categorylist) {
-                                Ingredient ingg = new Ingredient();
-                                ingg.setName(categoryName);
-                                ingg.setCategory_name(categoryName);
-                                if (!userIngredientList.contains(ingg))
-                                    userIngredientList.add(ingg);
-                                for (Ingredient inggg : ingredientList) {
-                                    if (inggg.getCategory().equals(categoryName) && !userIngredientList.contains(inggg))
-                                        userIngredientList.add(inggg);
+                                Ingredient categoryIngredient = new Ingredient();
+                                categoryIngredient.setName(categoryName);
+                                categoryIngredient.setCategory_name(categoryName);
+                                categoryIngredient.setCategory(categoryName);
+                                if (!userIngredientList.contains(categoryIngredient))
+                                    userIngredientList.add(categoryIngredient);
+                                for (Ingredient ingredient : ingredientList) {
+                                    if (ingredient.getCategory().equals(categoryName) && !userIngredientList.contains(ingredient)) {
+                                        userIngredientList.add(userIngredientList.indexOf(categoryIngredient) + 1, ingredient);
+                                    }
                                 }
 
                             }
+                            Log.d(TAG, "onEvent: adapter " + userIngredientList.toString());
+                            Log.d(TAG, "onEvent: categoryList " + categorylist.toString());
+                            Log.d(TAG, "onEvent: ingredientList " + ingredientList.toString());
+                            Log.d(TAG, "onEvent: all ingredients" + allIngredientsList.toString());
                             ingredientsAdapter.notifyDataSetChanged();
 
                         }

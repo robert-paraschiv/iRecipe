@@ -4,30 +4,22 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Fragments.ShoppingListFragment"
-    android:background="@color/fragment_background_color">
+    android:background="@color/fragment_background_color"
+    tools:context=".Fragments.ShoppingListFragment">
 
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="@dimen/actionBar_size"
-        app:title="Shopping Cart" />
+        app:title="Shopping List" />
 
-    <ScrollView
-        android:id="@+id/ingredients_checkbox_scrollView"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/shoppingListFragment_recyclerView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_above="@id/empty_basket_btn"
         android:layout_below="@id/toolbar"
-        android:layout_marginTop="4dp">
-
-        <LinearLayout
-            android:id="@+id/ingredients_checkBox_linearLayout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:animateLayoutChanges="true"
-            android:orientation="vertical" />
-    </ScrollView>
+        android:layout_marginTop="4dp" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/empty_basket_btn"
@@ -37,7 +29,8 @@
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="8dp"
-        android:text="Empty basket"
+        android:text="Empty List"
+        android:textAllCaps="false"
         android:visibility="invisible"
         app:cornerRadius="@dimen/buttonCornerRadius"
         tools:visibility="visible" />
