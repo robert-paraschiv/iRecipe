@@ -99,12 +99,11 @@ public class Ingredient implements Comparable<Ingredient> {
             return false;
         if (obj == this)
             return true;
-        return this.name.equals(((Ingredient) obj).name);
+        return this.name.equals(((Ingredient) obj).name) && this.category.equals(((Ingredient) obj).category);
     }
 
     @Override
     public int compareTo(Ingredient ingredient) {
         return this.getCategory().compareTo(ingredient.getCategory());
-
     }
 }

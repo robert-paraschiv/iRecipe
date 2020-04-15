@@ -106,7 +106,9 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         Post currentItem = (Post) itemList.get(position);
 
 
-        postItemViewHolder.tvDescription.setText(currentItem.getText());
+        if (currentItem.getText() != null)
+            postItemViewHolder.tvDescription.setText(currentItem.getText());
+
         if (!currentItem.getImageUrl().equals("")) {
 
             Glide.with(postItemViewHolder.mImageView.getContext()).load(currentItem.getImageUrl()).centerCrop().into(postItemViewHolder.mImageView);
@@ -197,10 +199,10 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         return itemList.size();
     }
 
-    public class PostItemViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
+    public class PostItemViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         TextView tvDescription, tvNrOfFaves, creatorName, creationDate, tvNumberOfComments, recipeNameTv;
         ImageView mImageView, imgFavorited, imgComment;
-        CircleImageView creatorImage, recipeImage;
+        CircleImageView creatorImage;
 
         public PostItemViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -214,7 +216,6 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             creationDate = itemView.findViewById(R.id.postItem_creationDate_text_view);
             imgComment = itemView.findViewById(R.id.postItem_comment);
             recipeNameTv = itemView.findViewById(R.id.recycler_view_postItem_recipeName);
-            recipeImage = itemView.findViewById(R.id.recycler_view_postItem_recipeImage);
 
             itemView.setOnClickListener(this);
 
@@ -241,6 +242,7 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 }
             });
         }
+
         @Override
         public void onClick(View v) {
             if (mListener != null) {

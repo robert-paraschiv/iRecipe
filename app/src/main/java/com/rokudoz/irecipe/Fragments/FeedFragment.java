@@ -14,6 +14,8 @@ import android.widget.Toast;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdLoader;
 import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.MobileAds;
+import com.google.android.gms.ads.RequestConfiguration;
 import com.google.android.gms.ads.formats.UnifiedNativeAd;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -46,6 +48,7 @@ import com.rokudoz.irecipe.R;
 import com.rokudoz.irecipe.SearchUserActivity;
 import com.rokudoz.irecipe.Utils.Adapters.FeedAdapter;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -185,10 +188,19 @@ public class FeedFragment extends Fragment implements FeedAdapter.OnItemClickLis
                 }
             }).build();
 
+            List<String> testDevices = new ArrayList<>();
+            testDevices.add("2F1C484BD502BA7D51AC78D75751AFE0");// Mi 9T Pro
+            testDevices.add("B141CB779F883EF84EA9A32A7D068B76");// RedMi 5 Plus
+            testDevices.add(AdRequest.DEVICE_ID_EMULATOR);
+
+
+            RequestConfiguration requestConfiguration
+                    = new RequestConfiguration.Builder()
+                    .setTestDeviceIds(testDevices)
+                    .build();
+            MobileAds.setRequestConfiguration(requestConfiguration);
+
             adLoader.loadAds(new AdRequest.Builder()
-                    .addTestDevice("2F1C484BD502BA7D51AC78D75751AFE0") // Mi 9T Pro
-                    .addTestDevice("B141CB779F883EF84EA9A32A7D068B76") // RedMi 5 Plus
-                    .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
                     .build(), NUMBER_OF_ADS);
 
 

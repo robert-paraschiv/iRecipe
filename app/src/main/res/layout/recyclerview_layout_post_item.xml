@@ -7,8 +7,7 @@
     android:layout_marginStart="4dp"
     android:layout_marginTop="8dp"
     android:layout_marginEnd="4dp"
-    android:layout_marginBottom="8dp"
-    android:background="@drawable/post_rounded_card">
+    android:layout_marginBottom="8dp">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -19,7 +18,7 @@
             android:id="@+id/postItem_creator_image"
             android:layout_width="35dp"
             android:layout_height="35dp"
-            android:layout_marginStart="8dp"
+            android:layout_marginStart="4dp"
             android:layout_marginTop="4dp"
             tools:src="@color/colorPrimaryDark" />
 
@@ -53,7 +52,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
             android:layout_marginTop="12dp"
-            android:layout_marginEnd="8dp"
+            android:layout_marginEnd="4dp"
             android:fontFamily="@font/open_sans"
             android:textSize="10sp"
             tools:text="30 hours ago" />
@@ -74,12 +73,26 @@
                 tools:src="@color/colorPrimary" />
         </com.google.android.material.card.MaterialCardView>
 
+        <TextView
+            android:id="@+id/postItem_description_text_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/recycler_view_postItem_Image_CardView"
+            android:layout_alignParentStart="true"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:fontFamily="@font/lato"
+            android:maxLines="3"
+            tools:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum" />
+
+
         <RelativeLayout
             android:id="@+id/recycler_view_relativeLayout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/recycler_view_postItem_Image_CardView"
-            android:layout_marginTop="8dp">
+            android:layout_below="@id/postItem_description_text_view"
+            android:layout_marginTop="2dp">
 
             <TextView
                 android:id="@+id/recycler_view_postItem_nrOfFaves_textView"
@@ -103,24 +116,6 @@
                 android:layout_marginTop="12dp"
                 android:layout_marginEnd="8dp"
                 android:src="@drawable/ic_favorite_border_black_24dp" />
-
-            <RelativeLayout
-                android:id="@+id/recycler_view_postItem_recipeLayout"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerHorizontal="true"
-                android:layout_centerVertical="true">
-
-                <de.hdodenhof.circleimageview.CircleImageView
-                    android:id="@+id/recycler_view_postItem_recipeImage"
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
-                    android:layout_centerVertical="true"
-                    android:visibility="gone"
-                    tools:src="@color/colorPrimary" />
-
-            </RelativeLayout>
-
 
             <TextView
                 android:id="@+id/recycler_view_postItem_nrOfComments_textView"
@@ -147,19 +142,6 @@
 
         </RelativeLayout>
 
-        <TextView
-            android:id="@+id/postItem_description_text_view"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/recycler_view_relativeLayout"
-            android:layout_alignParentStart="true"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginBottom="8dp"
-            android:fontFamily="@font/lato"
-            android:maxLines="3"
-            tools:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum" />
 
     </RelativeLayout>
 </RelativeLayout>

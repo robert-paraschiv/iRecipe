@@ -82,8 +82,7 @@ public class ShoppingListFragment extends Fragment {
 
 
     public static ShoppingListFragment newInstance() {
-        ShoppingListFragment fragment = new ShoppingListFragment();
-        return fragment;
+        return new ShoppingListFragment();
     }
 
     @Nullable
@@ -189,6 +188,8 @@ public class ShoppingListFragment extends Fragment {
                     }
                 }
                 Collections.sort(ingredientCategoryList);
+
+                
                 for (String category : ingredientCategoryList) {
                     List<Ingredient> ingredientsByCategoryList = new ArrayList<>();
                     for (Ingredient ing : shoppingListIngredients) {
@@ -224,6 +225,9 @@ public class ShoppingListFragment extends Fragment {
                         mEmptyBasketBtn.setVisibility(View.GONE);
                     }
                 });
+
+
+                // Add ingredient Manually
                 addIngredientToListFab.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {

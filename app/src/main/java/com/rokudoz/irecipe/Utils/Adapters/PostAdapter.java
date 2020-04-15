@@ -68,7 +68,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
     public class PostViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         TextView tvDescription, tvNrOfFaves, creatorName, creationDate, tvNumberOfComments, recipeNameTv;
         ImageView mImageView, imgFavorited, imgComment;
-        CircleImageView creatorImage, recipeImage;
+        CircleImageView creatorImage;
 
         public PostViewHolder(View itemView) {
             super(itemView);
@@ -82,7 +82,6 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
             creationDate = itemView.findViewById(R.id.postItem_creationDate_text_view);
             imgComment = itemView.findViewById(R.id.postItem_comment);
             recipeNameTv = itemView.findViewById(R.id.recycler_view_postItem_recipeName);
-            recipeImage = itemView.findViewById(R.id.recycler_view_postItem_recipeImage);
             itemView.setOnClickListener(this);
 
             imgFavorited.setOnClickListener(new View.OnClickListener() {
