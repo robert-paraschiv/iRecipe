@@ -1,6 +1,7 @@
 package com.rokudoz.irecipe.Fragments;
 
 
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.res.Resources;
 import android.os.Bundle;
@@ -51,6 +52,8 @@ public class ShoppingListFragment extends Fragment {
 
     private static final String TAG = "ShoppingListFragment";
     private FloatingActionButton addIngredientToListFab;
+
+    private boolean emptying = false;
 
     private ShoppingListAdapter mAdapter;
     private RecyclerView recyclerView;
@@ -297,18 +300,35 @@ public class ShoppingListFragment extends Fragment {
                 mEmptyBasketBtn.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        //stop listener
+//                        userShoppingListListener.remove();
+                        final ProgressDialog progressDialog = new ProgressDialog(getContext());
+                        progressDialog.setTitle("Please wait");
+                        progressDialog.setCancelable(false);
+                        progressDialog.show();
+                        recyclerView.setVisibility(View.INVISIBLE);
+
+                        final int[] deleted = {0};
                         for (final Ingredient ingToDelete : allIngredientsList) {
                             usersReference.document(userDocumentID).collection("ShoppingList").document(ingToDelete.getDocumentId())
                                     .delete().addOnSuccessListener(new OnSuccessListener<Void>() {
                                 @Override
                                 public void onSuccess(Void aVoid) {
-                                    Log.d(TAG, "onSuccess: Deleted" + ingToDelete.toString() + " from shopping list");
+//                                    Log.d(TAG, "onSuccess: Deleted" + ingToDelete.toString() + " from shopping list");
+                                    deleted[0]++;
+                                    Log.d(TAG, "onSuccess: " + deleted[0] + "    " + allIngredientsList.size());
+                                    if (deleted[0] == allIngredientsList.size()) {
+                                        shoppingList_withCategories.clear();
+                                        allIngredientsList.clear();
+                                        initialIngredientList.clear();
+                                        recyclerView.setVisibility(View.VISIBLE);
+                                        progressDialog.cancel();
+                                        mAdapter.notifyDataSetChanged();
+                                    }
 
                                 }
                             });
                         }
-                        shoppingList_withCategories.clear();
-                        mAdapter.notifyDataSetChanged();
                         mEmptyBasketBtn.setVisibility(View.GONE);
                     }
                 });
@@ -360,13 +380,16 @@ public class ShoppingListFragment extends Fragment {
                                 new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int id) {
                                         //
-                                        int quantity = Integer.parseInt(inputQuantity.getText().toString());
-                                        Ingredient ingredient = new Ingredient(input.getText().toString(), categorySpinner.getSelectedItem().toString(),
-                                                (float) quantity, quantityTypeSpinner.getSelectedItem().toString(), false);
 
-                                        if (input.getText().toString().trim().equals("")) {
-                                            Toast.makeText(getActivity(), "You need to write the name of what you want to add to the shopping list", Toast.LENGTH_SHORT).show();
+
+                                        if (input.getText().toString().trim().equals("") || inputQuantity.getText().toString().trim().equals("")) {
+                                            Toast.makeText(getActivity(), "You need to fill in all the info", Toast.LENGTH_SHORT).show();
                                         } else {
+
+                                            int quantity = Integer.parseInt(inputQuantity.getText().toString());
+                                            Ingredient ingredient = new Ingredient(input.getText().toString(), categorySpinner.getSelectedItem().toString(),
+                                                    (float) quantity, quantityTypeSpinner.getSelectedItem().toString(), false);
+
                                             if (shoppingList_withCategories.contains(ingredient)) {
                                                 Toast.makeText(getActivity(), "" + input.getText().toString() + " is already in your shopping list", Toast.LENGTH_SHORT).show();
                                             } else {
@@ -376,7 +399,6 @@ public class ShoppingListFragment extends Fragment {
                                                         Log.d(TAG, "onSuccess: added to db");
                                                     }
                                                 });
-
                                             }
                                             dialog.cancel();
                                         }
