@@ -4,6 +4,7 @@ package com.rokudoz.irecipe.Fragments;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.Resources;
 import android.os.Bundle;
@@ -20,6 +21,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -364,6 +366,20 @@ public class ShoppingListFragment extends Fragment {
 
                             final Dialog dialog = new Dialog(getContext(), R.style.CustomBottomSheetDialogTheme);
                             dialog.setContentView(dialogView);
+
+                            input.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+                                @Override
+                                public void onFocusChange(View v, boolean hasFocus) {
+                                    input.post(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            InputMethodManager inputMethodManager= (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                                            inputMethodManager.showSoftInput(input, InputMethodManager.SHOW_IMPLICIT);
+                                        }
+                                    });
+                                }
+                            });
+                            input.requestFocus();
 
                             confirmBtn.setOnClickListener(new View.OnClickListener() {
                                 @Override

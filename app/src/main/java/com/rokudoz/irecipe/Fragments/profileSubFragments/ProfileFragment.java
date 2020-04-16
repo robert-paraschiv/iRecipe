@@ -2,6 +2,7 @@ package com.rokudoz.irecipe.Fragments.profileSubFragments;
 
 import android.app.Dialog;
 import android.content.ContentResolver;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -23,6 +24,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.view.inputmethod.InputMethodManager;
 import android.webkit.MimeTypeMap;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
@@ -42,6 +44,7 @@ import com.google.android.material.button.MaterialButton;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
+import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
@@ -347,64 +350,72 @@ public class ProfileFragment extends Fragment {
     }
 
     private void addIngredientManually() {
+        if (categories == null)
+            return;
         //Button to add ingredient manually
-        final LinearLayout linearLayout = new LinearLayout(getActivity());
-        linearLayout.setOrientation(LinearLayout.VERTICAL);
-        final EditText input = new EditText(getActivity());
-        final Spinner spinner = new Spinner(getActivity());
-        //create an adapter to describe how the items are displayed, adapters are used in several places in android.
-        //There are multiple variations of this, but this is the basic variant.
+        View dialogView = getLayoutInflater().inflate(R.layout.dialog_add_tomyingredients, (ViewGroup) view, false);
+        final TextInputEditText input = dialogView.findViewById(R.id.dialog_add_myIngredients_ingredientName_input);
+        final Spinner spinner = dialogView.findViewById(R.id.dialog_add_myIngredients_categorySpinner);
+        final MaterialButton confirmBtn = dialogView.findViewById(R.id.dialog_add_myIngredients_confirmBtn);
+        final MaterialButton cancelBtn = dialogView.findViewById(R.id.dialog_add_myIngredients_cancelBtn);
+
         ArrayAdapter<String> adapter = new ArrayAdapter<>(Objects.requireNonNull(getActivity()), android.R.layout.simple_spinner_dropdown_item, categories);
-        //set the spinners adapter to the previously created one.
         spinner.setAdapter(adapter);
-        input.setInputType(InputType.TYPE_TEXT_FLAG_CAP_WORDS);
-        MaterialAlertDialogBuilder materialAlertDialogBuilder = new MaterialAlertDialogBuilder(getActivity(), R.style.ThemeOverlay_MaterialComponents_MaterialAlertDialog_Centered);
-        linearLayout.addView(input);
-        linearLayout.addView(spinner);
-        materialAlertDialogBuilder.setView(linearLayout);
-        materialAlertDialogBuilder.setMessage("Add ingredient to list");
-        materialAlertDialogBuilder.setCancelable(true);
-        materialAlertDialogBuilder.setPositiveButton(
-                "Confirm",
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        //
-                        Ingredient ingredient = new Ingredient(input.getText().toString(), spinner.getSelectedItem().toString(), 0f, "g", true);
 
-                        if (input.getText().toString().trim().equals("")) {
-                            Toast.makeText(getActivity(), "You need to write the name of what you want to add to the list", Toast.LENGTH_SHORT).show();
-                        } else {
-                            if (userIngredientList.contains(ingredient) && userIngredientList.get(userIngredientList.indexOf(ingredient)).getOwned()) {
-                                Toast.makeText(getActivity(), "" + input.getText().toString() + " is already in your list", Toast.LENGTH_SHORT).show();
-                            } else if (userIngredientList.contains(ingredient) && !userIngredientList.get(userIngredientList.indexOf(ingredient)).getOwned()) {
-                                ingredient.setDocumentId(userIngredientList.get(userIngredientList.indexOf(ingredient)).getDocumentId());
-                                usersReference.document(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid()).collection("Ingredients")
-                                        .document(ingredient.getDocumentId()).set(ingredient);
-                            } else {
-                                usersReference.document(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid()).collection("Ingredients")
-                                        .add(ingredient).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                                    @Override
-                                    public void onSuccess(DocumentReference documentReference) {
-                                        Log.d(TAG, "onSuccess: added to db");
-                                    }
-                                });
+        final Dialog dialog = new Dialog(getContext(), R.style.CustomBottomSheetDialogTheme);
+        dialog.setContentView(dialogView);
 
+        input.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                input.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        InputMethodManager inputMethodManager= (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                        inputMethodManager.showSoftInput(input, InputMethodManager.SHOW_IMPLICIT);
+                    }
+                });
+            }
+        });
+        input.requestFocus();
+
+        confirmBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //
+                Ingredient ingredient = new Ingredient(input.getText().toString(), spinner.getSelectedItem().toString(), 0f, "g", true);
+
+                if (input.getText().toString().trim().equals("")) {
+                    Toast.makeText(getActivity(), "You need to write the name of what you want to add to the list", Toast.LENGTH_SHORT).show();
+                } else {
+                    if (userIngredientList.contains(ingredient) && userIngredientList.get(userIngredientList.indexOf(ingredient)).getOwned()) {
+                        Toast.makeText(getActivity(), "" + input.getText().toString() + " is already in your list", Toast.LENGTH_SHORT).show();
+                    } else if (userIngredientList.contains(ingredient) && !userIngredientList.get(userIngredientList.indexOf(ingredient)).getOwned()) {
+                        ingredient.setDocumentId(userIngredientList.get(userIngredientList.indexOf(ingredient)).getDocumentId());
+                        usersReference.document(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid()).collection("Ingredients")
+                                .document(ingredient.getDocumentId()).set(ingredient);
+                    } else {
+                        usersReference.document(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid()).collection("Ingredients")
+                                .add(ingredient).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                            @Override
+                            public void onSuccess(DocumentReference documentReference) {
+                                Log.d(TAG, "onSuccess: added to db");
                             }
-                            dialog.cancel();
-                        }
+                        });
 
                     }
-                });
+                    dialog.cancel();
+                }
+            }
+        });
+        cancelBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.cancel();
+            }
+        });
 
-        materialAlertDialogBuilder.setNegativeButton(
-                "Cancel",
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        dialog.cancel();
-                    }
-                });
-
-        materialAlertDialogBuilder.show();
+        dialog.show();
 
     }
 
