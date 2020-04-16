@@ -1,6 +1,8 @@
 package com.rokudoz.irecipe.Fragments;
 
 
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.res.Resources;
@@ -26,9 +28,12 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.checkbox.MaterialCheckBox;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
@@ -58,6 +63,8 @@ public class ShoppingListFragment extends Fragment {
     private ShoppingListAdapter mAdapter;
     private RecyclerView recyclerView;
 
+    private View view;
+
     private String userDocumentID = "";
     private List<Ingredient> allIngredientsList = new ArrayList<>();
     private List<Ingredient> userIngredientList = new ArrayList<>();
@@ -83,7 +90,7 @@ public class ShoppingListFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_shopping_list, container, false);
+        view = inflater.inflate(R.layout.fragment_shopping_list, container, false);
 //        textViewData = view.findViewById(R.id.tv_data);
         mEmptyBasketBtn = view.findViewById(R.id.empty_basket_btn);
         recyclerView = view.findViewById(R.id.shoppingListFragment_recyclerView);
@@ -231,17 +238,6 @@ public class ShoppingListFragment extends Fragment {
                     Log.w(TAG, "onEvent: ", e);
                     return;
                 }
-                ingredientsReference.document("ingredient_categories").addSnapshotListener(new EventListener<DocumentSnapshot>() {
-                    @Override
-                    public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
-                        if (e == null && documentSnapshot != null) {
-                            ingredient_categories = (List<String>) documentSnapshot.get("categories");
-                            Log.d(TAG, "onEvent: categories " + ingredient_categories);
-                            categories = ingredient_categories.toArray(new String[0]);
-                        }
-                    }
-                });
-
 
                 List<Ingredient> ingredientList = new ArrayList<>();
 
@@ -302,10 +298,11 @@ public class ShoppingListFragment extends Fragment {
                     public void onClick(View v) {
                         //stop listener
 //                        userShoppingListListener.remove();
-                        final ProgressDialog progressDialog = new ProgressDialog(getContext());
-                        progressDialog.setTitle("Please wait");
-                        progressDialog.setCancelable(false);
-                        progressDialog.show();
+                        AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.CustomBottomSheetDialogTheme);
+                        builder.setCancelable(false); // if you want user to wait for some process to finish,
+                        builder.setView(R.layout.alert_dialog_please_wait);
+                        final AlertDialog dialog = builder.create();
+                        dialog.show();
                         recyclerView.setVisibility(View.INVISIBLE);
 
                         final int[] deleted = {0};
@@ -322,7 +319,7 @@ public class ShoppingListFragment extends Fragment {
                                         allIngredientsList.clear();
                                         initialIngredientList.clear();
                                         recyclerView.setVisibility(View.VISIBLE);
-                                        progressDialog.cancel();
+                                        dialog.dismiss();
                                         mAdapter.notifyDataSetChanged();
                                     }
 
@@ -333,99 +330,77 @@ public class ShoppingListFragment extends Fragment {
                     }
                 });
 
-
-                // Add ingredient Manually
-                addIngredientToListFab.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                                LinearLayout.LayoutParams.MATCH_PARENT,
-                                LinearLayout.LayoutParams.WRAP_CONTENT
-                        );
-                        params.setMargins(8, 0, 8, 0);
-
-                        String[] ingredientQuantitySpinnerItems = getResources().getStringArray(R.array.ingredient_quantity_type);
-                        final LinearLayout linearLayout = new LinearLayout(getActivity());
-                        linearLayout.setOrientation(LinearLayout.VERTICAL);
-                        final EditText input = new EditText(getActivity());
-                        input.setHint("Ingredient name");
-                        final EditText inputQuantity = new EditText(getActivity());
-                        inputQuantity.setHint("Quantity");
-                        final Spinner categorySpinner = new Spinner(getActivity());
-                        final Spinner quantityTypeSpinner = new Spinner(getActivity());
-
-                        input.setLayoutParams(params);
-                        inputQuantity.setLayoutParams(params);
-
-                        //create an adapter to describe how the items are displayed, adapters are used in several places in android.
-                        //There are multiple variations of this, but this is the basic variant.
-                        ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_dropdown_item, categories);
-                        ArrayAdapter<String> quantityAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_dropdown_item, ingredientQuantitySpinnerItems);
-                        //set the spinners adapter to the previously created one.
-                        categorySpinner.setAdapter(adapter);
-                        quantityTypeSpinner.setAdapter(quantityAdapter);
-                        input.setInputType(InputType.TYPE_TEXT_FLAG_CAP_WORDS);
-                        inputQuantity.setInputType(InputType.TYPE_CLASS_NUMBER);
-                        MaterialAlertDialogBuilder materialAlertDialogBuilder = new MaterialAlertDialogBuilder(getActivity(), R.style.ThemeOverlay_MaterialComponents_MaterialAlertDialog_Centered);
-
-                        linearLayout.addView(input);
-                        linearLayout.addView(categorySpinner);
-                        linearLayout.addView(inputQuantity);
-                        linearLayout.addView(quantityTypeSpinner);
-                        materialAlertDialogBuilder.setView(linearLayout);
-                        materialAlertDialogBuilder.setMessage("Add ingredient to shopping list");
-                        materialAlertDialogBuilder.setCancelable(true);
-                        materialAlertDialogBuilder.setPositiveButton(
-                                "Confirm",
-                                new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int id) {
-                                        //
-
-
-                                        if (input.getText().toString().trim().equals("") || inputQuantity.getText().toString().trim().equals("")) {
-                                            Toast.makeText(getActivity(), "You need to fill in all the info", Toast.LENGTH_SHORT).show();
-                                        } else {
-
-                                            int quantity = Integer.parseInt(inputQuantity.getText().toString());
-                                            Ingredient ingredient = new Ingredient(input.getText().toString(), categorySpinner.getSelectedItem().toString(),
-                                                    (float) quantity, quantityTypeSpinner.getSelectedItem().toString(), false);
-
-                                            if (shoppingList_withCategories.contains(ingredient)) {
-                                                Toast.makeText(getActivity(), "" + input.getText().toString() + " is already in your shopping list", Toast.LENGTH_SHORT).show();
-                                            } else {
-                                                usersReference.document(userDocumentID).collection("ShoppingList").add(ingredient).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                                                    @Override
-                                                    public void onSuccess(DocumentReference documentReference) {
-                                                        Log.d(TAG, "onSuccess: added to db");
-                                                    }
-                                                });
-                                            }
-                                            dialog.cancel();
-                                        }
-
-                                    }
-                                });
-
-                        materialAlertDialogBuilder.setNegativeButton(
-                                "Cancel",
-                                new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int id) {
-                                        dialog.cancel();
-                                    }
-                                });
-
-                        materialAlertDialogBuilder.show();
-
-                    }
-                });
+                getIngredientsCategories();
             }
         });
     }
 
-    //This function to convert DPs to pixels
-    private int convertDpToPixel(float dp) {
-        DisplayMetrics metrics = Resources.getSystem().getDisplayMetrics();
-        float px = dp * (metrics.densityDpi / 160f);
-        return Math.round(px);
+    private void getIngredientsCategories() {
+        //Get ingredients categories
+        ingredientsReference.document("ingredient_categories").addSnapshotListener(new EventListener<DocumentSnapshot>() {
+            @Override
+            public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
+                if (e == null && documentSnapshot != null) {
+                    ingredient_categories = (List<String>) documentSnapshot.get("categories");
+                    Log.d(TAG, "onEvent: categories " + ingredient_categories);
+                    categories = ingredient_categories.toArray(new String[0]);
+
+                    // Add ingredient Manually
+                    addIngredientToListFab.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+
+                            View dialogView = getLayoutInflater().inflate(R.layout.dialog_add_toshoppinglist, (ViewGroup) view, false);
+
+                            final TextInputEditText input = dialogView.findViewById(R.id.dialog_add_shoppingList_ingredientName_input);
+                            final TextInputEditText inputQuantity = dialogView.findViewById(R.id.dialog_add_shoppingList_ingredientQuantity_input);
+                            final Spinner categorySpinner = dialogView.findViewById(R.id.dialog_add_shoppingList_categorySpinner);
+                            final Spinner quantityTypeSpinner = dialogView.findViewById(R.id.dialog_add_shoppingList_quantityTypeSpinner);
+                            final MaterialButton confirmBtn = dialogView.findViewById(R.id.dialog_add_shoppingList_confirmBtn);
+                            final MaterialButton cancelBtn = dialogView.findViewById(R.id.dialog_add_shoppingList_cancelBtn);
+
+                            ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_dropdown_item, categories);
+                            categorySpinner.setAdapter(adapter);
+
+                            final Dialog dialog = new Dialog(getContext(), R.style.CustomBottomSheetDialogTheme);
+                            dialog.setContentView(dialogView);
+
+                            confirmBtn.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    if (input.getText().toString().trim().equals("") || inputQuantity.getText().toString().trim().equals("")) {
+                                        Toast.makeText(getActivity(), "You need to fill in all the info", Toast.LENGTH_SHORT).show();
+                                    } else {
+
+                                        int quantity = Integer.parseInt(inputQuantity.getText().toString());
+                                        Ingredient ingredient = new Ingredient(input.getText().toString(), categorySpinner.getSelectedItem().toString(),
+                                                (float) quantity, quantityTypeSpinner.getSelectedItem().toString(), false);
+
+                                        if (shoppingList_withCategories.contains(ingredient)) {
+                                            Toast.makeText(getActivity(), "" + input.getText().toString() + " is already in your shopping list", Toast.LENGTH_SHORT).show();
+                                        } else {
+                                            usersReference.document(userDocumentID).collection("ShoppingList").add(ingredient).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                                                @Override
+                                                public void onSuccess(DocumentReference documentReference) {
+                                                    Log.d(TAG, "onSuccess: added to db");
+                                                }
+                                            });
+                                        }
+                                        dialog.cancel();
+                                    }
+                                }
+                            });
+                            cancelBtn.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    dialog.cancel();
+                                }
+                            });
+                            dialog.show();
+                        }
+                    });
+                }
+            }
+        });
     }
 }
