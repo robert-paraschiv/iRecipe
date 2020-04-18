@@ -46,6 +46,8 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -55,6 +57,7 @@ import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.WriteBatch;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.StorageTask;
@@ -110,6 +113,11 @@ public class ProfileFragment extends Fragment {
     private StorageReference mStorageRef = FirebaseStorage.getInstance().getReference("UsersPhotos");
     private ListenerRegistration userDetailsListener;
     private StorageTask mUploadTask;
+
+
+    //Firebase RealTime db
+    FirebaseDatabase database = FirebaseDatabase.getInstance();
+    DatabaseReference usersRef;
 
 
     public static ProfileFragment newInstance() {
@@ -213,35 +221,45 @@ public class ProfileFragment extends Fragment {
                 signOutBtn.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-
                         //Dialog for sign out
-                        MaterialAlertDialogBuilder materialAlertDialogBuilder = new MaterialAlertDialogBuilder(getActivity(),
-                                R.style.ThemeOverlay_MaterialComponents_MaterialAlertDialog_Centered);
-                        materialAlertDialogBuilder.setMessage("Are you sure you want to sign out?");
-                        materialAlertDialogBuilder.setCancelable(true);
-                        materialAlertDialogBuilder.setPositiveButton(
-                                "Yes",
-                                new DialogInterface.OnClickListener() {
-                                    public void onClick(final DialogInterface dialog, int id) {
-                                        //Delete note
-                                        FirebaseAuth.getInstance().signOut();
-                                        Intent intent = new Intent(getActivity(), LoginActivity.class);
-                                        startActivity(intent);
-                                        getActivity().finish();
-                                    }
-                                });
+                        View dialogView = getLayoutInflater().inflate(R.layout.dialog_simple_yes_no, (ViewGroup) view, false);
+                        final Dialog dialog = new Dialog(getContext(), R.style.CustomBottomSheetDialogTheme);
+                        TextView title = dialogView.findViewById(R.id.dialog_simpleYesNo_title);
+                        title.setText("Are you sure you want to log out?");
+                        MaterialButton confirmBtn = dialogView.findViewById(R.id.dialog_simpleYesNo_confirmBtn);
+                        MaterialButton cancelBtn = dialogView.findViewById(R.id.dialog_simpleYesNo_cancelBtn);
+                        dialog.setContentView(dialogView);
 
-                        materialAlertDialogBuilder.setNegativeButton(
-                                "No",
-                                new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int id) {
-                                        dialog.cancel();
-                                    }
-                                });
+                        confirmBtn.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                if (FirebaseAuth.getInstance().getCurrentUser() != null) {
+                                    usersRef = database.getReference("Users").child(FirebaseAuth.getInstance().getCurrentUser().getUid());
+                                    usersRef.child("online").setValue(false).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void aVoid) {
+                                            Log.d(TAG, "onSuccess: SET user online FALSE");
+                                            FirebaseAuth.getInstance().signOut();
+                                            Intent intent = new Intent(getActivity(), LoginActivity.class);
+                                            startActivity(intent);
+                                            getActivity().finish();
+                                        }
+                                    });
+                                }
+                            }
+                        });
+                        cancelBtn.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                dialog.cancel();
+                            }
+                        });
 
-                        materialAlertDialogBuilder.show();
+                        dialog.show();
+
                     }
                 });
+
                 bottomSheetDialog.show();
                 Window window = bottomSheetDialog.getWindow();
                 if (window != null) {

@@ -288,13 +288,15 @@ public class PostDetailedFragment extends Fragment {
                     if (post != null)
                         post.setDocumentId(documentSnapshot.getId());
 
-                    Date date = post.getCreation_date();
-                    if (date != null) {
-                        DateFormat dateFormat = new SimpleDateFormat("HH:mm, MMM d", Locale.getDefault());
-                        String creationDate = dateFormat.format(date);
-                        long time = date.getTime();
-                        if (post.getCreation_date() != null && !post.getCreation_date().equals("")) {
-                            postCreationDate.setText(getTimeAgo(time));
+                    if (post.getCreation_date() != null) {
+                        Date date = post.getCreation_date();
+                        if (date != null) {
+                            DateFormat dateFormat = new SimpleDateFormat("HH:mm, MMM d", Locale.getDefault());
+                            String creationDate = dateFormat.format(date);
+                            long time = date.getTime();
+                            if (post.getCreation_date() != null && !post.getCreation_date().equals("")) {
+                                postCreationDate.setText(getTimeAgo(time));
+                            }
                         }
                     }
 

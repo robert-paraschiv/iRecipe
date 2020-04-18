@@ -14,20 +14,12 @@
         android:gravity="center_horizontal"
         android:orientation="vertical">
 
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/profileFragmentEditProfile_userProfilePic_MaterialCard"
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/profileFragmentEditProfile_userProfilePic_ImageView"
             android:layout_width="150dp"
             android:layout_height="150dp"
             android:layout_marginBottom="8dp"
-            app:cardCornerRadius="150dp">
-
-            <ImageView
-                android:id="@+id/profileFragmentEditProfile_userProfilePic_ImageView"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:scaleType="centerCrop"
-                tools:src="@color/colorPrimary" />
-        </com.google.android.material.card.MaterialCardView>
+            tools:src="@color/colorPrimary" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/profileFragmentEditProfile_changeProfilePic_MaterialButton"
@@ -41,6 +33,7 @@
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
             android:hint="Full name">
 
             <EditText
@@ -54,6 +47,7 @@
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
             android:hint="Username">
 
             <EditText
@@ -66,6 +60,7 @@
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
             android:hint="Email">
 
             <EditText
@@ -79,6 +74,7 @@
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
             android:hint="Description">
 
             <EditText
@@ -92,6 +88,7 @@
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
             android:hint="Country of origin">
 
             <EditText
@@ -104,7 +101,10 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="14dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="8dp"
             android:text="Gender" />
 
         <androidx.appcompat.widget.AppCompatSpinner
@@ -115,13 +115,14 @@
             android:spinnerMode="dropdown" />
 
         <com.google.android.material.button.MaterialButton
-            app:cornerRadius="@dimen/buttonCornerRadius"
             android:id="@+id/profileFragmentEditProfile_save_MaterialButton"
             style="@style/Widget.MaterialComponents.Button.OutlinedButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
             android:layout_marginBottom="8dp"
-            android:text="Save" />
+            android:text="Save"
+            app:cornerRadius="@dimen/buttonCornerRadius" />
     </LinearLayout>
 
 

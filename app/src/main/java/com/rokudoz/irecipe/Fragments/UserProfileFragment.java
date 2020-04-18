@@ -1,7 +1,7 @@
 package com.rokudoz.irecipe.Fragments;
 
 
-import android.content.DialogInterface;
+import android.app.Dialog;
 import android.os.Bundle;
 
 import androidx.annotation.Nullable;
@@ -23,7 +23,6 @@ import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.button.MaterialButton;
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
@@ -31,14 +30,12 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.WriteBatch;
 import com.rokudoz.irecipe.Models.FavoritePost;
 import com.rokudoz.irecipe.Models.Friend;
-import com.rokudoz.irecipe.Models.Ingredient;
 import com.rokudoz.irecipe.Models.Post;
 import com.rokudoz.irecipe.Models.Recipe;
 import com.rokudoz.irecipe.Models.User;
@@ -219,42 +216,44 @@ public class UserProfileFragment extends Fragment implements PostAdapter.OnItemC
                                 @Override
                                 public void onClick(View v) {
 
-                                    MaterialAlertDialogBuilder materialAlertDialogBuilder = new MaterialAlertDialogBuilder(getActivity(), R.style.ThemeOverlay_MaterialComponents_MaterialAlertDialog_Centered);
-                                    materialAlertDialogBuilder.setMessage("Are you sure you want to remove this user from your friend list?");
-                                    materialAlertDialogBuilder.setCancelable(true);
-                                    materialAlertDialogBuilder.setPositiveButton(
-                                            "Yes",
-                                            new DialogInterface.OnClickListener() {
-                                                public void onClick(DialogInterface dialog, int id) {
-                                                    //Delete user from friends
-                                                    WriteBatch batch = db.batch();
-                                                    batch.delete(usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).collection("FriendList")
-                                                            .document(documentID));
-                                                    batch.delete(usersReference.document(documentID).collection("FriendList")
-                                                            .document(FirebaseAuth.getInstance().getCurrentUser().getUid()));
-                                                    batch.commit().addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                        @Override
-                                                        public void onSuccess(Void aVoid) {
-                                                            if (getActivity() != null)
-                                                                Toast.makeText(getActivity(), "Removed from friend list", Toast.LENGTH_SHORT).show();
-                                                            mAddFriendButton.setText("Add Friend");
-                                                            acceptDeclineLayout.setVisibility(View.GONE);
-                                                            mAddFriendButton.setEnabled(true);
-                                                        }
-                                                    });
-                                                    dialog.cancel();
+                                    View dialogView = getLayoutInflater().inflate(R.layout.dialog_simple_yes_no, (ViewGroup) view, false);
+                                    final Dialog dialog = new Dialog(getContext(), R.style.CustomBottomSheetDialogTheme);
+                                    TextView title = dialogView.findViewById(R.id.dialog_simpleYesNo_title);
+                                    title.setText("Are you sure you want to unfriend this user?");
+                                    MaterialButton confirmBtn = dialogView.findViewById(R.id.dialog_simpleYesNo_confirmBtn);
+                                    MaterialButton cancelBtn = dialogView.findViewById(R.id.dialog_simpleYesNo_cancelBtn);
+                                    dialog.setContentView(dialogView);
+
+                                    confirmBtn.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View v) {
+                                            //Delete user from friends
+                                            WriteBatch batch = db.batch();
+                                            batch.delete(usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).collection("FriendList")
+                                                    .document(documentID));
+                                            batch.delete(usersReference.document(documentID).collection("FriendList")
+                                                    .document(FirebaseAuth.getInstance().getCurrentUser().getUid()));
+                                            batch.commit().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                @Override
+                                                public void onSuccess(Void aVoid) {
+                                                    if (getActivity() != null)
+                                                        Toast.makeText(getActivity(), "Removed from friend list", Toast.LENGTH_SHORT).show();
+                                                    mAddFriendButton.setText("Add Friend");
+                                                    acceptDeclineLayout.setVisibility(View.GONE);
+                                                    mAddFriendButton.setEnabled(true);
                                                 }
                                             });
+                                            dialog.cancel();
+                                        }
+                                    });
+                                    cancelBtn.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View v) {
+                                            dialog.cancel();
+                                        }
+                                    });
 
-                                    materialAlertDialogBuilder.setNegativeButton(
-                                            "No",
-                                            new DialogInterface.OnClickListener() {
-                                                public void onClick(DialogInterface dialog, int id) {
-                                                    dialog.cancel();
-                                                }
-                                            });
-
-                                    materialAlertDialogBuilder.show();
+                                    dialog.show();
 
                                 }
                             });

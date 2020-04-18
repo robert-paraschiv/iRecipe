@@ -20,7 +20,7 @@
             style="@style/TextAppearance.MaterialComponents.Body1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="6dp"
+            android:layout_margin="10dp"
             tools:text="Title of ingredient" />
     </com.google.android.material.card.MaterialCardView>
 

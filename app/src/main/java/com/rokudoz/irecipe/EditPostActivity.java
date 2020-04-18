@@ -2,22 +2,27 @@ package com.rokudoz.irecipe;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.WriteBatch;
+import com.rokudoz.irecipe.Account.LoginActivity;
 
 public class EditPostActivity extends AppCompatActivity {
 
@@ -56,36 +61,38 @@ public class EditPostActivity extends AppCompatActivity {
                 deletePost.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        MaterialAlertDialogBuilder materialAlertDialogBuilder = new MaterialAlertDialogBuilder(EditPostActivity.this,
-                                R.style.ThemeOverlay_MaterialComponents_MaterialAlertDialog_Centered);
-                        materialAlertDialogBuilder.setMessage("Are you sure you want to delete your post?");
-                        materialAlertDialogBuilder.setCancelable(true);
-                        materialAlertDialogBuilder.setPositiveButton(
-                                "Yes",
-                                new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int id) {
 
-                                        postsRef.document(postID).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
-                                            @Override
-                                            public void onSuccess(Void aVoid) {
-                                                Intent intent = new Intent(EditPostActivity.this, MainActivity.class);
-                                                startActivity(intent);
-                                                finish();
-                                            }
-                                        });
-                                        dialog.cancel();
+                        //Dialog for sign out
+                        View dialogView = getLayoutInflater().inflate(R.layout.dialog_simple_yes_no, null);
+                        final Dialog dialog = new Dialog(EditPostActivity.this, R.style.CustomBottomSheetDialogTheme);
+                        TextView title = dialogView.findViewById(R.id.dialog_simpleYesNo_title);
+                        title.setText("Are you sure you want to delete this post?");
+                        MaterialButton confirmBtn = dialogView.findViewById(R.id.dialog_simpleYesNo_confirmBtn);
+                        MaterialButton cancelBtn = dialogView.findViewById(R.id.dialog_simpleYesNo_cancelBtn);
+                        dialog.setContentView(dialogView);
+
+                        confirmBtn.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                postsRef.document(postID).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+                                        Intent intent = new Intent(EditPostActivity.this, MainActivity.class);
+                                        startActivity(intent);
+                                        finish();
                                     }
                                 });
+                                dialog.cancel();
+                            }
+                        });
+                        cancelBtn.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                dialog.cancel();
+                            }
+                        });
 
-                        materialAlertDialogBuilder.setNegativeButton(
-                                "No",
-                                new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int id) {
-                                        dialog.cancel();
-                                    }
-                                });
-
-                        materialAlertDialogBuilder.show();
+                        dialog.show();
                     }
                 });
 
