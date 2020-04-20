@@ -154,13 +154,15 @@ public class ProfileFragment extends Fragment {
         userDetailsLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Navigation.findNavController(view).navigate(ProfileFragmentDirections.actionProfileFragmentToProfileEditProfile());
+                if (Navigation.findNavController(view).getCurrentDestination().getId() == R.id.profileFragment)
+                    Navigation.findNavController(view).navigate(ProfileFragmentDirections.actionProfileFragmentToProfileEditProfile());
             }
         });
         mEditProfileBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Navigation.findNavController(view).navigate(ProfileFragmentDirections.actionProfileFragmentToProfileEditProfile());
+                if (Navigation.findNavController(view).getCurrentDestination().getId() == R.id.profileFragment)
+                    Navigation.findNavController(view).navigate(ProfileFragmentDirections.actionProfileFragmentToProfileEditProfile());
             }
         });
         mProfileImage.setOnClickListener(new View.OnClickListener() {
@@ -389,7 +391,7 @@ public class ProfileFragment extends Fragment {
                 input.post(new Runnable() {
                     @Override
                     public void run() {
-                        InputMethodManager inputMethodManager= (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                        InputMethodManager inputMethodManager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
                         inputMethodManager.showSoftInput(input, InputMethodManager.SHOW_IMPLICIT);
                     }
                 });

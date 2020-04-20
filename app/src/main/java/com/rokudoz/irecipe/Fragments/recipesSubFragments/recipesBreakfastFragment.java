@@ -435,8 +435,8 @@ public class recipesBreakfastFragment extends Fragment implements RecipeAdapter.
         String id = recipe.getDocumentId();
         String title = recipe.getTitle();
         Log.d(TAG, "onItemClick: CLICKED " + title + " id " + id);
-
-        Navigation.findNavController(view).navigate(RecipesFragmentDirections.actionRecipesFragmentToRecipeDetailedFragment(id));
+        if (Navigation.findNavController(view).getCurrentDestination().getId() == R.id.recipesFragment)
+            Navigation.findNavController(view).navigate(RecipesFragmentDirections.actionRecipesFragmentToRecipeDetailedFragment(id));
     }
 
     @Override

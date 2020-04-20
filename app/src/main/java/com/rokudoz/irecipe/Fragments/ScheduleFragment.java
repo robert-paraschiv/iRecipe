@@ -173,7 +173,9 @@ public class ScheduleFragment extends Fragment implements ScheduledMealAdapter.O
         calendarView.setListener(new CompactCalendarView.CompactCalendarViewListener() {
             @Override
             public void onDayClick(Date dateClicked) {
-                Navigation.findNavController(view).navigate(ScheduleFragmentDirections.actionScheduleFragmentToDayScheduleFragment(dateFormat.format(dateClicked)));
+                if (Navigation.findNavController(view).getCurrentDestination().getId() == R.id.scheduleFragment)
+                    Navigation.findNavController(view).navigate(ScheduleFragmentDirections
+                            .actionScheduleFragmentToDayScheduleFragment(dateFormat.format(dateClicked)));
             }
 
             @Override
@@ -198,7 +200,8 @@ public class ScheduleFragment extends Fragment implements ScheduledMealAdapter.O
 
     @Override
     public void onItemClick(int position) {
-        Navigation.findNavController(view).navigate(ScheduleFragmentDirections
-                .actionScheduleFragmentToRecipeDetailedFragment(todayScheduleList.get(position).getRecipeID()));
+        if (Navigation.findNavController(view).getCurrentDestination().getId() == R.id.scheduleFragment)
+            Navigation.findNavController(view).navigate(ScheduleFragmentDirections
+                    .actionScheduleFragmentToRecipeDetailedFragment(todayScheduleList.get(position).getRecipeID()));
     }
 }

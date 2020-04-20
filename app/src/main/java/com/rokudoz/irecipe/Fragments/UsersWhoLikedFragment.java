@@ -137,7 +137,8 @@ public class UsersWhoLikedFragment extends Fragment implements UserWhoLikedAdapt
     @Override
     public void onItemClick(int position) {
         Log.d(TAG, "onItemClick: " + position);
-        Navigation.findNavController(view).navigate(UsersWhoLikedFragmentDirections.
-                actionUsersWhoLikedToUserProfileFragment2(mUsersWhoFavedList.get(position).getUserID()));
+        if (Navigation.findNavController(view).getCurrentDestination().getId() == R.id.usersWhoLiked)
+            Navigation.findNavController(view).navigate(UsersWhoLikedFragmentDirections.
+                    actionUsersWhoLikedToUserProfileFragment2(mUsersWhoFavedList.get(position).getUserID()));
     }
 }

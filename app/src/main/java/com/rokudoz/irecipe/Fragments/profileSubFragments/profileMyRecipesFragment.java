@@ -321,8 +321,8 @@ public class profileMyRecipesFragment extends Fragment implements RecipeWithAdsA
         String id = recipe.getDocumentId();
         String title = recipe.getTitle();
         Log.d(TAG, "onItemClick: CLICKED " + title + " id " + id);
-
-        Navigation.findNavController(view).navigate(ProfileFragmentDirections.actionProfileFragmentToRecipeDetailedFragment(id));
+        if (Navigation.findNavController(view).getCurrentDestination().getId() == R.id.profileFragment)
+            Navigation.findNavController(view).navigate(ProfileFragmentDirections.actionProfileFragmentToRecipeDetailedFragment(id));
     }
 
     @Override

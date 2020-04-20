@@ -196,14 +196,15 @@ public class profileEditProfile extends Fragment {
                     Log.d(TAG, "onSuccess: Updated user");
                     Toast.makeText(getContext(), "Updated your info", Toast.LENGTH_SHORT).show();
                     progressDialog.dismiss();
-                    Navigation.findNavController(view).navigate(profileEditProfileDirections.actionProfileEditProfileToProfileFragment());
+                    if (Navigation.findNavController(view).getCurrentDestination().getId() == R.id.profileEditProfile)
+                        Navigation.findNavController(view).navigate(profileEditProfileDirections.actionProfileEditProfileToProfileFragment());
                 }
             });
         }
     }
 
     private void getCurrentUserDetails() {
-        userDetailsListener=usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).addSnapshotListener(new EventListener<DocumentSnapshot>() {
+        userDetailsListener = usersReference.document(FirebaseAuth.getInstance().getCurrentUser().getUid()).addSnapshotListener(new EventListener<DocumentSnapshot>() {
             @Override
             public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
                 if (e == null && documentSnapshot != null) {

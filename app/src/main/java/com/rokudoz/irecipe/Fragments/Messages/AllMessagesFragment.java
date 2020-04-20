@@ -107,7 +107,8 @@ public class AllMessagesFragment extends Fragment implements ConversationAdapter
         openSelectFriend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Navigation.findNavController(view).navigate(AllMessagesFragmentDirections.actionAllMessagesFragmentToSelectFriendToOpenConverstationFragment());
+                if (Navigation.findNavController(view).getCurrentDestination().getId() == R.id.allMessagesFragment)
+                    Navigation.findNavController(view).navigate(AllMessagesFragmentDirections.actionAllMessagesFragmentToSelectFriendToOpenConverstationFragment());
             }
         });
 
@@ -115,7 +116,8 @@ public class AllMessagesFragment extends Fragment implements ConversationAdapter
         backBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Navigation.findNavController(view).navigate(AllMessagesFragmentDirections.actionAllMessagesFragmentToFeedFragment());
+                if (Navigation.findNavController(view).getCurrentDestination().getId() == R.id.allMessagesFragment)
+                    Navigation.findNavController(view).navigate(AllMessagesFragmentDirections.actionAllMessagesFragmentToFeedFragment());
             }
         });
 
@@ -194,8 +196,8 @@ public class AllMessagesFragment extends Fragment implements ConversationAdapter
     public void onConversationClick(int position) {
         String id = conversationList.get(position).getUserId();
         Log.d(TAG, "onItemClick: CLICKED " + " id " + id);
-
-        Navigation.findNavController(view).navigate(AllMessagesFragmentDirections.actionAllMessagesFragmentToMessageFragment(id));
+        if (Navigation.findNavController(view).getCurrentDestination().getId() == R.id.allMessagesFragment)
+            Navigation.findNavController(view).navigate(AllMessagesFragmentDirections.actionAllMessagesFragmentToMessageFragment(id));
     }
 
     @Override

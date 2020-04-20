@@ -142,13 +142,15 @@ public class FeedFragment extends Fragment implements FeedAdapter.OnItemClickLis
             messagesLayout.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Navigation.findNavController(view).navigate(FeedFragmentDirections.actionFeedFragmentToAllMessagesFragment());
+                    if (Navigation.findNavController(view).getCurrentDestination().getId() == R.id.feedFragment)
+                        Navigation.findNavController(view).navigate(FeedFragmentDirections.actionFeedFragmentToAllMessagesFragment());
                 }
             });
             messagesBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Navigation.findNavController(view).navigate(FeedFragmentDirections.actionFeedFragmentToAllMessagesFragment());
+                    if (Navigation.findNavController(view).getCurrentDestination().getId() == R.id.feedFragment)
+                        Navigation.findNavController(view).navigate(FeedFragmentDirections.actionFeedFragmentToAllMessagesFragment());
                 }
             });
             searchUserBtn.setOnClickListener(new View.OnClickListener() {
@@ -507,7 +509,8 @@ public class FeedFragment extends Fragment implements FeedAdapter.OnItemClickLis
         Post post = (Post) mPostList.get(position);
         String id = post.getDocumentId();
         if (id != null && !id.equals("")) {
-            Navigation.findNavController(view).navigate(FeedFragmentDirections.actionFeedFragmentToPostDetailed(id));
+            if (Navigation.findNavController(view).getCurrentDestination().getId() == R.id.feedFragment)
+                Navigation.findNavController(view).navigate(FeedFragmentDirections.actionFeedFragmentToPostDetailed(id));
         } else {
             if (getActivity() != null)
                 Toast.makeText(getActivity(), "This is just a demo card, add a post or add friends", Toast.LENGTH_SHORT).show();
@@ -569,7 +572,8 @@ public class FeedFragment extends Fragment implements FeedAdapter.OnItemClickLis
         Post post = (Post) mPostList.get(position);
         String id = post.getDocumentId();
         if (id != null && !id.equals("")) {
-            Navigation.findNavController(view).navigate(FeedFragmentDirections.actionFeedFragmentToPostComments(id));
+            if (Navigation.findNavController(view).getCurrentDestination().getId() == R.id.feedFragment)
+                Navigation.findNavController(view).navigate(FeedFragmentDirections.actionFeedFragmentToPostComments(id));
         } else {
             if (getActivity() != null)
                 Toast.makeText(getActivity(), "This is just a demo card, add a post or add friends", Toast.LENGTH_SHORT).show();

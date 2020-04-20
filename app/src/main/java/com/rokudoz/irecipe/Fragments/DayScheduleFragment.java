@@ -124,6 +124,8 @@ public class DayScheduleFragment extends Fragment implements ScheduledMealAdapte
 
     @Override
     public void onItemClick(int position) {
-        Navigation.findNavController(view).navigate(DayScheduleFragmentDirections.actionDayScheduleFragmentToRecipeDetailedFragment(scheduleEventList.get(position).getRecipeID()));
+        if (Navigation.findNavController(view).getCurrentDestination().getId() == R.id.dayScheduleFragment)
+            Navigation.findNavController(view).navigate(DayScheduleFragmentDirections
+                    .actionDayScheduleFragmentToRecipeDetailedFragment(scheduleEventList.get(position).getRecipeID()));
     }
 }

@@ -208,7 +208,8 @@ public class UserProfileFragment extends Fragment implements PostAdapter.OnItemC
                             messageUser.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
-                                    Navigation.findNavController(view).navigate(UserProfileFragmentDirections.actionUserProfileFragment2ToMessageFragment(documentID));
+                                    if (Navigation.findNavController(view).getCurrentDestination().getId() == R.id.userProfileFragment2)
+                                        Navigation.findNavController(view).navigate(UserProfileFragmentDirections.actionUserProfileFragment2ToMessageFragment(documentID));
                                 }
                             });
 
@@ -527,7 +528,8 @@ public class UserProfileFragment extends Fragment implements PostAdapter.OnItemC
     public void onItemClick(int position) {
         String id = mPostList.get(position).getDocumentId();
         if (id != null && !id.equals(""))
-            Navigation.findNavController(view).navigate(UserProfileFragmentDirections.actionUserProfileFragment2ToPostDetailed(id));
+            if (Navigation.findNavController(view).getCurrentDestination().getId() == R.id.userProfileFragment2)
+                Navigation.findNavController(view).navigate(UserProfileFragmentDirections.actionUserProfileFragment2ToPostDetailed(id));
     }
 
     @Override
@@ -577,7 +579,9 @@ public class UserProfileFragment extends Fragment implements PostAdapter.OnItemC
     @Override
     public void onCommentClick(int position) {
         String id = mPostList.get(position).getDocumentId();
-        if (id != null)
-            Navigation.findNavController(view).navigate(UserProfileFragmentDirections.actionUserProfileFragment2ToPostComments(id));
+        if (id != null) {
+            if (Navigation.findNavController(view).getCurrentDestination().getId() == R.id.userProfileFragment2)
+                Navigation.findNavController(view).navigate(UserProfileFragmentDirections.actionUserProfileFragment2ToPostComments(id));
+        }
     }
 }

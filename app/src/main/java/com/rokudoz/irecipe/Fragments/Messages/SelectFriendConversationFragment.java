@@ -180,7 +180,7 @@ public class SelectFriendConversationFragment extends Fragment implements Friend
     public void onFriendClick(int position) {
         String id = mFriendList.get(position).getFriend_user_id();
         Log.d(TAG, "onItemClick: CLICKED " + " id " + id);
-
+        if (Navigation.findNavController(view).getCurrentDestination().getId() == R.id.selectFriendToOpenConverstationFragment)
         Navigation.findNavController(view)
                 .navigate(SelectFriendConversationFragmentDirections.actionSelectFriendToOpenConverstationFragmentToMessageFragment(id));
     }

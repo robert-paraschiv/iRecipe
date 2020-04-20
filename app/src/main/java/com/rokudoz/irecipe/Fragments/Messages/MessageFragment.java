@@ -162,7 +162,9 @@ public class MessageFragment extends Fragment implements MessageAdapter.OnItemCl
         friendImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Navigation.findNavController(view).navigate(MessageFragmentDirections.actionMessageFragmentToUserProfileFragment2(friendUserId));
+                if (
+                        Navigation.findNavController(view).getCurrentDestination().getId() == R.id.messageFragment)
+                    Navigation.findNavController(view).navigate(MessageFragmentDirections.actionMessageFragmentToUserProfileFragment2(friendUserId));
             }
         });
 
@@ -181,7 +183,8 @@ public class MessageFragment extends Fragment implements MessageAdapter.OnItemCl
             public void onClick(View v) {
                 if (getActivity() != null)
                     hideSoftKeyboard(getActivity());
-                Navigation.findNavController(view).navigate(MessageFragmentDirections.actionMessageFragmentToAllMessagesFragment());
+                if (Navigation.findNavController(view).getCurrentDestination().getId() == R.id.messageFragment)
+                    Navigation.findNavController(view).navigate(MessageFragmentDirections.actionMessageFragmentToAllMessagesFragment());
             }
         });
         sendButton.setOnClickListener(new View.OnClickListener() {
@@ -427,7 +430,7 @@ public class MessageFragment extends Fragment implements MessageAdapter.OnItemCl
                 }
                 DateFormat dateFormat = new SimpleDateFormat("MMMM dd, YYYY", Locale.getDefault());
 
-                if (linearLayoutManager.findLastCompletelyVisibleItemPosition() >= 0){
+                if (linearLayoutManager.findLastCompletelyVisibleItemPosition() >= 0) {
                     Message currentMessage = messageList.get(linearLayoutManager.findLastCompletelyVisibleItemPosition());
                     if (currentMessage.getTimestamp() != null) {
                         dateTV.setText(dateFormat.format(currentMessage.getTimestamp()));
@@ -606,11 +609,13 @@ public class MessageFragment extends Fragment implements MessageAdapter.OnItemCl
     @Override
     public void onPostRecipeMessageClick(int position) {
         if (messageList.get(position).getPost() != null && messageList.get(position).getRecipe() == null) {
-            Navigation.findNavController(view).navigate(MessageFragmentDirections
-                    .actionMessageFragmentToPostDetailed(messageList.get(position).getPost().getDocumentId()));
+            if (Navigation.findNavController(view).getCurrentDestination().getId() == R.id.messageFragment)
+                Navigation.findNavController(view).navigate(MessageFragmentDirections
+                        .actionMessageFragmentToPostDetailed(messageList.get(position).getPost().getDocumentId()));
         } else if (messageList.get(position).getPost() == null && messageList.get(position).getRecipe() != null) {
-            Navigation.findNavController(view).navigate(MessageFragmentDirections
-                    .actionMessageFragmentToRecipeDetailedFragment(messageList.get(position).getRecipe().getDocumentId()));
+            if (Navigation.findNavController(view).getCurrentDestination().getId() == R.id.messageFragment)
+                Navigation.findNavController(view).navigate(MessageFragmentDirections
+                        .actionMessageFragmentToRecipeDetailedFragment(messageList.get(position).getRecipe().getDocumentId()));
         }
     }
 }

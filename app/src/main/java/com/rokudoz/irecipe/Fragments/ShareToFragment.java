@@ -289,7 +289,8 @@ public class ShareToFragment extends Fragment implements ConversationAdapter.OnI
                                 public void onSuccess(Void aVoid) {
                                     Log.d(TAG, "onSuccess: added message");
                                     progressDialog.cancel();
-                                    Navigation.findNavController(view).navigate(ShareToFragmentDirections.actionShareToFragmentToMessageFragment(friendUserId));
+                                    if (Navigation.findNavController(view).getCurrentDestination().getId() == R.id.shareToFragment)
+                                        Navigation.findNavController(view).navigate(ShareToFragmentDirections.actionShareToFragmentToMessageFragment(friendUserId));
                                 }
                             });
                         }
@@ -329,7 +330,8 @@ public class ShareToFragment extends Fragment implements ConversationAdapter.OnI
                                 public void onSuccess(Void aVoid) {
                                     Log.d(TAG, "onSuccess: added message");
                                     progressDialog.cancel();
-                                    Navigation.findNavController(view).navigate(ShareToFragmentDirections.actionShareToFragmentToMessageFragment(friendUserId));
+                                    if (Navigation.findNavController(view).getCurrentDestination().getId() == R.id.shareToFragment)
+                                        Navigation.findNavController(view).navigate(ShareToFragmentDirections.actionShareToFragmentToMessageFragment(friendUserId));
                                 }
                             });
                         }

@@ -309,7 +309,8 @@ public class FavoritesFragment extends Fragment implements RecipeWithAdsAdapter.
     public void onItemClick(int position) {
         Recipe recipe = (Recipe) mRecipeList.get(position);
         String id = recipe.getDocumentId();
-        Navigation.findNavController(view).navigate(ProfileFragmentDirections.actionProfileFragmentToRecipeDetailedFragment(id));
+        if (Navigation.findNavController(view).getCurrentDestination().getId() == R.id.profileFragment)
+            Navigation.findNavController(view).navigate(ProfileFragmentDirections.actionProfileFragmentToRecipeDetailedFragment(id));
     }
 
     @Override

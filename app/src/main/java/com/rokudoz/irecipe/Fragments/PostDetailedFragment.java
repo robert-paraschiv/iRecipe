@@ -125,7 +125,8 @@ public class PostDetailedFragment extends Fragment {
         sharePostIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Navigation.findNavController(view).navigate(PostDetailedFragmentDirections.actionPostDetailedToShareToFragment(documentID, "post"));
+                if (Navigation.findNavController(view).getCurrentDestination().getId() == R.id.postDetailed)
+                    Navigation.findNavController(view).navigate(PostDetailedFragmentDirections.actionPostDetailedToShareToFragment(documentID, "post"));
             }
         });
 
@@ -315,11 +316,13 @@ public class PostDetailedFragment extends Fragment {
                             @Override
                             public void onClick(View v) {
                                 if (post.getCreatorId().equals(mUser.getUser_id())) {
-                                    Navigation.findNavController(view).navigate(PostDetailedFragmentDirections
-                                            .actionPostDetailedToProfileFragment());
+                                    if (Navigation.findNavController(view).getCurrentDestination().getId() == R.id.postDetailed)
+                                        Navigation.findNavController(view).navigate(PostDetailedFragmentDirections
+                                                .actionPostDetailedToProfileFragment());
                                 } else {
-                                    Navigation.findNavController(view).navigate(PostDetailedFragmentDirections
-                                            .actionPostDetailedToUserProfileFragment2(post.getCreatorId()));
+                                    if (Navigation.findNavController(view).getCurrentDestination().getId() == R.id.postDetailed)
+                                        Navigation.findNavController(view).navigate(PostDetailedFragmentDirections
+                                                .actionPostDetailedToUserProfileFragment2(post.getCreatorId()));
                                 }
                             }
                         });
@@ -388,8 +391,9 @@ public class PostDetailedFragment extends Fragment {
                                             postFavoriteNumber.setOnClickListener(new View.OnClickListener() {
                                                 @Override
                                                 public void onClick(View v) {
-                                                    Navigation.findNavController(view).navigate(PostDetailedFragmentDirections
-                                                            .actionPostDetailedToUsersWhoLiked(documentID, "Posts"));
+                                                    if (Navigation.findNavController(view).getCurrentDestination().getId() == R.id.postDetailed)
+                                                        Navigation.findNavController(view).navigate(PostDetailedFragmentDirections
+                                                                .actionPostDetailedToUsersWhoLiked(documentID, "Posts"));
                                                 }
                                             });
                                         }
@@ -457,8 +461,9 @@ public class PostDetailedFragment extends Fragment {
                     recipeLayout.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            Navigation.findNavController(view).navigate(PostDetailedFragmentDirections
-                                    .actionPostDetailedToRecipeDetailedFragment(post.getReferenced_recipe_docId()));
+                            if (Navigation.findNavController(view).getCurrentDestination().getId() == R.id.postDetailed)
+                                Navigation.findNavController(view).navigate(PostDetailedFragmentDirections
+                                        .actionPostDetailedToRecipeDetailedFragment(post.getReferenced_recipe_docId()));
                         }
                     });
 

@@ -143,7 +143,7 @@ public class profileMyFriendList extends Fragment implements FriendAdapter.OnIte
     public void onFriendClick(int position) {
         String id = mFriendList.get(position).getFriend_user_id();
         Log.d(TAG, "onItemClick: CLICKED " + " id " + id);
-
-        Navigation.findNavController(view).navigate(ProfileFragmentDirections.actionProfileFragmentToUserProfileFragment2(id));
+        if (Navigation.findNavController(view).getCurrentDestination().getId() == R.id.profileFragment)
+            Navigation.findNavController(view).navigate(ProfileFragmentDirections.actionProfileFragmentToUserProfileFragment2(id));
     }
 }

@@ -472,8 +472,9 @@ public class RecipeDetailedFragment extends Fragment implements RecipeInstructio
         shareRecipeIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Navigation.findNavController(view).navigate(RecipeDetailedFragmentDirections
-                        .actionRecipeDetailedFragmentToShareToFragment(documentID, "recipe"));
+                if (Navigation.findNavController(view).getCurrentDestination().getId() == R.id.recipeDetailedFragment)
+                    Navigation.findNavController(view).navigate(RecipeDetailedFragmentDirections
+                            .actionRecipeDetailedFragmentToShareToFragment(documentID, "recipe"));
             }
         });
     }
@@ -738,8 +739,9 @@ public class RecipeDetailedFragment extends Fragment implements RecipeInstructio
                                             mFavoriteNumber.setOnClickListener(new View.OnClickListener() {
                                                 @Override
                                                 public void onClick(View v) {
-                                                    Navigation.findNavController(view).navigate(RecipeDetailedFragmentDirections
-                                                            .actionRecipeDetailedFragmentToUsersWhoLiked(documentID, "Recipes"));
+                                                    if (Navigation.findNavController(view).getCurrentDestination().getId() == R.id.recipeDetailedFragment)
+                                                        Navigation.findNavController(view).navigate(RecipeDetailedFragmentDirections
+                                                                .actionRecipeDetailedFragmentToUsersWhoLiked(documentID, "Recipes"));
                                                 }
                                             });
                                         }
@@ -771,10 +773,12 @@ public class RecipeDetailedFragment extends Fragment implements RecipeInstructio
                             @Override
                             public void onClick(View v) {
                                 if (recipe.getCreator_docId().equals(mUser.getUser_id())) {
-                                    Navigation.findNavController(view).navigate(RecipeDetailedFragmentDirections.actionRecipeDetailedFragmentToProfileFragment());
+                                    if (Navigation.findNavController(view).getCurrentDestination().getId() == R.id.recipeDetailedFragment)
+                                        Navigation.findNavController(view).navigate(RecipeDetailedFragmentDirections.actionRecipeDetailedFragmentToProfileFragment());
                                 } else {
-                                    Navigation.findNavController(view).navigate(RecipeDetailedFragmentDirections
-                                            .actionRecipeDetailedFragmentToUserProfileFragment2(recipe.getCreator_docId()));
+                                    if (Navigation.findNavController(view).getCurrentDestination().getId() == R.id.recipeDetailedFragment)
+                                        Navigation.findNavController(view).navigate(RecipeDetailedFragmentDirections
+                                                .actionRecipeDetailedFragmentToUserProfileFragment2(recipe.getCreator_docId()));
                                 }
                             }
                         });
@@ -782,10 +786,12 @@ public class RecipeDetailedFragment extends Fragment implements RecipeInstructio
                             @Override
                             public void onClick(View v) {
                                 if (recipe.getCreator_docId().equals(mUser.getUser_id())) {
-                                    Navigation.findNavController(view).navigate(RecipeDetailedFragmentDirections.actionRecipeDetailedFragmentToProfileFragment());
+                                    if (Navigation.findNavController(view).getCurrentDestination().getId() == R.id.recipeDetailedFragment)
+                                        Navigation.findNavController(view).navigate(RecipeDetailedFragmentDirections.actionRecipeDetailedFragmentToProfileFragment());
                                 } else {
-                                    Navigation.findNavController(view).navigate(RecipeDetailedFragmentDirections
-                                            .actionRecipeDetailedFragmentToUserProfileFragment2(recipe.getCreator_docId()));
+                                    if (Navigation.findNavController(view).getCurrentDestination().getId() == R.id.recipeDetailedFragment)
+                                        Navigation.findNavController(view).navigate(RecipeDetailedFragmentDirections
+                                                .actionRecipeDetailedFragmentToUserProfileFragment2(recipe.getCreator_docId()));
                                 }
                             }
                         });

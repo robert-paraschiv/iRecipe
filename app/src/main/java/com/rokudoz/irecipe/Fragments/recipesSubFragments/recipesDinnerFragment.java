@@ -76,8 +76,7 @@ public class recipesDinnerFragment extends Fragment implements RecipeAdapter.OnI
     private CollectionReference recipeRef = db.collection("Recipes");
     private CollectionReference usersReference = db.collection("Users");
     private FirebaseStorage mStorageRef;
-    private ListenerRegistration userDetailsListener, userIngredientsListener, recipesListener, recipeFavListener, privateRecipesListener
-            , privateRecipeIngredientsListener, privateRecipeFavListener, recipesIngredientsListener;
+    private ListenerRegistration userDetailsListener, userIngredientsListener, recipesListener, recipeFavListener, privateRecipesListener, privateRecipeIngredientsListener, privateRecipeFavListener, recipesIngredientsListener;
 
     private RecyclerView mRecyclerView;
     private RecipeAdapter mAdapter;
@@ -432,7 +431,8 @@ public class recipesDinnerFragment extends Fragment implements RecipeAdapter.OnI
         String title = recipe.getTitle();
 
         Log.d(TAG, "onItemClick: CLICKED " + title + " id " + id);
-        Navigation.findNavController(view).navigate(RecipesFragmentDirections.actionRecipesFragmentToRecipeDetailedFragment(id));
+        if (Navigation.findNavController(view).getCurrentDestination().getId() == R.id.recipesFragment)
+            Navigation.findNavController(view).navigate(RecipesFragmentDirections.actionRecipesFragmentToRecipeDetailedFragment(id));
     }
 
     @Override
