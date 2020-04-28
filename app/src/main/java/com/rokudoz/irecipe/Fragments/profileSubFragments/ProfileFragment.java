@@ -444,7 +444,7 @@ public class ProfileFragment extends Fragment {
         adapter.addFragment(new profileMyIngredientsFragment(), "Fridge");
         adapter.addFragment(new profileMyRecipesFragment(), "My recipes");
         adapter.addFragment(new FavoritesFragment(), "Favorites");
-        adapter.addFragment(new profileMyFriendList(), "Friend List");
+        adapter.addFragment(new profileMyFriendList(), "Friends");
         viewPager.setAdapter(adapter);
 
         final FloatingActionButton floatingActionButton = view.findViewById(R.id.profileFragment_fab);

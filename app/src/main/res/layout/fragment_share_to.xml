@@ -4,8 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Fragments.ShareToFragment"
-    android:background="@color/fragment_background_color">
+    android:background="@color/fragment_background_color"
+    tools:context=".Fragments.ShareToFragment">
 
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"
@@ -26,12 +26,12 @@
             android:orientation="vertical">
 
             <TextView
-                android:textColor="@color/calendar_textColor"
-                android:textSize="18sp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:text="Your conversations" />
+                android:text="Your conversations"
+                android:textColor="@color/calendar_textColor"
+                android:textSize="18sp" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/shareToFragment_conversationList_rv"
@@ -55,12 +55,12 @@
             android:orientation="vertical">
 
             <TextView
-                android:textColor="@color/calendar_textColor"
-                android:textSize="18sp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:text="Other friends" />
+                android:text="Other friends"
+                android:textColor="@color/calendar_textColor"
+                android:textSize="18sp" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/shareToFragment_friendList_rv"

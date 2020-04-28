@@ -9,7 +9,9 @@
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/actionBar_size">
+        android:layout_height="@dimen/actionBar_size"
+        app:contentInsetEnd="0dp"
+        app:contentInsetStart="0dp">
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -21,6 +23,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
+                android:layout_marginStart="14dp"
                 android:text="Home" />
 
             <com.google.android.material.button.MaterialButton
@@ -39,7 +42,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
-                android:layout_marginEnd="8dp">
+                android:layout_marginEnd="14dp">
 
 
                 <com.google.android.material.card.MaterialCardView

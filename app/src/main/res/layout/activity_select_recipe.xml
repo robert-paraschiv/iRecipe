@@ -10,13 +10,16 @@
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/selectRecipeActivity_my_toolbar"
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize">
+        android:layout_height="?attr/actionBarSize"
+        app:contentInsetEnd="0dp"
+        app:contentInsetStart="0dp">
 
         <SearchView
             android:id="@+id/selectRecipeActivity_SearchView"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:layout_marginEnd="16dp"
+            android:layout_marginStart="16dp"
             android:background="@drawable/rounded_card"
             android:closeIcon="@drawable/ic_close"
             android:iconifiedByDefault="false"

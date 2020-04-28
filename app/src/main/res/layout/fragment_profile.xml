@@ -30,7 +30,9 @@
                 <com.google.android.material.appbar.MaterialToolbar
                     android:id="@+id/toolbar"
                     android:layout_width="match_parent"
-                    android:layout_height="@dimen/actionBar_size">
+                    android:layout_height="@dimen/actionBar_size"
+                    app:contentInsetEnd="0dp"
+                    app:contentInsetStart="0dp">
 
                     <RelativeLayout
                         android:layout_width="match_parent"
@@ -41,6 +43,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_centerVertical="true"
+                            android:layout_marginStart="14dp"
                             android:text="My Profile" />
 
                         <com.google.android.material.button.MaterialButton
@@ -50,9 +53,13 @@
                             android:layout_height="35dp"
                             android:layout_alignParentEnd="true"
                             android:layout_centerVertical="true"
-                            android:layout_marginEnd="4dp"
-                            android:textSize="12sp"
-                            app:icon="@drawable/ic_outline_settings_applications_24" />
+                            android:layout_marginEnd="14dp"
+                            android:minWidth="0dp"
+                            android:minHeight="0dp"
+                            android:padding="0dp"
+                            app:icon="@drawable/ic_outline_settings_applications_24"
+                            app:iconGravity="end"
+                            app:iconPadding="0dp" />
 
                     </RelativeLayout>
                 </com.google.android.material.appbar.MaterialToolbar>
@@ -63,7 +70,10 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@id/toolbar"
                     android:layout_centerHorizontal="true"
-                    android:layout_margin="8dp"
+                    android:layout_marginStart="14dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginEnd="14dp"
+                    android:layout_marginBottom="8dp"
                     app:cardCornerRadius="18dp">
 
                     <RelativeLayout
@@ -150,7 +160,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/appBarLayout"
-        android:layout_margin="4dp"
+        android:layout_marginStart="14dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="14dp"
+        android:layout_marginBottom="4dp"
         app:cardCornerRadius="12dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
@@ -172,7 +185,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/profileFragment_TabLayout_MaterialCard"
+        android:layout_marginStart="8dp"
         android:layout_marginTop="40dp"
+        android:layout_marginEnd="8dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
 

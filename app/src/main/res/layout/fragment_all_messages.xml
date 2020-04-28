@@ -11,30 +11,34 @@
         android:layout_height="match_parent">
 
         <com.google.android.material.appbar.MaterialToolbar
-            android:background="@color/messageFragment_toolbar_color"
             android:id="@+id/allMessages_toolbar"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/actionBar_size">
+            android:layout_height="@dimen/actionBar_size"
+            android:background="@color/messageFragment_toolbar_color"
+            app:contentInsetStart="0dp">
 
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
                 <com.google.android.material.button.MaterialButton
-                    app:iconGravity="start"
                     android:id="@+id/allMessages_backBtn"
                     style="@style/Widget.MaterialComponents.Button.TextButton"
                     android:layout_width="50dp"
                     android:layout_height="45dp"
                     android:layout_alignParentStart="true"
-                    app:icon="@drawable/ic_baseline_arrow_back_24" />
+                    android:layout_marginStart="12dp"
+                    android:padding="0dp"
+                    app:icon="@drawable/ic_baseline_arrow_back_24"
+                    app:iconGravity="start"
+                    app:iconPadding="0dp" />
 
                 <TextView
                     style="@style/TextAppearance.MaterialComponents.Headline6"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
-                    android:layout_marginStart="4dp"
+                    android:layout_marginStart="18dp"
                     android:layout_toEndOf="@id/allMessages_backBtn"
                     android:text="Messages" />
 
@@ -43,11 +47,13 @@
         </com.google.android.material.appbar.MaterialToolbar>
 
         <androidx.recyclerview.widget.RecyclerView
-            android:layout_marginTop="4dp"
             android:id="@+id/allMessages_recycler_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_below="@id/allMessages_toolbar" />
+            android:layout_below="@id/allMessages_toolbar"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="12dp"
+            android:layout_marginEnd="4dp" />
 
     </RelativeLayout>
 
@@ -55,8 +61,7 @@
         android:id="@+id/allmessages_pb"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        />
+        android:layout_gravity="center" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/allMessages_addConversation_fab"

@@ -3,8 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:background="@color/fragment_background_color"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/fragment_background_color">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/fragmentHomeAppBarLayout"
@@ -28,7 +28,9 @@
                 <com.google.android.material.appbar.MaterialToolbar
                     android:id="@+id/toolbar"
                     android:layout_width="match_parent"
-                    android:layout_height="@dimen/actionBar_size">
+                    android:layout_height="@dimen/actionBar_size"
+                    app:contentInsetEnd="0dp"
+                    app:contentInsetStart="0dp">
 
                     <RelativeLayout
                         android:layout_width="match_parent"
@@ -39,6 +41,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_centerVertical="true"
+                            android:layout_marginStart="14dp"
                             android:text="Recipes" />
 
                         <com.google.android.material.button.MaterialButton
@@ -48,7 +51,7 @@
                             android:layout_height="35dp"
                             android:layout_alignParentEnd="true"
                             android:layout_centerVertical="true"
-                            android:layout_marginEnd="8dp"
+                            android:layout_marginEnd="14dp"
                             app:icon="@drawable/ic_search_black_24dp" />
                     </RelativeLayout>
                 </com.google.android.material.appbar.MaterialToolbar>
@@ -63,7 +66,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/fragmentHomeAppBarLayout"
-        android:layout_margin="4dp"
+        android:layout_marginStart="14dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="14dp"
+        android:layout_marginBottom="4dp"
         app:cardCornerRadius="12dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
@@ -87,7 +93,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/homeFragment_TabLayout_MaterialCard"
+        android:layout_marginStart="4dp"
         android:layout_marginTop="40dp"
+        android:layout_marginEnd="4dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton

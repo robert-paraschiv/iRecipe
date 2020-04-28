@@ -10,7 +10,8 @@
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/actionBar_size">
+        android:layout_height="@dimen/actionBar_size"
+        app:contentInsetStart="0dp">
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -22,7 +23,7 @@
                 android:layout_height="35dp"
                 android:layout_alignParentStart="true"
                 android:layout_centerVertical="true"
-                android:layout_marginStart="4dp"
+                android:layout_marginStart="8dp"
                 android:layout_marginTop="8dp"
                 tools:src="@color/colorPrimaryDark" />
 
