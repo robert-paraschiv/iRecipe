@@ -55,7 +55,7 @@ public class UserProfileFragment extends Fragment implements PostAdapter.OnItemC
     private String userProfilePicUrl = "";
     private User mUser;
     private User otherUser = new User();
-    private TextView UserNameTv, UserUsernameTv, UserDescriptionTv;
+    private TextView UserNameTv, UserUsernameTv, UserDescriptionTv, emptyMessage;
     private MaterialButton mAddFriendButton, mAcceptFriendReqButton, mDeclineFriendReqButton, messageUser;
     private RelativeLayout acceptDeclineLayout;
     private CircleImageView mProfileImage;
@@ -98,7 +98,7 @@ public class UserProfileFragment extends Fragment implements PostAdapter.OnItemC
             Log.e(TAG, "onCreateView: ", e);
         }
 
-
+        emptyMessage = view.findViewById(R.id.userprofile_emptyMessage);
         UserNameTv = view.findViewById(R.id.userprofileFragment_user_name_TextView);
         UserUsernameTv = view.findViewById(R.id.userprofileFragment_userName_TextView);
         UserDescriptionTv = view.findViewById(R.id.userprofileFragment_user_description_TextView);
@@ -513,9 +513,8 @@ public class UserProfileFragment extends Fragment implements PostAdapter.OnItemC
                     Log.d(TAG, "onEvent: Querry result is null");
                 }
                 if (mPostList.isEmpty()) {
-                    mPostList.add(new Post(null, "", "", "", "", 0, 0
-                            , "This user hasn't posted anything yet :)", ""
-                            , false, "Everyone", null));
+                    emptyMessage.setVisibility(View.VISIBLE);
+                    mRecyclerView.setVisibility(View.INVISIBLE);
                     Log.d(TAG, "EMPTY: ");
                 }
                 mAdapter.notifyDataSetChanged();

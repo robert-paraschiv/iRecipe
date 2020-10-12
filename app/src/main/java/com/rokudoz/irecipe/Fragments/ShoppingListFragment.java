@@ -344,77 +344,81 @@ public class ShoppingListFragment extends Fragment {
             public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
                 if (e == null && documentSnapshot != null) {
                     ingredient_categories = (List<String>) documentSnapshot.get("categories");
-                    Log.d(TAG, "onEvent: categories " + ingredient_categories);
-                    categories = ingredient_categories.toArray(new String[0]);
 
-                    // Add ingredient Manually
-                    addIngredientToListFab.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
+                    if (ingredient_categories != null) {
+                        Log.d(TAG, "onEvent: categories " + ingredient_categories);
+                        categories = ingredient_categories.toArray(new String[0]);
 
-                            View dialogView = getLayoutInflater().inflate(R.layout.dialog_add_toshoppinglist, (ViewGroup) view, false);
+                        // Add ingredient Manually
+                        addIngredientToListFab.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
 
-                            final TextInputEditText input = dialogView.findViewById(R.id.dialog_add_shoppingList_ingredientName_input);
-                            final TextInputEditText inputQuantity = dialogView.findViewById(R.id.dialog_add_shoppingList_ingredientQuantity_input);
-                            final Spinner categorySpinner = dialogView.findViewById(R.id.dialog_add_shoppingList_categorySpinner);
-                            final Spinner quantityTypeSpinner = dialogView.findViewById(R.id.dialog_add_shoppingList_quantityTypeSpinner);
-                            final MaterialButton confirmBtn = dialogView.findViewById(R.id.dialog_add_shoppingList_confirmBtn);
-                            final MaterialButton cancelBtn = dialogView.findViewById(R.id.dialog_add_shoppingList_cancelBtn);
+                                View dialogView = getLayoutInflater().inflate(R.layout.dialog_add_toshoppinglist, (ViewGroup) view, false);
 
-                            ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_dropdown_item, categories);
-                            categorySpinner.setAdapter(adapter);
+                                final TextInputEditText input = dialogView.findViewById(R.id.dialog_add_shoppingList_ingredientName_input);
+                                final TextInputEditText inputQuantity = dialogView.findViewById(R.id.dialog_add_shoppingList_ingredientQuantity_input);
+                                final Spinner categorySpinner = dialogView.findViewById(R.id.dialog_add_shoppingList_categorySpinner);
+                                final Spinner quantityTypeSpinner = dialogView.findViewById(R.id.dialog_add_shoppingList_quantityTypeSpinner);
+                                final MaterialButton confirmBtn = dialogView.findViewById(R.id.dialog_add_shoppingList_confirmBtn);
+                                final MaterialButton cancelBtn = dialogView.findViewById(R.id.dialog_add_shoppingList_cancelBtn);
 
-                            final Dialog dialog = new Dialog(getContext(), R.style.CustomBottomSheetDialogTheme);
-                            dialog.setContentView(dialogView);
+                                ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_dropdown_item, categories);
+                                categorySpinner.setAdapter(adapter);
 
-                            input.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-                                @Override
-                                public void onFocusChange(View v, boolean hasFocus) {
-                                    input.post(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            InputMethodManager inputMethodManager= (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-                                            inputMethodManager.showSoftInput(input, InputMethodManager.SHOW_IMPLICIT);
-                                        }
-                                    });
-                                }
-                            });
-                            input.requestFocus();
+                                final Dialog dialog = new Dialog(getContext(), R.style.CustomBottomSheetDialogTheme);
+                                dialog.setContentView(dialogView);
 
-                            confirmBtn.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    if (input.getText().toString().trim().equals("") || inputQuantity.getText().toString().trim().equals("")) {
-                                        Toast.makeText(getActivity(), "You need to fill in all the info", Toast.LENGTH_SHORT).show();
-                                    } else {
+                                input.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+                                    @Override
+                                    public void onFocusChange(View v, boolean hasFocus) {
+                                        input.post(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                InputMethodManager inputMethodManager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                                                inputMethodManager.showSoftInput(input, InputMethodManager.SHOW_IMPLICIT);
+                                            }
+                                        });
+                                    }
+                                });
+                                input.requestFocus();
 
-                                        int quantity = Integer.parseInt(inputQuantity.getText().toString());
-                                        Ingredient ingredient = new Ingredient(input.getText().toString(), categorySpinner.getSelectedItem().toString(),
-                                                (float) quantity, quantityTypeSpinner.getSelectedItem().toString(), false);
-
-                                        if (shoppingList_withCategories.contains(ingredient)) {
-                                            Toast.makeText(getActivity(), "" + input.getText().toString() + " is already in your shopping list", Toast.LENGTH_SHORT).show();
+                                confirmBtn.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        if (input.getText().toString().trim().equals("") || inputQuantity.getText().toString().trim().equals("")) {
+                                            Toast.makeText(getActivity(), "You need to fill in all the info", Toast.LENGTH_SHORT).show();
                                         } else {
-                                            usersReference.document(userDocumentID).collection("ShoppingList").add(ingredient).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                                                @Override
-                                                public void onSuccess(DocumentReference documentReference) {
-                                                    Log.d(TAG, "onSuccess: added to db");
-                                                }
-                                            });
+
+                                            int quantity = Integer.parseInt(inputQuantity.getText().toString());
+                                            Ingredient ingredient = new Ingredient(input.getText().toString(), categorySpinner.getSelectedItem().toString(),
+                                                    (float) quantity, quantityTypeSpinner.getSelectedItem().toString(), false);
+
+                                            if (shoppingList_withCategories.contains(ingredient)) {
+                                                Toast.makeText(getActivity(), "" + input.getText().toString() + " is already in your shopping list", Toast.LENGTH_SHORT).show();
+                                            } else {
+                                                usersReference.document(userDocumentID).collection("ShoppingList").add(ingredient).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                                                    @Override
+                                                    public void onSuccess(DocumentReference documentReference) {
+                                                        Log.d(TAG, "onSuccess: added to db");
+                                                    }
+                                                });
+                                            }
+                                            dialog.cancel();
                                         }
+                                    }
+                                });
+                                cancelBtn.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
                                         dialog.cancel();
                                     }
-                                }
-                            });
-                            cancelBtn.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    dialog.cancel();
-                                }
-                            });
-                            dialog.show();
-                        }
-                    });
+                                });
+                                dialog.show();
+                            }
+                        });
+                    }
+
                 }
             }
         });

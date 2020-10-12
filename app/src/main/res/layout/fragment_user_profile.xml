@@ -101,7 +101,6 @@
                                 tools:text="Description" />
 
                             <com.google.android.material.button.MaterialButton
-                                app:cornerRadius="@dimen/buttonCornerRadius"
                                 android:id="@+id/userprofile_addFriend_MaterialButton"
                                 style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                                 android:layout_width="wrap_content"
@@ -113,6 +112,7 @@
                                 android:text="Add friend"
                                 android:textSize="14sp"
                                 android:visibility="gone"
+                                app:cornerRadius="@dimen/buttonCornerRadius"
                                 tools:visibility="visible" />
 
                             <RelativeLayout
@@ -135,7 +135,6 @@
                                     android:textSize="15sp" />
 
                                 <com.google.android.material.button.MaterialButton
-                                    app:cornerRadius="@dimen/buttonCornerRadius"
                                     android:id="@+id/userprofile_acceptFriend_MaterialButton"
                                     style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                                     android:layout_width="wrap_content"
@@ -144,10 +143,10 @@
                                     android:layout_alignParentStart="true"
                                     android:layout_marginTop="8dp"
                                     android:text="Accept"
-                                    android:textSize="14sp" />
+                                    android:textSize="14sp"
+                                    app:cornerRadius="@dimen/buttonCornerRadius" />
 
                                 <com.google.android.material.button.MaterialButton
-                                    app:cornerRadius="@dimen/buttonCornerRadius"
                                     android:id="@+id/userprofile_declineFriendReq_MaterialButton"
                                     style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                                     android:layout_width="wrap_content"
@@ -157,7 +156,8 @@
                                     android:layout_marginTop="8dp"
                                     android:layout_toEndOf="@id/userprofile_acceptFriend_MaterialButton"
                                     android:text="Decline"
-                                    android:textSize="14sp" />
+                                    android:textSize="14sp"
+                                    app:cornerRadius="@dimen/buttonCornerRadius" />
                             </RelativeLayout>
                         </RelativeLayout>
 
@@ -189,7 +189,7 @@
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/userprofile_MaterialCard"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="35dp"
             android:layout_margin="4dp"
             app:cardCornerRadius="12dp">
 
@@ -209,6 +209,17 @@
                     android:textSize="16sp" />
             </RelativeLayout>
         </com.google.android.material.card.MaterialCardView>
+
+        <TextView
+            android:layout_marginTop="40dp"
+            android:id="@+id/userprofile_emptyMessage"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/userprofile_MaterialCard"
+            android:gravity="center"
+            android:text="This user has not posted anything yet"
+            android:visibility="invisible"
+            tools:visibility="visible" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/userprofile_recycler_view"

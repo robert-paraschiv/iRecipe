@@ -70,7 +70,7 @@ public class FeedFragment extends Fragment implements FeedAdapter.OnItemClickLis
     private int indexOfAdToLoad = 0;
 
     public View view;
-    private TextView unreadMessagesTv;
+    private TextView unreadMessagesTv, emptyMessage;
     private MaterialCardView messagesCardView;
 
     private ProgressBar pbLoading;
@@ -128,6 +128,7 @@ public class FeedFragment extends Fragment implements FeedAdapter.OnItemClickLis
 
             mUser = new User();
             pbLoading = view.findViewById(R.id.homeFragment_pbLoading);
+            emptyMessage = view.findViewById(R.id.feedFragment_emptyMessage);
             addPostFab = view.findViewById(R.id.fab_add_recipe);
 //            scheduleFab = view.findViewById(R.id.fab_calendar_schedule);
             mRecyclerView = view.findViewById(R.id.recycler_view);
@@ -483,9 +484,8 @@ public class FeedFragment extends Fragment implements FeedAdapter.OnItemClickLis
                     Log.d(TAG, "onEvent: Querry result is null");
                 }
                 if (mPostList.isEmpty()) {
-                    mPostList.add(new Post(null, "", "", "", "", 0, 0
-                            , "Add friends to see posts just like this one", ""
-                            , false, "Everyone", null));
+                    emptyMessage.setVisibility(View.VISIBLE);
+                    mRecyclerView.setVisibility(View.INVISIBLE);
                     Log.d(TAG, "EMPTY: ");
                 }
 //                mAdapter.notifyDataSetChanged();
