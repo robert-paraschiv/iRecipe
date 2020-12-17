@@ -284,10 +284,14 @@ public class PostDetailedFragment extends Fragment {
                     return;
                 }
 
+                Post initialPost = null;
                 if (documentSnapshot != null) {
-                    final Post post = documentSnapshot.toObject(Post.class);
-                    if (post != null)
-                        post.setDocumentId(documentSnapshot.getId());
+                    initialPost = documentSnapshot.toObject(Post.class);
+                }
+                if (initialPost != null) {
+                    final Post post = initialPost;
+
+                    post.setDocumentId(documentSnapshot.getId());
 
                     if (post.getCreation_date() != null) {
                         Date date = post.getCreation_date();
